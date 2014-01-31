@@ -85,13 +85,13 @@ player::main_loop()
 	/* Set of commands that can be performed on the player. */
 	command_set PLAYER_CMDS = {
 		/* Nullary commands */
-		{ "play", [&](const std::vector<std::string> &words) { return this->cmd_play(); } },
-		{ "stop", [&](const std::vector<std::string> &words) { return this->cmd_stop(); } },
-		{ "ejct", [&](const std::vector<std::string> &words) { return this->cmd_ejct(); } },
-		{ "quit", [&](const std::vector<std::string> &words) { return this->cmd_quit(); } },
+		{ "play", [&](const cmd_words &) { return this->cmd_play(); } },
+		{ "stop", [&](const cmd_words &) { return this->cmd_stop(); } },
+		{ "ejct", [&](const cmd_words &) { return this->cmd_ejct(); } },
+		{ "quit", [&](const cmd_words &) { return this->cmd_quit(); } },
 		/* Unary commands */
-		{ "load", [&](const std::vector<std::string> &words) { return this->cmd_load(words[1]); } },
-		{ "seek", [&](const std::vector<std::string> &words) { return this->cmd_load(words[1]); } }
+		{ "load", [&](const cmd_words &words) { return this->cmd_load(words[1]); } },
+		{ "seek", [&](const cmd_words &words) { return this->cmd_load(words[1]); } }
 	};
 
 	response(R_OHAI, "%s", MSG_OHAI);	/* Say hello */
