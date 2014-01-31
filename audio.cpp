@@ -220,8 +220,7 @@ audio::decode()
 						     this->frame_ptr,
 						 (ring_buffer_size_t)count);
 		if (num_written != count)
-			err = error(E_INTERNAL_ERROR, "ringbuf write error");
-
+			throw error(E_INTERNAL_ERROR, "ringbuf write error");
 		this->frame_samples -= num_written;
 		this->frame_ptr += this->av->samples2bytes(num_written);
 	}
