@@ -48,6 +48,9 @@ audio::audio(const std::string &path, int device)
 
 	init_sink(device);
 	init_ring_buf(this->av->samples2bytes(1L));
+
+	this->frame_ptr = nullptr;
+	this->frame_samples = 0;
 }
 
 audio::~audio()
@@ -128,15 +131,6 @@ audio::usec()
 	return this->av->samples2usec(this->used_samples);
 }
 
-/* Gets the ring buffer that the playing callback should use to get decoded
- * samples.
- */
-PaUtilRingBuffer *
-audio::ringbuf()
-{
-	return this->ring_buf;
-}
-
 size_t
 audio::samples2bytes(size_t samples)
 {
@@ -154,7 +148,7 @@ audio::spin_up()
 {
 	ring_buffer_size_t  c;
 	enum error	err;
-	PaUtilRingBuffer *r = this->ring_buf;
+	PaUtilRingBuffer *r = this->ring_buf.get();
 
     /* Either fill the ringbuf or hit the maximum spin-up size,
      * whichever happens first.  (There's a maximum in order to
@@ -180,7 +174,7 @@ audio::seek_usec(uint64_t usec)
 	size_t samples = this->av->usec2samples(usec);
 
 	while (!Pa_IsStreamStopped(this->out_strm)); // Spin until stream finishes
-	PaUtil_FlushRingBuffer(this->ring_buf);
+	PaUtil_FlushRingBuffer(this->ring_buf.get());
 
 	this->av->seek(usec);
 
@@ -209,7 +203,7 @@ audio::decode()
 		/* We need to decode some new frames! */
 		this->av->decode(&(this->frame_ptr), &(this->frame_samples));
 	}
-	cap = (unsigned long)PaUtil_GetRingBufferWriteAvailable(this->ring_buf);
+	cap = (unsigned long)PaUtil_GetRingBufferWriteAvailable(this->ring_buf.get());
 	count = (cap < this->frame_samples ? cap : this->frame_samples);
 	if (count > 0 && err == E_OK) {
 		/*
@@ -218,7 +212,7 @@ audio::decode()
 		 */
 		unsigned long	num_written;
 
-		num_written = PaUtil_WriteRingBuffer(this->ring_buf,
+		num_written = PaUtil_WriteRingBuffer(this->ring_buf.get(),
 						     this->frame_ptr,
 						 (ring_buffer_size_t)count);
 		if (num_written != count)
@@ -242,6 +236,11 @@ audio::init_sink(int device)
 	sample_rate = this->av->sample_rate();
 
 	size_t samples_per_buf = this->av->pa_config(device, &pars);
+	
+	auto callback = [this](char *out, unsigned long frames_per_buf) {
+		return this->cb_play(out, frames_per_buf);
+	};
+
 	pa_err = Pa_OpenStream(&this->out_strm,
 			       NULL,
 			       &pars,
@@ -249,7 +248,7 @@ audio::init_sink(int device)
 			       samples_per_buf,
 			       paClipOff,
 			       audio_cb_play,
-			       static_cast<void *>(this));
+				   static_cast<void *>(&callback));
 	if (pa_err) {
 		throw error(E_AUDIO_INIT_FAIL, "couldn't open stream: %i samplerate %d", pa_err, sample_rate);
 	}
@@ -271,12 +270,12 @@ audio::init_ring_buf(size_t bytes_per_sample)
 	/* Get rid of any existing ring buffer stuff */
 	free_ring_buf();
 
-	this->ring_data = new char[RINGBUF_SIZE * bytes_per_sample];
-	this->ring_buf = new PaUtilRingBuffer;
-	if (PaUtil_InitializeRingBuffer(this->ring_buf,
-		(ring_buffer_size_t)bytes_per_sample,
-		(ring_buffer_size_t)RINGBUF_SIZE,
-		this->ring_data) != 0) {
+	this->ring_data = std::unique_ptr<char[]>(new char[RINGBUF_SIZE * bytes_per_sample]);
+	this->ring_buf = std::unique_ptr<PaUtilRingBuffer>(new PaUtilRingBuffer);
+	if (PaUtil_InitializeRingBuffer(this->ring_buf.get(),
+		static_cast<ring_buffer_size_t>(bytes_per_sample),
+		static_cast<ring_buffer_size_t>(RINGBUF_SIZE),
+		this->ring_data.get()) != 0) {
 		throw error(E_INTERNAL_ERROR, "ringbuf failed to init");
 	}
 }
@@ -285,12 +284,4 @@ audio::init_ring_buf(size_t bytes_per_sample)
 void
 audio::free_ring_buf()
 {
-	if (this->ring_buf != NULL) {
-		dbug("freeing existing ringbuf");
-		delete this->ring_buf;
-	}
-	if (this->ring_data != NULL) {
-		dbug("freeing existing ringbuf data buffer");
-		delete this->ring_data;
-	}
 }
