@@ -162,7 +162,7 @@ audio::spin_up()
 	/* Allow EOF, this'll be caught by the player callback once it hits the
 	 * end of file itself
 	 */
-	if (err != E_EOF) {
+	if (err != E_OK && err != E_EOF) {
 		throw err;
 	}
 }
