@@ -94,6 +94,7 @@ private:
 	PaStream *out_strm;	/* Output stream */
 	int device_id;	/* PortAudio device ID */
 	uint64_t used_samples;	/* Counter of samples played */
+	std::function<int(char *, unsigned long)> callback;
 
 	void init_sink(int device);
 	void init_ring_buf(size_t bytes_per_sample);

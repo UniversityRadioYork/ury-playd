@@ -51,6 +51,10 @@ audio::audio(const std::string &path, int device)
 
 	this->frame_ptr = nullptr;
 	this->frame_samples = 0;
+
+	this->callback = [this](char *out, unsigned long frames_per_buf) {
+		return this->cb_play(out, frames_per_buf);
+	};
 }
 
 audio::~audio()
@@ -236,10 +240,6 @@ audio::init_sink(int device)
 	sample_rate = this->av->sample_rate();
 
 	size_t samples_per_buf = this->av->pa_config(device, &pars);
-	
-	auto callback = [this](char *out, unsigned long frames_per_buf) {
-		return this->cb_play(out, frames_per_buf);
-	};
 
 	pa_err = Pa_OpenStream(&this->out_strm,
 			       NULL,
@@ -248,7 +248,7 @@ audio::init_sink(int device)
 			       samples_per_buf,
 			       paClipOff,
 			       audio_cb_play,
-				   static_cast<void *>(&callback));
+				   static_cast<void *>(&this->callback));
 	if (pa_err) {
 		throw error(E_AUDIO_INIT_FAIL, "couldn't open stream: %i samplerate %d", pa_err, sample_rate);
 	}
