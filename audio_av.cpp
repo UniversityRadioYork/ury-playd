@@ -224,7 +224,7 @@ au_in::conv_sample_fmt(enum AVSampleFormat in)
 		out = paFloat32;
 		break;
 	default:
-		throw E_BAD_FILE;
+		throw error(E_BAD_FILE, "unusable sample rate");
 	}
 
 	return out;
@@ -258,7 +258,7 @@ au_in::load_file(const std::string &path)
 		path.c_str(),
 		NULL,
 		NULL) < 0) {
-		throw E_NO_FILE;
+		throw error(E_NO_FILE, "couldn't open %s", path.c_str());
 	}
 
 	auto free_context = [](AVFormatContext *ctx) { avformat_close_input(&ctx); };
@@ -273,7 +273,7 @@ au_in::init_stream()
 	enum error	err = E_OK;
 
 	if (avformat_find_stream_info(this->context.get(), NULL) < 0) {
-		throw E_BAD_FILE;
+		throw error(E_BAD_FILE, "no audio stream in file");
 	}
 
 	stream = av_find_best_stream(this->context.get(),
@@ -284,7 +284,7 @@ au_in::init_stream()
 	  0);
 
 	if (stream < 0) {
-		throw E_BAD_FILE;
+		throw error(E_BAD_FILE, "can't open codec for file");
 	}
 
 	init_codec(stream, codec);
@@ -296,8 +296,9 @@ au_in::init_codec(int stream, AVCodec *codec)
 	enum error	err = E_OK;
 
 	AVCodecContext *codec_context = this->context->streams[stream]->codec;
-	if (avcodec_open2(codec_context, codec, NULL) < 0)
-		throw E_BAD_FILE;
+	if (avcodec_open2(codec_context, codec, NULL) < 0) {
+		throw error(E_BAD_FILE, "can't open codec for file");
+	}
 
 	this->stream = this->context->streams[stream];
 	this->stream_id = stream;
@@ -308,8 +309,9 @@ au_in::init_frame()
 {
 	auto frame_deleter = [](AVFrame *frame) { avcodec_free_frame(&frame); };
 	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(avcodec_alloc_frame(), frame_deleter);
-	if (this->frame == nullptr)
-		throw E_NO_MEM;
+	if (this->frame == nullptr) {
+		throw error(E_NO_MEM, "can't alloc frame");
+	}
 }
 
 void
