@@ -53,33 +53,35 @@
  */
 int
 audio_cb_play(const void *in,
-	      void *out,
-	      unsigned long frames_per_buf,
-	      const PaStreamCallbackTimeInfo *timeInfo,
-	      PaStreamCallbackFlags statusFlags,
-	      void *v_au)
+void *out,
+unsigned long frames_per_buf,
+const PaStreamCallbackTimeInfo *timeInfo,
+PaStreamCallbackFlags statusFlags,
+void *v_au)
+{
+	char *cout = static_cast<char *>(out);
+	auto f = static_cast<std::function<int(char *, unsigned long)> *>(v_au);
+
+	return (*f)(cout, frames_per_buf);
+}
+
+int
+audio::cb_play(char *out, unsigned long frames_per_buf)
 {
 	unsigned long avail;
 	PaStreamCallbackResult result = paContinue;
-	audio *au = static_cast<audio *>(v_au);
-	char *cout = static_cast<char *>(out);
-	unsigned long frames_written = 0;
-	PaUtilRingBuffer *buffer = au->ringbuf();
 
-	/* Ignoring these arguments */
-	in = (const void *)in;
-	timeInfo = (const PaStreamCallbackTimeInfo *)timeInfo;
-	statusFlags = (int)statusFlags;
+	unsigned long frames_written = 0;
 
 	while (result == paContinue && frames_written < frames_per_buf) {
-		avail = PaUtil_GetRingBufferReadAvailable(buffer);
+		avail = PaUtil_GetRingBufferReadAvailable(this->ring_buf.get());
 		if (avail == 0) {
 			/*
 			 * We've run out of sound, ruh-roh. Let's see if
 			 * something went awry during the last decode
 			 * cycle...
 			 */
-			switch (au->last_error()) {
+			switch (last_error()) {
 			case E_EOF:
 				/*
 				 * We've just hit the end of the file.
@@ -96,9 +98,9 @@ audio_cb_play(const void *in,
 				 */
 				dbug("buffer underflow");
 				/* Break out of the loop inelegantly */
-				memset(cout,
+				memset(out,
 				       0,
-				       au->samples2bytes(frames_per_buf)
+				       samples2bytes(frames_per_buf)
 					);
 				frames_written = frames_per_buf;
 				break;
@@ -108,7 +110,7 @@ audio_cb_play(const void *in,
 				break;
 			}
 		} else {
-			unsigned long	samples;
+			unsigned long samples;
 
 			/* How many samples do we have? */
 			if (avail > frames_per_buf - frames_written)
@@ -120,11 +122,11 @@ audio_cb_play(const void *in,
 			 * TODO: handle the ulong->long cast more gracefully,
 			 * perhaps.
 			 */
-			cout += PaUtil_ReadRingBuffer(buffer,
-						      cout,
+			out += PaUtil_ReadRingBuffer(this->ring_buf.get(),
+						      out,
 					       (ring_buffer_size_t)samples);
 			frames_written += samples;
-			au->inc_used_samples(samples);
+			inc_used_samples(samples);
 		}
 	}
 	return (int)result;

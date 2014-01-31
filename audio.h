@@ -74,7 +74,6 @@ public:
 	enum error last_error();	/* Gets last playback error */
 	bool halted();	/* Has stream halted itself? */
 	uint64_t usec();	/* Current time in song */
-	PaUtilRingBuffer *ringbuf();	/* Get ring buffer */
 
 	void seek_usec(uint64_t usec);
 	void inc_used_samples(uint64_t samples);
@@ -90,8 +89,8 @@ private:
 	char *frame_ptr;
 	size_t frame_samples;
 	/* PortAudio state */
-	PaUtilRingBuffer *ring_buf;
-	char *ring_data;
+	std::unique_ptr<PaUtilRingBuffer> ring_buf;
+	std::unique_ptr<char[]> ring_data;
 	PaStream *out_strm;	/* Output stream */
 	int device_id;	/* PortAudio device ID */
 	uint64_t used_samples;	/* Counter of samples played */
@@ -99,6 +98,8 @@ private:
 	void init_sink(int device);
 	void init_ring_buf(size_t bytes_per_sample);
 	void free_ring_buf();
+
+	int cb_play(char *out, unsigned long frames_per_buf);
 };
 
 #endif				/* not AUDIO_H */
