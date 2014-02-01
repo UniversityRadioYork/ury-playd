@@ -50,7 +50,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavcodec/version.h>		/* For old version patchups */
 #include <libavformat/avformat.h>
-#include <libavresample/avresample.h>
+#include <libswresample/swresample.h>
 #include <libavutil/opt.h>
 }
 
@@ -68,6 +68,7 @@ setup_pa(PaSampleFormat sf, int device,
 
 au_in::au_in(const std::string &path)
 {
+	this->resample_buffer = nullptr;
 	this->buffer = std::unique_ptr<unsigned char[]>(new unsigned char[BUFFER_SIZE]);
 	
 	load_file(path);
@@ -87,12 +88,6 @@ au_in::~au_in()
 void
 au_in::init_resampler()
 {
-	auto resampler_deleter = [](AVAudioResampleContext *avr) { avresample_free(&avr); };
-	this->avr = std::unique_ptr<AVAudioResampleContext, decltype(resampler_deleter)>(avresample_alloc_context(), resampler_deleter);
-	if (this->avr == nullptr) {
-		throw E_NO_MEM;
-	}
-
 	this->use_resampler = false;
 }
 
@@ -188,7 +183,45 @@ au_in::decode(char **buf, size_t *n)
 			more = false;
 		}
 		else if (this->packet->stream_index == this->stream_id) {
-			complete = decode_packet(buf, n);
+			complete = decode_packet();
+
+			if (complete) {
+				if (this->use_resampler) {
+					auto resample_buffer_deleter = [](uint8_t *buffer){ av_freep(&buffer); };
+					uint8_t *rbuf;
+
+					int in_samples = this->frame->nb_samples;
+					int rate = this->frame->sample_rate;
+					int out_samples = swr_get_delay(this->resampler.get(), rate) + in_samples;
+
+					if(av_samples_alloc(
+						&rbuf,
+						nullptr,
+						av_frame_get_channels(this->frame.get()),
+						out_samples,
+						this->sample_format,
+						0) < 0) {
+						throw E_INTERNAL_ERROR;
+					}
+
+					this->resample_buffer = std::unique_ptr<uint8_t, decltype(resample_buffer_deleter)>(rbuf, resample_buffer_deleter);
+
+					*n = (size_t)swr_convert(
+						this->resampler.get(),
+						&rbuf,
+						out_samples,
+						const_cast<const uint8_t**>(this->frame->extended_data),
+						this->frame->nb_samples);
+
+					*buf = (char *)this->resample_buffer.get();
+					*n = out_samples;
+				}
+				else {
+					// Only use first channel, as we have packed data.
+					*buf = (char *)this->frame->extended_data[0];
+					*n = this->frame->nb_samples;
+				}
+			}
 		}
 	}
 
@@ -208,13 +241,35 @@ au_in::conv_sample_fmt(enum AVSampleFormat in)
 
 	/* We need to convert planar samples into packed samples. */
 	if (av_sample_fmt_is_planar(in)) {
-		av_opt_set_int(this->avr.get(), "in_sample_fmt", in, 0);
-		in = av_get_packed_sample_fmt(in);
-		av_opt_set_int(this->avr.get(), "out_sample_fmt", in, 0);
+		this->sample_format = av_get_packed_sample_fmt(in);
+
+		auto resampler_deleter = [](SwrContext *avr) { swr_free(&avr); };
+		this->resampler = std::unique_ptr<SwrContext, decltype(resampler_deleter)>(
+			swr_alloc_set_opts(
+			nullptr,
+			this->stream->codec->channel_layout,
+			this->sample_format,
+			this->stream->codec->sample_rate,
+			this->stream->codec->channel_layout,
+			in,
+			this->stream->codec->sample_rate,
+			0,
+			nullptr
+			), resampler_deleter);
+		if (this->resampler == nullptr) {
+			throw E_NO_MEM;
+		}
+
+		swr_init(this->resampler.get());
 		this->use_resampler = true;
 	}
+	else {
+		this->sample_format = in;
+		this->resampler = nullptr;
+		this->use_resampler = false;
+	}
 
-	switch (in) {
+	switch (this->sample_format) {
 	case AV_SAMPLE_FMT_U8:
 		out = paUInt8;
 		break;
@@ -333,7 +388,7 @@ au_in::init_packet()
 /*  Also see the non-static functions for the frontend for frame decoding */
 
 bool
-au_in::decode_packet(char **buf, size_t *n)
+au_in::decode_packet()
 {
 	int		frame_finished = 0;
 
@@ -343,11 +398,6 @@ au_in::decode_packet(char **buf, size_t *n)
 				  this->packet.get()) < 0) {
 		/* Decode error */
 		throw error(E_BAD_FILE, "decoding error");
-	}
-	if (frame_finished) {
-		/* Record data that we'll use in the play loop */
-		*buf = (char *)this->frame->extended_data[0];
-		*n = this->frame->nb_samples;
 	}
 	return frame_finished;
 }

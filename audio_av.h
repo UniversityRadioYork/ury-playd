@@ -43,7 +43,7 @@
 #include <cstdint>		/* uint64_t */
 
 #include <libavformat/avformat.h>
-#include <libavresample/avresample.h>
+#include <libswresample/swresample.h>
 #include <portaudio.h>		/* PaStreamParameters */
 
 #include "cuppa/errors.h"	/* enum error */
@@ -75,14 +75,20 @@ public:
 	size_t		samples2bytes(size_t samples);
 
 private:
-	AVStream       *stream;
+	AVStream *stream;
+	int stream_id;
+
 	std::unique_ptr<AVFormatContext, std::function<void(AVFormatContext *)>> context;
 	std::unique_ptr<AVPacket, std::function<void(AVPacket *)>> packet;	/* Last undecoded packet */
 	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>> frame;	/* Last decoded frame */
-	std::unique_ptr<AVAudioResampleContext, std::function<void(AVAudioResampleContext *)>> avr;
 	std::unique_ptr<unsigned char []> buffer;
-	int		stream_id;
+
+
+	std::unique_ptr<SwrContext, std::function<void(SwrContext *)>> resampler;
+	enum AVSampleFormat sample_format;
 	bool use_resampler;
+	std::unique_ptr<uint8_t, std::function<void(uint8_t *)>> resample_buffer;
+
 
 	void load_file(const std::string &path);
 	void init_stream();
@@ -95,7 +101,7 @@ private:
 
 	void au_in::setup_pa(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars);
 		
-	bool decode_packet(char **buf, size_t *n);
+	bool decode_packet();
 };
 
 /* A structure containing a lump of decoded frame data.
