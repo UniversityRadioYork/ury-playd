@@ -34,13 +34,10 @@
 #ifndef CUPPA_CMD_H
 #define CUPPA_CMD_H
 
+#include <memory>
 #include <functional>
 #include <unordered_map>
 
-#include <stdio.h>		/* FILE */
-
-#include "constants.h"		/* WORD_LEN */
-#include "errors.h"		/* enum error */
 
 #ifdef IGNORE
 #undef IGNORE
@@ -52,7 +49,11 @@ typedef std::unordered_map<std::string, payload> command_set;
 
 class CommandHandler {
 public:
+	CommandHandler(const command_set &commands);
+	bool Run(const cmd_words &words);
+
 private:
+	std::unique_ptr<command_set> commands;
 };
 
 enum error	check_commands(const command_set &cmds);

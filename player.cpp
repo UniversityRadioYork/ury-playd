@@ -50,6 +50,7 @@ struct timespec
 
 #include "audio.h"
 #include "constants.h"
+#include "cuppa/constants.h"
 #include "messages.h"
 #include "player.h"
 

@@ -53,9 +53,35 @@ typedef SSIZE_T ssize_t;
 #include "errors.h"		/* error */
 #include "io.h"			/* response */
 #include "messages.h"		/* Messages (usually errors) */
-#include "utils.h"		/* skip_space, nullify_space, skip_unspace */
 
-static bool exec_cmd(const command_set &cmds, const cmd_words &words);
+/**
+ * Constructs a CommandHandler.
+ * @param commands The map of commands to their handlers to use for this
+ *   CommandHandler: this map will be copied.
+ */
+CommandHandler::CommandHandler(const command_set &commands)
+{
+	this->commands = std::unique_ptr<command_set>(new command_set(commands));
+}
+
+/**
+ * Runs a command.
+ * @param words The words that form the command: the first word is taken to be
+ *   the command name.
+ * @return true if the command was valid; false otherwise.
+ */
+bool CommandHandler::Run(const cmd_words &words)
+{
+	bool valid = false;
+
+	auto commandIter = this->commands->find(words[0]);
+	if (commandIter != this->commands->end()) {
+		valid = commandIter->second(words);
+	}
+
+	return valid;
+}
+
 static cmd_words tokenise(const std::string &line);
 
 /*
@@ -105,7 +131,8 @@ handle_cmd(const command_set &cmds)
 			err = error(E_BAD_COMMAND, MSG_CMD_NOWORD);
 	}
 	if (err == E_OK) {
-		bool valid = exec_cmd(cmds, words);
+		CommandHandler ch = CommandHandler(cmds);
+		bool valid = ch.Run(words);
 
 		if (valid) {
 			response(R_OKAY, input.c_str());
@@ -141,17 +168,4 @@ tokenise(const std::string &line)
 	}
 
 	return words;
-}
-
-static bool
-exec_cmd(const command_set &cmds, const cmd_words &words)
-{
-	bool valid = false;
-
-	auto cmd = cmds.at(words[0]);
-	if (cmd != nullptr) {
-		valid = cmd(words);
-	}
-
-	return valid;
 }
