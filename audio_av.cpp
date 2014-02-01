@@ -243,24 +243,36 @@ au_in::conv_sample_fmt(enum AVSampleFormat in)
 		this->use_resampler = false;
 	}
 
-	switch (this->sample_format) {
+	return SampleFormatAVToPA(this->sample_format);
+}
+
+/**
+ * Converts a sample format enumeration from FFmpeg to PortAudio.
+ * @param av_format The FFmpeg input format (must be packed).
+ * @return The corresponding PortAudio format.
+ * @note This only works for a small range of sample formats.
+ */
+PaSampleFormat au_in::SampleFormatAVToPA(AVSampleFormat av_format) {
+	PaSampleFormat pa_format = paUInt8;
+
+	switch (av_format) {
 	case AV_SAMPLE_FMT_U8:
-		out = paUInt8;
+		pa_format = paUInt8;
 		break;
 	case AV_SAMPLE_FMT_S16:
-		out = paInt16;
+		pa_format = paInt16;
 		break;
 	case AV_SAMPLE_FMT_S32:
-		out = paInt32;
+		pa_format = paInt32;
 		break;
 	case AV_SAMPLE_FMT_FLT:
-		out = paFloat32;
+		pa_format = paFloat32;
 		break;
 	default:
 		throw error(E_BAD_FILE, "unusable sample rate");
 	}
 
-	return out;
+	return pa_format;
 }
 
 /* Sets up a PortAudio parameter set ready for ffmpeg frames to be thrown at it.

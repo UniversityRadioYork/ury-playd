@@ -71,6 +71,8 @@ private:
 		
 	bool decode_packet();
 	void Resample(char **buf, size_t *n);
+
+	PaSampleFormat SampleFormatAVToPA(AVSampleFormat av_format);
 };
 
 /* A structure containing a lump of decoded frame data.
