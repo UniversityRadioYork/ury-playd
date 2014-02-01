@@ -1,0 +1,8 @@
+*cuppa* is the Common URY Playout Package Architecture, or a
+collection of C code intended for use in the
+playslave/listmaster/chanmux playout experiment.
+
+It is licenced under the terms of the 2-clause BSD licence (see
++LICENSE+ and the tops of code files); previous versions included
+within the +playslave+ repository were GPL and of course continue to
+be GPL.
