@@ -1,20 +1,3 @@
-/*
- * =============================================================================
- *
- *       Filename:  audio_cb.c
- *
- *    Description:  The audio callback
- *
- *        Version:  1.0
- *        Created:  25/12/2012 05:34:51
- *       Revision:  none
- *       Compiler:  clang
- *
- *         Author:  Matt Windsor (CaptainHayashi), matt.windsor@ury.org.uk
- *        Company:  University Radio York Computing Team
- *
- * =============================================================================
- */
 /*-
  * Copyright (C) 2012  University Radio York Computing Team
  *

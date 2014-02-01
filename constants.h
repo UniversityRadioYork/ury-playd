@@ -1,20 +1,3 @@
-/*
- * =============================================================================
- *
- *       Filename:  constants.h
- *
- *    Description:  Forward declarations of general constants
- *
- *        Version:  1.0
- *        Created:  24/12/2012 18:52:46
- *       Revision:  none
- *       Compiler:  clang
- *
- *         Author:  Matt Windsor (CaptainHayashi), matt.windsor@ury.org.uk
- *        Company:  University Radio York Computing Team
- *
- * =============================================================================
- */
 /*-
  * Copyright (C) 2012  University Radio York Computing Team
  *
@@ -47,19 +30,13 @@ extern "C" {
 #endif
 }
 
-/**  INCLUDES  ****************************************************************/
-
 #include <stdint.h>		/* int64_t */
-
-/**  MACROS  ******************************************************************/
 
 /* HOUSEKEEPING: Only put things in macros if they have to be constant at
  * compile-time (for example, array sizes).
  */
 
 #define SPINUP_SIZE (2 * BUFFER_SIZE)	/* Num. bytes to load before playing */
-
-/**  CONSTANTS  ***************************************************************/
 
 /* All of these are defined in constants.c.
  *

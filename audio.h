@@ -1,20 +1,3 @@
-/*
- * =============================================================================
- *
- *       Filename:  audio.h
- *
- *    Description:  Interface to the mid-level audio structure and functions
- *
- *        Version:  1.0
- *        Created:  25/12/2012 05:39:46
- *       Revision:  none
- *       Compiler:  clang
- *
- *         Author:  Matt Windsor (CaptainHayashi), matt.windsor@ury.org.uk
- *        Company:  University Radio York Computing Team
- *
- * =============================================================================
- */
 /*-
  * Copyright (C) 2012  University Radio York Computing Team
  *
@@ -37,8 +20,6 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-/**  INCLUDES  ****************************************************************/
-
 #include <memory> /* unique_ptr */
 
 #include <stdint.h>		/* uint64_t */
@@ -48,8 +29,6 @@
 #include "contrib/pa_ringbuffer.h"	/* PaUtilRingBuffer */
 
 #include "cuppa/errors.h"		/* enum error */
-
-/**  DATA TYPES  **************************************************************/
 
 /* The audio structure contains all state pertaining to the currently
  * playing audio file.

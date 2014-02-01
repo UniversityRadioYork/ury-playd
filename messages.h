@@ -1,20 +1,3 @@
-/*
- * =============================================================================
- *
- *       Filename:  messages.h
- *
- *    Description:  Forward declarations of messages.
- *
- *        Version:  1.0
- *        Created:  26/12/2012 01:34:44
- *       Revision:  none
- *       Compiler:  clang
- *
- *         Author:  Matt Windsor (CaptainHayashi), matt.windsor@ury.org.uk
- *        Company:  University Radio York Computing Team
- *
- * =============================================================================
- */
 /*-
  * Copyright (C) 2012  University Radio York Computing Team
  *
@@ -36,8 +19,6 @@
 
 #ifndef MESSAGES_H
 #define MESSAGES_H
-
-/**  CONSTANTS  ***************************************************************/
 
 /* All of these are defined in messages.c.
  *

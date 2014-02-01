@@ -1,20 +1,3 @@
-/*
- * =============================================================================
- *
- *       Filename:  main.c
- *
- *    Description:  Entry point.
- *
- *        Version:  1.0
- *        Created:  26/12/2012 01:41:52
- *       Revision:  none
- *       Compiler:  clang
- *
- *         Author:  Matt Windsor (CaptainHayashi), matt.windsor@ury.org.uk
- *        Company:  University Radio York Computing Team
- *
- * =============================================================================
- */
 /*-
  * Copyright (C) 2012  University Radio York Computing Team
  *
@@ -35,8 +18,6 @@
  */
 
 #define _POSIX_C_SOURCE 200809
-
-/**  INCLUDES  ****************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -59,11 +40,7 @@ extern "C" {
 #include "messages.h"		/* MSG_xyz */
 #include "player.h"
 
-/**  STATIC PROTOTYPES  *******************************************************/
-
 static PaDeviceIndex device_id(int argc, char *argv[]);
-
-/**  PUBLIC FUNCTIONS  ********************************************************/
 
 /* The main entry point. */
 int

@@ -19,8 +19,6 @@
 
 #define _POSIX_C_SOURCE 200809
 
-/**  INCLUDES  ****************************************************************/
-
 #include <memory>
 #include <sstream>
 #include <vector>

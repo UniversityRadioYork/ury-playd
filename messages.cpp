@@ -1,20 +1,3 @@
-/*
- * =============================================================================
- *
- *       Filename:  messages.c
- *
- *    Description:  Messages.  (Does exactly what it says on the tin...)
- *
- *        Version:  1.0
- *        Created:  26/12/2012 01:36:25
- *       Revision:  none
- *       Compiler:  clang
- *
- *         Author:  Matt Windsor (CaptainHayashi), matt.windsor@ury.org.uk
- *        Company:  University Radio York Computing Team
- *
- * =============================================================================
- */
 /*-
  * Copyright (C) 2012  University Radio York Computing Team
  *
@@ -33,9 +16,6 @@
  * playslave; if not, write to the Free Software Foundation, Inc., 51 Franklin
  * Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
-
-/**  GLOBAL VARIABLES  ********************************************************/
 
 const char     *MSG_DEV_BADID = "Incorrect device ID";
 const char     *MSG_DEV_NOID = "Expected a device ID as an argument";

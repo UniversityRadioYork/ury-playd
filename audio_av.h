@@ -1,21 +1,3 @@
-/*
- * =============================================================================
- *
- *       Filename:  audio_av.h
- *
- *    Description:  Interface to ffmpeg-specific code
- *
- *        Version:  1.0
- *        Created:  23/12/2012 01:19:42
- *       Revision:  none
- *       Compiler:  clang
- *
- *         Author:  Matt Windsor (CaptainHayashi), matt.windsor@ury.york.ac.uk
- *        Company:  University Radio York Computing Team
- *
- * =============================================================================
- */
-
 /*-
  * Copyright (C) 2012  University Radio York Computing Team
  *
