@@ -82,6 +82,7 @@ private:
 	std::unique_ptr<AVAudioResampleContext, std::function<void(AVAudioResampleContext *)>> avr;
 	std::unique_ptr<unsigned char []> buffer;
 	int		stream_id;
+	bool use_resampler;
 
 	void load_file(const std::string &path);
 	void init_stream();

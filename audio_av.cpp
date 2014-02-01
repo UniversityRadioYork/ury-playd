@@ -85,12 +85,15 @@ au_in::~au_in()
 }
 
 void
-au_in::init_resampler() {
+au_in::init_resampler()
+{
 	auto resampler_deleter = [](AVAudioResampleContext *avr) { avresample_free(&avr); };
 	this->avr = std::unique_ptr<AVAudioResampleContext, decltype(resampler_deleter)>(avresample_alloc_context(), resampler_deleter);
 	if (this->avr == nullptr) {
 		throw E_NO_MEM;
 	}
+
+	this->use_resampler = false;
 }
 
 size_t
@@ -208,6 +211,7 @@ au_in::conv_sample_fmt(enum AVSampleFormat in)
 		av_opt_set_int(this->avr.get(), "in_sample_fmt", in, 0);
 		in = av_get_packed_sample_fmt(in);
 		av_opt_set_int(this->avr.get(), "out_sample_fmt", in, 0);
+		this->use_resampler = true;
 	}
 
 	switch (in) {
