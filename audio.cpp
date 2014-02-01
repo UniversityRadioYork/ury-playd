@@ -170,15 +170,18 @@ void
 audio::seek_usec(uint64_t usec)
 {
 	size_t samples = this->av->usec2samples(usec);
-
-	while (!Pa_IsStreamStopped(this->out_strm)); // Spin until stream finishes
-	PaUtil_FlushRingBuffer(this->ring_buf.get());
-
 	this->av->seek(usec);
 
 	this->frame_samples = 0;
 	this->last_err = E_INCOMPLETE;
 	this->used_samples = samples;	/* Update position marker */
+
+	//while (!Pa_IsStreamStopped(this->out_strm)) {
+	//	decode();
+	//}; // Spin until stream finishes
+	PaUtil_FlushRingBuffer(this->ring_buf.get());
+
+
 }
 
 /* Increments the used samples counter, which is used to determine the current

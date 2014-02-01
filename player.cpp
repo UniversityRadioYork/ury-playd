@@ -179,14 +179,14 @@ player::cmd_seek(const std::string &time_str)
 	/* Weed out any unwanted states */
 	bool valid = gate_state({ S_PLAY, S_STOP });
 	if (valid) {
-		enum state current_state = this->cstate;
+		//enum state current_state = this->cstate;
 
-		cmd_stop(); // We need the player engine stopped in order to seek
+		//cmd_stop(); // We need the player engine stopped in order to seek
 		this->au->seek_usec(time);
-		if (current_state == S_PLAY) {
+		//if (current_state == S_PLAY) {
 			// If we were playing before we'd ideally like to resume
-			cmd_play();
-		}
+			//cmd_play();
+		//}
 	}
 
 	return valid;
