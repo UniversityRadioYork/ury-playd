@@ -53,11 +53,6 @@ struct timespec
 #include "messages.h"
 #include "player.h"
 
-/* This should be long enough to hold all the state names above separated with
- * spaces and null-terminated.
- */
-#define STATE_NAME_BUF 256
-
 /* Names of the states in enum state. */
 const char	STATES[NUM_STATES][WORD_LEN] = {
 	"Void",
@@ -66,9 +61,6 @@ const char	STATES[NUM_STATES][WORD_LEN] = {
 	"Play",
 	"Quit",
 };
-
-enum state	GEND = S_VOID;
-
 
 player::player(int device)
 {
@@ -114,7 +106,7 @@ player::main_loop()
 bool
 player::cmd_ejct()
 {
-	bool valid = gate_state(S_STOP, S_PLAY, GEND);
+	bool valid = gate_state({ S_STOP, S_PLAY });
 	if (valid) {
 		this->au = nullptr;
 		set_state(S_EJCT);
@@ -126,7 +118,7 @@ player::cmd_ejct()
 bool
 player::cmd_play()
 {
-	bool valid = gate_state(S_STOP, GEND) && (this->au != nullptr);
+	bool valid = gate_state({ S_STOP }) && (this->au != nullptr);
 	if (valid) {
 		this->au->start();
 		set_state(S_PLAY);
@@ -146,7 +138,7 @@ player::cmd_quit()
 bool
 player::cmd_stop()
 {
-	bool valid = gate_state(S_PLAY, GEND);
+	bool valid = gate_state({ S_PLAY });
 	if (valid) {
 		this->au->stop();
 		set_state(S_STOP);
@@ -184,7 +176,7 @@ player::cmd_seek(const std::string &time_str)
 	}
 
 	/* Weed out any unwanted states */
-	bool valid = gate_state(S_PLAY, S_STOP, GEND);
+	bool valid = gate_state({ S_PLAY, S_STOP });
 	if (valid) {
 		enum state current_state = this->cstate;
 
@@ -227,26 +219,17 @@ player::loop_iter()
 }
 
 /* Throws an error if the current state is not in the state set provided by
- * argument s1 and subsequent arguments up to 'GEND'.
- *
- * As a variadic function, the argument list MUST be terminated with 'GEND'.
+ * the initializer_list.
  */
 bool
-player::gate_state(enum state s1,...)
+player::gate_state(std::initializer_list<enum state> states)
 {
-	va_list		ap;
-	int		i;
-	enum error	err = E_OK;
 	bool		in_state = false;
-
-	va_start(ap, s1);
-	for (i = (int)s1; !in_state && i != (int)GEND; i = va_arg(ap, int)) {
-		if ((int)this->cstate == i) {
+	for (enum state state : states) {
+		if (this->cstate == state) {
 			in_state = true;
 		}
 	}
-	va_end(ap);
-
 	return in_state;
 }
 
