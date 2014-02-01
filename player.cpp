@@ -149,6 +149,7 @@ player::cmd_stop()
 	bool valid = gate_state(S_PLAY, GEND);
 	if (valid) {
 		this->au->stop();
+		set_state(S_STOP);
 	}
 	return valid;
 }
