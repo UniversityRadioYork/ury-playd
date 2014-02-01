@@ -84,7 +84,7 @@ player::main_loop()
 		{ "quit", [&](const cmd_words &) { return this->cmd_quit(); } },
 		/* Unary commands */
 		{ "load", [&](const cmd_words &words) { return this->cmd_load(words[1]); } },
-		{ "seek", [&](const cmd_words &words) { return this->cmd_load(words[1]); } }
+		{ "seek", [&](const cmd_words &words) { return this->cmd_seek(words[1]); } }
 	};
 
 	response(R_OHAI, "%s", MSG_OHAI);	/* Say hello */
