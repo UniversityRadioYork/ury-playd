@@ -155,34 +155,7 @@ au_in::decode(char **buf, size_t *n)
 
 			if (complete) {
 				if (this->use_resampler) {
-					auto resample_buffer_deleter = [](uint8_t *buffer){ av_freep(&buffer); };
-					uint8_t *rbuf;
-
-					int in_samples = this->frame->nb_samples;
-					int rate = this->frame->sample_rate;
-					int out_samples = swr_get_delay(this->resampler.get(), rate) + in_samples;
-
-					if(av_samples_alloc(
-						&rbuf,
-						nullptr,
-						av_frame_get_channels(this->frame.get()),
-						out_samples,
-						this->sample_format,
-						0) < 0) {
-						throw E_INTERNAL_ERROR;
-					}
-
-					this->resample_buffer = std::unique_ptr<uint8_t, decltype(resample_buffer_deleter)>(rbuf, resample_buffer_deleter);
-
-					*n = (size_t)swr_convert(
-						this->resampler.get(),
-						&rbuf,
-						out_samples,
-						const_cast<const uint8_t**>(this->frame->extended_data),
-						this->frame->nb_samples);
-
-					*buf = (char *)this->resample_buffer.get();
-					*n = out_samples;
+					Resample(buf, n);
 				}
 				else {
 					// Only use first channel, as we have packed data.
@@ -194,6 +167,39 @@ au_in::decode(char **buf, size_t *n)
 	}
 
 	return more;
+}
+
+void
+au_in::Resample(char **buf, size_t *n)
+{
+	auto resample_buffer_deleter = [](uint8_t *buffer){ av_freep(&buffer); };
+	uint8_t *rbuf;
+
+	int in_samples = this->frame->nb_samples;
+	int rate = this->frame->sample_rate;
+	int out_samples = swr_get_delay(this->resampler.get(), rate) + in_samples;
+
+	if (av_samples_alloc(
+		&rbuf,
+		nullptr,
+		av_frame_get_channels(this->frame.get()),
+		out_samples,
+		this->sample_format,
+		0) < 0) {
+		throw E_INTERNAL_ERROR;
+	}
+
+	this->resample_buffer = std::unique_ptr<uint8_t, decltype(resample_buffer_deleter)>(rbuf, resample_buffer_deleter);
+
+	*n = (size_t)swr_convert(
+		this->resampler.get(),
+		&rbuf,
+		out_samples,
+		const_cast<const uint8_t**>(this->frame->extended_data),
+		this->frame->nb_samples);
+
+	*buf = (char *)this->resample_buffer.get();
+	*n = out_samples;
 }
 
 /* Converts from ffmpeg sample format to PortAudio sample format.

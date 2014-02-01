@@ -70,6 +70,7 @@ private:
 	void au_in::setup_pa(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars);
 		
 	bool decode_packet();
+	void Resample(char **buf, size_t *n);
 };
 
 /* A structure containing a lump of decoded frame data.
