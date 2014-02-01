@@ -115,13 +115,7 @@ audio::last_error()
 bool
 audio::halted()
 {
-	bool halted = !Pa_IsStreamActive(this->out_strm);
-
-	if (halted && this->last_err == E_OK) {
-		/* Abnormal stream halts with error being OK are weird... */
-		throw E_UNKNOWN;
-	}
-	return halted;
+	return !Pa_IsStreamActive(this->out_strm);
 }
 
 /* Gets the current played position in the song, in microseconds.
