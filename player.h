@@ -19,15 +19,16 @@
  * at any given time is dictated by the current state, which is
  * represented by an instance of 'enum state'.
  */
-enum state {
-	S_VOID,			/* No state (usually when player starts up) */
-	S_EJCT, 		/* No file loaded */
-	S_STOP, 		/* File loaded but not playing */
-	S_PLAY, 		/* File loaded and playing */
-	S_QUIT, 		/* Player about to quit */
-        /*--------------------------------------------------------------------*/
-	NUM_STATES              /* Number of items in enum */
+enum class State {
+	STARTING,
+	EJECTED,
+	STOPPED,
+	PLAYING,
+	QUITTING
 };
+
+typedef std::function<void(uint64_t)> PositionListener;
+typedef std::function<void(State, State)> StateListener;
 
 /* The player structure contains all persistent state in the program.
  *
@@ -44,23 +45,28 @@ public:
 	bool Load(const std::string &path);
 	bool Seek(const std::string &time_str);
 
-	enum state state();
+	State CurrentState();
 
 	void Update();
 
-	void RegisterPositionListener(std::function<void(uint64_t)> listener, uint64_t position_usecs);
+	void RegisterPositionListener(PositionListener listener, uint64_t position_usecs);
+	void RegisterStateListener(StateListener listener);
+
 
 private:
 	int device;
-	enum state cstate;
+
 	std::unique_ptr<audio> au;
 
-	std::function<void(uint64_t)> position_listener;
+	PositionListener position_listener;
 	uint64_t position_period;
 	uint64_t position_last;
 
-	bool CurrentStateIn(std::initializer_list<enum state> states);
-	void SetState(enum state state);
+	StateListener state_listener;
+	State current_state;
+
+	bool CurrentStateIn(std::initializer_list<State> states);
+	void SetState(State state);
 
 	void SendPositionIfReady();
 	bool IsReadyToSendPosition(uint64_t current_position);

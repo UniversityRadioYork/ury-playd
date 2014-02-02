@@ -35,6 +35,15 @@ extern "C" {
 static PaDeviceIndex device_id(int argc, char *argv[]);
 static void MainLoop(player &player);
 
+/* Names of the states in enum state. */
+const static std::unordered_map<State, std::string> STATES = {
+	{ State::EJECTED, "Ejected" },
+	{ State::STOPPED, "Stopped" },
+	{ State::PLAYING, "Playing" },
+	{ State::QUITTING, "Quitting" }
+};
+
+
 /* The main entry point. */
 int
 main(int argc, char *argv[])
@@ -52,6 +61,9 @@ main(int argc, char *argv[])
 
 		player p(device);
 		p.RegisterPositionListener([](uint64_t position) { response(R_TIME, "%u", position); }, TIME_USECS);
+		p.RegisterStateListener([](State old_state, State new_state) {
+			response(R_STAT, "%s %s", STATES.at(old_state).c_str(), STATES.at(new_state).c_str());
+		});
 		MainLoop(p);
 	}
 	catch (enum error) {
@@ -80,7 +92,7 @@ MainLoop(player &p)
 
 	response(R_OHAI, "%s", MSG_OHAI);	/* Say hello */
 
-	while (p.state() != S_QUIT) {
+	while (p.CurrentState() != State::QUITTING) {
 		/*
 		* Possible Improvement: separate command checking and player
 		* updating into two threads.  Player updating is quite

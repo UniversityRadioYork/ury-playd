@@ -38,18 +38,9 @@ struct timespec
 #include "messages.h"
 #include "player.h"
 
-/* Names of the states in enum state. */
-const char	STATES[NUM_STATES][WORD_LEN] = {
-	"Void",
-	"Ejct",
-	"Stop",
-	"Play",
-	"Quit",
-};
-
 player::player(int device)
 {
-	this->cstate = S_EJCT;
+	this->current_state = State::EJECTED;
 	this->device = device;
 	this->au = nullptr;
 
@@ -61,10 +52,10 @@ player::player(int device)
 bool
 player::Eject()
 {
-	bool valid = CurrentStateIn({ S_STOP, S_PLAY });
+	bool valid = CurrentStateIn({ State::STOPPED, State::PLAYING });
 	if (valid) {
 		this->au = nullptr;
-		SetState(S_EJCT);
+		SetState(State::EJECTED);
 		this->position_last = 0;
 	}
 	return valid;
@@ -73,10 +64,10 @@ player::Eject()
 bool
 player::Play()
 {
-	bool valid = CurrentStateIn({ S_STOP }) && (this->au != nullptr);
+	bool valid = CurrentStateIn({ State::STOPPED }) && (this->au != nullptr);
 	if (valid) {
 		this->au->start();
-		SetState(S_PLAY);
+		SetState(State::PLAYING);
 	}
 	return valid;
 }
@@ -85,7 +76,7 @@ bool
 player::Quit()
 {
 	Eject();
-	SetState(S_QUIT);
+	SetState(State::QUITTING);
 
 	return true; // Always a valid command.
 }
@@ -93,10 +84,10 @@ player::Quit()
 bool
 player::Stop()
 {
-	bool valid = CurrentStateIn({ S_PLAY });
+	bool valid = CurrentStateIn({ State::PLAYING });
 	if (valid) {
 		this->au->stop();
-		SetState(S_STOP);
+		SetState(State::STOPPED);
 	}
 	return valid;
 }
@@ -107,7 +98,7 @@ player::Load(const std::string &filename)
 	try {
 		this->au = std::unique_ptr<audio>(new audio(filename, this->device));
 		dbug("loaded %s", filename);
-		SetState(S_STOP);
+		SetState(State::STOPPED);
 	}
 	catch (enum error) {
 		Eject();
@@ -131,7 +122,7 @@ player::Seek(const std::string &time_str)
 	}
 
 	/* Weed out any unwanted states */
-	bool valid = CurrentStateIn({ S_PLAY, S_STOP });
+	bool valid = CurrentStateIn({ State::PLAYING, State::STOPPED });
 	if (valid) {
 		//enum state current_state = this->cstate;
 
@@ -146,24 +137,24 @@ player::Seek(const std::string &time_str)
 	return valid;
 }
 
-enum state
-player::state()
+State
+player::CurrentState()
 {
-	return this->cstate;
+	return this->current_state;
 }
 
 /* Performs an iteration of the player update loop. */
 void
 player::Update()
 {
-	if (this->cstate == S_PLAY) {
+	if (this->current_state == State::PLAYING) {
 		if (this->au->halted()) {
 			Eject();
 		} else {
 			SendPositionIfReady();
 		}
 	}
-	if (CurrentStateIn({ S_PLAY, S_STOP }))	{
+	if (CurrentStateIn({ State::PLAYING, State::STOPPED }))	{
 		bool more = this->au->decode();
 		if (!more) {
 			Eject();
@@ -175,11 +166,11 @@ player::Update()
  * the initializer_list.
  */
 bool
-player::CurrentStateIn(std::initializer_list<enum state> states)
+player::CurrentStateIn(std::initializer_list<State> states)
 {
 	bool		in_state = false;
-	for (enum state state : states) {
-		if (this->cstate == state) {
+	for (State state : states) {
+		if (this->current_state == state) {
 			in_state = true;
 		}
 	}
@@ -188,13 +179,24 @@ player::CurrentStateIn(std::initializer_list<enum state> states)
 
 /* Sets the player state and honks accordingly. */
 void
-player::SetState(enum state state)
+player::SetState(State state)
 {
-	enum state pstate = this->cstate;
+	State last_state = this->current_state;
 
-	this->cstate = state;
+	this->current_state = state;
 
-	response(R_STAT, "%s %s", STATES[pstate], STATES[state]);
+	if (this->state_listener != nullptr) {
+		this->state_listener(last_state, state);
+	}
+}
+
+/**
+ * Registers a listener for state changes.
+ * @param listener The function to which state change signals shall be sent.
+ */
+void player::RegisterStateListener(StateListener listener)
+{
+	this->state_listener = listener;
 }
 
 /**
@@ -232,7 +234,7 @@ bool player::IsReadyToSendPosition(uint64_t current_position)
  * @param listener The function to which position signals shall be sent.
  * @param period_usecs The approximate period, in microseconds, between position signals.
  */
-void player::RegisterPositionListener(std::function<void(uint64_t)> listener, uint64_t period_usecs)
+void player::RegisterPositionListener(PositionListener listener, uint64_t period_usecs)
 {
 	this->position_listener = listener;
 	this->position_period = period_usecs;
