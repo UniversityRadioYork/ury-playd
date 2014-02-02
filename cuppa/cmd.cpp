@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+#include <boost/tokenizer.hpp>
+
 #include <ctype.h>
 #include <stdbool.h>		/* bool */
 #include <stdio.h>		/* getline */
@@ -61,7 +63,15 @@ bool CommandHandler::Run(const cmd_words &words)
 	return valid;
 }
 
-static cmd_words tokenise(const std::string &line);
+/**
+ * Parses a string as a command line and runs the result.
+ * @param line The string that represents the command line.
+ * @return true if the command was valid; false otherwise.
+ */
+bool CommandHandler::RunLine(const std::string &line)
+{
+	return Run(LineToWords(line));
+}
 
 /*
  * Checks to see if there is a command waiting on stdin and, if there is,
@@ -92,9 +102,6 @@ handle_cmd(const command_set &cmds)
 	std::string input;
 	enum error	err = E_OK;
 	cmd_words words;
-	char           *arg = NULL;
-	char           *end = NULL;
-	size_t		num_bytes = 0;
 
 	std::getline(std::cin, input);
 	dbug("got command: %s", input.c_str());
@@ -105,13 +112,8 @@ handle_cmd(const command_set &cmds)
 		err = E_EOF;
 	}
 	if (err == E_OK) {
-		words = tokenise(input);
-		if (words.empty())
-			err = error(E_BAD_COMMAND, MSG_CMD_NOWORD);
-	}
-	if (err == E_OK) {
 		CommandHandler ch = CommandHandler(cmds);
-		bool valid = ch.Run(words);
+		bool valid = ch.RunLine(input);
 
 		if (valid) {
 			response(R_OKAY, input.c_str());
@@ -125,26 +127,20 @@ handle_cmd(const command_set &cmds)
 	return err;
 }
 
-static std::vector<std::string>
-tokenise(const std::string &line)
+/**
+ * Parses a command line into a list of words.
+ * @param line The line to split into words.
+ * @return The list of words in the command line.
+ */
+cmd_words CommandHandler::LineToWords(const std::string &line)
 {
-	unsigned int size = line.size();
-	cmd_words words = {};
+	cmd_words words;
 
-	std::string current_word = "";
+	typedef boost::tokenizer<boost::escaped_list_separator<char>> Tokeniser;
+	boost::escaped_list_separator<char> separator('\\', ' ', '\"');
+	Tokeniser tok(line, separator);
 
-	for (char c : line) {
-		if (c == ' ' && !(current_word.empty())) {
-			words.push_back(std::string(current_word));
-			current_word.clear();
-		}
-		else {
-			current_word.push_back(c);
-		}
-	}
-	if (!current_word.empty()) {
-		words.push_back(std::string(current_word));
-	}
+	words.assign(tok.begin(), tok.end());
 
 	return words;
 }

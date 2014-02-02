@@ -1,4 +1,5 @@
 *
+cuppa
 !*.txt
 !.gitignore
 !*.cpp

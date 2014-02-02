@@ -30,9 +30,11 @@ class CommandHandler {
 public:
 	CommandHandler(const command_set &commands);
 	bool Run(const cmd_words &words);
-
+	bool RunLine(const std::string &line);
 private:
 	std::unique_ptr<command_set> commands;
+
+	cmd_words LineToWords(const std::string &line);
 };
 
 enum error	check_commands(const command_set &cmds);
