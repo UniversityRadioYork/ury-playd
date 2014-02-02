@@ -3,6 +3,11 @@
  * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
  */
 
+/**
+ * @file
+ * Definition of Player and associated types.
+ */
+
 #ifndef PLAYER_H
 #define PLAYER_H
 
@@ -11,13 +16,11 @@
 
 #include "audio.h"
 
-#include "cuppa/errors.h" /* enum error */
-
-/* Enumeration of states that the player can be in.
- *
+/**
+ * Enumeration of states that the player can be in.
  * The player is effectively a finite-state machine whose behaviour
  * at any given time is dictated by the current state, which is
- * represented by an instance of 'enum state'.
+ * represented by an instance of State.
  */
 enum class State {
 	STARTING,
@@ -27,32 +30,15 @@ enum class State {
 	QUITTING
 };
 
-typedef std::function<void(uint64_t)> PositionListener;
-typedef std::function<void(State, State)> StateListener;
 
-/* The player structure contains all persistent state in the program.
- *
+/**
+ * A player contains a loaded audio file and the state of its playback.
+ * Player connects to the audio system via PortAudio, given a device handle.
  */
 class Player {
 public:
-	Player(int driver);
-
-	bool Eject();
-	bool Play();
-	bool Quit();
-	bool Stop();
-
-	bool Load(const std::string &path);
-	bool Seek(const std::string &time_str);
-
-	State CurrentState();
-
-	void Update();
-
-	void RegisterPositionListener(PositionListener listener, uint64_t position_usecs);
-	void RegisterStateListener(StateListener listener);
-
-
+	typedef std::function<void(uint64_t)> PositionListener;
+	typedef std::function<void(State, State)> StateListener;
 private:
 	int device;
 
@@ -65,6 +51,23 @@ private:
 	StateListener state_listener;
 	State current_state;
 
+public:
+	Player(int driver);
+
+	bool Eject();
+	bool Play();
+	bool Quit();
+	bool Stop();
+	bool Load(const std::string &path);
+	bool Seek(const std::string &time_str);
+
+	State CurrentState();
+
+	void Update();
+
+	void RegisterPositionListener(PositionListener listener, uint64_t position_usecs);
+	void RegisterStateListener(StateListener listener);
+private:
 	bool CurrentStateIn(std::initializer_list<State> states);
 	void SetState(State state);
 
@@ -72,5 +75,4 @@ private:
 	bool IsReadyToSendPosition(uint64_t current_position);
 };
 
-
-#endif				/* not PLAYER_H */
+#endif /* !PLAYER_H */
