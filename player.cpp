@@ -49,8 +49,7 @@ player::player(int device)
 	this->position_last = 0;
 }
 
-bool
-player::Eject()
+bool player::Eject()
 {
 	bool valid = CurrentStateIn({ State::STOPPED, State::PLAYING });
 	if (valid) {
@@ -61,8 +60,7 @@ player::Eject()
 	return valid;
 }
 
-bool
-player::Play()
+bool player::Play()
 {
 	bool valid = CurrentStateIn({ State::STOPPED }) && (this->au != nullptr);
 	if (valid) {
@@ -72,8 +70,7 @@ player::Play()
 	return valid;
 }
 
-bool
-player::Quit()
+bool player::Quit()
 {
 	Eject();
 	SetState(State::QUITTING);
@@ -81,8 +78,7 @@ player::Quit()
 	return true; // Always a valid command.
 }
 
-bool
-player::Stop()
+bool player::Stop()
 {
 	bool valid = CurrentStateIn({ State::PLAYING });
 	if (valid) {
@@ -92,8 +88,7 @@ player::Stop()
 	return valid;
 }
 
-bool
-player::Load(const std::string &filename)
+bool player::Load(const std::string &filename)
 {
 	try {
 		this->au = std::unique_ptr<audio>(new audio(filename, this->device));
@@ -107,8 +102,7 @@ player::Load(const std::string &filename)
 	return true; // Always a valid command.
 }
 
-bool
-player::Seek(const std::string &time_str)
+bool player::Seek(const std::string &time_str)
 {
 	/* TODO: proper overflow checking */
 
@@ -137,15 +131,13 @@ player::Seek(const std::string &time_str)
 	return valid;
 }
 
-State
-player::CurrentState()
+State player::CurrentState()
 {
 	return this->current_state;
 }
 
 /* Performs an iteration of the player update loop. */
-void
-player::Update()
+void player::Update()
 {
 	if (this->current_state == State::PLAYING) {
 		if (this->au->halted()) {
@@ -165,10 +157,9 @@ player::Update()
 /* Throws an error if the current state is not in the state set provided by
  * the initializer_list.
  */
-bool
-player::CurrentStateIn(std::initializer_list<State> states)
+bool player::CurrentStateIn(std::initializer_list<State> states)
 {
-	bool		in_state = false;
+	bool in_state = false;
 	for (State state : states) {
 		if (this->current_state == state) {
 			in_state = true;
@@ -178,8 +169,7 @@ player::CurrentStateIn(std::initializer_list<State> states)
 }
 
 /* Sets the player state and honks accordingly. */
-void
-player::SetState(State state)
+void player::SetState(State state)
 {
 	State last_state = this->current_state;
 
