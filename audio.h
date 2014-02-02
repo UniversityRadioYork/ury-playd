@@ -38,40 +38,39 @@ public:
 	AudioOutput(const std::string &path, const std::string &device_id);
 	~AudioOutput();
 
-	void start();
-	void stop();
-	bool decode();
+	void Start();
+	void Stop();
+	bool Update();
 
-	ErrorCode last_error();
-	bool halted();
-	uint64_t usec();
+	ErrorCode LastError();
+	bool IsHalted();
+	uint64_t CurrentPositionMicroseconds();
 
-	void seek_usec(uint64_t usec);
-	void inc_used_samples(uint64_t samples);
+	void SeekToPositionMicroseconds(uint64_t usec);
 
-	void spin_up();
-
-	size_t samples2bytes(size_t samples);
-
+	void PreFillRingBuffer();
 private:
-	ErrorCode last_err;	/* Last result of decoding */
-	std::unique_ptr<au_in> av;	/* ffmpeg state */
+	ErrorCode last_error;
+	std::unique_ptr<au_in> av;
 	/* shared state */
 	char *frame_ptr;
 	size_t frame_samples;
 	/* PortAudio state */
 	std::unique_ptr<PaUtilRingBuffer> ring_buf;
 	std::unique_ptr<char[]> ring_data;
-	PaStream *out_strm;	/* Output stream */
-	int device_id;	/* PortAudio device ID */
-	uint64_t used_samples;	/* Counter of samples played */
+	PaStream *out_strm;
+	int device_id;
+	uint64_t position_sample_count;
 	std::function<int(char *, unsigned long)> callback;
 
-	void init_sink(int device);
-	void init_ring_buf(size_t bytes_per_sample);
+	void InitialisePortAudio(int device);
+	void InitialiseRingBuffer(size_t bytes_per_sample);
 
-	int cb_play(char *out, unsigned long frames_per_buf);
+	size_t ByteCountForSampleCount(size_t sample_count);
+
+	int PlayCallback(char *out, unsigned long frames_per_buf);
 	unsigned long ReadSamplesToOutput(char *&output, unsigned long output_capacity, unsigned long buffered_count);
+	void AdvancePositionBySampleCount(uint64_t sample_count);
 
 	bool DecodeIfFrameEmpty();
 

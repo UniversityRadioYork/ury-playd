@@ -62,7 +62,7 @@ bool Player::Play()
 {
 	bool valid = CurrentStateIn({ State::STOPPED }) && (this->au != nullptr);
 	if (valid) {
-		this->au->start();
+		this->au->Start();
 		SetState(State::PLAYING);
 	}
 	return valid;
@@ -80,7 +80,7 @@ bool Player::Stop()
 {
 	bool valid = CurrentStateIn({ State::PLAYING });
 	if (valid) {
-		this->au->stop();
+		this->au->Stop();
 		SetState(State::STOPPED);
 	}
 	return valid;
@@ -106,12 +106,12 @@ bool Player::Seek(const std::string &time_str)
 	/* TODO: proper overflow checking */
 
 	std::istringstream is(time_str);
-	uint64_t time;
+	uint64_t microseconds;
 	std::string rest;
-	is >> time >> rest;
+	is >> microseconds >> rest;
 
 	if (rest == "s" || rest == "sec") {
-		time *= USECS_IN_SEC;
+		microseconds *= USECS_IN_SEC;
 	}
 
 	/* Weed out any unwanted states */
@@ -120,7 +120,7 @@ bool Player::Seek(const std::string &time_str)
 		//enum state current_state = this->cstate;
 
 		//cmd_stop(); // We need the player engine stopped in order to seek
-		this->au->seek_usec(time);
+		this->au->SeekToPositionMicroseconds(microseconds);
 		//if (current_state == S_PLAY) {
 			// If we were playing before we'd ideally like to resume
 			//cmd_play();
@@ -139,14 +139,14 @@ State Player::CurrentState()
 void Player::Update()
 {
 	if (this->current_state == State::PLAYING) {
-		if (this->au->halted()) {
+		if (this->au->IsHalted()) {
 			Eject();
 		} else {
 			SendPositionIfReady();
 		}
 	}
 	if (CurrentStateIn({ State::PLAYING, State::STOPPED }))	{
-		bool more = this->au->decode();
+		bool more = this->au->Update();
 		if (!more) {
 			Eject();
 		}
@@ -195,7 +195,7 @@ void Player::RegisterStateListener(StateListener listener)
  */
 void Player::SendPositionIfReady()
 {
-	uint64_t position = this->au->usec();
+	uint64_t position = this->au->CurrentPositionMicroseconds();
 	if (IsReadyToSendPosition(position)) {
 		this->position_listener(position);
 		this->position_last = position;

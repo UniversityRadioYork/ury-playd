@@ -35,7 +35,7 @@ void *v_au)
 	return (*f)(cout, frames_per_buf);
 }
 
-int AudioOutput::cb_play(char *out, unsigned long frames_per_buf)
+int AudioOutput::PlayCallback(char *out, unsigned long frames_per_buf)
 {
 	unsigned long avail;
 	PaStreamCallbackResult result = paContinue;
@@ -50,7 +50,7 @@ int AudioOutput::cb_play(char *out, unsigned long frames_per_buf)
 			 * something went awry during the last decode
 			 * cycle...
 			 */
-			switch (last_error()) {
+			switch (LastError()) {
 			case ErrorCode::END_OF_FILE:
 				/*
 				 * We've just hit the end of the file.
@@ -69,7 +69,7 @@ int AudioOutput::cb_play(char *out, unsigned long frames_per_buf)
 				/* Break out of the loop inelegantly */
 				memset(out,
 				       0,
-				       samples2bytes(frames_per_buf)
+				       ByteCountForSampleCount(frames_per_buf)
 					);
 				frames_written = frames_per_buf;
 				break;
@@ -94,13 +94,13 @@ int AudioOutput::cb_play(char *out, unsigned long frames_per_buf)
  */
 unsigned long AudioOutput::ReadSamplesToOutput(char *&output, unsigned long output_capacity, unsigned long buffered_count)
 {
-	unsigned long transfer_count = std::min(output_capacity, buffered_count);
+	unsigned long transfer_sample_count = std::min(output_capacity, buffered_count);
 
 	// TODO: handle the ulong->long cast more gracefully, perhaps.
 	output += PaUtil_ReadRingBuffer(this->ring_buf.get(),
 		output,
-		static_cast<ring_buffer_size_t>(transfer_count));
+		static_cast<ring_buffer_size_t>(transfer_sample_count));
 
-	inc_used_samples(transfer_count);
-	return transfer_count;
+	AdvancePositionBySampleCount(transfer_sample_count);
+	return transfer_sample_count;
 }

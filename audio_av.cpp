@@ -36,11 +36,11 @@ au_in::au_in(const std::string &path)
 	this->resample_buffer = nullptr;
 	this->buffer = std::unique_ptr<unsigned char[]>(new unsigned char[BUFFER_SIZE]);
 	
-	load_file(path);
-	init_stream();
-	init_packet();
-	init_frame();
-	init_resampler();
+	Open(path);
+	InitialiseStream();
+	InitialisePacket();
+	InitialiseFrame();
+	InitialiseResampler();
 
 	Debug("stream id:", this->stream_id);
 	Debug("codec:", this->stream->codec->codec->long_name);
@@ -50,43 +50,41 @@ au_in::~au_in()
 {
 }
 
-void au_in::init_resampler()
+void au_in::InitialiseResampler()
 {
 	this->use_resampler = false;
 }
 
-size_t au_in::pa_config(int device, PaStreamParameters *params)
+size_t au_in::SetupPortAudio(int device, PaStreamParameters *params)
 {
-	PaSampleFormat	sf;
+	PaSampleFormat sf = SetupPortAudioSampleFormat();
+	SetupPortAudioParameters(sf, device, this->stream->codec->channels, params);
 
-	sf = conv_sample_fmt(this->stream->codec->sample_fmt);
-	setup_pa(sf, device, this->stream->codec->channels, params);
-
-	return bytes2samples(BUFFER_SIZE);
+	return SampleCountForByteCount(BUFFER_SIZE);
 }
 
 /* Returns the sample rate, providing av points to a properly initialised
  * au_in.
  */
-double au_in::sample_rate()
+double au_in::SampleRate()
 {
 	return (double)this->stream->codec->sample_rate;
 }
 
 /* Converts stream position (in microseconds) to estimated sample count. */
-size_t au_in::usec2samples(uint64_t usec)
+size_t au_in::SampleCountForPositionMicroseconds(uint64_t usec)
 {
-	return (usec * sample_rate()) / USECS_IN_SEC;
+	return (usec * SampleRate()) / USECS_IN_SEC;
 }
 
 /* Converts sample count to estimated stream position (in microseconds). */
-uint64_t au_in::samples2usec(size_t samples)
+uint64_t au_in::PositionMicrosecondsForSampleCount(size_t samples)
 {
-	return (samples * USECS_IN_SEC) / sample_rate();
+	return (samples * USECS_IN_SEC) / SampleRate();
 }
 
 /* Converts buffer size (in bytes) to sample count (in samples). */
-size_t au_in::bytes2samples(size_t bytes)
+size_t au_in::SampleCountForByteCount(size_t bytes)
 {
 	return (bytes /
 		this->stream->codec->channels /
@@ -94,7 +92,7 @@ size_t au_in::bytes2samples(size_t bytes)
 }
 
 /* Converts sample count (in samples) to buffer size (in bytes). */
-size_t au_in::samples2bytes(size_t samples)
+size_t au_in::ByteCountForSampleCount(size_t samples)
 {
 	return (samples *
 		this->stream->codec->channels *
@@ -102,7 +100,7 @@ size_t au_in::samples2bytes(size_t samples)
 }
 
 /* Attempts to seek to the position 'usec' milliseconds into the file. */
-void au_in::seek(uint64_t usec)
+void au_in::SeekToPositionMicroseconds(uint64_t usec)
 {
 	int64_t seek_pos = ((usec * this->stream->time_base.den) /
 			this->stream->time_base.num) / USECS_IN_SEC;
@@ -125,7 +123,7 @@ void au_in::seek(uint64_t usec)
  * return value signifies a decode error.  Do NOT rely on 'buf' and 'n' having
  * sensible values if E_OK is not returned.
  */
-bool au_in::decode(char **buf, size_t *n)
+bool au_in::Decode(char **buf, size_t *n)
 {
 	bool complete = false;
 	bool more = true;
@@ -135,7 +133,7 @@ bool au_in::decode(char **buf, size_t *n)
 			more = false;
 		}
 		else if (this->packet->stream_index == this->stream_id) {
-			complete = decode_packet();
+			complete = DecodePacket();
 
 			if (complete) {
 				if (this->use_resampler) {
@@ -191,8 +189,9 @@ void au_in::Resample(char **buf, size_t *n)
  * convert disallowed sample formats, and as such may fail with more
  * esoteric ffmpeg sample formats.
  */
-PaSampleFormat au_in::conv_sample_fmt(enum AVSampleFormat in)
+PaSampleFormat au_in::SetupPortAudioSampleFormat()
 {
+	AVSampleFormat in = this->stream->codec->sample_fmt;
 	PaSampleFormat out = 0;
 
 	/* We need to convert planar samples into packed samples. */
@@ -262,7 +261,7 @@ PaSampleFormat au_in::SampleFormatAVToPA(AVSampleFormat av_format) {
  * The parameter set pointed to by *params MUST already be allocated, and its
  * contents should only be used if this function returns E_OK.
  */
-void au_in::setup_pa(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars)
+void au_in::SetupPortAudioParameters(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars)
 {
 	memset(pars, 0, sizeof(*pars));
 	pars->channelCount = chans;
@@ -273,7 +272,7 @@ void au_in::setup_pa(PaSampleFormat sf, int device, int chans, PaStreamParameter
 				  defaultLowOutputLatency);
 }
 
-void au_in::load_file(const std::string &path)
+void au_in::Open(const std::string &path)
 {
 	AVFormatContext *ctx = nullptr;
 
@@ -290,10 +289,10 @@ void au_in::load_file(const std::string &path)
 	this->context = std::unique_ptr<AVFormatContext, decltype(free_context)>(ctx, free_context);
 }
 
-void au_in::init_stream()
+void au_in::InitialiseStream()
 {
 	FindStreamInfo();
-	FindStreamAndInitCodec();
+	FindStreamAndInitialiseCodec();
 }
 
 void au_in::FindStreamInfo()
@@ -303,7 +302,7 @@ void au_in::FindStreamInfo()
 	}
 }
 
-void au_in::FindStreamAndInitCodec()
+void au_in::FindStreamAndInitialiseCodec()
 {
 	AVCodec *codec;
 	int stream = av_find_best_stream(this->context.get(),
@@ -317,10 +316,10 @@ void au_in::FindStreamAndInitCodec()
 		throw Error(ErrorCode::BAD_FILE, "can't open codec for file");
 	}
 
-	init_codec(stream, codec);
+	InitialiseCodec(stream, codec);
 }
 
-void au_in::init_codec(int stream, AVCodec *codec)
+void au_in::InitialiseCodec(int stream, AVCodec *codec)
 {
 	AVCodecContext *codec_context = this->context->streams[stream]->codec;
 	if (avcodec_open2(codec_context, codec, NULL) < 0) {
@@ -331,7 +330,7 @@ void au_in::init_codec(int stream, AVCodec *codec)
 	this->stream_id = stream;
 }
 
-void au_in::init_frame()
+void au_in::InitialiseFrame()
 {
 	auto frame_deleter = [](AVFrame *frame) { avcodec_free_frame(&frame); };
 	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(avcodec_alloc_frame(), frame_deleter);
@@ -340,7 +339,7 @@ void au_in::init_frame()
 	}
 }
 
-void au_in::init_packet()
+void au_in::InitialisePacket()
 {
 	auto packet_deleter = [](AVPacket *packet) { av_free_packet(packet); delete packet; }; 
 	this->packet = std::unique_ptr<AVPacket, decltype(packet_deleter)>(new AVPacket, packet_deleter);
@@ -353,7 +352,7 @@ void au_in::init_packet()
 
 /*  Also see the non-static functions for the frontend for frame decoding */
 
-bool au_in::decode_packet()
+bool au_in::DecodePacket()
 {
 	int		frame_finished = 0;
 

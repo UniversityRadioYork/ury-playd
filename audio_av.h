@@ -27,20 +27,18 @@ class au_in {
 public:
 	au_in(const std::string &path);
 	~au_in();
-	size_t pa_config(
-		int device,	/* PortAudio device */
-		PaStreamParameters *params);
+	size_t SetupPortAudio(int device, PaStreamParameters *params);
 
-	bool	decode(char **buf, size_t *n);
-	double		sample_rate();
+	bool Decode(char **buf, size_t *n);
+	double SampleRate();
 
-	void seek(uint64_t usec);
+	void SeekToPositionMicroseconds(uint64_t usec);
 
-	/* Unit conversion */
-	uint64_t	samples2usec(size_t samples);
-	size_t		usec2samples(uint64_t usec);
-	size_t		bytes2samples(size_t bytes);
-	size_t		samples2bytes(size_t samples);
+	// Unit conversion
+	uint64_t	PositionMicrosecondsForSampleCount(size_t samples);
+	size_t		SampleCountForPositionMicroseconds(uint64_t usec);
+	size_t		SampleCountForByteCount(size_t bytes);
+	size_t		ByteCountForSampleCount(size_t samples);
 
 private:
 	AVStream *stream;
@@ -58,22 +56,21 @@ private:
 	std::unique_ptr<uint8_t, std::function<void(uint8_t *)>> resample_buffer;
 
 
-	void load_file(const std::string &path);
-	void init_stream();
+	void Open(const std::string &path);
 
+	void InitialiseStream();
 	void FindStreamInfo();
-	void FindStreamAndInitCodec();
+	void FindStreamAndInitialiseCodec();
 
-	void init_codec(int stream, AVCodec *codec);
-	void init_frame();
-	void init_packet();
-	void init_resampler();
+	void InitialiseCodec(int stream, AVCodec *codec);
+	void InitialiseFrame();
+	void InitialisePacket();
+	void InitialiseResampler();
 
-	PaSampleFormat conv_sample_fmt(enum AVSampleFormat in);
-
-	void au_in::setup_pa(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars);
+	PaSampleFormat SetupPortAudioSampleFormat();
+	void SetupPortAudioParameters(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars);
 		
-	bool decode_packet();
+	bool DecodePacket();
 	void Resample(char **buf, size_t *n);
 
 	PaSampleFormat SampleFormatAVToPA(AVSampleFormat av_format);
