@@ -137,16 +137,9 @@ audio::spin_up()
      * prevent spin-up from taking massive amounts of time and
      * thus delaying playback.)
      */
-	for (err = E_OK, c = PaUtil_GetRingBufferWriteAvailable(r);
-	     err == E_OK && (c > 0 && RINGBUF_SIZE - c < SPINUP_SIZE);
-	     err = decode(), c = PaUtil_GetRingBufferWriteAvailable(r));
-
-	/* Allow EOF, this'll be caught by the player callback once it hits the
-	 * end of file itself
-	 */
-	if (err != E_OK && err != E_EOF) {
-		throw err;
-	}
+	for (bool more = true, c = PaUtil_GetRingBufferWriteAvailable(r);
+	     more && (c > 0 && RINGBUF_SIZE - c < SPINUP_SIZE);
+	     more = decode(), c = PaUtil_GetRingBufferWriteAvailable(r));
 }
 
 /* Attempts to seek to the given position in microseconds. */
@@ -177,36 +170,40 @@ audio::inc_used_samples(uint64_t samples)
 	this->used_samples += samples;
 }
 
-enum error
+bool
 audio::decode()
 {
-	unsigned long	cap;
-	unsigned long	count;
-	enum error	err = E_OK;
+	bool more = true;
 
 	if (this->frame_samples == 0) {
 		/* We need to decode some new frames! */
-		this->av->decode(&(this->frame_ptr), &(this->frame_samples));
+		more = this->av->decode(&(this->frame_ptr), &(this->frame_samples));
 	}
-	cap = (unsigned long)PaUtil_GetRingBufferWriteAvailable(this->ring_buf.get());
-	count = (cap < this->frame_samples ? cap : this->frame_samples);
-	if (count > 0 && err == E_OK) {
-		/*
-		 * We can copy some already decoded samples into the ring
-		 * buffer
-		 */
-		unsigned long	num_written;
+	unsigned long cap = (unsigned long)PaUtil_GetRingBufferWriteAvailable(this->ring_buf.get());
+	unsigned long count = (cap < this->frame_samples ? cap : this->frame_samples);
+	if (count > 0) {
+		audio::WriteToRingBuffer(count);
+	}
 
-		num_written = PaUtil_WriteRingBuffer(this->ring_buf.get(),
-						     this->frame_ptr,
-						 (ring_buffer_size_t)count);
-		if (num_written != count)
-			throw error(E_INTERNAL_ERROR, "ringbuf write error");
-		this->frame_samples -= num_written;
-		this->frame_ptr += this->av->samples2bytes(num_written);
-	}
-	this->last_err = err;
-	return err;
+	return more;
+}
+
+/** 
+ * Write a given number of samples from the current frame to the ring buffer.
+ * @param count The number of samples to write to the ring buffer.
+ */
+void
+audio::WriteToRingBuffer(unsigned long count)
+{
+	unsigned long	num_written;
+
+	num_written = PaUtil_WriteRingBuffer(this->ring_buf.get(),
+		this->frame_ptr,
+		static_cast<ring_buffer_size_t>(count));
+	if (num_written != count)
+		throw error(E_INTERNAL_ERROR, "ringbuf write error");
+	this->frame_samples -= num_written;
+	this->frame_ptr += this->av->samples2bytes(num_written);
 }
 
 void

@@ -34,7 +34,7 @@ public:
 
 	void start();	/* Starts playback */
 	void stop();	/* Stops playback */
-	enum error decode();	/* Does some decoding work */
+	bool decode();	/* Does some decoding work */
 
 	enum error last_error();	/* Gets last playback error */
 	bool halted();	/* Has stream halted itself? */
@@ -66,6 +66,8 @@ private:
 	void free_ring_buf();
 
 	int cb_play(char *out, unsigned long frames_per_buf);
+
+	void WriteToRingBuffer(unsigned long count);
 };
 
 #endif				/* not AUDIO_H */

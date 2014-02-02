@@ -199,7 +199,10 @@ player::loop_iter()
 		}
 	}
 	if (this->cstate == S_PLAY || this->cstate == S_STOP) {
-		this->au->decode();
+		bool more = this->au->decode();
+		if (!more) {
+			cmd_ejct();
+		}
 	}
 }
 
