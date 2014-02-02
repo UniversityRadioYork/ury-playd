@@ -36,6 +36,8 @@ audio::audio(const std::string &path, int device)
 	this->frame_ptr = nullptr;
 	this->frame_samples = 0;
 
+	this->used_samples = 0;
+
 	this->callback = [this](char *out, unsigned long frames_per_buf) {
 		return this->cb_play(out, frames_per_buf);
 	};

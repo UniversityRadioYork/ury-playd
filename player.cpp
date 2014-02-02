@@ -52,6 +52,7 @@ player::player(int device)
 	this->cstate = S_EJCT;
 	this->device = device;
 	this->au = nullptr;
+	this->ptime = 0;
 }
 
 void
