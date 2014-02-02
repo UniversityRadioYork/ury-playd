@@ -130,7 +130,7 @@ audio::samples2bytes(size_t samples)
 void
 audio::spin_up()
 {
-	ring_buffer_size_t  c;
+	unsigned long c;
 	enum error	err;
 	PaUtilRingBuffer *r = this->ring_buf.get();
 
@@ -139,9 +139,9 @@ audio::spin_up()
      * prevent spin-up from taking massive amounts of time and
      * thus delaying playback.)
      */
-	for (bool more = true, c = PaUtil_GetRingBufferWriteAvailable(r);
+	for (bool more = true, c = RingBufferWriteCapacity();
 	     more && (c > 0 && RINGBUF_SIZE - c < SPINUP_SIZE);
-	     more = decode(), c = PaUtil_GetRingBufferWriteAvailable(r));
+	     more = decode(), c = RingBufferWriteCapacity());
 }
 
 /* Attempts to seek to the given position in microseconds. */
@@ -181,7 +181,7 @@ audio::decode()
 		/* We need to decode some new frames! */
 		more = this->av->decode(&(this->frame_ptr), &(this->frame_samples));
 	}
-	unsigned long cap = (unsigned long)PaUtil_GetRingBufferWriteAvailable(this->ring_buf.get());
+	unsigned long cap = RingBufferWriteCapacity();
 	unsigned long count = (cap < this->frame_samples ? cap : this->frame_samples);
 	if (count > 0) {
 		audio::WriteToRingBuffer(count);
@@ -270,4 +270,13 @@ audio::init_ring_buf(size_t bytes_per_sample)
 void
 audio::free_ring_buf()
 {
+}
+
+/**
+ * Gets the current write capacity of the ring buffer.
+ * @return The write capacity, in samples.
+ */
+unsigned long audio::RingBufferWriteCapacity()
+{
+	return PaUtil_GetRingBufferWriteAvailable(this->ring_buf.get());
 }
