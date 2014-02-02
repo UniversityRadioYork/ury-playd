@@ -1,5 +1,6 @@
 *
 cuppa
+!LICENSE.portaudio
 !*.txt
 !.gitignore
 !*.cpp
