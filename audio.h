@@ -6,9 +6,10 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-#include <memory> /* unique_ptr */
-
-#include <stdint.h>		/* uint64_t */
+#include <map>
+#include <memory>
+#include <string>
+#include <cstdint>
 
 #include "audio_av.h"
 
@@ -24,6 +25,10 @@
  */
 class audio {
 public:
+	typedef std::map<std::string, const std::string> DeviceList;
+
+	static DeviceList ListDevices();
+
 	/* Loads a file and constructs an audio structure to hold the playback
 	* state.
 	*/

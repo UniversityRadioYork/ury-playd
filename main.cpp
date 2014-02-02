@@ -21,6 +21,7 @@ extern "C" {
 
 #include <thread>
 #include <chrono>
+#include <iostream>
 
 #include <portaudio.h>
 
@@ -136,11 +137,7 @@ device_id(int argc, char *argv[])
 
 static void ListOutputDevices()
 {
-	const PaDeviceInfo *dev;
-
-	int	num_devices = Pa_GetDeviceCount();
-	for (int i = 0; i < num_devices; i++) {
-		dev = Pa_GetDeviceInfo(i);
-		dbug("%u: %s", i, dev->name);
+	for (auto device : audio::ListDevices()) {
+		std::cout << device.first << ": " << device.second << std::endl;
 	}
 }

@@ -17,6 +17,8 @@ extern "C" {
 }
 
 #include <algorithm>
+#include <map>
+#include <string>
 
 #include <portaudio.h>
 
@@ -26,6 +28,20 @@ extern "C" {
 #include "audio_av.h"
 #include "audio_cb.h"		/* audio_cb_play */
 #include "constants.h"
+
+audio::DeviceList audio::ListDevices()
+{
+	const PaDeviceInfo *dev;
+	DeviceList devices = {};
+
+	PaDeviceIndex num_devices = Pa_GetDeviceCount();
+	for (PaDeviceIndex i = 0; i < num_devices; i++) {
+		dev = Pa_GetDeviceInfo(i);
+		devices.emplace(std::to_string(i), std::string(dev->name));
+	}
+
+	return devices;
+}
 
 audio::audio(const std::string &path, int device)
 {
