@@ -55,40 +55,6 @@ player::player(int device)
 	this->ptime = 0;
 }
 
-void
-player::main_loop()
-{
-	enum error	err = E_OK;
-
-	/* Set of commands that can be performed on the player. */
-	command_set PLAYER_CMDS = {
-		/* Nullary commands */
-		{ "play", [&](const cmd_words &) { return this->cmd_play(); } },
-		{ "stop", [&](const cmd_words &) { return this->cmd_stop(); } },
-		{ "ejct", [&](const cmd_words &) { return this->cmd_ejct(); } },
-		{ "quit", [&](const cmd_words &) { return this->cmd_quit(); } },
-		/* Unary commands */
-		{ "load", [&](const cmd_words &words) { return this->cmd_load(words[1]); } },
-		{ "seek", [&](const cmd_words &words) { return this->cmd_seek(words[1]); } }
-	};
-
-	response(R_OHAI, "%s", MSG_OHAI);	/* Say hello */
-	while (state() != S_QUIT) {
-		/*
-		 * Possible Improvement: separate command checking and player
-		 * updating into two threads.  Player updating is quite
-		 * intensive and thus impairs the command checking latency.
-		 * Do this if it doesn't make the code too complex.
-		 */
-		err = check_commands(PLAYER_CMDS);
-		/* TODO: Check to see if err was fatal */
-		loop_iter();
-
-		std::this_thread::sleep_for(std::chrono::nanoseconds(LOOP_NSECS));
-	}
-	response(R_TTFN, "%s", MSG_TTFN);	/* Wave goodbye */
-}
-
 bool
 player::cmd_ejct()
 {
@@ -185,7 +151,7 @@ player::state()
 
 /* Performs an iteration of the player update loop. */
 void
-player::loop_iter()
+player::Update()
 {
 	if (this->cstate == S_PLAY) {
 		if (this->au->halted()) {

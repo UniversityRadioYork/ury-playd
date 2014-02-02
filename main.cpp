@@ -18,7 +18,13 @@ extern "C" {
 #undef inline
 #endif
 }
+
+#include <thread>
+#include <chrono>
+
 #include <portaudio.h>
+
+#include "cmd.h"
 
 #include "cuppa/io.h"
 
@@ -27,6 +33,7 @@ extern "C" {
 #include "player.h"
 
 static PaDeviceIndex device_id(int argc, char *argv[]);
+static void MainLoop(player &player);
 
 /* The main entry point. */
 int
@@ -44,19 +51,50 @@ main(int argc, char *argv[])
 		av_register_all();
 
 		player p(device);
-		p.main_loop();
-
-		Pa_Terminate();
-
+		MainLoop(p);
 	}
 	catch (enum error) {
 		exit_code = EXIT_FAILURE;
 	}
 
+	Pa_Terminate();
+
 	return exit_code;
 }
 
-/**  STATIC FUNCTIONS  ********************************************************/
+static void
+MainLoop(player &p)
+{
+	/* Set of commands that can be performed on the player. */
+	command_set PLAYER_CMDS = {
+		/* Nullary commands */
+		{ "play", [&](const cmd_words &) { return p.cmd_play(); } },
+		{ "stop", [&](const cmd_words &) { return p.cmd_stop(); } },
+		{ "ejct", [&](const cmd_words &) { return p.cmd_ejct(); } },
+		{ "quit", [&](const cmd_words &) { return p.cmd_quit(); } },
+		/* Unary commands */
+		{ "load", [&](const cmd_words &words) { return p.cmd_load(words[1]); } },
+		{ "seek", [&](const cmd_words &words) { return p.cmd_seek(words[1]); } }
+	};
+
+	response(R_OHAI, "%s", MSG_OHAI);	/* Say hello */
+
+	while (p.state() != S_QUIT) {
+		/*
+		* Possible Improvement: separate command checking and player
+		* updating into two threads.  Player updating is quite
+		* intensive and thus impairs the command checking latency.
+		* Do this if it doesn't make the code too complex.
+		*/
+		check_commands(PLAYER_CMDS);
+		/* TODO: Check to see if err was fatal */
+		p.Update();
+
+		std::this_thread::sleep_for(std::chrono::nanoseconds(LOOP_NSECS));
+	}
+
+	response(R_TTFN, "%s", MSG_TTFN);	/* Wave goodbye */
+}
 
 /* Tries to parse the device ID. */
 static PaDeviceIndex

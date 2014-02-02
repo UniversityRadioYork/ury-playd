@@ -48,6 +48,8 @@ public:
 
 	enum state state();
 
+	void Update();
+
 private:
 	int device;
 	uint64_t ptime;
@@ -56,7 +58,6 @@ private:
 
 	bool gate_state(std::initializer_list<enum state> states);
 	void set_state(enum state state);
-	void loop_iter();
 };
 
 
