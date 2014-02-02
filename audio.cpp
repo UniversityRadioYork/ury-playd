@@ -30,6 +30,25 @@ extern "C" {
 #include "audio_cb.h"		/* audio_cb_play */
 #include "constants.h"
 
+/**
+ * Initialises the libraries required for the audio subsystem.
+ */
+void audio::InitialiseLibraries()
+{
+	if (Pa_Initialize() != (int)paNoError) {
+		throw error(E_AUDIO_INIT_FAIL, "couldn't init portaudio");
+	}
+	av_register_all();
+}
+
+/**
+ * Cleans up the libraries initialised by InitialiseLibraries.
+ */
+void audio::CleanupLibraries()
+{
+	Pa_Terminate();
+}
+
 audio::DeviceList audio::ListDevices()
 {
 	const PaDeviceInfo *dev;

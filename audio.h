@@ -27,6 +27,9 @@ class audio {
 public:
 	typedef std::map<std::string, const std::string> DeviceList;
 
+	static void InitialiseLibraries();
+	static void CleanupLibraries();
+
 	static DeviceList ListDevices();
 
 	/* Loads a file and constructs an audio structure to hold the playback

@@ -51,26 +51,20 @@ const static std::unordered_map<State, std::string> STATES = {
 int
 main(int argc, char *argv[])
 {
-	int		exit_code = EXIT_SUCCESS;
+	int	exit_code = EXIT_SUCCESS;
 
 	try {
-		if (Pa_Initialize() != (int)paNoError) {
-			throw error(E_AUDIO_INIT_FAIL, "couldn't init portaudio");
-		}
+		audio::InitialiseLibraries();
 
-		std::string device = DeviceId(argc, argv);
-
-		av_register_all();
-
-		Player p(device);
+		Player p(DeviceId(argc, argv));
 		RegisterListeners(p);
 		MainLoop(p);
-	}
-	catch (enum error) {
+	} catch (enum error) {
+		std::cerr << "Unhandled exception caught, going away now.";
 		exit_code = EXIT_FAILURE;
 	}
 
-	Pa_Terminate();
+	audio::CleanupLibraries();
 
 	return exit_code;
 }
