@@ -5,6 +5,8 @@
 
 /**  INCLUDES  ****************************************************************/
 
+#include <algorithm>
+
 #include <string.h>
 
 #include <portaudio.h>
@@ -78,24 +80,28 @@ audio::cb_play(char *out, unsigned long frames_per_buf)
 				break;
 			}
 		} else {
-			unsigned long samples;
-
-			/* How many samples do we have? */
-			if (avail > frames_per_buf - frames_written)
-				samples = frames_per_buf - frames_written;
-			else
-				samples = avail;
-
-			/*
-			 * TODO: handle the ulong->long cast more gracefully,
-			 * perhaps.
-			 */
-			out += PaUtil_ReadRingBuffer(this->ring_buf.get(),
-						      out,
-					       (ring_buffer_size_t)samples);
-			frames_written += samples;
-			inc_used_samples(samples);
+			frames_written += ReadSamplesToOutput(out, avail, frames_per_buf - frames_written);
 		}
 	}
 	return (int)result;
+}
+
+/**
+ * Reads samples from the ring buffer to an output, and updates the used samples count.
+ * @param output A reference to the output buffer's current pointer.
+ * @param output_capacity The capacity of the output buffer, in samples.
+ * @param buffered_count The number of samples available in the ring buffer.
+ * @return The number of samples successfully written to the output buffer.
+ */
+unsigned long audio::ReadSamplesToOutput(char *&output, unsigned long output_capacity, unsigned long buffered_count)
+{
+	unsigned long transfer_count = std::min(output_capacity, buffered_count);
+
+	// TODO: handle the ulong->long cast more gracefully, perhaps.
+	output += PaUtil_ReadRingBuffer(this->ring_buf.get(),
+		output,
+		static_cast<ring_buffer_size_t>(transfer_count));
+
+	inc_used_samples(transfer_count);
+	return transfer_count;
 }

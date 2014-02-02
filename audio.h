@@ -66,6 +66,7 @@ private:
 	void free_ring_buf();
 
 	int cb_play(char *out, unsigned long frames_per_buf);
+	unsigned long audio::ReadSamplesToOutput(char *&output, unsigned long output_capacity, unsigned long buffered_count);
 
 	bool DecodeIfFrameEmpty();
 
