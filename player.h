@@ -33,9 +33,9 @@ typedef std::function<void(State, State)> StateListener;
 /* The player structure contains all persistent state in the program.
  *
  */
-class player {
+class Player {
 public:
-	player(int driver);
+	Player(int driver);
 
 	bool Eject();
 	bool Play();

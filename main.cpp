@@ -33,7 +33,7 @@ extern "C" {
 #include "player.h"
 
 static PaDeviceIndex device_id(int argc, char *argv[]);
-static void MainLoop(player &player);
+static void MainLoop(Player &player);
 
 /* Names of the states in enum state. */
 const static std::unordered_map<State, std::string> STATES = {
@@ -59,7 +59,7 @@ main(int argc, char *argv[])
 
 		av_register_all();
 
-		player p(device);
+		Player p(device);
 		p.RegisterPositionListener([](uint64_t position) { response(R_TIME, "%u", position); }, TIME_USECS);
 		p.RegisterStateListener([](State old_state, State new_state) {
 			response(R_STAT, "%s %s", STATES.at(old_state).c_str(), STATES.at(new_state).c_str());
@@ -76,7 +76,7 @@ main(int argc, char *argv[])
 }
 
 static void
-MainLoop(player &p)
+MainLoop(Player &p)
 {
 	/* Set of commands that can be performed on the player. */
 	command_set PLAYER_CMDS = {

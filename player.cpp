@@ -38,7 +38,7 @@ struct timespec
 #include "messages.h"
 #include "player.h"
 
-player::player(int device)
+Player::Player(int device)
 {
 	this->current_state = State::EJECTED;
 	this->device = device;
@@ -49,7 +49,7 @@ player::player(int device)
 	this->position_last = 0;
 }
 
-bool player::Eject()
+bool Player::Eject()
 {
 	bool valid = CurrentStateIn({ State::STOPPED, State::PLAYING });
 	if (valid) {
@@ -60,7 +60,7 @@ bool player::Eject()
 	return valid;
 }
 
-bool player::Play()
+bool Player::Play()
 {
 	bool valid = CurrentStateIn({ State::STOPPED }) && (this->au != nullptr);
 	if (valid) {
@@ -70,7 +70,7 @@ bool player::Play()
 	return valid;
 }
 
-bool player::Quit()
+bool Player::Quit()
 {
 	Eject();
 	SetState(State::QUITTING);
@@ -78,7 +78,7 @@ bool player::Quit()
 	return true; // Always a valid command.
 }
 
-bool player::Stop()
+bool Player::Stop()
 {
 	bool valid = CurrentStateIn({ State::PLAYING });
 	if (valid) {
@@ -88,7 +88,7 @@ bool player::Stop()
 	return valid;
 }
 
-bool player::Load(const std::string &filename)
+bool Player::Load(const std::string &filename)
 {
 	try {
 		this->au = std::unique_ptr<audio>(new audio(filename, this->device));
@@ -102,7 +102,7 @@ bool player::Load(const std::string &filename)
 	return true; // Always a valid command.
 }
 
-bool player::Seek(const std::string &time_str)
+bool Player::Seek(const std::string &time_str)
 {
 	/* TODO: proper overflow checking */
 
@@ -131,13 +131,13 @@ bool player::Seek(const std::string &time_str)
 	return valid;
 }
 
-State player::CurrentState()
+State Player::CurrentState()
 {
 	return this->current_state;
 }
 
 /* Performs an iteration of the player update loop. */
-void player::Update()
+void Player::Update()
 {
 	if (this->current_state == State::PLAYING) {
 		if (this->au->halted()) {
@@ -157,7 +157,7 @@ void player::Update()
 /* Throws an error if the current state is not in the state set provided by
  * the initializer_list.
  */
-bool player::CurrentStateIn(std::initializer_list<State> states)
+bool Player::CurrentStateIn(std::initializer_list<State> states)
 {
 	bool in_state = false;
 	for (State state : states) {
@@ -169,7 +169,7 @@ bool player::CurrentStateIn(std::initializer_list<State> states)
 }
 
 /* Sets the player state and honks accordingly. */
-void player::SetState(State state)
+void Player::SetState(State state)
 {
 	State last_state = this->current_state;
 
@@ -184,7 +184,7 @@ void player::SetState(State state)
  * Registers a listener for state changes.
  * @param listener The function to which state change signals shall be sent.
  */
-void player::RegisterStateListener(StateListener listener)
+void Player::RegisterStateListener(StateListener listener)
 {
 	this->state_listener = listener;
 }
@@ -194,7 +194,7 @@ void player::RegisterStateListener(StateListener listener)
  * This only sends a signal if the requested amount of time has passed since the last one.
  * It requires a handler to have been registered via SetTimeSignalHandler.
  */
-void player::SendPositionIfReady()
+void Player::SendPositionIfReady()
 {
 	uint64_t position = this->au->usec();
 	if (IsReadyToSendPosition(position)) {
@@ -208,7 +208,7 @@ void player::SendPositionIfReady()
  * @param current_time The current position in the song.
  * @return True if enough time has elapsed for a signal to be sent; false otherwise.
  */
-bool player::IsReadyToSendPosition(uint64_t current_position)
+bool Player::IsReadyToSendPosition(uint64_t current_position)
 {
 	bool ready = false;
 
@@ -224,7 +224,7 @@ bool player::IsReadyToSendPosition(uint64_t current_position)
  * @param listener The function to which position signals shall be sent.
  * @param period_usecs The approximate period, in microseconds, between position signals.
  */
-void player::RegisterPositionListener(PositionListener listener, uint64_t period_usecs)
+void Player::RegisterPositionListener(PositionListener listener, uint64_t period_usecs)
 {
 	this->position_listener = listener;
 	this->position_period = period_usecs;
