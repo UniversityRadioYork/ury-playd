@@ -56,7 +56,7 @@ player::player(int device)
 }
 
 bool
-player::cmd_ejct()
+player::Eject()
 {
 	bool valid = gate_state({ S_STOP, S_PLAY });
 	if (valid) {
@@ -68,7 +68,7 @@ player::cmd_ejct()
 }
 
 bool
-player::cmd_play()
+player::Play()
 {
 	bool valid = gate_state({ S_STOP }) && (this->au != nullptr);
 	if (valid) {
@@ -79,16 +79,16 @@ player::cmd_play()
 }
 
 bool
-player::cmd_quit()
+player::Quit()
 {
-	cmd_ejct();
+	Eject();
 	set_state(S_QUIT);
 
 	return true; // Always a valid command.
 }
 
 bool
-player::cmd_stop()
+player::Stop()
 {
 	bool valid = gate_state({ S_PLAY });
 	if (valid) {
@@ -99,7 +99,7 @@ player::cmd_stop()
 }
 
 bool
-player::cmd_load(const std::string &filename)
+player::Load(const std::string &filename)
 {
 	try {
 		this->au = std::unique_ptr<audio>(new audio(filename, this->device));
@@ -107,14 +107,14 @@ player::cmd_load(const std::string &filename)
 		set_state(S_STOP);
 	}
 	catch (enum error) {
-		cmd_ejct();
+		Eject();
 	}
 
 	return true; // Always a valid command.
 }
 
 bool
-player::cmd_seek(const std::string &time_str)
+player::Seek(const std::string &time_str)
 {
 	/* TODO: proper overflow checking */
 
@@ -155,7 +155,7 @@ player::Update()
 {
 	if (this->cstate == S_PLAY) {
 		if (this->au->halted()) {
-			cmd_ejct();
+			Eject();
 		} else {
 			/* Send a time pulse upstream every TIME_USECS usecs */
 			uint64_t time = this->au->usec();
@@ -168,7 +168,7 @@ player::Update()
 	if (this->cstate == S_PLAY || this->cstate == S_STOP) {
 		bool more = this->au->decode();
 		if (!more) {
-			cmd_ejct();
+			Eject();
 		}
 	}
 }

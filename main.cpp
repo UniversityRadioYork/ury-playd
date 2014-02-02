@@ -68,13 +68,13 @@ MainLoop(player &p)
 	/* Set of commands that can be performed on the player. */
 	command_set PLAYER_CMDS = {
 		/* Nullary commands */
-		{ "play", [&](const cmd_words &) { return p.cmd_play(); } },
-		{ "stop", [&](const cmd_words &) { return p.cmd_stop(); } },
-		{ "ejct", [&](const cmd_words &) { return p.cmd_ejct(); } },
-		{ "quit", [&](const cmd_words &) { return p.cmd_quit(); } },
+		{ "play", [&](const cmd_words &) { return p.Play(); } },
+		{ "stop", [&](const cmd_words &) { return p.Stop(); } },
+		{ "ejct", [&](const cmd_words &) { return p.Eject(); } },
+		{ "quit", [&](const cmd_words &) { return p.Quit(); } },
 		/* Unary commands */
-		{ "load", [&](const cmd_words &words) { return p.cmd_load(words[1]); } },
-		{ "seek", [&](const cmd_words &words) { return p.cmd_seek(words[1]); } }
+		{ "load", [&](const cmd_words &words) { return p.Load(words[1]); } },
+		{ "seek", [&](const cmd_words &words) { return p.Seek(words[1]); } }
 	};
 
 	response(R_OHAI, "%s", MSG_OHAI);	/* Say hello */

@@ -38,13 +38,13 @@ public:
 
 	void main_loop();
 
-	bool cmd_ejct();
-	bool cmd_play();
-	bool cmd_quit();
-	bool cmd_stop();
+	bool Eject();
+	bool Play();
+	bool Quit();
+	bool Stop();
 
-	bool cmd_load(const std::string &path);
-	bool cmd_seek(const std::string &time_str);
+	bool Load(const std::string &path);
+	bool Seek(const std::string &time_str);
 
 	enum state state();
 
