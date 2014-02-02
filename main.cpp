@@ -36,6 +36,7 @@ extern "C" {
 static std::string DeviceId(int argc, char *argv[]);
 static void MainLoop(Player &player);
 static void ListOutputDevices();
+static void RegisterListeners(Player &p);
 
 /* Names of the states in enum state. */
 const static std::unordered_map<State, std::string> STATES = {
@@ -62,10 +63,7 @@ main(int argc, char *argv[])
 		av_register_all();
 
 		Player p(device);
-		p.RegisterPositionListener([](uint64_t position) { response(R_TIME, "%u", position); }, TIME_USECS);
-		p.RegisterStateListener([](State old_state, State new_state) {
-			response(R_STAT, "%s %s", STATES.at(old_state).c_str(), STATES.at(new_state).c_str());
-		});
+		RegisterListeners(p);
 		MainLoop(p);
 	}
 	catch (enum error) {
@@ -75,6 +73,14 @@ main(int argc, char *argv[])
 	Pa_Terminate();
 
 	return exit_code;
+}
+
+static void RegisterListeners(Player &p)
+{
+	p.RegisterPositionListener([](uint64_t position) { response(R_TIME, "%u", position); }, TIME_USECS);
+	p.RegisterStateListener([](State old_state, State new_state) {
+		response(R_STAT, "%s %s", STATES.at(old_state).c_str(), STATES.at(new_state).c_str());
+	});
 }
 
 static void
