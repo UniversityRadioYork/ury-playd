@@ -81,8 +81,7 @@ bool CommandHandler::RunLine(const std::string &line)
  * commands; 'cmds' is a pointer to an END_CMDS-terminated array of command
  * definitions (see cmd.h for details).
  */
-void
-check_commands(const command_set &cmds)
+void check_commands(const command_set &cmds)
 {
 	if (input_waiting()) {
 		handle_cmd(cmds);
@@ -92,8 +91,7 @@ check_commands(const command_set &cmds)
  * If the command is set to be handled by PROPAGATE, it will be sent through
  * prop; it is an error if prop is NULL and PROPAGATE is reached.
  */
-void
-handle_cmd(const command_set &cmds)
+void handle_cmd(const command_set &cmds)
 {
 	std::string input;
 	cmd_words words;

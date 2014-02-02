@@ -50,13 +50,13 @@ inline void RespondArgs()
 
 inline void Respond(Response code)
 {
-	std::cout << RESPONSES.at(code) << " " << std::endl;
+	std::cout << RESPONSES.at(code) << std::endl;
 }
 
 template<typename... Args>
 inline void Respond(Response code, Args&... args)
 {
-	std::cout << RESPONSES.at(code) << " ";
+	std::cout << RESPONSES.at(code);
 	RespondArgs(args...);
 	std::cout << std::endl;
 }
@@ -64,7 +64,7 @@ inline void Respond(Response code, Args&... args)
 template<typename Arg1, typename... Args>
 inline void RespondArgs(const Arg1 &arg1, const Args&... args)
 {
-	std::cout << arg1;
+	std::cout << " " << arg1;
 	RespondArgs(args...);
 }
 

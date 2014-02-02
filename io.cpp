@@ -45,8 +45,7 @@ const std::unordered_map<Response, std::string> RESPONSES = {
 };
 
 /* Returns true if input is waiting on standard in. */
-int
-input_waiting(void)
+int input_waiting(void)
 {
 #ifdef WIN32
 	return _kbhit();

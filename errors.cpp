@@ -31,7 +31,7 @@ void Error::ToResponse()
 	Respond(Response::FAIL, Message());
 }
 
-std::string Error::Message()
+const std::string &Error::Message()
 {
 	return this->message;
 }

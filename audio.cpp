@@ -252,8 +252,7 @@ void AudioOutput::IncrementFrameMarkers(unsigned long sample_count)
 	this->frame_ptr += this->av->samples2bytes(sample_count);
 }
 
-void
-AudioOutput::init_sink(int device)
+void AudioOutput::init_sink(int device)
 {
 	double sample_rate = this->av->sample_rate();
 	PaStreamParameters pars;
@@ -279,8 +278,7 @@ AudioOutput::init_sink(int device)
  * The number of bytes for each sample must be provided; see
  * audio_av_samples2bytes for one way of getting this.
  */
-void
-AudioOutput::init_ring_buf(size_t bytes_per_sample)
+void AudioOutput::init_ring_buf(size_t bytes_per_sample)
 {
 	this->ring_data = std::unique_ptr<char[]>(new char[RINGBUF_SIZE * bytes_per_sample]);
 	this->ring_buf = std::unique_ptr<PaUtilRingBuffer>(new PaUtilRingBuffer);

@@ -30,8 +30,7 @@ const static std::unordered_map<State, std::string> STATES = {
 
 
 /* The main entry point. */
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	int	exit_code = EXIT_SUCCESS;
 
@@ -65,8 +64,7 @@ static void RegisterListeners(Player &p)
 	});
 }
 
-static void
-MainLoop(Player &p)
+static void MainLoop(Player &p)
 {
 	/* Set of commands that can be performed on the player. */
 	command_set PLAYER_CMDS = {

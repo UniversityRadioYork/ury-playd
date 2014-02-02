@@ -41,22 +41,29 @@ public:
 	
 	void Error::ToResponse();
 	ErrorCode Code();
-	std::string Message();
+	const std::string &Message();
 private:
 	ErrorCode error_code;
 	std::string message;
 };
 
-inline void Debug()
+inline void DebugArgs()
 {
 }
 
-template<typename T1, typename... Ts>
-inline void Debug(T1 &t1, Ts &...ts)
+template<typename... Ts>
+inline void Debug(Ts &...ts)
 {
-	std::cerr << "DEBUG: " << t1;
-	Debug(ts...);
+	std::cerr << "DEBUG:";
+	DebugArgs(ts...);
 	std::cerr << std::endl;
 };
+
+template<typename T1, typename... Ts>
+inline void DebugArgs(T1 &t1, Ts &...ts)
+{
+	std::cerr << " " << t1;
+	DebugArgs(ts...);
+}
 
 #endif				/* !CUPPA_ERRORS_H */
