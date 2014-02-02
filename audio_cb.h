@@ -6,13 +6,9 @@
 #ifndef AUDIO_CB_H
 #define AUDIO_CB_H
 
-/**  INCLUDES  ****************************************************************/
-
 #include <stdint.h>		/* uint64_t */
 
 #include "contrib/pa_ringbuffer.h"	/* PaUtilRingBuffer */
-
-/**  FUNCTIONS  ***************************************************************/
 
 int
 audio_cb_play(const void *in,
