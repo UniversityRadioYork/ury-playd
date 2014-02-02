@@ -56,8 +56,8 @@ private:
 	enum state cstate;
 	std::unique_ptr<audio> au;
 
-	bool gate_state(std::initializer_list<enum state> states);
-	void set_state(enum state state);
+	bool CurrentStateIn(std::initializer_list<enum state> states);
+	void SetState(enum state state);
 };
 
 

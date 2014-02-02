@@ -9,7 +9,7 @@
 #include <sstream>
 #include <vector>
 
-#include <cstdarg>		/* gate_state */
+#include <cstdarg>		/* CurrentStateIn */
 #include <cstdbool>		/* bool */
 #include <cstdint>
 #include <cstdlib>
@@ -58,10 +58,10 @@ player::player(int device)
 bool
 player::Eject()
 {
-	bool valid = gate_state({ S_STOP, S_PLAY });
+	bool valid = CurrentStateIn({ S_STOP, S_PLAY });
 	if (valid) {
 		this->au = nullptr;
-		set_state(S_EJCT);
+		SetState(S_EJCT);
 		this->ptime = 0;
 	}
 	return valid;
@@ -70,10 +70,10 @@ player::Eject()
 bool
 player::Play()
 {
-	bool valid = gate_state({ S_STOP }) && (this->au != nullptr);
+	bool valid = CurrentStateIn({ S_STOP }) && (this->au != nullptr);
 	if (valid) {
 		this->au->start();
-		set_state(S_PLAY);
+		SetState(S_PLAY);
 	}
 	return valid;
 }
@@ -82,7 +82,7 @@ bool
 player::Quit()
 {
 	Eject();
-	set_state(S_QUIT);
+	SetState(S_QUIT);
 
 	return true; // Always a valid command.
 }
@@ -90,10 +90,10 @@ player::Quit()
 bool
 player::Stop()
 {
-	bool valid = gate_state({ S_PLAY });
+	bool valid = CurrentStateIn({ S_PLAY });
 	if (valid) {
 		this->au->stop();
-		set_state(S_STOP);
+		SetState(S_STOP);
 	}
 	return valid;
 }
@@ -104,7 +104,7 @@ player::Load(const std::string &filename)
 	try {
 		this->au = std::unique_ptr<audio>(new audio(filename, this->device));
 		dbug("loaded %s", filename);
-		set_state(S_STOP);
+		SetState(S_STOP);
 	}
 	catch (enum error) {
 		Eject();
@@ -128,7 +128,7 @@ player::Seek(const std::string &time_str)
 	}
 
 	/* Weed out any unwanted states */
-	bool valid = gate_state({ S_PLAY, S_STOP });
+	bool valid = CurrentStateIn({ S_PLAY, S_STOP });
 	if (valid) {
 		//enum state current_state = this->cstate;
 
@@ -177,7 +177,7 @@ player::Update()
  * the initializer_list.
  */
 bool
-player::gate_state(std::initializer_list<enum state> states)
+player::CurrentStateIn(std::initializer_list<enum state> states)
 {
 	bool		in_state = false;
 	for (enum state state : states) {
@@ -190,7 +190,7 @@ player::gate_state(std::initializer_list<enum state> states)
 
 /* Sets the player state and honks accordingly. */
 void
-player::set_state(enum state state)
+player::SetState(enum state state)
 {
 	enum state pstate = this->cstate;
 
