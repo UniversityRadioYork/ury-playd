@@ -165,7 +165,7 @@ player::Update()
 			this->ptime = time;
 		}
 	}
-	if (this->cstate == S_PLAY || this->cstate == S_STOP) {
+	if (CurrentStateIn({ S_PLAY, S_STOP }))	{
 		bool more = this->au->decode();
 		if (!more) {
 			Eject();
