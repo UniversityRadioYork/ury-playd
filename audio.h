@@ -32,18 +32,16 @@ public:
 	/* Loads a file and constructs an audio structure to hold the playback
 	* state.
 	*/
-	audio(
-	  const std::string &path,	/* File to load into the audio struct */
-	  int device);		/* ID of the device to play out on */
-	  ~audio();	/* Frees an audio struct */
+	audio(const std::string &path, const std::string &device_id);
+	~audio();
 
-	void start();	/* Starts playback */
-	void stop();	/* Stops playback */
-	bool decode();	/* Does some decoding work */
+	void start();
+	void stop();
+	bool decode();
 
-	enum error last_error();	/* Gets last playback error */
-	bool halted();	/* Has stream halted itself? */
-	uint64_t usec();	/* Current time in song */
+	enum error last_error();
+	bool halted();
+	uint64_t usec();
 
 	void seek_usec(uint64_t usec);
 	void inc_used_samples(uint64_t samples);
@@ -81,6 +79,8 @@ private:
 	unsigned long RingBufferWriteCapacity();
 	unsigned long RingBufferTransferCount();
 	void IncrementFrameMarkers(unsigned long sample_count);
+
+	PaDeviceIndex audio::DeviceIdToPa(const std::string &id_string);
 };
 
 #endif				/* not AUDIO_H */

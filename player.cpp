@@ -38,10 +38,9 @@ struct timespec
 #include "messages.h"
 #include "player.h"
 
-Player::Player(int device)
+Player::Player(const std::string &device) : device(device)
 {
 	this->current_state = State::EJECTED;
-	this->device = device;
 	this->au = nullptr;
 
 	this->position_listener = nullptr;

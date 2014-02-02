@@ -40,7 +40,7 @@ public:
 	typedef std::function<void(uint64_t)> PositionListener;
 	typedef std::function<void(State, State)> StateListener;
 private:
-	int device;
+	const std::string &device;
 
 	std::unique_ptr<audio> au;
 
@@ -52,7 +52,7 @@ private:
 	State current_state;
 
 public:
-	Player(int driver);
+	Player(const std::string &device);
 
 	bool Eject();
 	bool Play();

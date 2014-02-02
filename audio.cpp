@@ -19,6 +19,7 @@ extern "C" {
 #include <algorithm>
 #include <map>
 #include <string>
+#include <sstream>
 
 #include <portaudio.h>
 
@@ -43,12 +44,12 @@ audio::DeviceList audio::ListDevices()
 	return devices;
 }
 
-audio::audio(const std::string &path, int device)
+audio::audio(const std::string &path, const std::string &device_id)
 {
 	this->last_err = E_INCOMPLETE;
 	this->av = std::unique_ptr<au_in>(new au_in(path));
 
-	init_sink(device);
+	init_sink(DeviceIdToPa(device_id));
 	init_ring_buf(this->av->samples2bytes(1L));
 
 	this->frame_ptr = nullptr;
@@ -317,4 +318,23 @@ unsigned long audio::RingBufferWriteCapacity()
 unsigned long audio::RingBufferTransferCount()
 {
 	return std::min(static_cast<unsigned long>(this->frame_samples), RingBufferWriteCapacity());
+}
+
+/**
+ * Converts a string device ID to a PaDeviceID.
+ * @param id_string The device ID, as a string.
+ * @return The device ID, as a PaDeviceID.
+ */
+PaDeviceIndex audio::DeviceIdToPa(const std::string &id_string)
+{
+	PaDeviceIndex id_pa = 0;
+
+	std::istringstream is(id_string);
+	is >> id_pa;
+
+	if (id_pa >= Pa_GetDeviceCount()) {
+		throw error(E_BAD_CONFIG, "Bad PortAudio ID.");
+	}
+
+	return id_pa;
 }

@@ -33,7 +33,7 @@ extern "C" {
 #include "messages.h"		/* MSG_xyz */
 #include "player.h"
 
-static PaDeviceIndex device_id(int argc, char *argv[]);
+static std::string DeviceId(int argc, char *argv[]);
 static void MainLoop(Player &player);
 static void ListOutputDevices();
 
@@ -57,7 +57,7 @@ main(int argc, char *argv[])
 			throw error(E_AUDIO_INIT_FAIL, "couldn't init portaudio");
 		}
 
-		PaDeviceIndex device = device_id(argc, argv);
+		std::string device = DeviceId(argc, argv);
 
 		av_register_all();
 
@@ -112,10 +112,9 @@ MainLoop(Player &p)
 }
 
 /* Tries to parse the device ID. */
-static PaDeviceIndex
-device_id(int argc, char *argv[])
+static std::string DeviceId(int argc, char *argv[])
 {
-	PaDeviceIndex device = 0;
+	std::string device = "";
 
 	/*
 	 * Possible Improvement: This is rather dodgy code for getting the
@@ -126,10 +125,7 @@ device_id(int argc, char *argv[])
 		ListOutputDevices();
 		throw error(E_BAD_CONFIG, MSG_DEV_NOID);
 	} else {
-		device = (int)strtoul(argv[1], NULL, 10);
-		if (device >= Pa_GetDeviceCount()) {
-			throw error(E_BAD_CONFIG, MSG_DEV_BADID);
-		}
+		device = std::string(argv[1]);
 	}
 
 	return device;
