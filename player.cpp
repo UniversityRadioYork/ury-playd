@@ -89,7 +89,7 @@ bool Player::Stop()
 bool Player::Load(const std::string &filename)
 {
 	try {
-		this->au = std::unique_ptr<audio>(new audio(filename, this->device));
+		this->au = std::unique_ptr<AudioOutput>(new AudioOutput(filename, this->device));
 		Debug("Loaded ", filename);
 		SetState(State::STOPPED);
 	}

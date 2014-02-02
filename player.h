@@ -42,7 +42,7 @@ public:
 private:
 	const std::string &device;
 
-	std::unique_ptr<audio> au;
+	std::unique_ptr<AudioOutput> au;
 
 	PositionListener position_listener;
 	uint64_t position_period;

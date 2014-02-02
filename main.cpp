@@ -36,7 +36,7 @@ main(int argc, char *argv[])
 	int	exit_code = EXIT_SUCCESS;
 
 	try {
-		audio::InitialiseLibraries();
+		AudioOutput::InitialiseLibraries();
 
 		// Don't roll this into the constructor: it'll go out of scope!
 		std::string device_id = DeviceId(argc, argv);
@@ -50,7 +50,7 @@ main(int argc, char *argv[])
 		exit_code = EXIT_FAILURE;
 	}
 
-	audio::CleanupLibraries();
+	AudioOutput::CleanupLibraries();
 
 	return exit_code;
 }
@@ -121,7 +121,7 @@ static std::string DeviceId(int argc, char *argv[])
 
 static void ListOutputDevices()
 {
-	for (auto device : audio::ListDevices()) {
+	for (auto device : AudioOutput::ListDevices()) {
 		std::cout << device.first << ": " << device.second << std::endl;
 	}
 }

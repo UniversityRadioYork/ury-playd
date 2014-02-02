@@ -35,8 +35,7 @@ void *v_au)
 	return (*f)(cout, frames_per_buf);
 }
 
-int
-audio::cb_play(char *out, unsigned long frames_per_buf)
+int AudioOutput::cb_play(char *out, unsigned long frames_per_buf)
 {
 	unsigned long avail;
 	PaStreamCallbackResult result = paContinue;
@@ -93,7 +92,7 @@ audio::cb_play(char *out, unsigned long frames_per_buf)
  * @param buffered_count The number of samples available in the ring buffer.
  * @return The number of samples successfully written to the output buffer.
  */
-unsigned long audio::ReadSamplesToOutput(char *&output, unsigned long output_capacity, unsigned long buffered_count)
+unsigned long AudioOutput::ReadSamplesToOutput(char *&output, unsigned long output_capacity, unsigned long buffered_count)
 {
 	unsigned long transfer_count = std::min(output_capacity, buffered_count);
 

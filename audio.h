@@ -23,7 +23,7 @@
  * struct audio is an opaque structure; only audio.c knows its true
  * definition.
  */
-class audio {
+class AudioOutput {
 public:
 	typedef std::map<std::string, const std::string> DeviceList;
 
@@ -35,8 +35,8 @@ public:
 	/* Loads a file and constructs an audio structure to hold the playback
 	* state.
 	*/
-	audio(const std::string &path, const std::string &device_id);
-	~audio();
+	AudioOutput(const std::string &path, const std::string &device_id);
+	~AudioOutput();
 
 	void start();
 	void stop();
@@ -69,10 +69,9 @@ private:
 
 	void init_sink(int device);
 	void init_ring_buf(size_t bytes_per_sample);
-	void free_ring_buf();
 
 	int cb_play(char *out, unsigned long frames_per_buf);
-	unsigned long audio::ReadSamplesToOutput(char *&output, unsigned long output_capacity, unsigned long buffered_count);
+	unsigned long ReadSamplesToOutput(char *&output, unsigned long output_capacity, unsigned long buffered_count);
 
 	bool DecodeIfFrameEmpty();
 
@@ -83,7 +82,7 @@ private:
 	unsigned long RingBufferTransferCount();
 	void IncrementFrameMarkers(unsigned long sample_count);
 
-	PaDeviceIndex audio::DeviceIdToPa(const std::string &id_string);
+	PaDeviceIndex DeviceIdToPa(const std::string &id_string);
 };
 
 #endif				/* not AUDIO_H */

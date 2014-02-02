@@ -33,7 +33,7 @@ extern "C" {
 /**
  * Initialises the libraries required for the audio subsystem.
  */
-void audio::InitialiseLibraries()
+void AudioOutput::InitialiseLibraries()
 {
 	if (Pa_Initialize() != (int)paNoError) {
 		throw Error(ErrorCode::AUDIO_INIT_FAIL, "couldn't init portaudio");
@@ -44,12 +44,12 @@ void audio::InitialiseLibraries()
 /**
  * Cleans up the libraries initialised by InitialiseLibraries.
  */
-void audio::CleanupLibraries()
+void AudioOutput::CleanupLibraries()
 {
 	Pa_Terminate();
 }
 
-audio::DeviceList audio::ListDevices()
+AudioOutput::DeviceList AudioOutput::ListDevices()
 {
 	const PaDeviceInfo *dev;
 	DeviceList devices = {};
@@ -63,7 +63,7 @@ audio::DeviceList audio::ListDevices()
 	return devices;
 }
 
-audio::audio(const std::string &path, const std::string &device_id)
+AudioOutput::AudioOutput(const std::string &path, const std::string &device_id)
 {
 	this->last_err = ErrorCode::INCOMPLETE;
 	this->av = std::unique_ptr<au_in>(new au_in(path));
@@ -81,10 +81,8 @@ audio::audio(const std::string &path, const std::string &device_id)
 	};
 }
 
-audio::~audio()
+AudioOutput::~AudioOutput()
 {
-	free_ring_buf();
-
 	if (this->out_strm != nullptr) {
 		Pa_CloseStream(this->out_strm);
 		this->out_strm = nullptr;
@@ -92,8 +90,7 @@ audio::~audio()
 	}
 }
 
-void
-audio::start()
+void AudioOutput::start()
 {
 	spin_up();
 
@@ -105,8 +102,7 @@ audio::start()
 	Debug("audio started");
 }
 
-void
-audio::stop()
+void AudioOutput::stop()
 {
 	PaError		pa_err = Pa_AbortStream(this->out_strm);
 	if (pa_err != paNoError) {
@@ -119,8 +115,7 @@ audio::stop()
 }
 
 /* Returns the last decoding error, or E_OK if the last decode succeeded. */
-ErrorCode
-audio::last_error()
+ErrorCode AudioOutput::last_error()
 {
 	return this->last_err;
 }
@@ -131,8 +126,7 @@ audio::last_error()
  * error that caused playback to halt will be returned.  E_UNKNOWN is returned
  * if playback has halted but the last error report was E_OK.
  */
-bool
-audio::halted()
+bool AudioOutput::halted()
 {
 	return !Pa_IsStreamActive(this->out_strm);
 }
@@ -142,14 +136,12 @@ audio::halted()
  * As this may be executing whilst the playing callback is running,
  * do not expect it to be highly accurate.
  */
-uint64_t
-audio::usec()
+uint64_t AudioOutput::usec()
 {
 	return this->av->samples2usec(this->used_samples);
 }
 
-size_t
-audio::samples2bytes(size_t samples)
+size_t AudioOutput::samples2bytes(size_t samples)
 {
 	return this->av->samples2bytes(samples);
 }
@@ -160,8 +152,7 @@ audio::samples2bytes(size_t samples)
  * If end of file is reached, it is ignored and converted to E_OK so that it can
  * later be caught by the player callback once it runs out of sound.
  */
-void
-audio::spin_up()
+void AudioOutput::spin_up()
 {
     /* Either fill the ringbuf or hit the maximum spin-up size,
      * whichever happens first.  (There's a maximum in order to
@@ -177,8 +168,7 @@ audio::spin_up()
 }
 
 /* Attempts to seek to the given position in microseconds. */
-void
-audio::seek_usec(uint64_t usec)
+void AudioOutput::seek_usec(uint64_t usec)
 {
 	size_t samples = this->av->usec2samples(usec);
 	this->av->seek(usec);
@@ -198,13 +188,12 @@ audio::seek_usec(uint64_t usec)
 /* Increments the used samples counter, which is used to determine the current
  * position in the song, by 'samples' samples.
  */
-void
-audio::inc_used_samples(uint64_t samples)
+void AudioOutput::inc_used_samples(uint64_t samples)
 {
 	this->used_samples += samples;
 }
 
-bool audio::decode()
+bool AudioOutput::decode()
 {
 	bool more_frames_available = DecodeIfFrameEmpty();
 	WriteAllAvailableToRingBuffer();
@@ -216,7 +205,7 @@ bool audio::decode()
  * Asks the decoder to decode the next frame if the current frame has been fully used.
  * @return true if the decoder has more frames available; false if it has run out.
  */
-bool audio::DecodeIfFrameEmpty()
+bool AudioOutput::DecodeIfFrameEmpty()
 {
 	bool more = true;
 	if (this->frame_samples == 0) {
@@ -229,11 +218,11 @@ bool audio::DecodeIfFrameEmpty()
 /**
  * Writes all samples currently waiting to be transferred to the ring buffer.
  */
-void audio::WriteAllAvailableToRingBuffer()
+void AudioOutput::WriteAllAvailableToRingBuffer()
 {
 	unsigned long count = RingBufferTransferCount();
 	if (count > 0) {
-		audio::WriteToRingBuffer(count);
+		WriteToRingBuffer(count);
 	}
 }
 
@@ -241,7 +230,7 @@ void audio::WriteAllAvailableToRingBuffer()
  * Write a given number of samples from the current frame to the ring buffer.
  * @param sample_count The number of samples to write to the ring buffer.
  */
-void audio::WriteToRingBuffer(unsigned long sample_count)
+void AudioOutput::WriteToRingBuffer(unsigned long sample_count)
 {
 	unsigned long written_count = PaUtil_WriteRingBuffer(this->ring_buf.get(),
 		this->frame_ptr,
@@ -250,21 +239,21 @@ void audio::WriteToRingBuffer(unsigned long sample_count)
 		throw Error(ErrorCode::INTERNAL_ERROR, "ringbuf write error");
 	}
 
-	audio::IncrementFrameMarkers(written_count);
+	IncrementFrameMarkers(written_count);
 }
 
 /**
  * Moves the frame samples and data markers forward.
  * @param sample_count The number of samples to move the markers.
  */
-void audio::IncrementFrameMarkers(unsigned long sample_count)
+void AudioOutput::IncrementFrameMarkers(unsigned long sample_count)
 {
 	this->frame_samples -= sample_count;
 	this->frame_ptr += this->av->samples2bytes(sample_count);
 }
 
 void
-audio::init_sink(int device)
+AudioOutput::init_sink(int device)
 {
 	double sample_rate = this->av->sample_rate();
 	PaStreamParameters pars;
@@ -291,11 +280,8 @@ audio::init_sink(int device)
  * audio_av_samples2bytes for one way of getting this.
  */
 void
-audio::init_ring_buf(size_t bytes_per_sample)
+AudioOutput::init_ring_buf(size_t bytes_per_sample)
 {
-	/* Get rid of any existing ring buffer stuff */
-	free_ring_buf();
-
 	this->ring_data = std::unique_ptr<char[]>(new char[RINGBUF_SIZE * bytes_per_sample]);
 	this->ring_buf = std::unique_ptr<PaUtilRingBuffer>(new PaUtilRingBuffer);
 	if (PaUtil_InitializeRingBuffer(this->ring_buf.get(),
@@ -306,17 +292,11 @@ audio::init_ring_buf(size_t bytes_per_sample)
 	}
 }
 
-/* Frees an audio structure's ring buffer. */
-void
-audio::free_ring_buf()
-{
-}
-
 /**
  * Gets the current write capacity of the ring buffer.
  * @return The write capacity, in samples.
  */
-unsigned long audio::RingBufferWriteCapacity()
+unsigned long AudioOutput::RingBufferWriteCapacity()
 {
 	return PaUtil_GetRingBufferWriteAvailable(this->ring_buf.get());
 }
@@ -325,7 +305,7 @@ unsigned long audio::RingBufferWriteCapacity()
  * Gets the current number of samples that may be transferred from the frame to the ring buffer.
  * @return The transfer count, in samples.
  */
-unsigned long audio::RingBufferTransferCount()
+unsigned long AudioOutput::RingBufferTransferCount()
 {
 	return std::min(static_cast<unsigned long>(this->frame_samples), RingBufferWriteCapacity());
 }
@@ -335,7 +315,7 @@ unsigned long audio::RingBufferTransferCount()
  * @param id_string The device ID, as a string.
  * @return The device ID, as a PaDeviceID.
  */
-PaDeviceIndex audio::DeviceIdToPa(const std::string &id_string)
+PaDeviceIndex AudioOutput::DeviceIdToPa(const std::string &id_string)
 {
 	PaDeviceIndex id_pa = 0;
 
