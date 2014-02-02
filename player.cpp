@@ -29,7 +29,7 @@ struct timespec
 #include <time.h>		/* struct timespec */
 #endif
 
-#include "cuppa/cmd.h"		/* struct cmd, check_commands */
+#include "cmd.h"		/* struct cmd, check_commands */
 #include "cuppa/io.h"           /* response */
 
 #include "audio.h"

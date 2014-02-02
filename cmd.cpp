@@ -31,8 +31,8 @@ typedef SSIZE_T ssize_t;
 
 #include "constants.h"		/* WORD_LEN */
 #include "cmd.h"		/* struct cmd, enum cmd_type */
-#include "errors.h"		/* error */
-#include "io.h"			/* response */
+#include "cuppa/errors.h"		/* error */
+#include "cuppa/io.h"			/* response */
 #include "messages.h"		/* Messages (usually errors) */
 
 /**
