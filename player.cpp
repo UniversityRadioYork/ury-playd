@@ -52,7 +52,10 @@ player::player(int device)
 	this->cstate = S_EJCT;
 	this->device = device;
 	this->au = nullptr;
-	this->ptime = 0;
+
+	this->position_listener = nullptr;
+	this->position_period = 0;
+	this->position_last = 0;
 }
 
 bool
@@ -62,7 +65,7 @@ player::Eject()
 	if (valid) {
 		this->au = nullptr;
 		SetState(S_EJCT);
-		this->ptime = 0;
+		this->position_last = 0;
 	}
 	return valid;
 }
@@ -157,12 +160,7 @@ player::Update()
 		if (this->au->halted()) {
 			Eject();
 		} else {
-			/* Send a time pulse upstream every TIME_USECS usecs */
-			uint64_t time = this->au->usec();
-			if (time / TIME_USECS > this->ptime / TIME_USECS) {
-				response(R_TIME, "%u", time);
-			}
-			this->ptime = time;
+			SendPositionIfReady();
 		}
 	}
 	if (CurrentStateIn({ S_PLAY, S_STOP }))	{
@@ -197,4 +195,45 @@ player::SetState(enum state state)
 	this->cstate = state;
 
 	response(R_STAT, "%s %s", STATES[pstate], STATES[state]);
+}
+
+/**
+ * Sends a position signal to the outside environment, if ready to send one.
+ * This only sends a signal if the requested amount of time has passed since the last one.
+ * It requires a handler to have been registered via SetTimeSignalHandler.
+ */
+void player::SendPositionIfReady()
+{
+	uint64_t position = this->au->usec();
+	if (IsReadyToSendPosition(position)) {
+		this->position_listener(position);
+		this->position_last = position;
+	}
+}
+
+/**
+ * Figures out whether it's time to send a position signal.
+ * @param current_time The current position in the song.
+ * @return True if enough time has elapsed for a signal to be sent; false otherwise.
+ */
+bool player::IsReadyToSendPosition(uint64_t current_position)
+{
+	bool ready = false;
+
+	if (this->position_listener != nullptr) {
+		ready = (current_position - this->position_last) > this->position_period;
+	}
+
+	return ready;
+}
+
+/**
+ * Registers a listener for position signals.
+ * @param listener The function to which position signals shall be sent.
+ * @param period_usecs The approximate period, in microseconds, between position signals.
+ */
+void player::RegisterPositionListener(std::function<void(uint64_t)> listener, uint64_t period_usecs)
+{
+	this->position_listener = listener;
+	this->position_period = period_usecs;
 }

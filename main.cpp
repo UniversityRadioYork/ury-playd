@@ -51,6 +51,7 @@ main(int argc, char *argv[])
 		av_register_all();
 
 		player p(device);
+		p.RegisterPositionListener([](uint64_t position) { response(R_TIME, "%u", position); }, TIME_USECS);
 		MainLoop(p);
 	}
 	catch (enum error) {

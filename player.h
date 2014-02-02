@@ -36,8 +36,6 @@ class player {
 public:
 	player(int driver);
 
-	void main_loop();
-
 	bool Eject();
 	bool Play();
 	bool Quit();
@@ -50,14 +48,22 @@ public:
 
 	void Update();
 
+	void RegisterPositionListener(std::function<void(uint64_t)> listener, uint64_t position_usecs);
+
 private:
 	int device;
-	uint64_t ptime;
 	enum state cstate;
 	std::unique_ptr<audio> au;
 
+	std::function<void(uint64_t)> position_listener;
+	uint64_t position_period;
+	uint64_t position_last;
+
 	bool CurrentStateIn(std::initializer_list<enum state> states);
 	void SetState(enum state state);
+
+	void SendPositionIfReady();
+	bool IsReadyToSendPosition(uint64_t current_position);
 };
 
 
