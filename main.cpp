@@ -3,27 +3,9 @@
  * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
  */
 
-#define _POSIX_C_SOURCE 200809
-
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-
-extern "C" {
-#ifdef WIN32
-#define inline __inline
-#endif
-#include <libavformat/avformat.h>
-#ifdef WIN32
-#undef inline
-#endif
-}
-
 #include <thread>
 #include <chrono>
 #include <iostream>
-
-#include <portaudio.h>
 
 #include "cmd.h"
 
