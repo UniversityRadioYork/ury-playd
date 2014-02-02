@@ -9,7 +9,7 @@
 
 #include "cmd.h"
 
-#include "cuppa/io.h"
+#include "io.hpp"
 
 #include "constants.h"		/* LOOP_NSECS */
 #include "messages.h"		/* MSG_xyz */
@@ -38,11 +38,15 @@ main(int argc, char *argv[])
 	try {
 		audio::InitialiseLibraries();
 
-		Player p(DeviceId(argc, argv));
+		// Don't roll this into the constructor: it'll go out of scope!
+		std::string device_id = DeviceId(argc, argv);
+
+		Player p(device_id);
 		RegisterListeners(p);
 		MainLoop(p);
-	} catch (enum error) {
-		std::cerr << "Unhandled exception caught, going away now.";
+	} catch (Error &error) {
+		error.ToResponse();
+		Debug("Unhandled exception caught, going away now.");
 		exit_code = EXIT_FAILURE;
 	}
 
@@ -53,9 +57,11 @@ main(int argc, char *argv[])
 
 static void RegisterListeners(Player &p)
 {
-	p.RegisterPositionListener([](uint64_t position) { response(R_TIME, "%u", position); }, TIME_USECS);
+	p.RegisterPositionListener([](uint64_t position) {
+		Respond(Response::TIME, position);
+	}, TIME_USECS);
 	p.RegisterStateListener([](State old_state, State new_state) {
-		response(R_STAT, "%s %s", STATES.at(old_state).c_str(), STATES.at(new_state).c_str());
+		Respond(Response::STAT, STATES.at(old_state), STATES.at(new_state));
 	});
 }
 
@@ -74,7 +80,7 @@ MainLoop(Player &p)
 		{ "seek", [&](const cmd_words &words) { return p.Seek(words[1]); } }
 	};
 
-	response(R_OHAI, "%s", MSG_OHAI);	/* Say hello */
+	Respond(Response::OHAI, MSG_OHAI); // Say hello
 
 	while (p.CurrentState() != State::QUITTING) {
 		/*
@@ -90,7 +96,7 @@ MainLoop(Player &p)
 		std::this_thread::sleep_for(std::chrono::nanoseconds(LOOP_NSECS));
 	}
 
-	response(R_TTFN, "%s", MSG_TTFN);	/* Wave goodbye */
+	Respond(Response::TTFN, MSG_TTFN);	// Wave goodbye
 }
 
 /* Tries to parse the device ID. */
@@ -105,7 +111,7 @@ static std::string DeviceId(int argc, char *argv[])
 	 */
 	if (argc < 2) {
 		ListOutputDevices();
-		throw error(E_BAD_CONFIG, MSG_DEV_NOID);
+		throw Error(ErrorCode::BAD_CONFIG, MSG_DEV_NOID);
 	} else {
 		device = std::string(argv[1]);
 	}

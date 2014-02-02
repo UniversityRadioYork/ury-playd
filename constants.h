@@ -34,6 +34,7 @@ extern "C" {
 //extern const size_t	BUFFER_SIZE;	/* Number of bytes in decoding buffer */
 //extern const size_t	RINGBUF_SIZE;	/* Number of samples in ring buffer */
 //extern const uint64_t	TIME_USECS;	/* Number of microseconds between TIME pulses */
+const uint64_t	USECS_IN_SEC = 1000000;
 
 const long	LOOP_NSECS = 1000;
 const size_t	BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;

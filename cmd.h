@@ -37,7 +37,7 @@ private:
 	cmd_words LineToWords(const std::string &line);
 };
 
-enum error	check_commands(const command_set &cmds);
-enum error	handle_cmd(const command_set &cmds);
+void check_commands(const command_set &cmds);
+void handle_cmd(const command_set &cmds);
 
 #endif				/* !CUPPA_CMD_H */

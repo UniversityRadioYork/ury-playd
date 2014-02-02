@@ -6,17 +6,18 @@
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
-/* All of these are defined in messages.c.
- *
- * NOTE: Some messages are defined in cuppa, see cuppa/messages.[hc].
- *
- * HOUSEKEEPING: Keep these and their messages.c counterparts in ASCIIbetical
- * order if possible?
- */
+#include <string>
 
-extern const char     *MSG_DEV_BADID;  /* Incorrect device ID given */ 
-extern const char     *MSG_DEV_NOID;	/* No device ID given */
-extern const char     *MSG_OHAI;	/* Greeting message */
-extern const char     *MSG_TTFN;	/* Parting message */
+const std::string MSG_DEV_BADID = "Incorrect device ID";
+const std::string MSG_DEV_NOID = "Expected a device ID as an argument";
+const std::string MSG_OHAI = "URY playslave at your service";
+const std::string MSG_TTFN = "Sleep now";
+const std::string MSG_CMD_ARGN = "Expecting no argument, got one";
+const std::string MSG_CMD_ARGU = "Expecting an argument, didn't get one";
+const std::string MSG_CMD_HITEND = "Hit end of commands list without stopping";
+const std::string MSG_CMD_NOPROP = "Command type is PROPAGATE, but propagate stream is NULL";
+const std::string MSG_CMD_NOSUCH = "Command not recognised";
+const std::string MSG_CMD_NOWORD = "Need at least a command word";
+const std::string MSG_ERR_NOMEM = "(ran out of memory to write error!)";
 
-#endif				/* not MESSAGES_H  */
+#endif /* !MESSAGES_H  */

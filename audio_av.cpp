@@ -9,6 +9,8 @@
 #include <string>
 #include <memory>
 #include <cstdlib>
+#include <iostream>
+#include <sstream>
 
 /* ffmpeg */
 extern "C" {
@@ -24,8 +26,7 @@ extern "C" {
 
 #include <portaudio.h>
 
-#include "cuppa/errors.h"               /* dbug, error */
-#include "cuppa/constants.h"            /* USECS_IN_SEC */
+#include "errors.hpp"
 
 #include "audio_av.h"
 #include "constants.h"
@@ -45,8 +46,8 @@ au_in::au_in(const std::string &path)
 	init_frame();
 	init_resampler();
 
-	dbug("stream id: %u", this->stream_id);
-	dbug("codec: %s", this->stream->codec->codec->long_name);
+	std::cerr << "stream id: " << this->stream_id;
+	std::cerr << "codec: ", this->stream->codec->codec->long_name;
 }
 
 au_in::~au_in()
@@ -112,21 +113,17 @@ au_in::samples2bytes(size_t samples)
 }
 
 /* Attempts to seek to the position 'usec' milliseconds into the file. */
-enum error
+void
 au_in::seek(uint64_t usec)
 {
-	int64_t		seek_pos;
-	enum error	err = E_OK;
-
-	seek_pos = ((usec * this->stream->time_base.den) /
+	int64_t seek_pos = ((usec * this->stream->time_base.den) /
 			this->stream->time_base.num) / USECS_IN_SEC;
 	if (av_seek_frame(this->context.get(),
-			  this->stream_id,
-			  (int64_t)seek_pos,
-			  AVSEEK_FLAG_ANY) != 0)
-		err = error(E_INTERNAL_ERROR, "seek failed");
-
-	return err;
+		this->stream_id,
+		(int64_t)seek_pos,
+		AVSEEK_FLAG_ANY) != 0) {
+		throw Error(ErrorCode::INTERNAL_ERROR, "seek failed");
+	}
 }
 
 /* Tries to decode an entire frame and points to its contents.
@@ -186,7 +183,7 @@ au_in::Resample(char **buf, size_t *n)
 		out_samples,
 		this->sample_format,
 		0) < 0) {
-		throw E_INTERNAL_ERROR;
+		throw Error(ErrorCode::INTERNAL_ERROR, "Couldn't allocate samples for reallocation!");
 	}
 
 	this->resample_buffer = std::unique_ptr<uint8_t, decltype(resample_buffer_deleter)>(rbuf, resample_buffer_deleter);
@@ -231,7 +228,7 @@ au_in::conv_sample_fmt(enum AVSampleFormat in)
 			nullptr
 			), resampler_deleter);
 		if (this->resampler == nullptr) {
-			throw E_NO_MEM;
+			throw Error(ErrorCode::NO_MEM, "Out of memory for resampler!");
 		}
 
 		swr_init(this->resampler.get());
@@ -269,7 +266,7 @@ PaSampleFormat au_in::SampleFormatAVToPA(AVSampleFormat av_format) {
 		pa_format = paFloat32;
 		break;
 	default:
-		throw error(E_BAD_FILE, "unusable sample rate");
+		throw Error(ErrorCode::BAD_FILE, "unusable sample rate");
 	}
 
 	return pa_format;
@@ -295,15 +292,15 @@ au_in::setup_pa(PaSampleFormat sf, int device, int chans, PaStreamParameters *pa
 void
 au_in::load_file(const std::string &path)
 {
-	enum error	err = E_OK;
-
 	AVFormatContext *ctx = nullptr;
 
 	if (avformat_open_input(&ctx,
 		path.c_str(),
 		NULL,
 		NULL) < 0) {
-		throw error(E_NO_FILE, "couldn't open %s", path.c_str());
+		std::ostringstream os;
+		os << "couldn't open " << path;
+		throw Error(ErrorCode::NO_FILE, os.str());
 	}
 
 	auto free_context = [](AVFormatContext *ctx) { avformat_close_input(&ctx); };
@@ -313,15 +310,12 @@ au_in::load_file(const std::string &path)
 void
 au_in::init_stream()
 {
-	AVCodec        *codec;
-	int		stream;
-	enum error	err = E_OK;
-
 	if (avformat_find_stream_info(this->context.get(), NULL) < 0) {
-		throw error(E_BAD_FILE, "no audio stream in file");
+		throw Error(ErrorCode::BAD_FILE, "no audio stream in file");
 	}
 
-	stream = av_find_best_stream(this->context.get(),
+	AVCodec *codec;
+	int stream = av_find_best_stream(this->context.get(),
 	  AVMEDIA_TYPE_AUDIO,
 	  -1,
 	  -1,
@@ -329,7 +323,7 @@ au_in::init_stream()
 	  0);
 
 	if (stream < 0) {
-		throw error(E_BAD_FILE, "can't open codec for file");
+		throw Error(ErrorCode::BAD_FILE, "can't open codec for file");
 	}
 
 	init_codec(stream, codec);
@@ -338,11 +332,9 @@ au_in::init_stream()
 void
 au_in::init_codec(int stream, AVCodec *codec)
 {
-	enum error	err = E_OK;
-
 	AVCodecContext *codec_context = this->context->streams[stream]->codec;
 	if (avcodec_open2(codec_context, codec, NULL) < 0) {
-		throw error(E_BAD_FILE, "can't open codec for file");
+		throw Error(ErrorCode::BAD_FILE, "can't open codec for file");
 	}
 
 	this->stream = this->context->streams[stream];
@@ -355,7 +347,7 @@ au_in::init_frame()
 	auto frame_deleter = [](AVFrame *frame) { avcodec_free_frame(&frame); };
 	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(avcodec_alloc_frame(), frame_deleter);
 	if (this->frame == nullptr) {
-		throw error(E_NO_MEM, "can't alloc frame");
+		throw Error(ErrorCode::NO_MEM, "can't alloc frame");
 	}
 }
 
@@ -382,8 +374,7 @@ au_in::decode_packet()
 				  this->frame.get(),
 				  &frame_finished,
 				  this->packet.get()) < 0) {
-		/* Decode error */
-		throw error(E_BAD_FILE, "decoding error");
+		throw Error(ErrorCode::BAD_FILE, "decoding error");
 	}
 	return frame_finished;
 }

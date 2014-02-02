@@ -11,7 +11,7 @@
 
 #include <portaudio.h>
 
-#include "cuppa/errors.h"	/* dbug */
+#include "errors.hpp"
 #include "contrib/pa_ringbuffer.h"	/* Ringbuffer */
 
 #include "audio.h"		/* Manipulating the audio structure */
@@ -52,21 +52,21 @@ audio::cb_play(char *out, unsigned long frames_per_buf)
 			 * cycle...
 			 */
 			switch (last_error()) {
-			case E_EOF:
+			case ErrorCode::END_OF_FILE:
 				/*
 				 * We've just hit the end of the file.
 				 * Nothing to worry about!
 				 */
 				result = paComplete;
 				break;
-			case E_OK:
-			case E_INCOMPLETE:
+			case ErrorCode::OK:
+			case ErrorCode::INCOMPLETE:
 				/*
 				 * Looks like we're just waiting for the
 				 * decoding to go through. In other words,
 				 * this is a buffer underflow.
 				 */
-				dbug("buffer underflow");
+				Debug("buffer underflow");
 				/* Break out of the loop inelegantly */
 				memset(out,
 				       0,

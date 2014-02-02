@@ -30,11 +30,10 @@ struct timespec
 #endif
 
 #include "cmd.h"		/* struct cmd, check_commands */
-#include "cuppa/io.h"           /* response */
+#include "io.hpp"
 
 #include "audio.h"
 #include "constants.h"
-#include "cuppa/constants.h"
 #include "messages.h"
 #include "player.h"
 
@@ -91,10 +90,11 @@ bool Player::Load(const std::string &filename)
 {
 	try {
 		this->au = std::unique_ptr<audio>(new audio(filename, this->device));
-		dbug("loaded %s", filename);
+		Debug("Loaded ", filename);
 		SetState(State::STOPPED);
 	}
-	catch (enum error) {
+	catch (Error &error) {
+		error.ToResponse();
 		Eject();
 	}
 

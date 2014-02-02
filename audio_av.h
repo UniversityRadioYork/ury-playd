@@ -14,7 +14,7 @@
 #include <libswresample/swresample.h>
 #include <portaudio.h>		/* PaStreamParameters */
 
-#include "cuppa/errors.h"	/* enum error */
+#include "errors.hpp"
 
 /* The audio input structure (thusly named in case we ever generalise
  * away from ffmpeg), containing all state pertaining to the input
@@ -34,7 +34,7 @@ public:
 	bool	decode(char **buf, size_t *n);
 	double		sample_rate();
 
-	enum error	seek(uint64_t usec);
+	void seek(uint64_t usec);
 
 	/* Unit conversion */
 	uint64_t	samples2usec(size_t samples);

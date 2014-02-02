@@ -15,7 +15,7 @@
 
 #include "contrib/pa_ringbuffer.h"	/* PaUtilRingBuffer */
 
-#include "cuppa/errors.h"		/* enum error */
+#include "errors.hpp"
 
 /* The audio structure contains all state pertaining to the currently
  * playing audio file.
@@ -42,7 +42,7 @@ public:
 	void stop();
 	bool decode();
 
-	enum error last_error();
+	ErrorCode last_error();
 	bool halted();
 	uint64_t usec();
 
@@ -54,7 +54,7 @@ public:
 	size_t samples2bytes(size_t samples);
 
 private:
-	enum error last_err;	/* Last result of decoding */
+	ErrorCode last_err;	/* Last result of decoding */
 	std::unique_ptr<au_in> av;	/* ffmpeg state */
 	/* shared state */
 	char *frame_ptr;

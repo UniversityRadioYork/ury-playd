@@ -36,7 +36,7 @@ extern "C" {
 void audio::InitialiseLibraries()
 {
 	if (Pa_Initialize() != (int)paNoError) {
-		throw error(E_AUDIO_INIT_FAIL, "couldn't init portaudio");
+		throw Error(ErrorCode::AUDIO_INIT_FAIL, "couldn't init portaudio");
 	}
 	av_register_all();
 }
@@ -65,7 +65,7 @@ audio::DeviceList audio::ListDevices()
 
 audio::audio(const std::string &path, const std::string &device_id)
 {
-	this->last_err = E_INCOMPLETE;
+	this->last_err = ErrorCode::INCOMPLETE;
 	this->av = std::unique_ptr<au_in>(new au_in(path));
 
 	init_sink(DeviceIdToPa(device_id));
@@ -88,43 +88,38 @@ audio::~audio()
 	if (this->out_strm != nullptr) {
 		Pa_CloseStream(this->out_strm);
 		this->out_strm = nullptr;
-		dbug("closed output stream");
+		Debug("closed output stream");
 	}
 }
 
 void
 audio::start()
 {
-	PaError		pa_err;
-	enum error	err = E_OK;
-
 	spin_up();
-	pa_err = Pa_StartStream(this->out_strm);
-	if (pa_err) {
-		throw error(E_INTERNAL_ERROR, "couldn't start stream");
+
+	PaError pa_err = Pa_StartStream(this->out_strm);
+	if (pa_err != paNoError) {
+		throw Error(ErrorCode::INTERNAL_ERROR, "couldn't start stream");
 	}
 
-	dbug("audio started");
+	Debug("audio started");
 }
 
 void
 audio::stop()
 {
-	PaError		pa_err;
-	enum error	err = E_OK;
-
-	pa_err = Pa_AbortStream(this->out_strm);
-	if (pa_err) {
-		throw error(E_INTERNAL_ERROR, "couldn't stop stream");
+	PaError		pa_err = Pa_AbortStream(this->out_strm);
+	if (pa_err != paNoError) {
+		throw Error(ErrorCode::INTERNAL_ERROR, "couldn't stop stream");
 	}
 
-	dbug("audio stopped");
+	Debug("audio stopped");
 
 	/* TODO: Possibly recover from dropping frames due to abort. */
 }
 
 /* Returns the last decoding error, or E_OK if the last decode succeeded. */
-enum error
+ErrorCode
 audio::last_error()
 {
 	return this->last_err;
@@ -189,7 +184,7 @@ audio::seek_usec(uint64_t usec)
 	this->av->seek(usec);
 
 	this->frame_samples = 0;
-	this->last_err = E_INCOMPLETE;
+	this->last_err = ErrorCode::INCOMPLETE;
 	this->used_samples = samples;	/* Update position marker */
 
 	//while (!Pa_IsStreamStopped(this->out_strm)) {
@@ -251,8 +246,9 @@ void audio::WriteToRingBuffer(unsigned long sample_count)
 	unsigned long written_count = PaUtil_WriteRingBuffer(this->ring_buf.get(),
 		this->frame_ptr,
 		static_cast<ring_buffer_size_t>(sample_count));
-	if (written_count != sample_count)
-		throw error(E_INTERNAL_ERROR, "ringbuf write error");
+	if (written_count != sample_count) {
+		throw Error(ErrorCode::INTERNAL_ERROR, "ringbuf write error");
+	}
 
 	audio::IncrementFrameMarkers(written_count);
 }
@@ -270,15 +266,10 @@ void audio::IncrementFrameMarkers(unsigned long sample_count)
 void
 audio::init_sink(int device)
 {
-	PaError		pa_err;
-	double		sample_rate;
+	double sample_rate = this->av->sample_rate();
 	PaStreamParameters pars;
-
-	sample_rate = this->av->sample_rate();
-
 	size_t samples_per_buf = this->av->pa_config(device, &pars);
-
-	pa_err = Pa_OpenStream(&this->out_strm,
+	PaError pa_err = Pa_OpenStream(&this->out_strm,
 			       NULL,
 			       &pars,
 			       sample_rate,
@@ -286,8 +277,8 @@ audio::init_sink(int device)
 			       paClipOff,
 			       audio_cb_play,
 				   static_cast<void *>(&this->callback));
-	if (pa_err) {
-		throw error(E_AUDIO_INIT_FAIL, "couldn't open stream: %i samplerate %d", pa_err, sample_rate);
+	if (pa_err != paNoError) {
+		throw Error(ErrorCode::AUDIO_INIT_FAIL, "couldn't open stream");
 	}
 }
 
@@ -311,7 +302,7 @@ audio::init_ring_buf(size_t bytes_per_sample)
 		static_cast<ring_buffer_size_t>(bytes_per_sample),
 		static_cast<ring_buffer_size_t>(RINGBUF_SIZE),
 		this->ring_data.get()) != 0) {
-		throw error(E_INTERNAL_ERROR, "ringbuf failed to init");
+		throw Error(ErrorCode::INTERNAL_ERROR, "ringbuf failed to init");
 	}
 }
 
@@ -352,7 +343,7 @@ PaDeviceIndex audio::DeviceIdToPa(const std::string &id_string)
 	is >> id_pa;
 
 	if (id_pa >= Pa_GetDeviceCount()) {
-		throw error(E_BAD_CONFIG, "Bad PortAudio ID.");
+		throw Error(ErrorCode::BAD_CONFIG, "Bad PortAudio ID.");
 	}
 
 	return id_pa;

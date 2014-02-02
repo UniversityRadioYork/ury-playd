@@ -31,8 +31,8 @@ typedef SSIZE_T ssize_t;
 
 #include "constants.h"		/* WORD_LEN */
 #include "cmd.h"		/* struct cmd, enum cmd_type */
-#include "cuppa/errors.h"		/* error */
-#include "cuppa/io.h"			/* response */
+#include "errors.hpp"
+#include "io.hpp"
 #include "messages.h"		/* Messages (usually errors) */
 
 /**
@@ -81,50 +81,40 @@ bool CommandHandler::RunLine(const std::string &line)
  * commands; 'cmds' is a pointer to an END_CMDS-terminated array of command
  * definitions (see cmd.h for details).
  */
-enum error
+void
 check_commands(const command_set &cmds)
 {
-	enum error	err = E_OK;
-
 	if (input_waiting()) {
-		err = handle_cmd(cmds);
+		handle_cmd(cmds);
 	}
-
-	return err;
 }
 /* Processes the command currently waiting on the given stream.
  * If the command is set to be handled by PROPAGATE, it will be sent through
  * prop; it is an error if prop is NULL and PROPAGATE is reached.
  */
-enum error
+void
 handle_cmd(const command_set &cmds)
 {
 	std::string input;
-	enum error	err = E_OK;
 	cmd_words words;
 
 	std::getline(std::cin, input);
-	dbug("got command: %s", input.c_str());
+	Debug("got command: ", input);
 
 	/* Silently fail if the command is actually end of file */
 	if (std::cin.eof()) {
-		dbug("end of file");
-		err = E_EOF;
+		Debug("end of file");
+		throw Error(ErrorCode::END_OF_FILE, "TODO: Handle this better");
 	}
-	if (err == E_OK) {
-		CommandHandler ch = CommandHandler(cmds);
-		bool valid = ch.RunLine(input);
 
-		if (valid) {
-			response(R_OKAY, input.c_str());
-		}
-		else {
-			error(E_BAD_COMMAND, "Bad command (or file name?)");
-		}
+	CommandHandler ch = CommandHandler(cmds);
+	bool valid = ch.RunLine(input);
+
+	if (valid) {
+		Respond(Response::OKAY, input);
+	} else {
+		Respond(Response::WHAT, "Invalid command.");
 	}
-	dbug("command processed");
-
-	return err;
 }
 
 /**
