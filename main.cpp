@@ -34,6 +34,7 @@ extern "C" {
 
 static PaDeviceIndex device_id(int argc, char *argv[]);
 static void MainLoop(Player &player);
+static void ListOutputDevices();
 
 /* Names of the states in enum state. */
 const static std::unordered_map<State, std::string> STATES = {
@@ -113,7 +114,6 @@ MainLoop(Player &p)
 static PaDeviceIndex
 device_id(int argc, char *argv[])
 {
-	int	num_devices = Pa_GetDeviceCount();
 	PaDeviceIndex device = 0;
 
 	/*
@@ -122,22 +122,25 @@ device_id(int argc, char *argv[])
 	 * more robust.
 	 */
 	if (argc < 2) {
-		int		i;
-		const PaDeviceInfo *dev;
-
-		/* Print out the available devices */
-		for (i = 0; i < num_devices; i++) {
-			dev = Pa_GetDeviceInfo(i);
-			dbug("%u: %s", i, dev->name);
-		}
-
+		ListOutputDevices();
 		throw error(E_BAD_CONFIG, MSG_DEV_NOID);
 	} else {
 		device = (int)strtoul(argv[1], NULL, 10);
-		if (device >= num_devices) {
+		if (device >= Pa_GetDeviceCount()) {
 			throw error(E_BAD_CONFIG, MSG_DEV_BADID);
 		}
 	}
 
 	return device;
+}
+
+static void ListOutputDevices()
+{
+	const PaDeviceInfo *dev;
+
+	int	num_devices = Pa_GetDeviceCount();
+	for (int i = 0; i < num_devices; i++) {
+		dev = Pa_GetDeviceInfo(i);
+		dbug("%u: %s", i, dev->name);
+	}
 }
