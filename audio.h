@@ -67,9 +67,13 @@ private:
 
 	int cb_play(char *out, unsigned long frames_per_buf);
 
+	bool DecodeIfFrameEmpty();
+
+	void WriteAllAvailableToRingBuffer();
 	void WriteToRingBuffer(unsigned long count);
 
 	unsigned long RingBufferWriteCapacity();
+	unsigned long RingBufferTransferCount();
 	void IncrementFrameMarkers(unsigned long sample_count);
 };
 

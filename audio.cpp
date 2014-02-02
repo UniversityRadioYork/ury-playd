@@ -16,6 +16,8 @@ extern "C" {
 #endif
 }
 
+#include <algorithm>
+
 #include <portaudio.h>
 
 #include "contrib/pa_ringbuffer.h"
@@ -172,22 +174,37 @@ audio::inc_used_samples(uint64_t samples)
 	this->used_samples += samples;
 }
 
-bool
-audio::decode()
+bool audio::decode()
+{
+	bool more_frames_available = DecodeIfFrameEmpty();
+	WriteAllAvailableToRingBuffer();
+
+	return more_frames_available;
+}
+
+/**
+ * Asks the decoder to decode the next frame if the current frame has been fully used.
+ * @return true if the decoder has more frames available; false if it has run out.
+ */
+bool audio::DecodeIfFrameEmpty()
 {
 	bool more = true;
-
 	if (this->frame_samples == 0) {
 		/* We need to decode some new frames! */
 		more = this->av->decode(&(this->frame_ptr), &(this->frame_samples));
 	}
-	unsigned long cap = RingBufferWriteCapacity();
-	unsigned long count = (cap < this->frame_samples ? cap : this->frame_samples);
+	return true;
+}
+
+/**
+ * Writes all samples currently waiting to be transferred to the ring buffer.
+ */
+void audio::WriteAllAvailableToRingBuffer()
+{
+	unsigned long count = RingBufferTransferCount();
 	if (count > 0) {
 		audio::WriteToRingBuffer(count);
 	}
-
-	return more;
 }
 
 /** 
@@ -279,4 +296,13 @@ audio::free_ring_buf()
 unsigned long audio::RingBufferWriteCapacity()
 {
 	return PaUtil_GetRingBufferWriteAvailable(this->ring_buf.get());
+}
+
+/**
+ * Gets the current number of samples that may be transferred from the frame to the ring buffer.
+ * @return The transfer count, in samples.
+ */
+unsigned long audio::RingBufferTransferCount()
+{
+	return std::min(static_cast<unsigned long>(this->frame_samples), RingBufferWriteCapacity());
 }
