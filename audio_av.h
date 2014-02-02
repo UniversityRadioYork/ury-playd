@@ -60,6 +60,10 @@ private:
 
 	void load_file(const std::string &path);
 	void init_stream();
+
+	void FindStreamInfo();
+	void FindStreamAndInitCodec();
+
 	void init_codec(int stream, AVCodec *codec);
 	void init_frame();
 	void init_packet();

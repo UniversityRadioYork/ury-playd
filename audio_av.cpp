@@ -307,13 +307,21 @@ au_in::load_file(const std::string &path)
 	this->context = std::unique_ptr<AVFormatContext, decltype(free_context)>(ctx, free_context);
 }
 
-void
-au_in::init_stream()
+void au_in::init_stream()
+{
+	FindStreamInfo();
+	FindStreamAndInitCodec();
+}
+
+void au_in::FindStreamInfo()
 {
 	if (avformat_find_stream_info(this->context.get(), NULL) < 0) {
 		throw Error(ErrorCode::BAD_FILE, "no audio stream in file");
 	}
+}
 
+void au_in::FindStreamAndInitCodec()
+{
 	AVCodec *codec;
 	int stream = av_find_best_stream(this->context.get(),
 	  AVMEDIA_TYPE_AUDIO,
