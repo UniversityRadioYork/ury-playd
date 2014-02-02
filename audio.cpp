@@ -192,20 +192,27 @@ audio::decode()
 
 /** 
  * Write a given number of samples from the current frame to the ring buffer.
- * @param count The number of samples to write to the ring buffer.
+ * @param sample_count The number of samples to write to the ring buffer.
  */
-void
-audio::WriteToRingBuffer(unsigned long count)
+void audio::WriteToRingBuffer(unsigned long sample_count)
 {
-	unsigned long	num_written;
-
-	num_written = PaUtil_WriteRingBuffer(this->ring_buf.get(),
+	unsigned long written_count = PaUtil_WriteRingBuffer(this->ring_buf.get(),
 		this->frame_ptr,
-		static_cast<ring_buffer_size_t>(count));
-	if (num_written != count)
+		static_cast<ring_buffer_size_t>(sample_count));
+	if (written_count != sample_count)
 		throw error(E_INTERNAL_ERROR, "ringbuf write error");
-	this->frame_samples -= num_written;
-	this->frame_ptr += this->av->samples2bytes(num_written);
+
+	audio::IncrementFrameMarkers(written_count);
+}
+
+/**
+ * Moves the frame samples and data markers forward.
+ * @param sample_count The number of samples to move the markers.
+ */
+void audio::IncrementFrameMarkers(unsigned long sample_count)
+{
+	this->frame_samples -= sample_count;
+	this->frame_ptr += this->av->samples2bytes(sample_count);
 }
 
 void

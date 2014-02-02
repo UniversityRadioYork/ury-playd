@@ -68,6 +68,7 @@ private:
 	int cb_play(char *out, unsigned long frames_per_buf);
 
 	void WriteToRingBuffer(unsigned long count);
+	void IncrementFrameMarkers(unsigned long sample_count);
 };
 
 #endif				/* not AUDIO_H */
