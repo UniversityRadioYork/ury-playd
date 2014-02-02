@@ -132,18 +132,17 @@ audio::samples2bytes(size_t samples)
 void
 audio::spin_up()
 {
-	unsigned long c;
-	enum error	err;
-	PaUtilRingBuffer *r = this->ring_buf.get();
-
     /* Either fill the ringbuf or hit the maximum spin-up size,
      * whichever happens first.  (There's a maximum in order to
      * prevent spin-up from taking massive amounts of time and
      * thus delaying playback.)
      */
-	for (bool more = true, c = RingBufferWriteCapacity();
-	     more && (c > 0 && RINGBUF_SIZE - c < SPINUP_SIZE);
-	     more = decode(), c = RingBufferWriteCapacity());
+	bool more = true;
+	unsigned long c = RingBufferWriteCapacity();
+	while (more && c > 0 && RINGBUF_SIZE - c < SPINUP_SIZE) {
+		more = decode();
+		c = RingBufferWriteCapacity();
+	}
 }
 
 /* Attempts to seek to the given position in microseconds. */
@@ -238,7 +237,6 @@ audio::init_sink(int device)
 	PaError		pa_err;
 	double		sample_rate;
 	PaStreamParameters pars;
-	enum error	err = E_OK;
 
 	sample_rate = this->av->sample_rate();
 
@@ -268,8 +266,6 @@ audio::init_sink(int device)
 void
 audio::init_ring_buf(size_t bytes_per_sample)
 {
-	enum error	err = E_OK;
-
 	/* Get rid of any existing ring buffer stuff */
 	free_ring_buf();
 
