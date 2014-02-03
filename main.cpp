@@ -18,7 +18,7 @@
 static void ListOutputDevices();
 static std::string DeviceId(int argc, char *argv[]);
 static void MainLoop(Player &player);
-static void RegisterListeners(Player &p);
+static void RegisterListeners(Player &player);
 
 const static std::unordered_map<State, std::string> STATES = {
 	{ State::EJECTED, "Ejected" },
@@ -90,9 +90,9 @@ int main(int argc, char *argv[])
 		// Don't roll this into the constructor: it'll go out of scope!
 		std::string device_id = DeviceId(argc, argv);
 
-		Player p(device_id);
-		RegisterListeners(p);
-		MainLoop(p);
+		Player player(device_id);
+		RegisterListeners(player);
+		MainLoop(player);
 	} catch (Error &error) {
 		error.ToResponse();
 		Debug("Unhandled exception caught, going away now.");
@@ -110,23 +110,23 @@ int main(int argc, char *argv[])
  * @todo Make the command check asynchronous/event based.
  * @todo Possibly separate command check and player updating into separate threads?
  */
-static void MainLoop(Player &p)
+static void MainLoop(Player &player)
 {
 	/* Set of commands that can be performed on the player. */
 	command_set PLAYER_CMDS = {
 		/* Nullary commands */
-		{ "play", [&](const cmd_words &) { return p.Play(); } },
-		{ "stop", [&](const cmd_words &) { return p.Stop(); } },
-		{ "ejct", [&](const cmd_words &) { return p.Eject(); } },
-		{ "quit", [&](const cmd_words &) { return p.Quit(); } },
+		{ "play", [&](const cmd_words &) { return player.Play(); } },
+		{ "stop", [&](const cmd_words &) { return player.Stop(); } },
+		{ "ejct", [&](const cmd_words &) { return player.Eject(); } },
+		{ "quit", [&](const cmd_words &) { return player.Quit(); } },
 		/* Unary commands */
-		{ "load", [&](const cmd_words &words) { return p.Load(words[1]); } },
-		{ "seek", [&](const cmd_words &words) { return p.Seek(words[1]); } }
+		{ "load", [&](const cmd_words &words) { return player.Load(words[1]); } },
+		{ "seek", [&](const cmd_words &words) { return player.Seek(words[1]); } }
 	};
 
 	Respond(Response::OHAI, MSG_OHAI); // Say hello
 
-	while (p.CurrentState() != State::QUITTING) {
+	while (player.CurrentState() != State::QUITTING) {
 		/*
 		* Possible Improvement: separate command checking and player
 		* updating into two threads.  Player updating is quite
@@ -134,11 +134,10 @@ static void MainLoop(Player &p)
 		* Do this if it doesn't make the code too complex.
 		*/
 		check_commands(PLAYER_CMDS);
-		/* TODO: Check to see if err was fatal */
-		p.Update();
+		player.Update();
 
 		std::this_thread::sleep_for(std::chrono::nanoseconds(LOOP_NSECS));
 	}
 
-	Respond(Response::TTFN, MSG_TTFN);	// Wave goodbye
+	Respond(Response::TTFN, MSG_TTFN); // Wave goodbye
 }
