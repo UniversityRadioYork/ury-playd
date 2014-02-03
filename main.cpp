@@ -15,12 +15,11 @@
 #include "messages.h"		/* MSG_xyz */
 #include "player.h"
 
+static void ListOutputDevices();
 static std::string DeviceId(int argc, char *argv[]);
 static void MainLoop(Player &player);
-static void ListOutputDevices();
 static void RegisterListeners(Player &p);
 
-/* Names of the states in enum state. */
 const static std::unordered_map<State, std::string> STATES = {
 	{ State::EJECTED, "Ejected" },
 	{ State::STOPPED, "Stopped" },
@@ -28,8 +27,59 @@ const static std::unordered_map<State, std::string> STATES = {
 	{ State::QUITTING, "Quitting" }
 };
 
+/**
+ * Lists on stdout all sound devices to which the audio output may connect.
+ * This is mainly for the benefit of the end user.
+ */
+static void ListOutputDevices()
+{
+	for (auto device : AudioOutput::ListDevices()) {
+		std::cout << device.first << ": " << device.second << std::endl;
+	}
+}
 
-/* The main entry point. */
+/**
+ * Tries to get the output device ID from stdin.
+ * If there is no stdin, the program prints up the available devices and dies.
+ * @param argc The program argument count (from main()).
+ * @param argv The program argument vector (from main()).
+ * @return The device ID, as a string.
+ */
+static std::string DeviceId(int argc, char *argv[])
+{
+	std::string device = "";
+
+	// TODO: Perhaps make this section more robust.
+	if (argc < 2) {
+		ListOutputDevices();
+		throw Error(ErrorCode::BAD_CONFIG, MSG_DEV_NOID);
+	} else {
+		device = std::string(argv[1]);
+	}
+
+	return device;
+}
+
+/**
+ * Registers various listeners with the Player.
+ * This is so time and state changes can be sent out on stdout.
+ * @param player The player to which the listeners will subscribe.
+ */
+static void RegisterListeners(Player &player)
+{
+	player.RegisterPositionListener([](uint64_t position) {
+			Respond(Response::TIME, position);
+	}, TIME_USECS);
+	player.RegisterStateListener([](State old_state, State new_state) {
+		Respond(Response::STAT, STATES.at(old_state), STATES.at(new_state));
+	});
+}
+
+/**
+ * The main entry point.
+ * @param argc Program argument count.
+ * @param argv Program argument vector.
+ */
 int main(int argc, char *argv[])
 {
 	int	exit_code = EXIT_SUCCESS;
@@ -54,16 +104,12 @@ int main(int argc, char *argv[])
 	return exit_code;
 }
 
-static void RegisterListeners(Player &p)
-{
-	p.RegisterPositionListener([](uint64_t position) {
-		Respond(Response::TIME, position);
-	}, TIME_USECS);
-	p.RegisterStateListener([](State old_state, State new_state) {
-		Respond(Response::STAT, STATES.at(old_state), STATES.at(new_state));
-	});
-}
-
+/**
+ * Performs the playslave main loop.
+ * This involves listening for commands and asking the player to do some work.
+ * @todo Make the command check asynchronous/event based.
+ * @todo Possibly separate command check and player updating into separate threads?
+ */
 static void MainLoop(Player &p)
 {
 	/* Set of commands that can be performed on the player. */
@@ -95,31 +141,4 @@ static void MainLoop(Player &p)
 	}
 
 	Respond(Response::TTFN, MSG_TTFN);	// Wave goodbye
-}
-
-/* Tries to parse the device ID. */
-static std::string DeviceId(int argc, char *argv[])
-{
-	std::string device = "";
-
-	/*
-	 * Possible Improvement: This is rather dodgy code for getting the
-	 * device ID out of the command line arguments, maybe make it a bit
-	 * more robust.
-	 */
-	if (argc < 2) {
-		ListOutputDevices();
-		throw Error(ErrorCode::BAD_CONFIG, MSG_DEV_NOID);
-	} else {
-		device = std::string(argv[1]);
-	}
-
-	return device;
-}
-
-static void ListOutputDevices()
-{
-	for (auto device : AudioOutput::ListDevices()) {
-		std::cout << device.first << ": " << device.second << std::endl;
-	}
 }
