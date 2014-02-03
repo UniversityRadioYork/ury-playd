@@ -8,11 +8,9 @@
 #include <iostream>
 
 #include "cmd.h"
-
+#include "constants.h"
 #include "io.hpp"
-
-#include "constants.h"		/* LOOP_NSECS */
-#include "messages.h"		/* MSG_xyz */
+#include "messages.h"
 #include "player.h"
 
 static void ListOutputDevices();
@@ -49,7 +47,7 @@ static std::string DeviceId(int argc, char *argv[])
 {
 	std::string device = "";
 
-	// TODO: Perhaps make this section more robust.
+	/* TODO: Perhaps make this section more robust. */
 	if (argc < 2) {
 		ListOutputDevices();
 		throw Error(ErrorCode::BAD_CONFIG, MSG_DEV_NOID);
@@ -67,12 +65,11 @@ static std::string DeviceId(int argc, char *argv[])
  */
 static void RegisterListeners(Player &player)
 {
-	player.RegisterPositionListener([](uint64_t position) {
-			Respond(Response::TIME, position);
-	}, TIME_USECS);
-	player.RegisterStateListener([](State old_state, State new_state) {
-		Respond(Response::STAT, STATES.at(old_state), STATES.at(new_state));
-	});
+	player.RegisterPositionListener(
+			[](uint64_t position) { Respond(Response::TIME, position); },
+			TIME_USECS);
+	player.RegisterStateListener(
+			[](State old_state, State new_state) { Respond(Response::STAT, STATES.at(old_state), STATES.at(new_state)); });
 }
 
 /**
@@ -87,7 +84,7 @@ int main(int argc, char *argv[])
 	try {
 		AudioOutput::InitialiseLibraries();
 
-		// Don't roll this into the constructor: it'll go out of scope!
+		/* Don't roll this into the constructor: it'll go out of scope! */
 		std::string device_id = DeviceId(argc, argv);
 
 		Player player(device_id);
@@ -114,30 +111,27 @@ static void MainLoop(Player &player)
 {
 	/* Set of commands that can be performed on the player. */
 	command_set PLAYER_CMDS = {
-		/* Nullary commands */
 		{ "play", [&](const cmd_words &) { return player.Play(); } },
 		{ "stop", [&](const cmd_words &) { return player.Stop(); } },
 		{ "ejct", [&](const cmd_words &) { return player.Eject(); } },
 		{ "quit", [&](const cmd_words &) { return player.Quit(); } },
-		/* Unary commands */
 		{ "load", [&](const cmd_words &words) { return player.Load(words[1]); } },
 		{ "seek", [&](const cmd_words &words) { return player.Seek(words[1]); } }
 	};
 
-	Respond(Response::OHAI, MSG_OHAI); // Say hello
+	Respond(Response::OHAI, MSG_OHAI);
 
 	while (player.CurrentState() != State::QUITTING) {
-		/*
-		* Possible Improvement: separate command checking and player
-		* updating into two threads.  Player updating is quite
-		* intensive and thus impairs the command checking latency.
-		* Do this if it doesn't make the code too complex.
-		*/
+		/* Possible Improvement: separate command checking and player
+		 * updating into two threads.  Player updating is quite
+		 * intensive and thus impairs the command checking latency.
+		 * Do this if it doesn't make the code too complex.
+		 */
 		check_commands(PLAYER_CMDS);
 		player.Update();
 
 		std::this_thread::sleep_for(std::chrono::nanoseconds(LOOP_NSECS));
 	}
 
-	Respond(Response::TTFN, MSG_TTFN); // Wave goodbye
+	Respond(Response::TTFN, MSG_TTFN);
 }
