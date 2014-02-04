@@ -44,9 +44,29 @@ public:
 
 	ErrorCode LastError();
 	bool IsHalted();
-	uint64_t CurrentPositionMicroseconds();
+		
+	/**
+	 * Return the current position, as a std::chrono::duration.
+	 * @return The current position in the audio.
+	 */
+	template<typename R>
+	R CurrentPosition()
+	{
+		return std::chrono::duration_cast<R>(CurrentPositionMicroseconds());
+	}
+	std::chrono::microseconds CurrentPositionMicroseconds();
 
-	void SeekToPositionMicroseconds(uint64_t usec);
+	/**
+	 * Seek to a position expressed as a std::chrono::duration.
+	 * @param position The position to seek to in the audio.
+	 */
+	template<typename R>
+	void SeekToPosition(R position)
+	{
+		SeekToPositionMicroseconds(
+				std::chrono::duration_cast<std::chrono::microseconds>(position));
+	}
+	void SeekToPositionMicroseconds(std::chrono::microseconds microseconds);
 
 	void PreFillRingBuffer();
 private:

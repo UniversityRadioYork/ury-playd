@@ -43,8 +43,9 @@ Player::Player(const std::string &device) : device(device)
 	this->au = nullptr;
 
 	this->position_listener = nullptr;
-	this->position_period = 0;
-	this->position_last = 0;
+	this->position_period = std::chrono::microseconds(0);
+	this->position_last = std::chrono::microseconds(0);
+	this->position_last_invalid = true;
 }
 
 bool Player::Eject()
@@ -53,7 +54,7 @@ bool Player::Eject()
 	if (valid) {
 		this->au = nullptr;
 		SetState(State::EJECTED);
-		this->position_last = 0;
+		this->position_last = std::chrono::microseconds(0);
 	}
 	return valid;
 }
@@ -90,6 +91,7 @@ bool Player::Load(const std::string &filename)
 {
 	try {
 		this->au = std::unique_ptr<AudioOutput>(new AudioOutput(filename, this->device));
+		this->position_last_invalid = true;
 		Debug("Loaded ", filename);
 		SetState(State::STOPPED);
 	}
@@ -106,12 +108,18 @@ bool Player::Seek(const std::string &time_str)
 	/* TODO: proper overflow checking */
 
 	std::istringstream is(time_str);
-	uint64_t microseconds;
+	uint64_t raw_time;
 	std::string rest;
-	is >> microseconds >> rest;
-
+	is >> raw_time >> rest;
+	
+	std::chrono::microseconds position(0);
 	if (rest == "s" || rest == "sec") {
-		microseconds *= USECS_IN_SEC;
+		position = std::chrono::duration_cast<std::chrono::microseconds>(
+				std::chrono::seconds(raw_time));
+
+	} else {
+		/* Assume microseconds */
+		position = std::chrono::microseconds(raw_time);
 	}
 
 	/* Weed out any unwanted states */
@@ -120,7 +128,9 @@ bool Player::Seek(const std::string &time_str)
 		//enum state current_state = this->cstate;
 
 		//cmd_stop(); // We need the player engine stopped in order to seek
-		this->au->SeekToPositionMicroseconds(microseconds);
+		this->au->SeekToPosition(position);
+		this->position_last_invalid = true;
+
 		//if (current_state == S_PLAY) {
 			// If we were playing before we'd ideally like to resume
 			//cmd_play();
@@ -195,24 +205,28 @@ void Player::RegisterStateListener(StateListener listener)
  */
 void Player::SendPositionIfReady()
 {
-	uint64_t position = this->au->CurrentPositionMicroseconds();
+	auto position = this->au->CurrentPosition<std::chrono::microseconds>();
 	if (IsReadyToSendPosition(position)) {
 		this->position_listener(position);
 		this->position_last = position;
+		this->position_last_invalid = false;
 	}
 }
 
 /**
  * Figures out whether it's time to send a position signal.
- * @param current_time The current position in the song.
+ * @param current_position The current position in the song.
  * @return True if enough time has elapsed for a signal to be sent; false otherwise.
  */
-bool Player::IsReadyToSendPosition(uint64_t current_position)
+bool Player::IsReadyToSendPosition(std::chrono::microseconds current_position)
 {
 	bool ready = false;
 
-	if (this->position_listener != nullptr) {
-		ready = (current_position - this->position_last) > this->position_period;
+	if (this->position_last_invalid) {
+		ready = true;
+	} else if (this->position_listener != nullptr) {
+		auto difference = current_position - this->position_last;
+		ready = difference >= this->position_period;
 	}
 
 	return ready;
@@ -223,8 +237,8 @@ bool Player::IsReadyToSendPosition(uint64_t current_position)
  * @param listener The function to which position signals shall be sent.
  * @param period_usecs The approximate period, in microseconds, between position signals.
  */
-void Player::RegisterPositionListener(PositionListener listener, uint64_t period_usecs)
+void Player::RegisterPositionListener(PositionListener listener, const std::chrono::microseconds period)
 {
 	this->position_listener = listener;
-	this->position_period = period_usecs;
+	this->position_period = period;
 }

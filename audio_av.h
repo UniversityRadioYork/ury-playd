@@ -6,13 +6,14 @@
 #ifndef AUDIO_AV_H
 #define AUDIO_AV_H
 
+#include <chrono>
 #include <functional>
 #include <string>
-#include <cstdint>		/* uint64_t */
+#include <cstdint>
 
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
-#include <portaudio.h>		/* PaStreamParameters */
+#include <portaudio.h>
 
 #include "errors.hpp"
 
@@ -32,13 +33,13 @@ public:
 	bool Decode(char **buf, size_t *n);
 	double SampleRate();
 
-	void SeekToPositionMicroseconds(uint64_t usec);
+	void SeekToPositionMicroseconds(std::chrono::microseconds position);
 
 	// Unit conversion
-	uint64_t	PositionMicrosecondsForSampleCount(size_t samples);
-	size_t		SampleCountForPositionMicroseconds(uint64_t usec);
-	size_t		SampleCountForByteCount(size_t bytes);
-	size_t		ByteCountForSampleCount(size_t samples);
+	std::chrono::microseconds PositionMicrosecondsForSampleCount(size_t samples);
+	size_t SampleCountForPositionMicroseconds(std::chrono::microseconds position);
+	size_t SampleCountForByteCount(size_t bytes);
+	size_t ByteCountForSampleCount(size_t samples);
 
 private:
 	AVStream *stream;

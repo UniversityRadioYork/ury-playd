@@ -136,7 +136,7 @@ bool AudioOutput::IsHalted()
  * As this may be executing whilst the playing callback is running,
  * do not expect it to be highly accurate.
  */
-uint64_t AudioOutput::CurrentPositionMicroseconds()
+std::chrono::microseconds AudioOutput::CurrentPositionMicroseconds()
 {
 	return this->av->PositionMicrosecondsForSampleCount(this->position_sample_count);
 }
@@ -168,7 +168,7 @@ void AudioOutput::PreFillRingBuffer()
 }
 
 /* Attempts to seek to the given position in microseconds. */
-void AudioOutput::SeekToPositionMicroseconds(uint64_t microseconds)
+void AudioOutput::SeekToPositionMicroseconds(std::chrono::microseconds microseconds)
 {
 	size_t new_position_sample_count = this->av->SampleCountForPositionMicroseconds(microseconds);
 	this->av->SeekToPositionMicroseconds(microseconds);

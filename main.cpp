@@ -66,8 +66,8 @@ static std::string DeviceId(int argc, char *argv[])
 static void RegisterListeners(Player &player)
 {
 	player.RegisterPositionListener(
-			[](uint64_t position) { Respond(Response::TIME, position); },
-			TIME_USECS);
+		[](std::chrono::microseconds position) { uint64_t p = position.count();  Respond(Response::TIME, p); },
+			POSITION_PERIOD);
 	player.RegisterStateListener(
 			[](State old_state, State new_state) { Respond(Response::STAT, STATES.at(old_state), STATES.at(new_state)); });
 }
@@ -130,7 +130,7 @@ static void MainLoop(Player &player)
 		check_commands(PLAYER_CMDS);
 		player.Update();
 
-		std::this_thread::sleep_for(std::chrono::nanoseconds(LOOP_NSECS));
+		std::this_thread::sleep_for(LOOP_PERIOD);
 	}
 
 	Respond(Response::TTFN, MSG_TTFN);

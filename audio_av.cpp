@@ -72,15 +72,17 @@ double au_in::SampleRate()
 }
 
 /* Converts stream position (in microseconds) to estimated sample count. */
-size_t au_in::SampleCountForPositionMicroseconds(uint64_t usec)
+size_t au_in::SampleCountForPositionMicroseconds(std::chrono::microseconds usec)
 {
-	return (usec * SampleRate()) / USECS_IN_SEC;
+	auto sample_micros = usec * SampleRate();
+	return std::chrono::duration_cast<std::chrono::seconds>(sample_micros).count();
 }
 
 /* Converts sample count to estimated stream position (in microseconds). */
-uint64_t au_in::PositionMicrosecondsForSampleCount(size_t samples)
+std::chrono::microseconds au_in::PositionMicrosecondsForSampleCount(size_t samples)
 {
-	return (samples * USECS_IN_SEC) / SampleRate();
+	auto position_secs = std::chrono::seconds(samples) / SampleRate();
+	return std::chrono::duration_cast<std::chrono::microseconds>(position_secs);
 }
 
 /* Converts buffer size (in bytes) to sample count (in samples). */
@@ -100,13 +102,17 @@ size_t au_in::ByteCountForSampleCount(size_t samples)
 }
 
 /* Attempts to seek to the position 'usec' milliseconds into the file. */
-void au_in::SeekToPositionMicroseconds(uint64_t usec)
+void au_in::SeekToPositionMicroseconds(std::chrono::microseconds position)
 {
-	int64_t seek_pos = ((usec * this->stream->time_base.den) /
-			this->stream->time_base.num) / USECS_IN_SEC;
+	auto position_timebase_microseconds = (position * this->stream->time_base.den)
+			/ this->stream->time_base.num;
+	auto position_timebase_seconds = std::chrono::duration_cast<std::chrono::seconds>(position_timebase_microseconds);
+	auto c = position_timebase_seconds.count();
+	Debug("Seeking to:", c);
+
 	if (av_seek_frame(this->context.get(),
 		this->stream_id,
-		(int64_t)seek_pos,
+		static_cast<int64_t>(position_timebase_seconds.count()),
 		AVSEEK_FLAG_ANY) != 0) {
 		throw Error(ErrorCode::INTERNAL_ERROR, "seek failed");
 	}

@@ -37,7 +37,7 @@ enum class State {
  */
 class Player {
 public:
-	typedef std::function<void(uint64_t)> PositionListener;
+	typedef std::function<void(std::chrono::microseconds)> PositionListener;
 	typedef std::function<void(State, State)> StateListener;
 private:
 	const std::string &device;
@@ -45,8 +45,9 @@ private:
 	std::unique_ptr<AudioOutput> au;
 
 	PositionListener position_listener;
-	uint64_t position_period;
-	uint64_t position_last;
+	std::chrono::microseconds position_period;
+	std::chrono::microseconds position_last;
+	bool position_last_invalid;
 
 	StateListener state_listener;
 	State current_state;
@@ -65,14 +66,14 @@ public:
 
 	void Update();
 
-	void RegisterPositionListener(PositionListener listener, uint64_t position_usecs);
+	void Player::RegisterPositionListener(PositionListener listener, const std::chrono::microseconds period);
 	void RegisterStateListener(StateListener listener);
 private:
 	bool CurrentStateIn(std::initializer_list<State> states);
 	void SetState(State state);
 
 	void SendPositionIfReady();
-	bool IsReadyToSendPosition(uint64_t current_position);
+	bool IsReadyToSendPosition(std::chrono::microseconds current_position);
 };
 
 #endif /* !PLAYER_H */
