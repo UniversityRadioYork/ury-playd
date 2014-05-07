@@ -21,13 +21,9 @@
 /* The callback proper, which is executed in a separate thread by PortAudio once
  * a stream is playing with the callback registered to it.
  */
-int
-audio_cb_play(const void *in,
-void *out,
-unsigned long frames_per_buf,
-const PaStreamCallbackTimeInfo *timeInfo,
-PaStreamCallbackFlags statusFlags,
-void *v_au)
+int audio_cb_play(const void* /*in*/, void *out,
+	unsigned long frames_per_buf, const PaStreamCallbackTimeInfo* /*timeInfo*/,
+	PaStreamCallbackFlags /*statusFlags*/, void *v_au)
 {
 	char *cout = static_cast<char *>(out);
 	auto f = static_cast<std::function<int(char *, unsigned long)> *>(v_au);

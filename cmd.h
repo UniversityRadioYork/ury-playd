@@ -15,7 +15,8 @@
 
 #include <memory>
 #include <functional>
-#include <unordered_map>
+#include <map>
+#include <vector>
 
 
 #ifdef IGNORE
@@ -24,7 +25,7 @@
 
 typedef std::vector<std::string> cmd_words;
 typedef std::function <bool(cmd_words)> payload;
-typedef std::unordered_map<std::string, payload> command_set;
+typedef std::map<std::string, payload> command_set;
 
 class CommandHandler {
 public:

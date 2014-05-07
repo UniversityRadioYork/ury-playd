@@ -10,7 +10,7 @@
  */
 
 #include <iostream>
-#include <unordered_map>
+#include <map>
 #include <string>
 
 #include <cstdarg>
@@ -27,7 +27,7 @@
 #include "io.hpp"
 
 /* Data for the responses used by cuppa. */
-const std::unordered_map<Response, std::string> RESPONSES = {
+const std::map<Response, std::string> RESPONSES = {
 	{ Response::OKAY, "OKAY" },
 	{ Response::WHAT, "WHAT" },
 	{ Response::FAIL, "FAIL" },

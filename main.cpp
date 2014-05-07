@@ -18,7 +18,7 @@ static std::string DeviceId(int argc, char *argv[]);
 static void MainLoop(Player &player);
 static void RegisterListeners(Player &player);
 
-const static std::unordered_map<State, std::string> STATES = {
+const static std::map<State, std::string> STATES = {
 	{ State::EJECTED, "Ejected" },
 	{ State::STOPPED, "Stopped" },
 	{ State::PLAYING, "Playing" },

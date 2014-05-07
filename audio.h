@@ -44,7 +44,7 @@ public:
 
 	ErrorCode LastError();
 	bool IsHalted();
-		
+
 	/**
 	 * Return the current position, as a std::chrono::duration.
 	 * @return The current position in the audio.

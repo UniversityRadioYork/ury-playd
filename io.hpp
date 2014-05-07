@@ -13,7 +13,7 @@
 #ifndef CUPPA_IO_H
 #define CUPPA_IO_H
 
-#include <unordered_map>
+#include <map>
 #include <iostream>
 #include <string>
 #include <stdarg.h>		/* vresponse */
@@ -42,10 +42,17 @@ enum class Response {
 	QNUM			/* Reminder of current number of queue items */
 };
 
-extern const std::unordered_map<Response, std::string> RESPONSES;
+extern const std::map<Response, std::string> RESPONSES;
 
 inline void RespondArgs()
 {
+}
+
+template<typename Arg1, typename... Args>
+inline void RespondArgs(const Arg1 &arg1, const Args&... args)
+{
+	std::cout << " " << arg1;
+	RespondArgs(args...);
 }
 
 inline void Respond(Response code)
@@ -59,13 +66,6 @@ inline void Respond(Response code, Args&... args)
 	std::cout << RESPONSES.at(code);
 	RespondArgs(args...);
 	std::cout << std::endl;
-}
-
-template<typename Arg1, typename... Args>
-inline void RespondArgs(const Arg1 &arg1, const Args&... args)
-{
-	std::cout << " " << arg1;
-	RespondArgs(args...);
 }
 
 int		input_waiting(void);

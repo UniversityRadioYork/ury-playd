@@ -111,7 +111,7 @@ bool Player::Seek(const std::string &time_str)
 	uint64_t raw_time;
 	std::string rest;
 	is >> raw_time >> rest;
-	
+
 	std::chrono::microseconds position(0);
 	if (rest == "s" || rest == "sec") {
 		position = std::chrono::duration_cast<std::chrono::microseconds>(
