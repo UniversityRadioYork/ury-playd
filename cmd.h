@@ -1,5 +1,5 @@
 /*
- * cmd.h - command parser Part of cuppa, the Common URY Playout Package
+ * cmd.h - command parser
  * Architecture
  *
  * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>

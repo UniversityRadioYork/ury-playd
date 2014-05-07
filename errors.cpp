@@ -1,6 +1,5 @@
 /*
  * errors.c - error reporting
- *   Part of cuppa, the Common URY Playout Package Architecture
  *
  * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
  */

@@ -1,6 +1,5 @@
 /*******************************************************************************
  * io.c - input/output
- *   Part of cuppa, the Common URY Playout Package Architecture
  *
  * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
  */
@@ -26,7 +25,7 @@
 
 #include "io.hpp"
 
-/* Data for the responses used by cuppa. */
+/* Data for the responses. */
 const std::map<Response, std::string> RESPONSES = {
 	{ Response::OKAY, "OKAY" },
 	{ Response::WHAT, "WHAT" },

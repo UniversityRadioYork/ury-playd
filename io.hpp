@@ -1,6 +1,5 @@
 /*******************************************************************************
  * io.h - input/output
- *   Part of cuppa, the Common URY Playout Package Architecture
  *
  * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
  */
