@@ -29,13 +29,11 @@ int audio_cb_play(const void* /*in*/, void *out,
 
 int AudioOutput::PlayCallback(char *out, unsigned long frames_per_buf)
 {
-	unsigned long avail;
 	PaStreamCallbackResult result = paContinue;
-
 	unsigned long frames_written = 0;
 
 	while (result == paContinue && frames_written < frames_per_buf) {
-		avail = PaUtil_GetRingBufferReadAvailable(this->ring_buf.get());
+		unsigned long avail = PaUtil_GetRingBufferReadAvailable(this->ring_buf.get());
 		if (avail == 0) {
 			/*
 			 * We've run out of sound, ruh-roh. Let's see if

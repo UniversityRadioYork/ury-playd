@@ -89,7 +89,6 @@ void check_commands(const command_set &cmds)
 void handle_cmd(const command_set &cmds)
 {
 	std::string input;
-	cmd_words words;
 
 	std::getline(std::cin, input);
 	Debug("got command: ", input);

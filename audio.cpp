@@ -51,12 +51,11 @@ void AudioOutput::CleanupLibraries()
 
 AudioOutput::DeviceList AudioOutput::ListDevices()
 {
-	const PaDeviceInfo *dev;
 	DeviceList devices = {};
 
 	PaDeviceIndex num_devices = Pa_GetDeviceCount();
 	for (PaDeviceIndex i = 0; i < num_devices; i++) {
-		dev = Pa_GetDeviceInfo(i);
+		const PaDeviceInfo *dev = Pa_GetDeviceInfo(i);
 		devices.emplace(std::to_string(i), std::string(dev->name));
 	}
 
