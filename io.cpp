@@ -1,8 +1,4 @@
-/*******************************************************************************
- * io.c - input/output
- *
- * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
- */
+/* io.cpp - input/output */
 /*
  * This file is part of Playslave-C++.
  * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.

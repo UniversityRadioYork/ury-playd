@@ -1,8 +1,4 @@
-/*******************************************************************************
- * cmd.c - command parser
- *
- * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
- */
+/* cmd.cpp - command parser */
 
 /*
  * This file is part of Playslave-C++.

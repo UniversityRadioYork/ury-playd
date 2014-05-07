@@ -1,8 +1,4 @@
-/*******************************************************************************
- * io.h - input/output
- *
- * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
- */
+/* io.h - input/output  */
 
 /*
  * This file is part of Playslave-C++.

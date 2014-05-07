@@ -1,8 +1,4 @@
-/*
- * errors.c - error reporting
- *
- * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
- */
+/* errors.cpp - error reporting */
 
 /*
  * This file is part of Playslave-C++.
