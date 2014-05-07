@@ -3,8 +3,6 @@
  * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
  */
 
-/**  INCLUDES  ****************************************************************/
-
 #include <algorithm>
 
 #include <string.h>
@@ -15,8 +13,6 @@
 #include "contrib/pa_ringbuffer.h"	/* Ringbuffer */
 
 #include "audio.h"		/* Manipulating the audio structure */
-
-/**  PUBLIC FUNCTIONS  ********************************************************/
 
 /* The callback proper, which is executed in a separate thread by PortAudio once
  * a stream is playing with the callback registered to it.
