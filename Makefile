@@ -24,7 +24,7 @@ $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -f $(OBJECTS) $(TARGET)
+	rm -f $(OBJECTS) $(COBJECTS) $(TARGET)
 
 mkdir:
 	mkdir -p $(OBJDIR)
