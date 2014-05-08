@@ -1,9 +1,4 @@
-/*
- * errors.c - error reporting
- *   Part of cuppa, the Common URY Playout Package Architecture
- *
- * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
- */
+/* errors.cpp - error reporting */
 
 /*
  * This file is part of Playslave-C++.

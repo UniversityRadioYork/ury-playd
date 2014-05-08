@@ -1,9 +1,4 @@
- /*
- * errors.c - error reporting
- *   Part of cuppa, the Common URY Playout Package Architecture
- *
- * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
- */
+/* errors.c - error reporting */
 
 /*
  * This file is part of Playslave-C++.
@@ -38,8 +33,8 @@ enum class ErrorCode {
 class Error {
 public:
 	Error(ErrorCode error_code, std::string message);
-	
-	void Error::ToResponse();
+
+	void ToResponse();
 	ErrorCode Code();
 	const std::string &Message();
 private:
@@ -51,19 +46,19 @@ inline void DebugArgs()
 {
 }
 
+template<typename T1, typename... Ts>
+inline void DebugArgs(T1 &t1, Ts &...ts)
+{
+	std::cerr << " " << t1;
+	DebugArgs(ts...);
+}
+
 template<typename... Ts>
 inline void Debug(Ts &...ts)
 {
 	std::cerr << "DEBUG:";
 	DebugArgs(ts...);
 	std::cerr << std::endl;
-};
-
-template<typename T1, typename... Ts>
-inline void DebugArgs(T1 &t1, Ts &...ts)
-{
-	std::cerr << " " << t1;
-	DebugArgs(ts...);
 }
 
 #endif				/* !CUPPA_ERRORS_H */

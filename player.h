@@ -66,7 +66,7 @@ public:
 
 	void Update();
 
-	void Player::RegisterPositionListener(PositionListener listener, const std::chrono::microseconds period);
+	void RegisterPositionListener(PositionListener listener, const std::chrono::microseconds period);
 	void RegisterStateListener(StateListener listener);
 private:
 	bool CurrentStateIn(std::initializer_list<State> states);

@@ -3,8 +3,6 @@
  * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
  */
 
-/**  INCLUDES  ****************************************************************/
-
 #include <algorithm>
 
 #include <string.h>
@@ -16,18 +14,12 @@
 
 #include "audio.h"		/* Manipulating the audio structure */
 
-/**  PUBLIC FUNCTIONS  ********************************************************/
-
 /* The callback proper, which is executed in a separate thread by PortAudio once
  * a stream is playing with the callback registered to it.
  */
-int
-audio_cb_play(const void *in,
-void *out,
-unsigned long frames_per_buf,
-const PaStreamCallbackTimeInfo *timeInfo,
-PaStreamCallbackFlags statusFlags,
-void *v_au)
+int audio_cb_play(const void* /*in*/, void *out,
+	unsigned long frames_per_buf, const PaStreamCallbackTimeInfo* /*timeInfo*/,
+	PaStreamCallbackFlags /*statusFlags*/, void *v_au)
 {
 	char *cout = static_cast<char *>(out);
 	auto f = static_cast<std::function<int(char *, unsigned long)> *>(v_au);
@@ -37,13 +29,11 @@ void *v_au)
 
 int AudioOutput::PlayCallback(char *out, unsigned long frames_per_buf)
 {
-	unsigned long avail;
 	PaStreamCallbackResult result = paContinue;
-
 	unsigned long frames_written = 0;
 
 	while (result == paContinue && frames_written < frames_per_buf) {
-		avail = PaUtil_GetRingBufferReadAvailable(this->ring_buf.get());
+		unsigned long avail = PaUtil_GetRingBufferReadAvailable(this->ring_buf.get());
 		if (avail == 0) {
 			/*
 			 * We've run out of sound, ruh-roh. Let's see if

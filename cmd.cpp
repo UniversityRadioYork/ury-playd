@@ -1,9 +1,4 @@
-/*******************************************************************************
- * cmd.c - command parser
- *   Part of cuppa, the Common URY Playout Package Architecture
- *
- * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
- */
+/* cmd.cpp - command parser */
 
 /*
  * This file is part of Playslave-C++.
@@ -94,7 +89,6 @@ void check_commands(const command_set &cmds)
 void handle_cmd(const command_set &cmds)
 {
 	std::string input;
-	cmd_words words;
 
 	std::getline(std::cin, input);
 	Debug("got command: ", input);

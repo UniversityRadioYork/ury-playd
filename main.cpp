@@ -13,12 +13,7 @@
 #include "messages.h"
 #include "player.h"
 
-static void ListOutputDevices();
-static std::string DeviceId(int argc, char *argv[]);
-static void MainLoop(Player &player);
-static void RegisterListeners(Player &player);
-
-const static std::unordered_map<State, std::string> STATES = {
+const static std::map<State, std::string> STATES = {
 	{ State::EJECTED, "Ejected" },
 	{ State::STOPPED, "Stopped" },
 	{ State::PLAYING, "Playing" },
@@ -73,35 +68,6 @@ static void RegisterListeners(Player &player)
 }
 
 /**
- * The main entry point.
- * @param argc Program argument count.
- * @param argv Program argument vector.
- */
-int main(int argc, char *argv[])
-{
-	int	exit_code = EXIT_SUCCESS;
-
-	try {
-		AudioOutput::InitialiseLibraries();
-
-		/* Don't roll this into the constructor: it'll go out of scope! */
-		std::string device_id = DeviceId(argc, argv);
-
-		Player player(device_id);
-		RegisterListeners(player);
-		MainLoop(player);
-	} catch (Error &error) {
-		error.ToResponse();
-		Debug("Unhandled exception caught, going away now.");
-		exit_code = EXIT_FAILURE;
-	}
-
-	AudioOutput::CleanupLibraries();
-
-	return exit_code;
-}
-
-/**
  * Performs the playslave main loop.
  * This involves listening for commands and asking the player to do some work.
  * @todo Make the command check asynchronous/event based.
@@ -134,4 +100,33 @@ static void MainLoop(Player &player)
 	}
 
 	Respond(Response::TTFN, MSG_TTFN);
+}
+
+/**
+ * The main entry point.
+ * @param argc Program argument count.
+ * @param argv Program argument vector.
+ */
+int main(int argc, char *argv[])
+{
+	int	exit_code = EXIT_SUCCESS;
+
+	try {
+		AudioOutput::InitialiseLibraries();
+
+		/* Don't roll this into the constructor: it'll go out of scope! */
+		std::string device_id = DeviceId(argc, argv);
+
+		Player player(device_id);
+		RegisterListeners(player);
+		MainLoop(player);
+	} catch (Error &error) {
+		error.ToResponse();
+		Debug("Unhandled exception caught, going away now.");
+		exit_code = EXIT_FAILURE;
+	}
+
+	AudioOutput::CleanupLibraries();
+
+	return exit_code;
 }

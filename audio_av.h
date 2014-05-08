@@ -70,7 +70,7 @@ private:
 
 	PaSampleFormat SetupPortAudioSampleFormat();
 	void SetupPortAudioParameters(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars);
-		
+
 	bool DecodePacket();
 	void Resample(char **buf, size_t *n);
 

@@ -35,7 +35,7 @@ au_in::au_in(const std::string &path)
 {
 	this->resample_buffer = nullptr;
 	this->buffer = std::unique_ptr<unsigned char[]>(new unsigned char[BUFFER_SIZE]);
-	
+
 	Open(path);
 	InitialiseStream();
 	InitialisePacket();
@@ -198,7 +198,6 @@ void au_in::Resample(char **buf, size_t *n)
 PaSampleFormat au_in::SetupPortAudioSampleFormat()
 {
 	AVSampleFormat in = this->stream->codec->sample_fmt;
-	PaSampleFormat out = 0;
 
 	/* We need to convert planar samples into packed samples. */
 	if (av_sample_fmt_is_planar(in)) {
@@ -338,8 +337,8 @@ void au_in::InitialiseCodec(int stream, AVCodec *codec)
 
 void au_in::InitialiseFrame()
 {
-	auto frame_deleter = [](AVFrame *frame) { avcodec_free_frame(&frame); };
-	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(avcodec_alloc_frame(), frame_deleter);
+	auto frame_deleter = [](AVFrame *frame) { av_frame_free(&frame); };
+	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(av_frame_alloc(), frame_deleter);
 	if (this->frame == nullptr) {
 		throw Error(ErrorCode::NO_MEM, "can't alloc frame");
 	}
@@ -347,7 +346,7 @@ void au_in::InitialiseFrame()
 
 void au_in::InitialisePacket()
 {
-	auto packet_deleter = [](AVPacket *packet) { av_free_packet(packet); delete packet; }; 
+	auto packet_deleter = [](AVPacket *packet) { av_free_packet(packet); delete packet; };
 	this->packet = std::unique_ptr<AVPacket, decltype(packet_deleter)>(new AVPacket, packet_deleter);
 
 	AVPacket *pkt = this->packet.get();

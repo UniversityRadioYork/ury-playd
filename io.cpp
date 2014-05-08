@@ -1,16 +1,11 @@
-/*******************************************************************************
- * io.c - input/output
- *   Part of cuppa, the Common URY Playout Package Architecture
- *
- * Contributors:  Matt Windsor <matt.windsor@ury.org.uk>
- */
+/* io.cpp - input/output */
 /*
  * This file is part of Playslave-C++.
  * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
  */
 
 #include <iostream>
-#include <unordered_map>
+#include <map>
 #include <string>
 
 #include <cstdarg>
@@ -26,8 +21,8 @@
 
 #include "io.hpp"
 
-/* Data for the responses used by cuppa. */
-const std::unordered_map<Response, std::string> RESPONSES = {
+/* Data for the responses. */
+const std::map<Response, std::string> RESPONSES = {
 	{ Response::OKAY, "OKAY" },
 	{ Response::WHAT, "WHAT" },
 	{ Response::FAIL, "FAIL" },

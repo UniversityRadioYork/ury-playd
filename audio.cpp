@@ -51,12 +51,11 @@ void AudioOutput::CleanupLibraries()
 
 AudioOutput::DeviceList AudioOutput::ListDevices()
 {
-	const PaDeviceInfo *dev;
 	DeviceList devices = {};
 
 	PaDeviceIndex num_devices = Pa_GetDeviceCount();
 	for (PaDeviceIndex i = 0; i < num_devices; i++) {
-		dev = Pa_GetDeviceInfo(i);
+		const PaDeviceInfo *dev = Pa_GetDeviceInfo(i);
 		devices.emplace(std::to_string(i), std::string(dev->name));
 	}
 
@@ -214,10 +213,9 @@ bool AudioOutput::Update()
  */
 bool AudioOutput::DecodeIfFrameEmpty()
 {
-	bool more = true;
 	if (this->frame_samples == 0) {
 		/* We need to decode some new frames! */
-		more = this->av->Decode(&(this->frame_ptr), &(this->frame_samples));
+		return this->av->Decode(&(this->frame_ptr), &(this->frame_samples));
 	}
 	return true;
 }
@@ -233,7 +231,7 @@ void AudioOutput::WriteAllAvailableToRingBuffer()
 	}
 }
 
-/** 
+/**
  * Write a given number of samples from the current frame to the ring buffer.
  * @param sample_count The number of samples to write to the ring buffer.
  */
