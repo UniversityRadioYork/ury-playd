@@ -5,6 +5,7 @@
  */
 
 #include <memory>
+#include <vector>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -14,12 +15,34 @@ extern "C" {
 #include "audio_resample.h"
 #include "errors.hpp"
 
+Resampler::Resampler(const SampleByteConverter &conv) : out(conv)
+{
+}
+
 AVSampleFormat Resampler::AVOutputFormat()
 {
 	return this->output_format;
 }
 
-PlanarResampler::PlanarResampler(AVCodecContext *codec)
+size_t Resampler::SampleCountForByteCount(size_t bytes) const
+{
+	return this->out.SampleCountForByteCount(bytes);
+}
+
+size_t Resampler::ByteCountForSampleCount(size_t samples) const
+{
+	return this->out.ByteCountForSampleCount(samples);
+}
+
+std::vector<char> *Resampler::MakeFrameVector(char *start, int sample_count)
+{
+	char *end = start + ByteCountForSampleCount(sample_count);
+	return new std::vector<char>(start, end);
+}
+
+PlanarResampler::PlanarResampler(const SampleByteConverter &out,
+                                 AVCodecContext *codec)
+    : Resampler(out)
 {
 	this->resample_buffer = nullptr;
 	this->output_format = av_get_packed_sample_fmt(codec->sample_fmt);
@@ -40,11 +63,8 @@ PlanarResampler::PlanarResampler(AVCodecContext *codec)
 	swr_init(this->swr.get());
 }
 
-size_t PlanarResampler::Resample(char **buf, AVFrame *frame)
+std::vector<char> *PlanarResampler::Resample(AVFrame *frame)
 {
-	auto resample_buffer_deleter = [](uint8_t *buffer) {
-		av_freep(&buffer);
-	};
 	uint8_t *rbuf;
 
 	int in_samples = frame->nb_samples;
@@ -57,27 +77,27 @@ size_t PlanarResampler::Resample(char **buf, AVFrame *frame)
 		            "Couldn't allocate samples for reallocation!");
 	}
 
-	this->resample_buffer = std::unique_ptr<
-	                uint8_t, decltype(resample_buffer_deleter)>(
-	                rbuf, resample_buffer_deleter);
-
 	size_t n = (size_t)swr_convert(
 	                this->swr.get(), &rbuf, out_samples,
 	                const_cast<const uint8_t **>(frame->extended_data),
 	                in_samples);
 
-	*buf = (char *)this->resample_buffer.get();
-	return n;
+	auto vector = MakeFrameVector(reinterpret_cast<char *>(rbuf), n);
+	av_freep(&rbuf);
+
+	return vector;
 }
 
-PackedResampler::PackedResampler(AVCodecContext *codec)
+PackedResampler::PackedResampler(const SampleByteConverter &out,
+                                 AVCodecContext *codec)
+    : Resampler(out)
 {
 	this->output_format = codec->sample_fmt;
 }
 
-size_t PackedResampler::Resample(char **buf, AVFrame *frame)
+std::vector<char> *PackedResampler::Resample(AVFrame *frame)
 {
-	// Only use first channel, as we have packed data.
-	*buf = (char *)frame->extended_data[0];
-	return frame->nb_samples;
+	return MakeFrameVector(
+	                reinterpret_cast<char *>(frame->extended_data[0]),
+	                frame->nb_samples);
 }

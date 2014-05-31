@@ -85,14 +85,14 @@ std::chrono::microseconds au_in::PositionMicrosecondsForSampleCount(
 }
 
 /* Converts buffer size (in bytes) to sample count (in samples). */
-size_t au_in::SampleCountForByteCount(size_t bytes)
+size_t au_in::SampleCountForByteCount(size_t bytes) const
 {
-	return (bytes / this->stream->codec->channels /
+	return ((bytes / this->stream->codec->channels) /
 	        av_get_bytes_per_sample(this->stream->codec->sample_fmt));
 }
 
 /* Converts sample count (in samples) to buffer size (in bytes). */
-size_t au_in::ByteCountForSampleCount(size_t samples)
+size_t au_in::ByteCountForSampleCount(size_t samples) const
 {
 	return (samples * this->stream->codec->channels *
 	        av_get_bytes_per_sample(this->stream->codec->sample_fmt));
@@ -118,21 +118,17 @@ void au_in::SeekToPositionMicroseconds(std::chrono::microseconds position)
 	}
 }
 
-/* Tries to decode an entire frame and points to its contents.
+/* Tries to decode an entire frame and returns a vector of its contents.
  *
- * The current state in *av is used to try run ffmpeg's decoder.
- *
- * If successful, returns E_OK and sets 'buf' and 'n' to a pointer to the buffer
- * and number of bytes decoded into it respectively.
- *
- * If the return value is false, we have run out of frames to decode; any other
- * return value signifies a decode error.  Do NOT rely on 'buf' and 'n' having
- * sensible values if E_OK is not returned.
+ * If successful, returns a pointer to the resulting vector of decoded data,
+ * which is owned by the caller.  If the return value is nullptr, we have run
+ * out of frames to decode.
  */
-bool au_in::Decode(char **buf, size_t *n)
+std::vector<char> *au_in::Decode()
 {
 	bool complete = false;
 	bool more = true;
+	std::vector<char> *vector = nullptr;
 
 	while (!(complete) && more) {
 		if (av_read_frame(this->context.get(), this->packet.get()) <
@@ -141,17 +137,17 @@ bool au_in::Decode(char **buf, size_t *n)
 		} else if (this->packet->stream_index == this->stream_id) {
 			complete = DecodePacket();
 			if (complete) {
-				*n = Resample(buf);
+				vector = Resample();
 			}
 		}
 	}
 
-	return more;
+	return vector;
 }
 
-size_t au_in::Resample(char **buf)
+std::vector<char> *au_in::Resample()
 {
-	return this->resampler->Resample(buf, this->frame.get());
+	return this->resampler->Resample(this->frame.get());
 }
 
 /* Converts from ffmpeg sample format to PortAudio sample format.
@@ -163,13 +159,18 @@ size_t au_in::Resample(char **buf)
 PaSampleFormat au_in::SetupPortAudioSampleFormat()
 {
 	/* We need to convert planar samples into packed samples. */
-	std::function<Resampler *(AVCodecContext *)> rs;
+	std::function<Resampler *(const SampleByteConverter &, AVCodecContext *)> rs;
 	if (av_sample_fmt_is_planar(this->stream->codec->sample_fmt)) {
-		rs = [](AVCodecContext *c) { return new PlanarResampler(c); };
+		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
+			return new PlanarResampler(s, c);
+		};
 	} else {
-		rs = [](AVCodecContext *c) { return new PackedResampler(c); };
+		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
+			return new PackedResampler(s, c);
+		};
 	}
-	this->resampler = std::unique_ptr<Resampler>(rs(this->stream->codec));
+	this->resampler = std::unique_ptr<Resampler>(
+	                rs(*this, this->stream->codec));
 	return SampleFormatAVToPA(this->resampler->AVOutputFormat());
 }
 

@@ -8,9 +8,10 @@
 #define AUDIO_AV_H
 
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <string>
-#include <cstdint>
+#include <vector>
 
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
@@ -26,13 +27,13 @@
  * struct au_in is an opaque structure; only audio_av.c knows its true
  * definition.
  */
-class au_in {
+class au_in : public SampleByteConverter {
 public:
 	au_in(const std::string &path);
 	~au_in();
 	size_t SetupPortAudio(int device, PaStreamParameters *params);
 
-	bool Decode(char **buf, size_t *n);
+	std::vector<char> *Decode();
 	double SampleRate();
 
 	void SeekToPositionMicroseconds(std::chrono::microseconds position);
@@ -42,8 +43,9 @@ public:
 	                size_t samples);
 	size_t SampleCountForPositionMicroseconds(
 	                std::chrono::microseconds position);
-	size_t SampleCountForByteCount(size_t bytes);
-	size_t ByteCountForSampleCount(size_t samples);
+
+	size_t SampleCountForByteCount(size_t bytes) const;
+	size_t ByteCountForSampleCount(size_t samples) const;
 
 private:
 	AVStream *stream;
@@ -73,7 +75,7 @@ private:
 	                              PaStreamParameters *pars);
 
 	bool DecodePacket();
-	size_t Resample(char **buf);
+	std::vector<char> *Resample();
 
 	PaSampleFormat SampleFormatAVToPA(AVSampleFormat av_format);
 };

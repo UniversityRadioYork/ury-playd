@@ -17,6 +17,7 @@ extern "C" {
 #endif
 }
 
+#include <cassert>
 #include <algorithm>
 #include <map>
 #include <string>
@@ -72,8 +73,7 @@ AudioOutput::AudioOutput(const std::string &path, const std::string &device_id)
 	InitialisePortAudio(DeviceIdToPa(device_id));
 	InitialiseRingBuffer(ByteCountForSampleCount(1L));
 
-	this->frame_ptr = nullptr;
-	this->frame_samples = 0;
+	this->frame = nullptr;
 
 	this->position_sample_count = 0;
 
@@ -148,6 +148,11 @@ size_t AudioOutput::ByteCountForSampleCount(size_t samples)
 	return this->av->ByteCountForSampleCount(samples);
 }
 
+size_t AudioOutput::SampleCountForByteCount(size_t bytes)
+{
+	return this->av->SampleCountForByteCount(bytes);
+}
+
 /* Tries to place enough audio into the audio buffer to prevent a
  * buffer underrun during a player start.
  *
@@ -178,7 +183,7 @@ void AudioOutput::SeekToPositionMicroseconds(
 	                                microseconds);
 	this->av->SeekToPositionMicroseconds(microseconds);
 
-	this->frame_samples = 0;
+	this->frame = nullptr;
 	this->last_error = ErrorCode::INCOMPLETE;
 	this->position_sample_count = new_position_sample_count;
 
@@ -213,19 +218,28 @@ bool AudioOutput::Update()
 }
 
 /**
- * Asks the decoder to decode the next frame if the current frame has been fully
- * used.
- * @return true if the decoder has more frames available; false if it has run
- * out.
+ * Decode the next frame if the current frame has been fully used.
+ * @return True if there were some samples left to decode; false otherwise.
  */
 bool AudioOutput::DecodeIfFrameEmpty()
 {
-	if (this->frame_samples == 0) {
-		/* We need to decode some new frames! */
-		return this->av->Decode(&(this->frame_ptr),
-		                        &(this->frame_samples));
+	bool more = true;
+
+	assert(this->frame == nullptr ||
+	       this->frame_iterator < this->frame->end());
+
+	if (this->frame == nullptr) {
+		std::vector<char> *frame_ptr = this->av->Decode();
+		if (frame_ptr == nullptr) {
+			more = false;
+		} else {
+			assert(frame_ptr->begin() < frame_ptr->end());
+			this->frame = decltype(this->frame)(frame_ptr);
+			this->frame_iterator = this->frame->begin();
+		}
 	}
-	return true;
+
+	return more;
 }
 
 /**
@@ -234,7 +248,7 @@ bool AudioOutput::DecodeIfFrameEmpty()
 void AudioOutput::WriteAllAvailableToRingBuffer()
 {
 	unsigned long count = RingBufferTransferCount();
-	if (count > 0) {
+	if (0 < count) {
 		WriteToRingBuffer(count);
 	}
 }
@@ -245,24 +259,41 @@ void AudioOutput::WriteAllAvailableToRingBuffer()
  */
 void AudioOutput::WriteToRingBuffer(unsigned long sample_count)
 {
+	assert(0 < sample_count);
+
 	unsigned long written_count = PaUtil_WriteRingBuffer(
-	                this->ring_buf.get(), this->frame_ptr,
+	                this->ring_buf.get(), &(*this->frame_iterator),
 	                static_cast<ring_buffer_size_t>(sample_count));
 	if (written_count != sample_count) {
 		throw Error(ErrorCode::INTERNAL_ERROR, "ringbuf write error");
 	}
+	assert(0 < written_count);
 
-	IncrementFrameMarkers(written_count);
+	AdvanceFrameIterator(written_count);
 }
 
 /**
- * Moves the frame samples and data markers forward.
+ * Moves the decoded data iterator forwards by a number of samples.
+ *
+ * If the iterator runs off the end of the decoded data vector, the data
+ * vector is freed and set to nullptr, so that a new decoding run can occur.
+ *
  * @param sample_count The number of samples to move the markers.
  */
-void AudioOutput::IncrementFrameMarkers(unsigned long sample_count)
+void AudioOutput::AdvanceFrameIterator(unsigned long sample_count)
 {
-	this->frame_samples -= sample_count;
-	this->frame_ptr += this->av->ByteCountForSampleCount(sample_count);
+	auto byte_count = this->av->ByteCountForSampleCount(sample_count);
+	assert(sample_count <= byte_count);
+	assert(0 < byte_count);
+
+	std::advance(this->frame_iterator, byte_count);
+	if (this->frame_iterator >= this->frame->end()) {
+		this->frame = nullptr;
+	}
+
+	assert(this->frame == nullptr ||
+	       (this->frame->begin() < this->frame_iterator &&
+	        this->frame_iterator < this->frame->end()));
 }
 
 void AudioOutput::InitialisePortAudio(int device)
@@ -319,8 +350,9 @@ unsigned long AudioOutput::RingBufferWriteCapacity()
  */
 unsigned long AudioOutput::RingBufferTransferCount()
 {
-	return std::min(static_cast<unsigned long>(this->frame_samples),
-	                RingBufferWriteCapacity());
+	long bytes = std::distance(this->frame_iterator, this->frame->end());
+	size_t samples = SampleCountForByteCount(static_cast<size_t>(bytes));
+	return std::min(samples, RingBufferWriteCapacity());
 }
 
 /**

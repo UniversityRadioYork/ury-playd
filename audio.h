@@ -76,8 +76,8 @@ private:
 	ErrorCode last_error;
 	std::unique_ptr<au_in> av;
 	/* shared state */
-	char *frame_ptr;
-	size_t frame_samples;
+	std::unique_ptr<std::vector<char>> frame;
+	decltype(frame->begin()) frame_iterator;
 	/* PortAudio state */
 	std::unique_ptr<PaUtilRingBuffer> ring_buf;
 	std::unique_ptr<char[]> ring_data;
@@ -90,6 +90,7 @@ private:
 	void InitialiseRingBuffer(size_t bytes_per_sample);
 
 	size_t ByteCountForSampleCount(size_t sample_count);
+	size_t SampleCountForByteCount(size_t sample_count);
 
 	int PlayCallback(char *out, unsigned long frames_per_buf);
 	unsigned long ReadSamplesToOutput(char *&output,
@@ -104,7 +105,7 @@ private:
 
 	unsigned long RingBufferWriteCapacity();
 	unsigned long RingBufferTransferCount();
-	void IncrementFrameMarkers(unsigned long sample_count);
+	void AdvanceFrameIterator(unsigned long sample_count);
 
 	PaDeviceIndex DeviceIdToPa(const std::string &id_string);
 };
