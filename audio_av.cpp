@@ -21,7 +21,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavcodec/version.h> /* For old version patchups */
 #include <libavformat/avformat.h>
-#include <libswresample/swresample.h>
 #include <libavutil/opt.h>
 }
 
@@ -30,11 +29,11 @@ extern "C" {
 #include "errors.hpp"
 
 #include "audio_av.h"
+#include "audio_resample.h"
 #include "constants.h"
 
 au_in::au_in(const std::string &path)
 {
-	this->resample_buffer = nullptr;
 	this->buffer = std::unique_ptr<unsigned char[]>(
 	                new unsigned char[BUFFER_SIZE]);
 
@@ -42,7 +41,6 @@ au_in::au_in(const std::string &path)
 	InitialiseStream();
 	InitialisePacket();
 	InitialiseFrame();
-	InitialiseResampler();
 
 	Debug("stream id:", this->stream_id);
 	Debug("codec:", this->stream->codec->codec->long_name);
@@ -50,11 +48,6 @@ au_in::au_in(const std::string &path)
 
 au_in::~au_in()
 {
-}
-
-void au_in::InitialiseResampler()
-{
-	this->use_resampler = false;
 }
 
 size_t au_in::SetupPortAudio(int device, PaStreamParameters *params)
@@ -147,17 +140,8 @@ bool au_in::Decode(char **buf, size_t *n)
 			more = false;
 		} else if (this->packet->stream_index == this->stream_id) {
 			complete = DecodePacket();
-
 			if (complete) {
-				if (this->use_resampler) {
-					Resample(buf, n);
-				} else {
-					// Only use first channel, as we have
-					// packed data.
-					*buf = (char *)this->frame->extended_data
-					                       [0];
-					*n = this->frame->nb_samples;
-				}
+				*n = Resample(buf);
 			}
 		}
 	}
@@ -165,36 +149,9 @@ bool au_in::Decode(char **buf, size_t *n)
 	return more;
 }
 
-void au_in::Resample(char **buf, size_t *n)
+size_t au_in::Resample(char **buf)
 {
-	auto resample_buffer_deleter = [](uint8_t *buffer) {
-		av_freep(&buffer);
-	};
-	uint8_t *rbuf;
-
-	int in_samples = this->frame->nb_samples;
-	int rate = this->frame->sample_rate;
-	int out_samples =
-	                swr_get_delay(this->resampler.get(), rate) + in_samples;
-
-	if (av_samples_alloc(&rbuf, nullptr,
-	                     av_frame_get_channels(this->frame.get()),
-	                     out_samples, this->sample_format, 0) < 0) {
-		throw Error(ErrorCode::INTERNAL_ERROR,
-		            "Couldn't allocate samples for reallocation!");
-	}
-
-	this->resample_buffer = std::unique_ptr<
-	                uint8_t, decltype(resample_buffer_deleter)>(
-	                rbuf, resample_buffer_deleter);
-
-	*n = (size_t)swr_convert(this->resampler.get(), &rbuf, out_samples,
-	                         const_cast<const uint8_t **>(
-	                                         this->frame->extended_data),
-	                         this->frame->nb_samples);
-
-	*buf = (char *)this->resample_buffer.get();
-	*n = out_samples;
+	return this->resampler->Resample(buf, this->frame.get());
 }
 
 /* Converts from ffmpeg sample format to PortAudio sample format.
@@ -205,45 +162,15 @@ void au_in::Resample(char **buf, size_t *n)
  */
 PaSampleFormat au_in::SetupPortAudioSampleFormat()
 {
-	AVSampleFormat in = this->stream->codec->sample_fmt;
-
 	/* We need to convert planar samples into packed samples. */
-	if (av_sample_fmt_is_planar(in)) {
-		this->sample_format = av_get_packed_sample_fmt(in);
-
-		auto resampler_deleter = [](SwrContext *avr) {
-			swr_free(&avr);
-		};
-		this->resampler = std::unique_ptr<SwrContext,
-		                                  decltype(resampler_deleter)>(
-		                swr_alloc_set_opts(
-		                                nullptr,
-		                                this->stream->codec
-		                                                ->channel_layout,
-		                                this->sample_format,
-		                                this->stream->codec
-		                                                ->sample_rate,
-		                                this->stream->codec
-		                                                ->channel_layout,
-		                                in,
-		                                this->stream->codec
-		                                                ->sample_rate,
-		                                0, nullptr),
-		                resampler_deleter);
-		if (this->resampler == nullptr) {
-			throw Error(ErrorCode::NO_MEM,
-			            "Out of memory for resampler!");
-		}
-
-		swr_init(this->resampler.get());
-		this->use_resampler = true;
+	std::function<Resampler *(AVCodecContext *)> rs;
+	if (av_sample_fmt_is_planar(this->stream->codec->sample_fmt)) {
+		rs = [](AVCodecContext *c) { return new PlanarResampler(c); };
 	} else {
-		this->sample_format = in;
-		this->resampler = nullptr;
-		this->use_resampler = false;
+		rs = [](AVCodecContext *c) { return new PackedResampler(c); };
 	}
-
-	return SampleFormatAVToPA(this->sample_format);
+	this->resampler = std::unique_ptr<Resampler>(rs(this->stream->codec));
+	return SampleFormatAVToPA(this->resampler->AVOutputFormat());
 }
 
 /**

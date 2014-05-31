@@ -16,6 +16,7 @@
 #include <libswresample/swresample.h>
 #include <portaudio.h>
 
+#include "audio_resample.h"
 #include "errors.hpp"
 
 /* The audio input structure (thusly named in case we ever generalise
@@ -55,13 +56,7 @@ private:
 	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
 	                frame; /* Last decoded frame */
 	std::unique_ptr<unsigned char[]> buffer;
-
-	std::unique_ptr<SwrContext, std::function<void(SwrContext *)>>
-	                resampler;
-	enum AVSampleFormat sample_format;
-	bool use_resampler;
-	std::unique_ptr<uint8_t, std::function<void(uint8_t *)>>
-	                resample_buffer;
+	std::unique_ptr<Resampler> resampler;
 
 	void Open(const std::string &path);
 
@@ -72,14 +67,13 @@ private:
 	void InitialiseCodec(int stream, AVCodec *codec);
 	void InitialiseFrame();
 	void InitialisePacket();
-	void InitialiseResampler();
 
 	PaSampleFormat SetupPortAudioSampleFormat();
 	void SetupPortAudioParameters(PaSampleFormat sf, int device, int chans,
 	                              PaStreamParameters *pars);
 
 	bool DecodePacket();
-	void Resample(char **buf, size_t *n);
+	size_t Resample(char **buf);
 
 	PaSampleFormat SampleFormatAVToPA(AVSampleFormat av_format);
 };
