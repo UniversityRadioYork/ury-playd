@@ -5,3 +5,4 @@ playslave++
 !*.cpp
 !*.c
 !*.h
+objs/
