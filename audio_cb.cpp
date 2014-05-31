@@ -34,49 +34,63 @@ int AudioOutput::PlayCallback(char *out, unsigned long frames_per_buf)
 	                std::make_pair(paContinue, 0);
 
 	while (result.first == paContinue && result.second < frames_per_buf) {
-		unsigned long avail = PaUtil_GetRingBufferReadAvailable(
-		                this->ring_buf.get());
-		if (avail == 0) {
-			/*
-			 * We've run out of sound, ruh-roh. Let's see if
-			 * something went awry during the last decode
-			 * cycle...
-			 */
-			switch (LastError()) {
-				case ErrorCode::END_OF_FILE:
-					/*
-					 * We've just hit the end of the file.
-					 * Nothing to worry about!
-					 */
-					result.first = paComplete;
-					break;
-				case ErrorCode::OK:
-				case ErrorCode::INCOMPLETE:
-					/*
-					 * Looks like we're just waiting for the
-					 * decoding to go through. In other
-					 * words,
-					 * this is a buffer underflow.
-					 */
-					Debug("buffer underflow");
-					/* Break out of the loop inelegantly */
-					memset(out, 0,
-					       ByteCountForSampleCount(
-					                       frames_per_buf));
-					result.second = frames_per_buf;
-					break;
-				default:
-					/* Something genuinely went tits-up. */
-					result.first = paAbort;
-					break;
-			}
-		} else {
-			result.second += ReadSamplesToOutput(
-			                out, avail,
-			                frames_per_buf - result.second);
-		}
+		result = PlayCallbackStep(out, frames_per_buf, result);
 	}
 	return static_cast<int>(result.first);
+}
+
+PlayCallbackStepResult AudioOutput::PlayCallbackStep(
+                char *out, unsigned long frames_per_buf,
+                PlayCallbackStepResult in)
+{
+	decltype(in) result;
+
+	unsigned long avail =
+	                PaUtil_GetRingBufferReadAvailable(this->ring_buf.get());
+	if (avail == 0) {
+		result = PlayCallbackFailure(out, frames_per_buf, in);
+	} else {
+		result = std::make_pair(paContinue,
+		                in.second + ReadSamplesToOutput(
+		                                            out, avail,
+		                                            frames_per_buf -
+		                                                            in.second));
+	}
+
+	return result;
+}
+
+PlayCallbackStepResult AudioOutput::PlayCallbackFailure(
+                char *out, unsigned long frames_per_buf,
+                PlayCallbackStepResult in)
+{
+	decltype(in) result;
+
+	switch (LastError()) {
+		case ErrorCode::END_OF_FILE:
+			// We've just hit the end of the file.  This is ok.
+			result = std::make_pair(paComplete, in.second);
+			break;
+		case ErrorCode::OK: // Fallthrough intentional
+		case ErrorCode::INCOMPLETE:
+			/*
+			 * Looks like we're just waiting for the
+			 * decoding to go through. In other
+			 * words,
+			 * this is a buffer underflow.
+			 */
+			Debug("buffer underflow");
+			// Break out of the loop inelegantly
+			memset(out, 0, ByteCountForSampleCount(frames_per_buf));
+			result.second = frames_per_buf;
+			break;
+		default:
+			// Something genuinely went tits-up.  Abort!
+			result = std::make_pair(paAbort, in.second);
+			break;
+	}
+
+	return result;
 }
 
 /**
