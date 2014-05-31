@@ -1,6 +1,7 @@
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #ifndef AUDIO_AV_H
@@ -36,8 +37,10 @@ public:
 	void SeekToPositionMicroseconds(std::chrono::microseconds position);
 
 	// Unit conversion
-	std::chrono::microseconds PositionMicrosecondsForSampleCount(size_t samples);
-	size_t SampleCountForPositionMicroseconds(std::chrono::microseconds position);
+	std::chrono::microseconds PositionMicrosecondsForSampleCount(
+	                size_t samples);
+	size_t SampleCountForPositionMicroseconds(
+	                std::chrono::microseconds position);
 	size_t SampleCountForByteCount(size_t bytes);
 	size_t ByteCountForSampleCount(size_t samples);
 
@@ -45,17 +48,20 @@ private:
 	AVStream *stream;
 	int stream_id;
 
-	std::unique_ptr<AVFormatContext, std::function<void(AVFormatContext *)>> context;
-	std::unique_ptr<AVPacket, std::function<void(AVPacket *)>> packet;	/* Last undecoded packet */
-	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>> frame;	/* Last decoded frame */
-	std::unique_ptr<unsigned char []> buffer;
+	std::unique_ptr<AVFormatContext, std::function<void(AVFormatContext *)>>
+	                context;
+	std::unique_ptr<AVPacket, std::function<void(AVPacket *)>>
+	                packet; /* Last undecoded packet */
+	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
+	                frame; /* Last decoded frame */
+	std::unique_ptr<unsigned char[]> buffer;
 
-
-	std::unique_ptr<SwrContext, std::function<void(SwrContext *)>> resampler;
+	std::unique_ptr<SwrContext, std::function<void(SwrContext *)>>
+	                resampler;
 	enum AVSampleFormat sample_format;
 	bool use_resampler;
-	std::unique_ptr<uint8_t, std::function<void(uint8_t *)>> resample_buffer;
-
+	std::unique_ptr<uint8_t, std::function<void(uint8_t *)>>
+	                resample_buffer;
 
 	void Open(const std::string &path);
 
@@ -69,7 +75,8 @@ private:
 	void InitialiseResampler();
 
 	PaSampleFormat SetupPortAudioSampleFormat();
-	void SetupPortAudioParameters(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars);
+	void SetupPortAudioParameters(PaSampleFormat sf, int device, int chans,
+	                              PaStreamParameters *pars);
 
 	bool DecodePacket();
 	void Resample(char **buf, size_t *n);
@@ -84,4 +91,4 @@ private:
  */
 struct au_frame;
 
-#endif				/* not AUDIO_AV_H */
+#endif /* not AUDIO_AV_H */

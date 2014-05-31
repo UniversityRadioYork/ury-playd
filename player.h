@@ -1,6 +1,7 @@
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 /**
@@ -30,7 +31,6 @@ enum class State {
 	QUITTING
 };
 
-
 /**
  * A player contains a loaded audio file and the state of its playback.
  * Player connects to the audio system via PortAudio, given a device handle.
@@ -39,6 +39,7 @@ class Player {
 public:
 	typedef std::function<void(std::chrono::microseconds)> PositionListener;
 	typedef std::function<void(State, State)> StateListener;
+
 private:
 	const std::string &device;
 
@@ -66,8 +67,10 @@ public:
 
 	void Update();
 
-	void RegisterPositionListener(PositionListener listener, const std::chrono::microseconds period);
+	void RegisterPositionListener(PositionListener listener,
+	                              const std::chrono::microseconds period);
 	void RegisterStateListener(StateListener listener);
+
 private:
 	bool CurrentStateIn(std::initializer_list<State> states);
 	void SetState(State state);

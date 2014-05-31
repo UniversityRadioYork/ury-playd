@@ -1,6 +1,7 @@
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #define _POSIX_C_SOURCE 200809
@@ -27,7 +28,7 @@ extern "C" {
 
 #include "audio.h"
 #include "audio_av.h"
-#include "audio_cb.h"		/* audio_cb_play */
+#include "audio_cb.h" /* audio_cb_play */
 #include "constants.h"
 
 /**
@@ -36,7 +37,8 @@ extern "C" {
 void AudioOutput::InitialiseLibraries()
 {
 	if (Pa_Initialize() != (int)paNoError) {
-		throw Error(ErrorCode::AUDIO_INIT_FAIL, "couldn't init portaudio");
+		throw Error(ErrorCode::AUDIO_INIT_FAIL,
+		            "couldn't init portaudio");
 	}
 	av_register_all();
 }
@@ -103,7 +105,7 @@ void AudioOutput::Start()
 
 void AudioOutput::Stop()
 {
-	PaError		pa_err = Pa_AbortStream(this->out_strm);
+	PaError pa_err = Pa_AbortStream(this->out_strm);
 	if (pa_err != paNoError) {
 		throw Error(ErrorCode::INTERNAL_ERROR, "couldn't stop stream");
 	}
@@ -137,7 +139,8 @@ bool AudioOutput::IsHalted()
  */
 std::chrono::microseconds AudioOutput::CurrentPositionMicroseconds()
 {
-	return this->av->PositionMicrosecondsForSampleCount(this->position_sample_count);
+	return this->av->PositionMicrosecondsForSampleCount(
+	                this->position_sample_count);
 }
 
 size_t AudioOutput::ByteCountForSampleCount(size_t samples)
@@ -153,11 +156,11 @@ size_t AudioOutput::ByteCountForSampleCount(size_t samples)
  */
 void AudioOutput::PreFillRingBuffer()
 {
-    /* Either fill the ringbuf or hit the maximum spin-up size,
-     * whichever happens first.  (There's a maximum in order to
-     * prevent spin-up from taking massive amounts of time and
-     * thus delaying playback.)
-     */
+	/* Either fill the ringbuf or hit the maximum spin-up size,
+	 * whichever happens first.  (There's a maximum in order to
+	 * prevent spin-up from taking massive amounts of time and
+	 * thus delaying playback.)
+	 */
 	bool more = true;
 	unsigned long c = RingBufferWriteCapacity();
 	while (more && c > 0 && RINGBUF_SIZE - c < SPINUP_SIZE) {
@@ -167,21 +170,22 @@ void AudioOutput::PreFillRingBuffer()
 }
 
 /* Attempts to seek to the given position in microseconds. */
-void AudioOutput::SeekToPositionMicroseconds(std::chrono::microseconds microseconds)
+void AudioOutput::SeekToPositionMicroseconds(
+                std::chrono::microseconds microseconds)
 {
-	size_t new_position_sample_count = this->av->SampleCountForPositionMicroseconds(microseconds);
+	size_t new_position_sample_count =
+	                this->av->SampleCountForPositionMicroseconds(
+	                                microseconds);
 	this->av->SeekToPositionMicroseconds(microseconds);
 
 	this->frame_samples = 0;
 	this->last_error = ErrorCode::INCOMPLETE;
 	this->position_sample_count = new_position_sample_count;
 
-	//while (!Pa_IsStreamStopped(this->out_strm)) {
+	// while (!Pa_IsStreamStopped(this->out_strm)) {
 	//	decode();
 	//}; // Spin until stream finishes
 	PaUtil_FlushRingBuffer(this->ring_buf.get());
-
-
 }
 
 /* Increments the used samples counter, which is used to determine the current
@@ -197,7 +201,8 @@ void AudioOutput::AdvancePositionBySampleCount(uint64_t sample_count)
  * This ensures the ring buffer has output to offer to the sound driver.
  * It does this by by asking the AudioDecoder to decode if necessary.
  *
- * @return True if there is more output to send to the sound card; false otherwise.
+ * @return True if there is more output to send to the sound card; false
+ *otherwise.
  */
 bool AudioOutput::Update()
 {
@@ -208,14 +213,17 @@ bool AudioOutput::Update()
 }
 
 /**
- * Asks the decoder to decode the next frame if the current frame has been fully used.
- * @return true if the decoder has more frames available; false if it has run out.
+ * Asks the decoder to decode the next frame if the current frame has been fully
+ * used.
+ * @return true if the decoder has more frames available; false if it has run
+ * out.
  */
 bool AudioOutput::DecodeIfFrameEmpty()
 {
 	if (this->frame_samples == 0) {
 		/* We need to decode some new frames! */
-		return this->av->Decode(&(this->frame_ptr), &(this->frame_samples));
+		return this->av->Decode(&(this->frame_ptr),
+		                        &(this->frame_samples));
 	}
 	return true;
 }
@@ -237,9 +245,9 @@ void AudioOutput::WriteAllAvailableToRingBuffer()
  */
 void AudioOutput::WriteToRingBuffer(unsigned long sample_count)
 {
-	unsigned long written_count = PaUtil_WriteRingBuffer(this->ring_buf.get(),
-		this->frame_ptr,
-		static_cast<ring_buffer_size_t>(sample_count));
+	unsigned long written_count = PaUtil_WriteRingBuffer(
+	                this->ring_buf.get(), this->frame_ptr,
+	                static_cast<ring_buffer_size_t>(sample_count));
 	if (written_count != sample_count) {
 		throw Error(ErrorCode::INTERNAL_ERROR, "ringbuf write error");
 	}
@@ -262,14 +270,10 @@ void AudioOutput::InitialisePortAudio(int device)
 	double sample_rate = this->av->SampleRate();
 	PaStreamParameters pars;
 	size_t samples_per_buf = this->av->SetupPortAudio(device, &pars);
-	PaError pa_err = Pa_OpenStream(&this->out_strm,
-			       NULL,
-			       &pars,
-			       sample_rate,
-			       samples_per_buf,
-			       paClipOff,
-			       audio_cb_play,
-				   static_cast<void *>(&this->callback));
+	PaError pa_err =
+	                Pa_OpenStream(&this->out_strm, NULL, &pars, sample_rate,
+	                              samples_per_buf, paClipOff, audio_cb_play,
+	                              static_cast<void *>(&this->callback));
 	if (pa_err != paNoError) {
 		throw Error(ErrorCode::AUDIO_INIT_FAIL, "couldn't open stream");
 	}
@@ -285,13 +289,17 @@ void AudioOutput::InitialisePortAudio(int device)
  */
 void AudioOutput::InitialiseRingBuffer(size_t bytes_per_sample)
 {
-	this->ring_data = std::unique_ptr<char[]>(new char[RINGBUF_SIZE * bytes_per_sample]);
-	this->ring_buf = std::unique_ptr<PaUtilRingBuffer>(new PaUtilRingBuffer);
-	if (PaUtil_InitializeRingBuffer(this->ring_buf.get(),
-		static_cast<ring_buffer_size_t>(bytes_per_sample),
-		static_cast<ring_buffer_size_t>(RINGBUF_SIZE),
-		this->ring_data.get()) != 0) {
-		throw Error(ErrorCode::INTERNAL_ERROR, "ringbuf failed to init");
+	this->ring_data = std::unique_ptr<char[]>(
+	                new char[RINGBUF_SIZE * bytes_per_sample]);
+	this->ring_buf =
+	                std::unique_ptr<PaUtilRingBuffer>(new PaUtilRingBuffer);
+	if (PaUtil_InitializeRingBuffer(
+	                    this->ring_buf.get(),
+	                    static_cast<ring_buffer_size_t>(bytes_per_sample),
+	                    static_cast<ring_buffer_size_t>(RINGBUF_SIZE),
+	                    this->ring_data.get()) != 0) {
+		throw Error(ErrorCode::INTERNAL_ERROR,
+		            "ringbuf failed to init");
 	}
 }
 
@@ -305,12 +313,14 @@ unsigned long AudioOutput::RingBufferWriteCapacity()
 }
 
 /**
- * Gets the current number of samples that may be transferred from the frame to the ring buffer.
+ * Gets the current number of samples that may be transferred from the frame to
+ * the ring buffer.
  * @return The transfer count, in samples.
  */
 unsigned long AudioOutput::RingBufferTransferCount()
 {
-	return std::min(static_cast<unsigned long>(this->frame_samples), RingBufferWriteCapacity());
+	return std::min(static_cast<unsigned long>(this->frame_samples),
+	                RingBufferWriteCapacity());
 }
 
 /**

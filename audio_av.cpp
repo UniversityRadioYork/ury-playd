@@ -1,6 +1,7 @@
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #define _POSIX_C_SOURCE 200809
@@ -18,7 +19,7 @@ extern "C" {
 #define inline __inline
 #endif
 #include <libavcodec/avcodec.h>
-#include <libavcodec/version.h>		/* For old version patchups */
+#include <libavcodec/version.h> /* For old version patchups */
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
 #include <libavutil/opt.h>
@@ -34,7 +35,8 @@ extern "C" {
 au_in::au_in(const std::string &path)
 {
 	this->resample_buffer = nullptr;
-	this->buffer = std::unique_ptr<unsigned char[]>(new unsigned char[BUFFER_SIZE]);
+	this->buffer = std::unique_ptr<unsigned char[]>(
+	                new unsigned char[BUFFER_SIZE]);
 
 	Open(path);
 	InitialiseStream();
@@ -58,7 +60,8 @@ void au_in::InitialiseResampler()
 size_t au_in::SetupPortAudio(int device, PaStreamParameters *params)
 {
 	PaSampleFormat sf = SetupPortAudioSampleFormat();
-	SetupPortAudioParameters(sf, device, this->stream->codec->channels, params);
+	SetupPortAudioParameters(sf, device, this->stream->codec->channels,
+	                         params);
 
 	return SampleCountForByteCount(BUFFER_SIZE);
 }
@@ -75,45 +78,49 @@ double au_in::SampleRate()
 size_t au_in::SampleCountForPositionMicroseconds(std::chrono::microseconds usec)
 {
 	auto sample_micros = usec * SampleRate();
-	return std::chrono::duration_cast<std::chrono::seconds>(sample_micros).count();
+	return std::chrono::duration_cast<std::chrono::seconds>(sample_micros)
+	                .count();
 }
 
 /* Converts sample count to estimated stream position (in microseconds). */
-std::chrono::microseconds au_in::PositionMicrosecondsForSampleCount(size_t samples)
+std::chrono::microseconds au_in::PositionMicrosecondsForSampleCount(
+                size_t samples)
 {
 	auto position_secs = std::chrono::seconds(samples) / SampleRate();
-	return std::chrono::duration_cast<std::chrono::microseconds>(position_secs);
+	return std::chrono::duration_cast<std::chrono::microseconds>(
+	                position_secs);
 }
 
 /* Converts buffer size (in bytes) to sample count (in samples). */
 size_t au_in::SampleCountForByteCount(size_t bytes)
 {
-	return (bytes /
-		this->stream->codec->channels /
-		av_get_bytes_per_sample(this->stream->codec->sample_fmt));
+	return (bytes / this->stream->codec->channels /
+	        av_get_bytes_per_sample(this->stream->codec->sample_fmt));
 }
 
 /* Converts sample count (in samples) to buffer size (in bytes). */
 size_t au_in::ByteCountForSampleCount(size_t samples)
 {
-	return (samples *
-		this->stream->codec->channels *
-		av_get_bytes_per_sample(this->stream->codec->sample_fmt));
+	return (samples * this->stream->codec->channels *
+	        av_get_bytes_per_sample(this->stream->codec->sample_fmt));
 }
 
 /* Attempts to seek to the position 'usec' milliseconds into the file. */
 void au_in::SeekToPositionMicroseconds(std::chrono::microseconds position)
 {
-	auto position_timebase_microseconds = (position * this->stream->time_base.den)
-			/ this->stream->time_base.num;
-	auto position_timebase_seconds = std::chrono::duration_cast<std::chrono::seconds>(position_timebase_microseconds);
+	auto position_timebase_microseconds =
+	                (position * this->stream->time_base.den) /
+	                this->stream->time_base.num;
+	auto position_timebase_seconds =
+	                std::chrono::duration_cast<std::chrono::seconds>(
+	                                position_timebase_microseconds);
 	auto c = position_timebase_seconds.count();
 	Debug("Seeking to:", c);
 
-	if (av_seek_frame(this->context.get(),
-		this->stream_id,
-		static_cast<int64_t>(position_timebase_seconds.count()),
-		AVSEEK_FLAG_ANY) != 0) {
+	if (av_seek_frame(this->context.get(), this->stream_id,
+	                  static_cast<int64_t>(
+	                                  position_timebase_seconds.count()),
+	                  AVSEEK_FLAG_ANY) != 0) {
 		throw Error(ErrorCode::INTERNAL_ERROR, "seek failed");
 	}
 }
@@ -135,19 +142,20 @@ bool au_in::Decode(char **buf, size_t *n)
 	bool more = true;
 
 	while (!(complete) && more) {
-		if (av_read_frame(this->context.get(), this->packet.get()) < 0) {
+		if (av_read_frame(this->context.get(), this->packet.get()) <
+		    0) {
 			more = false;
-		}
-		else if (this->packet->stream_index == this->stream_id) {
+		} else if (this->packet->stream_index == this->stream_id) {
 			complete = DecodePacket();
 
 			if (complete) {
 				if (this->use_resampler) {
 					Resample(buf, n);
-				}
-				else {
-					// Only use first channel, as we have packed data.
-					*buf = (char *)this->frame->extended_data[0];
+				} else {
+					// Only use first channel, as we have
+					// packed data.
+					*buf = (char *)this->frame->extended_data
+					                       [0];
 					*n = this->frame->nb_samples;
 				}
 			}
@@ -159,31 +167,31 @@ bool au_in::Decode(char **buf, size_t *n)
 
 void au_in::Resample(char **buf, size_t *n)
 {
-	auto resample_buffer_deleter = [](uint8_t *buffer){ av_freep(&buffer); };
+	auto resample_buffer_deleter = [](uint8_t *buffer) {
+		av_freep(&buffer);
+	};
 	uint8_t *rbuf;
 
 	int in_samples = this->frame->nb_samples;
 	int rate = this->frame->sample_rate;
-	int out_samples = swr_get_delay(this->resampler.get(), rate) + in_samples;
+	int out_samples =
+	                swr_get_delay(this->resampler.get(), rate) + in_samples;
 
-	if (av_samples_alloc(
-		&rbuf,
-		nullptr,
-		av_frame_get_channels(this->frame.get()),
-		out_samples,
-		this->sample_format,
-		0) < 0) {
-		throw Error(ErrorCode::INTERNAL_ERROR, "Couldn't allocate samples for reallocation!");
+	if (av_samples_alloc(&rbuf, nullptr,
+	                     av_frame_get_channels(this->frame.get()),
+	                     out_samples, this->sample_format, 0) < 0) {
+		throw Error(ErrorCode::INTERNAL_ERROR,
+		            "Couldn't allocate samples for reallocation!");
 	}
 
-	this->resample_buffer = std::unique_ptr<uint8_t, decltype(resample_buffer_deleter)>(rbuf, resample_buffer_deleter);
+	this->resample_buffer = std::unique_ptr<
+	                uint8_t, decltype(resample_buffer_deleter)>(
+	                rbuf, resample_buffer_deleter);
 
-	*n = (size_t)swr_convert(
-		this->resampler.get(),
-		&rbuf,
-		out_samples,
-		const_cast<const uint8_t**>(this->frame->extended_data),
-		this->frame->nb_samples);
+	*n = (size_t)swr_convert(this->resampler.get(), &rbuf, out_samples,
+	                         const_cast<const uint8_t **>(
+	                                         this->frame->extended_data),
+	                         this->frame->nb_samples);
 
 	*buf = (char *)this->resample_buffer.get();
 	*n = out_samples;
@@ -203,27 +211,33 @@ PaSampleFormat au_in::SetupPortAudioSampleFormat()
 	if (av_sample_fmt_is_planar(in)) {
 		this->sample_format = av_get_packed_sample_fmt(in);
 
-		auto resampler_deleter = [](SwrContext *avr) { swr_free(&avr); };
-		this->resampler = std::unique_ptr<SwrContext, decltype(resampler_deleter)>(
-			swr_alloc_set_opts(
-			nullptr,
-			this->stream->codec->channel_layout,
-			this->sample_format,
-			this->stream->codec->sample_rate,
-			this->stream->codec->channel_layout,
-			in,
-			this->stream->codec->sample_rate,
-			0,
-			nullptr
-			), resampler_deleter);
+		auto resampler_deleter = [](SwrContext *avr) {
+			swr_free(&avr);
+		};
+		this->resampler = std::unique_ptr<SwrContext,
+		                                  decltype(resampler_deleter)>(
+		                swr_alloc_set_opts(
+		                                nullptr,
+		                                this->stream->codec
+		                                                ->channel_layout,
+		                                this->sample_format,
+		                                this->stream->codec
+		                                                ->sample_rate,
+		                                this->stream->codec
+		                                                ->channel_layout,
+		                                in,
+		                                this->stream->codec
+		                                                ->sample_rate,
+		                                0, nullptr),
+		                resampler_deleter);
 		if (this->resampler == nullptr) {
-			throw Error(ErrorCode::NO_MEM, "Out of memory for resampler!");
+			throw Error(ErrorCode::NO_MEM,
+			            "Out of memory for resampler!");
 		}
 
 		swr_init(this->resampler.get());
 		this->use_resampler = true;
-	}
-	else {
+	} else {
 		this->sample_format = in;
 		this->resampler = nullptr;
 		this->use_resampler = false;
@@ -238,24 +252,26 @@ PaSampleFormat au_in::SetupPortAudioSampleFormat()
  * @return The corresponding PortAudio format.
  * @note This only works for a small range of sample formats.
  */
-PaSampleFormat au_in::SampleFormatAVToPA(AVSampleFormat av_format) {
+PaSampleFormat au_in::SampleFormatAVToPA(AVSampleFormat av_format)
+{
 	PaSampleFormat pa_format = paUInt8;
 
 	switch (av_format) {
-	case AV_SAMPLE_FMT_U8:
-		pa_format = paUInt8;
-		break;
-	case AV_SAMPLE_FMT_S16:
-		pa_format = paInt16;
-		break;
-	case AV_SAMPLE_FMT_S32:
-		pa_format = paInt32;
-		break;
-	case AV_SAMPLE_FMT_FLT:
-		pa_format = paFloat32;
-		break;
-	default:
-		throw Error(ErrorCode::BAD_FILE, "unusable sample rate");
+		case AV_SAMPLE_FMT_U8:
+			pa_format = paUInt8;
+			break;
+		case AV_SAMPLE_FMT_S16:
+			pa_format = paInt16;
+			break;
+		case AV_SAMPLE_FMT_S32:
+			pa_format = paInt32;
+			break;
+		case AV_SAMPLE_FMT_FLT:
+			pa_format = paFloat32;
+			break;
+		default:
+			throw Error(ErrorCode::BAD_FILE,
+			            "unusable sample rate");
 	}
 
 	return pa_format;
@@ -266,32 +282,34 @@ PaSampleFormat au_in::SampleFormatAVToPA(AVSampleFormat av_format) {
  * The parameter set pointed to by *params MUST already be allocated, and its
  * contents should only be used if this function returns E_OK.
  */
-void au_in::SetupPortAudioParameters(PaSampleFormat sf, int device, int chans, PaStreamParameters *pars)
+void au_in::SetupPortAudioParameters(PaSampleFormat sf, int device, int chans,
+                                     PaStreamParameters *pars)
 {
 	memset(pars, 0, sizeof(*pars));
 	pars->channelCount = chans;
 	pars->device = device;
 	pars->hostApiSpecificStreamInfo = NULL;
 	pars->sampleFormat = sf;
-	pars->suggestedLatency = (Pa_GetDeviceInfo(device)->
-				  defaultLowOutputLatency);
+	pars->suggestedLatency =
+	                (Pa_GetDeviceInfo(device)->defaultLowOutputLatency);
 }
 
 void au_in::Open(const std::string &path)
 {
 	AVFormatContext *ctx = nullptr;
 
-	if (avformat_open_input(&ctx,
-		path.c_str(),
-		NULL,
-		NULL) < 0) {
+	if (avformat_open_input(&ctx, path.c_str(), NULL, NULL) < 0) {
 		std::ostringstream os;
 		os << "couldn't open " << path;
 		throw Error(ErrorCode::NO_FILE, os.str());
 	}
 
-	auto free_context = [](AVFormatContext *ctx) { avformat_close_input(&ctx); };
-	this->context = std::unique_ptr<AVFormatContext, decltype(free_context)>(ctx, free_context);
+	auto free_context = [](AVFormatContext *ctx) {
+		avformat_close_input(&ctx);
+	};
+	this->context = std::unique_ptr<AVFormatContext,
+	                                decltype(free_context)>(ctx,
+	                                                        free_context);
 }
 
 void au_in::InitialiseStream()
@@ -311,11 +329,7 @@ void au_in::FindStreamAndInitialiseCodec()
 {
 	AVCodec *codec;
 	int stream = av_find_best_stream(this->context.get(),
-	  AVMEDIA_TYPE_AUDIO,
-	  -1,
-	  -1,
-	  &codec,
-	  0);
+	                                 AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
 
 	if (stream < 0) {
 		throw Error(ErrorCode::BAD_FILE, "can't open codec for file");
@@ -338,7 +352,8 @@ void au_in::InitialiseCodec(int stream, AVCodec *codec)
 void au_in::InitialiseFrame()
 {
 	auto frame_deleter = [](AVFrame *frame) { av_frame_free(&frame); };
-	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(av_frame_alloc(), frame_deleter);
+	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(
+	                av_frame_alloc(), frame_deleter);
 	if (this->frame == nullptr) {
 		throw Error(ErrorCode::NO_MEM, "can't alloc frame");
 	}
@@ -346,8 +361,12 @@ void au_in::InitialiseFrame()
 
 void au_in::InitialisePacket()
 {
-	auto packet_deleter = [](AVPacket *packet) { av_free_packet(packet); delete packet; };
-	this->packet = std::unique_ptr<AVPacket, decltype(packet_deleter)>(new AVPacket, packet_deleter);
+	auto packet_deleter = [](AVPacket *packet) {
+		av_free_packet(packet);
+		delete packet;
+	};
+	this->packet = std::unique_ptr<AVPacket, decltype(packet_deleter)>(
+	                new AVPacket, packet_deleter);
 
 	AVPacket *pkt = this->packet.get();
 	av_init_packet(pkt);
@@ -359,12 +378,10 @@ void au_in::InitialisePacket()
 
 bool au_in::DecodePacket()
 {
-	int		frame_finished = 0;
+	int frame_finished = 0;
 
-	if (avcodec_decode_audio4(this->stream->codec,
-				  this->frame.get(),
-				  &frame_finished,
-				  this->packet.get()) < 0) {
+	if (avcodec_decode_audio4(this->stream->codec, this->frame.get(),
+	                          &frame_finished, this->packet.get()) < 0) {
 		throw Error(ErrorCode::BAD_FILE, "decoding error");
 	}
 	return frame_finished;

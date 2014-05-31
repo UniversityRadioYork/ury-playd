@@ -2,7 +2,8 @@
 
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #define _POSIX_C_SOURCE 200809
@@ -14,8 +15,8 @@
 #include <boost/tokenizer.hpp>
 
 #include <ctype.h>
-#include <stdbool.h>		/* bool */
-#include <stdio.h>		/* getline */
+#include <stdbool.h> /* bool */
+#include <stdio.h>   /* getline */
 #include <stdlib.h>
 #include <string.h>
 
@@ -24,11 +25,11 @@
 typedef SSIZE_T ssize_t;
 #endif
 
-#include "constants.h"		/* WORD_LEN */
-#include "cmd.h"		/* struct cmd, enum cmd_type */
+#include "constants.h" /* WORD_LEN */
+#include "cmd.h"       /* struct cmd, enum cmd_type */
 #include "errors.hpp"
 #include "io.hpp"
-#include "messages.h"		/* Messages (usually errors) */
+#include "messages.h" /* Messages (usually errors) */
 
 /**
  * Constructs a CommandHandler.
@@ -37,7 +38,8 @@ typedef SSIZE_T ssize_t;
  */
 CommandHandler::CommandHandler(const command_set &commands)
 {
-	this->commands = std::unique_ptr<command_set>(new command_set(commands));
+	this->commands =
+	                std::unique_ptr<command_set>(new command_set(commands));
 }
 
 /**

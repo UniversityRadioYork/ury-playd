@@ -1,6 +1,7 @@
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #include <thread>
@@ -14,11 +15,10 @@
 #include "player.h"
 
 const static std::map<State, std::string> STATES = {
-	{ State::EJECTED, "Ejected" },
-	{ State::STOPPED, "Stopped" },
-	{ State::PLAYING, "Playing" },
-	{ State::QUITTING, "Quitting" }
-};
+                {State::EJECTED, "Ejected"},
+                {State::STOPPED, "Stopped"},
+                {State::PLAYING, "Playing"},
+                {State::QUITTING, "Quitting"}};
 
 /**
  * Lists on stdout all sound devices to which the audio output may connect.
@@ -60,30 +60,42 @@ static std::string DeviceId(int argc, char *argv[])
  */
 static void RegisterListeners(Player &player)
 {
-	player.RegisterPositionListener(
-		[](std::chrono::microseconds position) { uint64_t p = position.count();  Respond(Response::TIME, p); },
-			POSITION_PERIOD);
-	player.RegisterStateListener(
-			[](State old_state, State new_state) { Respond(Response::STAT, STATES.at(old_state), STATES.at(new_state)); });
+	player.RegisterPositionListener([](std::chrono::microseconds position) {
+		                                uint64_t p = position.count();
+		                                Respond(Response::TIME, p);
+		                        },
+	                                POSITION_PERIOD);
+	player.RegisterStateListener([](State old_state, State new_state) {
+		Respond(Response::STAT, STATES.at(old_state),
+		        STATES.at(new_state));
+	});
 }
 
 /**
  * Performs the playslave main loop.
  * This involves listening for commands and asking the player to do some work.
  * @todo Make the command check asynchronous/event based.
- * @todo Possibly separate command check and player updating into separate threads?
+ * @todo Possibly separate command check and player updating into separate
+ * threads?
  */
 static void MainLoop(Player &player)
 {
 	/* Set of commands that can be performed on the player. */
 	command_set PLAYER_CMDS = {
-		{ "play", [&](const cmd_words &) { return player.Play(); } },
-		{ "stop", [&](const cmd_words &) { return player.Stop(); } },
-		{ "ejct", [&](const cmd_words &) { return player.Eject(); } },
-		{ "quit", [&](const cmd_words &) { return player.Quit(); } },
-		{ "load", [&](const cmd_words &words) { return player.Load(words[1]); } },
-		{ "seek", [&](const cmd_words &words) { return player.Seek(words[1]); } }
-	};
+	                {"play",
+	                 [&](const cmd_words &) { return player.Play(); }},
+	                {"stop",
+	                 [&](const cmd_words &) { return player.Stop(); }},
+	                {"ejct",
+	                 [&](const cmd_words &) { return player.Eject(); }},
+	                {"quit",
+	                 [&](const cmd_words &) { return player.Quit(); }},
+	                {"load", [&](const cmd_words &words) {
+		                return player.Load(words[1]);
+		        }},
+	                {"seek", [&](const cmd_words &words) {
+		                return player.Seek(words[1]);
+		        }}};
 
 	Respond(Response::OHAI, MSG_OHAI);
 
@@ -109,18 +121,22 @@ static void MainLoop(Player &player)
  */
 int main(int argc, char *argv[])
 {
-	int	exit_code = EXIT_SUCCESS;
+	int exit_code = EXIT_SUCCESS;
 
-	try {
+	try
+	{
 		AudioOutput::InitialiseLibraries();
 
-		/* Don't roll this into the constructor: it'll go out of scope! */
+		/* Don't roll this into the constructor: it'll go out of scope!
+		 */
 		std::string device_id = DeviceId(argc, argv);
 
 		Player player(device_id);
 		RegisterListeners(player);
 		MainLoop(player);
-	} catch (Error &error) {
+	}
+	catch (Error &error)
+	{
 		error.ToResponse();
 		Debug("Unhandled exception caught, going away now.");
 		exit_code = EXIT_FAILURE;

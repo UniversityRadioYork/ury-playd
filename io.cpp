@@ -1,7 +1,8 @@
 /* io.cpp - input/output */
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #include <iostream>
@@ -16,28 +17,26 @@
 #include <conio.h>
 #else
 #include <unistd.h>
-#include <sys/select.h>		/* select */
+#include <sys/select.h> /* select */
 #endif
 
 #include "io.hpp"
 
 /* Data for the responses. */
-const std::map<Response, std::string> RESPONSES = {
-	{ Response::OKAY, "OKAY" },
-	{ Response::WHAT, "WHAT" },
-	{ Response::FAIL, "FAIL" },
-	{ Response::OOPS, "OOPS" },
-	{ Response::NOPE, "NOPE" },
-	{ Response::OHAI, "OHAI" },
-	{ Response::TTFN, "TTFN" },
-	{ Response::STAT, "STAT" },
-	{ Response::TIME, "TIME" },
-	{ Response::DBUG, "DBUG" },
-	{ Response::QPOS, "QPOS" },
-	{ Response::QENT, "QENT" },
-	{ Response::QMOD, "QMOD" },
-	{ Response::QNUM, "QNUM" }
-};
+const std::map<Response, std::string> RESPONSES = {{Response::OKAY, "OKAY"},
+                                                   {Response::WHAT, "WHAT"},
+                                                   {Response::FAIL, "FAIL"},
+                                                   {Response::OOPS, "OOPS"},
+                                                   {Response::NOPE, "NOPE"},
+                                                   {Response::OHAI, "OHAI"},
+                                                   {Response::TTFN, "TTFN"},
+                                                   {Response::STAT, "STAT"},
+                                                   {Response::TIME, "TIME"},
+                                                   {Response::DBUG, "DBUG"},
+                                                   {Response::QPOS, "QPOS"},
+                                                   {Response::QENT, "QENT"},
+                                                   {Response::QMOD, "QMOD"},
+                                                   {Response::QNUM, "QNUM"}};
 
 /* Returns true if input is waiting on standard in. */
 int input_waiting(void)
@@ -45,8 +44,8 @@ int input_waiting(void)
 #ifdef WIN32
 	return _kbhit();
 #else
-	fd_set		rfds;
-	struct timeval	tv;
+	fd_set rfds;
+	struct timeval tv;
 
 	/* Watch stdin (fd 0) to see when it has input. */
 	FD_ZERO(&rfds);

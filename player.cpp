@@ -1,6 +1,7 @@
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #define _POSIX_C_SOURCE 200809
@@ -9,8 +10,8 @@
 #include <sstream>
 #include <vector>
 
-#include <cstdarg>		/* CurrentStateIn */
-#include <cstdbool>		/* bool */
+#include <cstdarg>  /* CurrentStateIn */
+#include <cstdbool> /* bool */
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -19,17 +20,16 @@
 #include <chrono>
 
 #ifdef WIN32
-struct timespec
-{
+struct timespec {
 	time_t tv_sec;
 	long tv_nsec;
 };
 #include <Winsock2.h>
 #else
-#include <time.h>		/* struct timespec */
+#include <time.h> /* struct timespec */
 #endif
 
-#include "cmd.h"		/* struct cmd, check_commands */
+#include "cmd.h" /* struct cmd, check_commands */
 #include "io.hpp"
 
 #include "audio.h"
@@ -50,7 +50,7 @@ Player::Player(const std::string &device) : device(device)
 
 bool Player::Eject()
 {
-	bool valid = CurrentStateIn({ State::STOPPED, State::PLAYING });
+	bool valid = CurrentStateIn({State::STOPPED, State::PLAYING});
 	if (valid) {
 		this->au = nullptr;
 		SetState(State::EJECTED);
@@ -61,7 +61,7 @@ bool Player::Eject()
 
 bool Player::Play()
 {
-	bool valid = CurrentStateIn({ State::STOPPED }) && (this->au != nullptr);
+	bool valid = CurrentStateIn({State::STOPPED}) && (this->au != nullptr);
 	if (valid) {
 		this->au->Start();
 		SetState(State::PLAYING);
@@ -79,7 +79,7 @@ bool Player::Quit()
 
 bool Player::Stop()
 {
-	bool valid = CurrentStateIn({ State::PLAYING });
+	bool valid = CurrentStateIn({State::PLAYING});
 	if (valid) {
 		this->au->Stop();
 		SetState(State::STOPPED);
@@ -89,13 +89,16 @@ bool Player::Stop()
 
 bool Player::Load(const std::string &filename)
 {
-	try {
-		this->au = std::unique_ptr<AudioOutput>(new AudioOutput(filename, this->device));
+	try
+	{
+		this->au = std::unique_ptr<AudioOutput>(
+		                new AudioOutput(filename, this->device));
 		this->position_last_invalid = true;
 		Debug("Loaded ", filename);
 		SetState(State::STOPPED);
 	}
-	catch (Error &error) {
+	catch (Error &error)
+	{
 		error.ToResponse();
 		Eject();
 	}
@@ -114,8 +117,9 @@ bool Player::Seek(const std::string &time_str)
 
 	std::chrono::microseconds position(0);
 	if (rest == "s" || rest == "sec") {
-		position = std::chrono::duration_cast<std::chrono::microseconds>(
-				std::chrono::seconds(raw_time));
+		position = std::chrono::duration_cast<
+		                std::chrono::microseconds>(
+		                std::chrono::seconds(raw_time));
 
 	} else {
 		/* Assume microseconds */
@@ -123,17 +127,18 @@ bool Player::Seek(const std::string &time_str)
 	}
 
 	/* Weed out any unwanted states */
-	bool valid = CurrentStateIn({ State::PLAYING, State::STOPPED });
+	bool valid = CurrentStateIn({State::PLAYING, State::STOPPED});
 	if (valid) {
-		//enum state current_state = this->cstate;
+		// enum state current_state = this->cstate;
 
-		//cmd_stop(); // We need the player engine stopped in order to seek
+		// cmd_stop(); // We need the player engine stopped in order to
+		// seek
 		this->au->SeekToPosition(position);
 		this->position_last_invalid = true;
 
-		//if (current_state == S_PLAY) {
-			// If we were playing before we'd ideally like to resume
-			//cmd_play();
+		// if (current_state == S_PLAY) {
+		// If we were playing before we'd ideally like to resume
+		// cmd_play();
 		//}
 	}
 
@@ -155,7 +160,7 @@ void Player::Update()
 			SendPositionIfReady();
 		}
 	}
-	if (CurrentStateIn({ State::PLAYING, State::STOPPED }))	{
+	if (CurrentStateIn({State::PLAYING, State::STOPPED})) {
 		bool more = this->au->Update();
 		if (!more) {
 			Eject();
@@ -200,7 +205,8 @@ void Player::RegisterStateListener(StateListener listener)
 
 /**
  * Sends a position signal to the outside environment, if ready to send one.
- * This only sends a signal if the requested amount of time has passed since the last one.
+ * This only sends a signal if the requested amount of time has passed since the
+ * last one.
  * It requires a handler to have been registered via SetTimeSignalHandler.
  */
 void Player::SendPositionIfReady()
@@ -216,7 +222,8 @@ void Player::SendPositionIfReady()
 /**
  * Figures out whether it's time to send a position signal.
  * @param current_position The current position in the song.
- * @return True if enough time has elapsed for a signal to be sent; false otherwise.
+ * @return True if enough time has elapsed for a signal to be sent; false
+ * otherwise.
  */
 bool Player::IsReadyToSendPosition(std::chrono::microseconds current_position)
 {
@@ -235,9 +242,11 @@ bool Player::IsReadyToSendPosition(std::chrono::microseconds current_position)
 /**
  * Registers a listener for position signals.
  * @param listener The function to which position signals shall be sent.
- * @param period_usecs The approximate period, in microseconds, between position signals.
+ * @param period_usecs The approximate period, in microseconds, between position
+ * signals.
  */
-void Player::RegisterPositionListener(PositionListener listener, const std::chrono::microseconds period)
+void Player::RegisterPositionListener(PositionListener listener,
+                                      const std::chrono::microseconds period)
 {
 	this->position_listener = listener;
 	this->position_period = period;

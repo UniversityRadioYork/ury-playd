@@ -7,7 +7,8 @@
 
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #ifndef CUPPA_CMD_H
@@ -18,13 +19,12 @@
 #include <map>
 #include <vector>
 
-
 #ifdef IGNORE
 #undef IGNORE
 #endif
 
 typedef std::vector<std::string> cmd_words;
-typedef std::function <bool(cmd_words)> payload;
+typedef std::function<bool(cmd_words)> payload;
 typedef std::map<std::string, payload> command_set;
 
 class CommandHandler {
@@ -32,6 +32,7 @@ public:
 	CommandHandler(const command_set &commands);
 	bool Run(const cmd_words &words);
 	bool RunLine(const std::string &line);
+
 private:
 	std::unique_ptr<command_set> commands;
 
@@ -41,4 +42,4 @@ private:
 void check_commands(const command_set &cmds);
 void handle_cmd(const command_set &cmds);
 
-#endif				/* !CUPPA_CMD_H */
+#endif /* !CUPPA_CMD_H */
