@@ -30,10 +30,10 @@ int audio_cb_play(const void * /*in*/, void *out, unsigned long frames_per_buf,
 
 int AudioOutput::PlayCallback(char *out, unsigned long frames_per_buf)
 {
-	PaStreamCallbackResult result = paContinue;
-	unsigned long frames_written = 0;
+	std::pair<PaStreamCallbackResult, unsigned long> result =
+	                std::make_pair(paContinue, 0);
 
-	while (result == paContinue && frames_written < frames_per_buf) {
+	while (result.first == paContinue && result.second < frames_per_buf) {
 		unsigned long avail = PaUtil_GetRingBufferReadAvailable(
 		                this->ring_buf.get());
 		if (avail == 0) {
@@ -48,7 +48,7 @@ int AudioOutput::PlayCallback(char *out, unsigned long frames_per_buf)
 					 * We've just hit the end of the file.
 					 * Nothing to worry about!
 					 */
-					result = paComplete;
+					result.first = paComplete;
 					break;
 				case ErrorCode::OK:
 				case ErrorCode::INCOMPLETE:
@@ -63,20 +63,20 @@ int AudioOutput::PlayCallback(char *out, unsigned long frames_per_buf)
 					memset(out, 0,
 					       ByteCountForSampleCount(
 					                       frames_per_buf));
-					frames_written = frames_per_buf;
+					result.second = frames_per_buf;
 					break;
 				default:
 					/* Something genuinely went tits-up. */
-					result = paAbort;
+					result.first = paAbort;
 					break;
 			}
 		} else {
-			frames_written += ReadSamplesToOutput(
+			result.second += ReadSamplesToOutput(
 			                out, avail,
-			                frames_per_buf - frames_written);
+			                frames_per_buf - result.second);
 		}
 	}
-	return (int)result;
+	return static_cast<int>(result.first);
 }
 
 /**
