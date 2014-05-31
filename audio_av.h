@@ -24,13 +24,13 @@
  * away from ffmpeg), containing all state pertaining to the input
  * decoder for a file.
  *
- * struct au_in is an opaque structure; only audio_av.c knows its true
+ * struct AudioDecoder is an opaque structure; only audio_av.c knows its true
  * definition.
  */
-class au_in : public SampleByteConverter {
+class AudioDecoder : public SampleByteConverter {
 public:
-	au_in(const std::string &path);
-	~au_in();
+	AudioDecoder(const std::string &path);
+	~AudioDecoder();
 	size_t SetupPortAudio(int device, PaStreamParameters *params);
 
 	std::vector<char> *Decode();

@@ -74,7 +74,7 @@ public:
 
 private:
 	ErrorCode last_error;
-	std::unique_ptr<au_in> av;
+	std::unique_ptr<AudioDecoder> av;
 	/* shared state */
 	std::unique_ptr<std::vector<char>> frame;
 	decltype(frame->begin()) frame_iterator;

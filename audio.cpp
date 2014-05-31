@@ -68,7 +68,7 @@ AudioOutput::DeviceList AudioOutput::ListDevices()
 AudioOutput::AudioOutput(const std::string &path, const std::string &device_id)
 {
 	this->last_error = ErrorCode::INCOMPLETE;
-	this->av = std::unique_ptr<au_in>(new au_in(path));
+	this->av = std::unique_ptr<AudioDecoder>(new AudioDecoder(path));
 
 	InitialisePortAudio(DeviceIdToPa(device_id));
 	InitialiseRingBuffer(ByteCountForSampleCount(1L));
