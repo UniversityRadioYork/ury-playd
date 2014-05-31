@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <algorithm>
 #include <thread>
 #include <chrono>
 
@@ -173,13 +174,9 @@ void Player::Update()
  */
 bool Player::CurrentStateIn(std::initializer_list<State> states)
 {
-	bool in_state = false;
-	for (State state : states) {
-		if (this->current_state == state) {
-			in_state = true;
-		}
-	}
-	return in_state;
+	return std::any_of(states.begin(), states.end(), [this](State state) {
+		return this->current_state == state;
+	});
 }
 
 /* Sets the player state and honks accordingly. */
