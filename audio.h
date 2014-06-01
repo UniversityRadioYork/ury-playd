@@ -16,7 +16,9 @@
 
 #include "contrib/pa_ringbuffer.h" /* PaUtilRingBuffer */
 
+#include "constants.h"
 #include "errors.hpp"
+#include "ringbuffer.hpp"
 
 typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
 
@@ -80,9 +82,7 @@ private:
 	/* shared state */
 	std::unique_ptr<std::vector<char>> frame;
 	decltype(frame->begin()) frame_iterator;
-	/* PortAudio state */
-	std::unique_ptr<PaUtilRingBuffer> ring_buf;
-	std::unique_ptr<char[]> ring_data;
+	std::unique_ptr<RingBuffer<char, long, RINGBUF_POWER>> ring_buf;
 	PaStream *out_strm;
 	int device_id;
 	uint64_t position_sample_count;

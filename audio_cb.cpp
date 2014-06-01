@@ -45,12 +45,12 @@ PlayCallbackStepResult AudioOutput::PlayCallbackStep(
 {
 	decltype(in) result;
 
-	unsigned long avail =
-	                PaUtil_GetRingBufferReadAvailable(this->ring_buf.get());
+	unsigned long avail = this->ring_buf->ReadCapacity();
 	if (avail == 0) {
 		result = PlayCallbackFailure(out, frames_per_buf, in);
 	} else {
-		result = std::make_pair(paContinue,
+		result = std::make_pair(
+		                paContinue,
 		                in.second + ReadSamplesToOutput(
 		                                            out, avail,
 		                                            frames_per_buf -
@@ -109,8 +109,8 @@ unsigned long AudioOutput::ReadSamplesToOutput(char *&output,
 	                std::min(output_capacity, buffered_count);
 
 	// TODO: handle the ulong->long cast more gracefully, perhaps.
-	output += PaUtil_ReadRingBuffer(
-	                this->ring_buf.get(), output,
+	output += this->ring_buf->Read(
+	                output,
 	                static_cast<ring_buffer_size_t>(transfer_sample_count));
 
 	AdvancePositionBySampleCount(transfer_sample_count);

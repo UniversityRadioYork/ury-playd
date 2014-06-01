@@ -190,7 +190,7 @@ void AudioOutput::SeekToPositionMicroseconds(
 	// while (!Pa_IsStreamStopped(this->out_strm)) {
 	//	decode();
 	//}; // Spin until stream finishes
-	PaUtil_FlushRingBuffer(this->ring_buf.get());
+	this->ring_buf->Flush();
 }
 
 /* Increments the used samples counter, which is used to determine the current
@@ -261,8 +261,8 @@ void AudioOutput::WriteToRingBuffer(unsigned long sample_count)
 {
 	assert(0 < sample_count);
 
-	unsigned long written_count = PaUtil_WriteRingBuffer(
-	                this->ring_buf.get(), &(*this->frame_iterator),
+	unsigned long written_count = this->ring_buf->Write(
+	                &(*this->frame_iterator),
 	                static_cast<ring_buffer_size_t>(sample_count));
 	if (written_count != sample_count) {
 		throw Error(ErrorCode::INTERNAL_ERROR, "ringbuf write error");
@@ -320,18 +320,9 @@ void AudioOutput::InitialisePortAudio(int device)
  */
 void AudioOutput::InitialiseRingBuffer(size_t bytes_per_sample)
 {
-	this->ring_data = std::unique_ptr<char[]>(
-	                new char[RINGBUF_SIZE * bytes_per_sample]);
-	this->ring_buf =
-	                std::unique_ptr<PaUtilRingBuffer>(new PaUtilRingBuffer);
-	if (PaUtil_InitializeRingBuffer(
-	                    this->ring_buf.get(),
-	                    static_cast<ring_buffer_size_t>(bytes_per_sample),
-	                    static_cast<ring_buffer_size_t>(RINGBUF_SIZE),
-	                    this->ring_data.get()) != 0) {
-		throw Error(ErrorCode::INTERNAL_ERROR,
-		            "ringbuf failed to init");
-	}
+	this->ring_buf = std::unique_ptr<RingBuffer<char, long, RINGBUF_POWER>>(
+	                new RingBuffer<char, long, RINGBUF_POWER>(
+	                                bytes_per_sample));
 }
 
 /**
@@ -340,7 +331,7 @@ void AudioOutput::InitialiseRingBuffer(size_t bytes_per_sample)
  */
 unsigned long AudioOutput::RingBufferWriteCapacity()
 {
-	return PaUtil_GetRingBufferWriteAvailable(this->ring_buf.get());
+	return this->ring_buf->WriteCapacity();
 }
 
 /**

@@ -31,6 +31,7 @@ const std::chrono::microseconds POSITION_PERIOD(500000);
 const std::chrono::nanoseconds LOOP_PERIOD(1000);
 
 const size_t BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
+const size_t RINGBUF_POWER = (size_t)16;
 const size_t RINGBUF_SIZE = (size_t)(1 << 16);
 
 /* See constants.c for more constants (especially macro-based ones) */
