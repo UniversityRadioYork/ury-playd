@@ -89,13 +89,13 @@ bool Player::Stop()
 
 bool Player::Load(const std::string &filename)
 {
+	if (filename.length() == 0) return false;
 	try {
 		this->au = std::unique_ptr<AudioOutput>(new AudioOutput(filename, this->device));
 		this->position_last_invalid = true;
 		Debug("Loaded ", filename);
 		SetState(State::STOPPED);
-	}
-	catch (Error &error) {
+	} catch (Error &error) {
 		error.ToResponse();
 		Eject();
 	}
