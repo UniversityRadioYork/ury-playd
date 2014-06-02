@@ -75,6 +75,8 @@ private:
 	bool CurrentStateIn(std::initializer_list<State> states);
 	void SetState(State state);
 
+	std::pair<std::string, uint64_t> ParseSeekTime(const std::string &time_str) const;
+
 	void SendPositionIfReady();
 	bool IsReadyToSendPosition(std::chrono::microseconds current_position);
 };

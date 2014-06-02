@@ -131,7 +131,7 @@ typedef std::map<std::string,
  * time integers to the appropriate duration in microseconds.
  */
 static const TimeSuffixMap time_suffixes = {
-                {"s"  , MkTime<std::chrono::seconds>},
+                {"s", MkTime<std::chrono::seconds>},
                 {"sec", MkTime<std::chrono::seconds>},
                 {"secs", MkTime<std::chrono::seconds>},
                 {"m", MkTime<std::chrono::minutes>},
@@ -143,20 +143,32 @@ static const TimeSuffixMap time_suffixes = {
                 // Default when there is no unit
                 {"", MkTime<std::chrono::microseconds>}};
 
+/**
+ * Parses a seek time ('5m', '10000', etc) into a pair of unit suffix and value.
+ * @param time_str The time string.
+ * @return The unit/value pair.
+ */
+std::pair<std::string, uint64_t> Player::ParseSeekTime(
+                const std::string &time_str) const
+{
+	std::istringstream is(time_str);
+	uint64_t raw_time;
+	std::string rest;
+
+	is >> raw_time >> rest;
+	return std::make_pair(rest, raw_time);
+}
+
 bool Player::Seek(const std::string &time_str)
 {
 	bool valid = CurrentStateIn({State::PLAYING, State::STOPPED});
 	if (valid) {
-		std::istringstream is(time_str);
-		uint64_t raw_time;
-		std::string rest;
-		is >> raw_time >> rest;
-
+		auto seek = ParseSeekTime(time_str);
 		std::chrono::microseconds position(0);
 
 		try
 		{
-			position = time_suffixes.at(rest)(raw_time);
+			position = time_suffixes.at(seek.first)(seek.second);
 		}
 		catch (std::out_of_range)
 		{
