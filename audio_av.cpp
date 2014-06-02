@@ -88,15 +88,19 @@ std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
 /* Converts buffer size (in bytes) to sample count (in samples). */
 size_t AudioDecoder::SampleCountForByteCount(size_t bytes) const
 {
-	return ((bytes / this->stream->codec->channels) /
-	        av_get_bytes_per_sample(this->stream->codec->sample_fmt));
+	return ((bytes / this->stream->codec->channels) / BytesPerSample());
 }
 
 /* Converts sample count (in samples) to buffer size (in bytes). */
 size_t AudioDecoder::ByteCountForSampleCount(size_t samples) const
 {
-	return (samples * this->stream->codec->channels *
-	        av_get_bytes_per_sample(this->stream->codec->sample_fmt));
+	return (samples * this->stream->codec->channels * BytesPerSample());
+}
+
+/* Returns the current number of bytes per sample. */
+size_t AudioDecoder::BytesPerSample() const
+{
+	return av_get_bytes_per_sample(this->stream->codec->sample_fmt);
 }
 
 /* Attempts to seek to the position 'usec' milliseconds into the file. */

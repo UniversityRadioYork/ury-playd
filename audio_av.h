@@ -78,6 +78,8 @@ private:
 	std::vector<char> *Resample();
 
 	PaSampleFormat SampleFormatAVToPA(AVSampleFormat av_format);
+
+	size_t BytesPerSample() const;
 };
 
 /* A structure containing a lump of decoded frame data.
