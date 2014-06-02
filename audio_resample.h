@@ -12,8 +12,9 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
-#include <libswresample/swresample.h>
 }
+
+#include "swr.h"
 
 class SampleByteConverter {
 public:
@@ -45,7 +46,7 @@ public:
 	std::vector<char> *Resample(AVFrame *frame);
 
 private:
-	std::unique_ptr<SwrContext, std::function<void(SwrContext *)>> swr;
+	std::unique_ptr<Swr> swr;
 	std::unique_ptr<uint8_t, std::function<void(uint8_t *)>>
 	                resample_buffer;
 };
