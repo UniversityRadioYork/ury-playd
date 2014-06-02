@@ -221,7 +221,11 @@ void AudioOutput::AdvancePositionBySampleCount(uint64_t sample_count)
 bool AudioOutput::Update()
 {
 	bool more_frames_available = DecodeIfFrameEmpty();
-	WriteAllAvailableToRingBuffer();
+
+	if (more_frames_available) {
+		assert(this->frame != nullptr);
+		WriteAllAvailableToRingBuffer();
+	}
 
 	return more_frames_available;
 }
@@ -376,7 +380,11 @@ unsigned long AudioOutput::RingBufferWriteCapacity()
  */
 unsigned long AudioOutput::RingBufferTransferCount()
 {
+	assert(this->frame != nullptr);
+
 	long bytes = std::distance(this->frame_iterator, this->frame->end());
+	assert(0 <= bytes);
+
 	size_t samples = SampleCountForByteCount(static_cast<size_t>(bytes));
 	return std::min(samples, RingBufferWriteCapacity());
 }
