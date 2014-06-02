@@ -90,6 +90,8 @@ bool Player::Stop()
 
 bool Player::Load(const std::string &filename)
 {
+	if (filename.length() == 0) return false;
+
 	try
 	{
 		this->au = std::unique_ptr<AudioOutput>(
