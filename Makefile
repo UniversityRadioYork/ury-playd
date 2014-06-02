@@ -12,9 +12,9 @@ OBJECTS=$(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
 COBJECTS=$(addprefix $(OBJDIR)/,$(CSOURCES:.c=.o))
 TARGET=playslave++
 
-all: $(TARGET)
+all: mkdir $(TARGET)
 
-$(TARGET): mkdir $(COBJECTS) $(OBJECTS)
+$(TARGET): $(COBJECTS) $(OBJECTS)
 	$(CXX) $(COBJECTS) $(OBJECTS) $(LDFLAGS) -o $@
 
 $(OBJDIR)/%.o: %.c

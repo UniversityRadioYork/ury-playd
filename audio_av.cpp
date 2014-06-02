@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 #include <cstdlib>
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -24,8 +25,6 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/opt.h>
 }
-
-#include <portaudio.h>
 
 #include "errors.hpp"
 
@@ -43,6 +42,7 @@ AudioDecoder::AudioDecoder(const std::string &path)
 	InitialiseStream();
 	InitialisePacket();
 	InitialiseFrame();
+	InitialiseResampler();
 
 	Debug("stream id:", this->stream_id);
 	Debug("codec:", this->stream->codec->codec->long_name);
@@ -52,26 +52,27 @@ AudioDecoder::~AudioDecoder()
 {
 }
 
-size_t AudioDecoder::SetupPortAudio(int device, PaStreamParameters *params)
+/* @return The number of channels this decoder outputs. */
+std::uint8_t AudioDecoder::ChannelCount() const
 {
-	PaSampleFormat sf = SetupPortAudioSampleFormat();
-	SetupPortAudioParameters(sf, device, this->stream->codec->channels,
-	                         params);
+	return this->stream->codec->channels;
+}
 
+/* @return The size of this decoder's buffer, in samples. */
+size_t AudioDecoder::BufferSampleCapacity() const
+{
 	return SampleCountForByteCount(BUFFER_SIZE);
 }
 
-/* Returns the sample rate, providing av points to a properly initialised
- * AudioDecoder.
- */
-double AudioDecoder::SampleRate()
+/* @return The sample rate. */
+double AudioDecoder::SampleRate() const
 {
 	return (double)this->stream->codec->sample_rate;
 }
 
 /* Converts stream position (in microseconds) to estimated sample count. */
 size_t AudioDecoder::SampleCountForPositionMicroseconds(
-                std::chrono::microseconds usec)
+                std::chrono::microseconds usec) const
 {
 	auto sample_micros = usec * SampleRate();
 	return std::chrono::duration_cast<std::chrono::seconds>(sample_micros)
@@ -80,7 +81,7 @@ size_t AudioDecoder::SampleCountForPositionMicroseconds(
 
 /* Converts sample count to estimated stream position (in microseconds). */
 std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
-                size_t samples)
+                size_t samples) const
 {
 	auto position_secs = std::chrono::seconds(samples) / SampleRate();
 	return std::chrono::duration_cast<std::chrono::microseconds>(
@@ -158,75 +159,25 @@ std::vector<char> *AudioDecoder::Resample()
 	return this->resampler->Resample(this->frame.get());
 }
 
-/* Converts from ffmpeg sample format to PortAudio sample format.
- *
- * The conversion is currently done straight with no attempts to
- * convert disallowed sample formats, and as such may fail with more
- * esoteric ffmpeg sample formats.
- */
-PaSampleFormat AudioDecoder::SetupPortAudioSampleFormat()
-{
-	/* We need to convert planar samples into packed samples. */
-	std::function<Resampler *(const SampleByteConverter &,
-	                          AVCodecContext *)> rs;
-	if (av_sample_fmt_is_planar(this->stream->codec->sample_fmt)) {
-		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
-			return new PlanarResampler(s, c);
-		};
-	} else {
-		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
-			return new PackedResampler(s, c);
-		};
-	}
-	this->resampler = std::unique_ptr<Resampler>(
-	                rs(*this, this->stream->codec));
-	return SampleFormatAVToPA(this->resampler->AVOutputFormat());
-}
-
 static std::map<AVSampleFormat, SampleFormat> sf_from_av = {
                 {AV_SAMPLE_FMT_U8, SampleFormat::PACKED_UNSIGNED_INT_8},
                 {AV_SAMPLE_FMT_S16, SampleFormat::PACKED_SIGNED_INT_16},
                 {AV_SAMPLE_FMT_S32, SampleFormat::PACKED_SIGNED_INT_32},
                 {AV_SAMPLE_FMT_FLT, SampleFormat::PACKED_FLOAT_32}};
-static std::map<SampleFormat, PaSampleFormat> pa_from_sf = {
-                {SampleFormat::PACKED_UNSIGNED_INT_8, paUInt8},
-                {SampleFormat::PACKED_SIGNED_INT_16, paInt16},
-                {SampleFormat::PACKED_SIGNED_INT_32, paInt32},
-                {SampleFormat::PACKED_FLOAT_32, paFloat32}};
 
 /**
- * Converts a sample format enumeration from FFmpeg to PortAudio.
- * @param av_format The FFmpeg input format (must be packed).
- * @return The corresponding PortAudio format.
- * @note This only works for a small range of sample formats.
+ * @return The sample format of the data returned by this decoder.
  */
-PaSampleFormat AudioDecoder::SampleFormatAVToPA(AVSampleFormat av_format)
+SampleFormat AudioDecoder::SampleFormat() const
 {
 	try
 	{
-		return pa_from_sf.at(sf_from_av.at(av_format));
+		return sf_from_av.at(this->resampler->AVOutputFormat());
 	}
 	catch (std::out_of_range)
 	{
 		throw Error(ErrorCode::BAD_FILE, "unusable sample rate");
 	}
-}
-
-/* Sets up a PortAudio parameter set ready for ffmpeg frames to be thrown at it.
- *
- * The parameter set pointed to by *params MUST already be allocated, and its
- * contents should only be used if this function returns E_OK.
- */
-void AudioDecoder::SetupPortAudioParameters(PaSampleFormat sf, int device,
-                                            int chans, PaStreamParameters *pars)
-{
-	memset(pars, 0, sizeof(*pars));
-	pars->channelCount = chans;
-	pars->device = device;
-	pars->hostApiSpecificStreamInfo = NULL;
-	pars->sampleFormat = sf;
-	pars->suggestedLatency =
-	                (Pa_GetDeviceInfo(device)->defaultLowOutputLatency);
 }
 
 void AudioDecoder::Open(const std::string &path)
@@ -307,6 +258,23 @@ void AudioDecoder::InitialisePacket()
 	av_init_packet(pkt);
 	pkt->data = this->buffer.get();
 	pkt->size = BUFFER_SIZE;
+}
+
+void AudioDecoder::InitialiseResampler()
+{
+	std::function<Resampler *(const SampleByteConverter &,
+	                          AVCodecContext *)> rs;
+	if (av_sample_fmt_is_planar(this->stream->codec->sample_fmt)) {
+		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
+			return new PlanarResampler(s, c);
+		};
+	} else {
+		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
+			return new PackedResampler(s, c);
+		};
+	}
+	this->resampler = std::unique_ptr<Resampler>(
+	                rs(*this, this->stream->codec));
 }
 
 /*  Also see the non-static functions for the frontend for frame decoding */

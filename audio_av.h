@@ -15,10 +15,10 @@
 
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
-#include <portaudio.h>
 
 #include "audio_resample.h"
 #include "errors.hpp"
+#include "sample_formats.hpp"
 
 /* The audio input structure (thusly named in case we ever generalise
  * away from ffmpeg), containing all state pertaining to the input
@@ -31,18 +31,21 @@ class AudioDecoder : public SampleByteConverter {
 public:
 	AudioDecoder(const std::string &path);
 	~AudioDecoder();
-	size_t SetupPortAudio(int device, PaStreamParameters *params);
 
 	std::vector<char> *Decode();
-	double SampleRate();
+
+	std::uint8_t ChannelCount() const;
+	double SampleRate() const;
+	SampleFormat SampleFormat() const;
+	size_t BufferSampleCapacity() const;
 
 	void SeekToPositionMicroseconds(std::chrono::microseconds position);
 
 	// Unit conversion
 	std::chrono::microseconds PositionMicrosecondsForSampleCount(
-	                size_t samples);
+	                size_t samples) const;
 	size_t SampleCountForPositionMicroseconds(
-	                std::chrono::microseconds position);
+	                std::chrono::microseconds position) const;
 
 	size_t SampleCountForByteCount(size_t bytes) const;
 	size_t ByteCountForSampleCount(size_t samples) const;
@@ -69,16 +72,10 @@ private:
 	void InitialiseCodec(int stream, AVCodec *codec);
 	void InitialiseFrame();
 	void InitialisePacket();
-
-	PaSampleFormat SetupPortAudioSampleFormat();
-	void SetupPortAudioParameters(PaSampleFormat sf, int device, int chans,
-	                              PaStreamParameters *pars);
+	void InitialiseResampler();
 
 	bool DecodePacket();
 	std::vector<char> *Resample();
-
-	PaSampleFormat SampleFormatAVToPA(AVSampleFormat av_format);
-
 	size_t BytesPerSample() const;
 };
 

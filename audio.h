@@ -20,6 +20,8 @@
 #include "errors.hpp"
 #include "ringbuffer.hpp"
 
+#include <portaudio.h>
+
 typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
 
 /* The audio structure contains all state pertaining to the currently
@@ -117,6 +119,7 @@ private:
 	void AdvanceFrameIterator(unsigned long sample_count);
 
 	PaDeviceIndex DeviceIdToPa(const std::string &id_string);
+	PaSampleFormat PaSampleFormatFrom(SampleFormat fmt);
 };
 
 #endif /* not AUDIO_H */

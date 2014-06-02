@@ -32,6 +32,15 @@ extern "C" {
 #include "audio_cb.h" /* audio_cb_play */
 #include "constants.h"
 
+#include "sample_formats.hpp"
+
+// Mappings from SampleFormats to their equivalent PaSampleFormats.
+static std::map<SampleFormat, PaSampleFormat> pa_from_sf = {
+                {SampleFormat::PACKED_UNSIGNED_INT_8, paUInt8},
+                {SampleFormat::PACKED_SIGNED_INT_16, paInt16},
+                {SampleFormat::PACKED_SIGNED_INT_32, paInt32},
+                {SampleFormat::PACKED_FLOAT_32, paFloat32}};
+
 /**
  * Initialises the libraries required for the audio subsystem.
  */
@@ -296,11 +305,37 @@ void AudioOutput::AdvanceFrameIterator(unsigned long sample_count)
 	        this->frame_iterator < this->frame->end()));
 }
 
+/**
+ * Converts a sample format identifier from playslave++ to PortAudio.
+ * @param fmt The playslave++ sample format identifier.
+ * @return The PortAudio equivalent of the given SampleFormat.
+ */
+PaSampleFormat AudioOutput::PaSampleFormatFrom(SampleFormat fmt)
+{
+	try
+	{
+		return pa_from_sf.at(fmt);
+	}
+	catch (std::out_of_range)
+	{
+		throw Error(ErrorCode::BAD_FILE, "unusable sample rate");
+	}
+}
+
 void AudioOutput::InitialisePortAudio(int device)
 {
 	double sample_rate = this->av->SampleRate();
 	PaStreamParameters pars;
-	size_t samples_per_buf = this->av->SetupPortAudio(device, &pars);
+	memset(&pars, 0, sizeof(pars));
+
+	pars.channelCount = this->av->ChannelCount();
+	pars.device = device;
+	pars.hostApiSpecificStreamInfo = nullptr;
+	pars.sampleFormat = PaSampleFormatFrom(this->av->SampleFormat());
+	pars.suggestedLatency =
+	                Pa_GetDeviceInfo(device)->defaultLowOutputLatency;
+
+	size_t samples_per_buf = this->av->BufferSampleCapacity();
 	PaError pa_err =
 	                Pa_OpenStream(&this->out_strm, NULL, &pars, sample_rate,
 	                              samples_per_buf, paClipOff, audio_cb_play,
