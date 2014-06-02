@@ -109,40 +109,64 @@ bool Player::Load(const std::string &filename)
 	return true; // Always a valid command.
 }
 
+/**
+ * A template for converting a uint64_t giving a duration in terms of T1 into
+ * a duration expressed as a T2.
+ *
+ * For example, MkTime<std::chrono::seconds> takes in a uint64_t of seconds
+ * and returns a std::chrono::microseconds.
+ */
+template <typename T1, typename T2 = std::chrono::microseconds>
+T2 MkTime(uint64_t raw_time)
+{
+	return std::chrono::duration_cast<T2>(T1(raw_time));
+}
+
+typedef std::map<std::string,
+                 std::function<std::chrono::microseconds(uint64_t)>>
+                TimeSuffixMap;
+
+/**
+ * Mapping from unit suffixes for seek command times to functions converting
+ * time integers to the appropriate duration in microseconds.
+ */
+static const TimeSuffixMap time_suffixes = {
+                {"s"  , MkTime<std::chrono::seconds>},
+                {"sec", MkTime<std::chrono::seconds>},
+                {"secs", MkTime<std::chrono::seconds>},
+                {"m", MkTime<std::chrono::minutes>},
+                {"min", MkTime<std::chrono::minutes>},
+                {"mins", MkTime<std::chrono::minutes>},
+                {"h", MkTime<std::chrono::hours>},
+                {"hour", MkTime<std::chrono::hours>},
+                {"hours", MkTime<std::chrono::hours>},
+                // Default when there is no unit
+                {"", MkTime<std::chrono::microseconds>}};
+
 bool Player::Seek(const std::string &time_str)
 {
-	/* TODO: proper overflow checking */
-
-	std::istringstream is(time_str);
-	uint64_t raw_time;
-	std::string rest;
-	is >> raw_time >> rest;
-
-	std::chrono::microseconds position(0);
-	if (rest == "s" || rest == "sec") {
-		position = std::chrono::duration_cast<
-		                std::chrono::microseconds>(
-		                std::chrono::seconds(raw_time));
-
-	} else {
-		/* Assume microseconds */
-		position = std::chrono::microseconds(raw_time);
-	}
-
-	/* Weed out any unwanted states */
 	bool valid = CurrentStateIn({State::PLAYING, State::STOPPED});
 	if (valid) {
-		// enum state current_state = this->cstate;
+		std::istringstream is(time_str);
+		uint64_t raw_time;
+		std::string rest;
+		is >> raw_time >> rest;
 
-		// cmd_stop(); // We need the player engine stopped in order to
-		// seek
-		this->au->SeekToPosition(position);
-		this->position_last_invalid = true;
+		std::chrono::microseconds position(0);
 
-		// if (current_state == S_PLAY) {
-		// If we were playing before we'd ideally like to resume
-		// cmd_play();
-		//}
+		try
+		{
+			position = time_suffixes.at(rest)(raw_time);
+		}
+		catch (std::out_of_range)
+		{
+			valid = false;
+		}
+
+		if (valid) {
+			this->au->SeekToPosition(position);
+			this->position_last_invalid = true;
+		}
 	}
 
 	return valid;
