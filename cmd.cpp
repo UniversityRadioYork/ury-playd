@@ -52,9 +52,11 @@ bool CommandHandler::Run(const cmd_words &words)
 {
 	bool valid = false;
 
-	auto commandIter = this->commands->find(words[0]);
-	if (commandIter != this->commands->end()) {
-		valid = commandIter->second(words);
+	if (!words.empty()) {
+		auto commandIter = this->commands->find(words[0]);
+		if (commandIter != this->commands->end()) {
+			valid = commandIter->second(words);
+		}
 	}
 
 	return valid;
