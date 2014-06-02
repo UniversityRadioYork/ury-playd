@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
+#include <map>
 
 /* ffmpeg */
 extern "C" {
@@ -31,6 +32,7 @@ extern "C" {
 #include "audio_av.h"
 #include "audio_resample.h"
 #include "constants.h"
+#include "sample_formats.hpp"
 
 AudioDecoder::AudioDecoder(const std::string &path)
 {
@@ -181,6 +183,17 @@ PaSampleFormat AudioDecoder::SetupPortAudioSampleFormat()
 	return SampleFormatAVToPA(this->resampler->AVOutputFormat());
 }
 
+static std::map<AVSampleFormat, SampleFormat> sf_from_av = {
+                {AV_SAMPLE_FMT_U8, SampleFormat::PACKED_UNSIGNED_INT_8},
+                {AV_SAMPLE_FMT_S16, SampleFormat::PACKED_SIGNED_INT_16},
+                {AV_SAMPLE_FMT_S32, SampleFormat::PACKED_SIGNED_INT_32},
+                {AV_SAMPLE_FMT_FLT, SampleFormat::PACKED_FLOAT_32}};
+static std::map<SampleFormat, PaSampleFormat> pa_from_sf = {
+                {SampleFormat::PACKED_UNSIGNED_INT_8, paUInt8},
+                {SampleFormat::PACKED_SIGNED_INT_16, paInt16},
+                {SampleFormat::PACKED_SIGNED_INT_32, paInt32},
+                {SampleFormat::PACKED_FLOAT_32, paFloat32}};
+
 /**
  * Converts a sample format enumeration from FFmpeg to PortAudio.
  * @param av_format The FFmpeg input format (must be packed).
@@ -189,27 +202,14 @@ PaSampleFormat AudioDecoder::SetupPortAudioSampleFormat()
  */
 PaSampleFormat AudioDecoder::SampleFormatAVToPA(AVSampleFormat av_format)
 {
-	PaSampleFormat pa_format = paUInt8;
-
-	switch (av_format) {
-		case AV_SAMPLE_FMT_U8:
-			pa_format = paUInt8;
-			break;
-		case AV_SAMPLE_FMT_S16:
-			pa_format = paInt16;
-			break;
-		case AV_SAMPLE_FMT_S32:
-			pa_format = paInt32;
-			break;
-		case AV_SAMPLE_FMT_FLT:
-			pa_format = paFloat32;
-			break;
-		default:
-			throw Error(ErrorCode::BAD_FILE,
-			            "unusable sample rate");
+	try
+	{
+		return pa_from_sf.at(sf_from_av.at(av_format));
 	}
-
-	return pa_format;
+	catch (std::out_of_range)
+	{
+		throw Error(ErrorCode::BAD_FILE, "unusable sample rate");
+	}
 }
 
 /* Sets up a PortAudio parameter set ready for ffmpeg frames to be thrown at it.

@@ -82,11 +82,4 @@ private:
 	size_t BytesPerSample() const;
 };
 
-/* A structure containing a lump of decoded frame data.
- *
- * struct au_frame is an opaque structure; only audio_av.c knows its true
- * definition.
- */
-struct au_frame;
-
 #endif /* not AUDIO_AV_H */
