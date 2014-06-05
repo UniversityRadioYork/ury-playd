@@ -187,11 +187,11 @@ void AudioOutput::PreFillRingBuffer()
 void AudioOutput::SeekToPositionMicroseconds(
                 std::chrono::microseconds microseconds)
 {
+	this->av->SeekToPositionMicroseconds(microseconds);
+
 	size_t new_position_sample_count =
 	                this->av->SampleCountForPositionMicroseconds(
 	                                microseconds);
-	this->av->SeekToPositionMicroseconds(microseconds);
-
 	this->frame = nullptr;
 	this->last_error = ErrorCode::INCOMPLETE;
 	this->position_sample_count = new_position_sample_count;
