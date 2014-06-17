@@ -35,10 +35,10 @@ size_t Resampler::ByteCountForSampleCount(size_t samples) const
 	return this->out.ByteCountForSampleCount(samples);
 }
 
-std::vector<char> *Resampler::MakeFrameVector(char *start, int sample_count)
+std::vector<char> Resampler::MakeFrameVector(char *start, int sample_count)
 {
 	char *end = start + ByteCountForSampleCount(sample_count);
-	return new std::vector<char>(start, end);
+	return std::vector<char>(start, end);
 }
 
 PlanarResampler::PlanarResampler(const SampleByteConverter &out,
@@ -54,7 +54,7 @@ PlanarResampler::PlanarResampler(const SampleByteConverter &out,
 	                codec->sample_fmt, codec->sample_rate, 0, nullptr));
 }
 
-std::vector<char> *PlanarResampler::Resample(AVFrame *frame)
+std::vector<char> PlanarResampler::Resample(AVFrame *frame)
 {
 	std::uint8_t *rbuf;
 
@@ -73,10 +73,11 @@ std::vector<char> *PlanarResampler::Resample(AVFrame *frame)
 	                const_cast<const uint8_t **>(frame->extended_data),
 	                in_samples));
 
-	auto vector = MakeFrameVector(reinterpret_cast<char *>(rbuf), n);
+	std::vector<char> vec =
+	                MakeFrameVector(reinterpret_cast<char *>(rbuf), n);
 	av_freep(&rbuf);
 
-	return vector;
+	return vec;
 }
 
 PackedResampler::PackedResampler(const SampleByteConverter &out,
@@ -86,9 +87,7 @@ PackedResampler::PackedResampler(const SampleByteConverter &out,
 	this->output_format = codec->sample_fmt;
 }
 
-std::vector<char> *PackedResampler::Resample(AVFrame *frame)
+std::vector<char> PackedResampler::Resample(AVFrame *frame)
 {
-	return MakeFrameVector(
-	                reinterpret_cast<char *>(frame->extended_data[0]),
-	                frame->nb_samples);
+	return MakeFrameVector(reinterpret_cast<char *>(frame->extended_data[0]), frame->nb_samples);
 }

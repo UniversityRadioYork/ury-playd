@@ -200,8 +200,7 @@ void Player::Update()
 		}
 	}
 	if (CurrentStateIn({State::PLAYING, State::STOPPED})) {
-		bool more = this->au->Update();
-		if (!more) {
+		if (!this->au->Update()) {
 			Eject();
 		}
 	}

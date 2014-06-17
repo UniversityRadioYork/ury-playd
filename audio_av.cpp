@@ -133,28 +133,28 @@ void AudioDecoder::SeekToPositionMicroseconds(
  * which is owned by the caller.  If the return value is nullptr, we have run
  * out of frames to decode.
  */
-std::vector<char> *AudioDecoder::Decode()
+std::vector<char> AudioDecoder::Decode()
 {
 	bool complete = false;
 	bool more = true;
-	std::vector<char> *vector = nullptr;
+	std::vector<char> vec;
 
-	while (!(complete) && more) {
+	while (!complete && more) {
 		if (av_read_frame(this->context.get(), this->packet.get()) <
 		    0) {
 			more = false;
 		} else if (this->packet->stream_index == this->stream_id) {
 			complete = DecodePacket();
 			if (complete) {
-				vector = Resample();
+				vec = Resample();
 			}
 		}
 	}
 
-	return vector;
+	return vec;
 }
 
-std::vector<char> *AudioDecoder::Resample()
+std::vector<char> AudioDecoder::Resample()
 {
 	return this->resampler->Resample(this->frame.get());
 }

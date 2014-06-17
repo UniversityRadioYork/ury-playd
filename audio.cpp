@@ -82,9 +82,10 @@ AudioOutput::AudioOutput(const std::string &path, const std::string &device_id)
 	InitialisePortAudio(DeviceIdToPa(device_id));
 	InitialiseRingBuffer(ByteCountForSampleCount(1L));
 
-	this->frame = nullptr;
-
 	this->position_sample_count = 0;
+
+	this->frame = std::vector<char>();
+	this->frame_iterator = this->frame.end();
 
 	this->callback = [this](char *out, unsigned long frames_per_buf) {
 		return this->PlayCallback(out, frames_per_buf);
@@ -192,7 +193,9 @@ void AudioOutput::SeekToPositionMicroseconds(
 	size_t new_position_sample_count =
 	                this->av->SampleCountForPositionMicroseconds(
 	                                microseconds);
-	this->frame = nullptr;
+	this->frame.clear();
+	this->frame_iterator = this->frame.end();
+
 	this->last_error = ErrorCode::INCOMPLETE;
 	this->position_sample_count = new_position_sample_count;
 
@@ -200,14 +203,6 @@ void AudioOutput::SeekToPositionMicroseconds(
 	//	decode();
 	//}; // Spin until stream finishes
 	this->ring_buf->Flush();
-}
-
-/* Increments the used samples counter, which is used to determine the current
- * position in the song, by 'samples' samples.
- */
-void AudioOutput::AdvancePositionBySampleCount(uint64_t sample_count)
-{
-	this->position_sample_count += sample_count;
 }
 
 /**
@@ -223,7 +218,7 @@ bool AudioOutput::Update()
 	bool more_frames_available = DecodeIfFrameEmpty();
 
 	if (more_frames_available) {
-		assert(this->frame != nullptr);
+		assert(!this->frame.empty());
 		WriteAllAvailableToRingBuffer();
 	}
 
@@ -236,23 +231,15 @@ bool AudioOutput::Update()
  */
 bool AudioOutput::DecodeIfFrameEmpty()
 {
-	bool more = true;
+	assert(this->frame.empty() || this->frame_iterator < this->frame.end());
 
-	assert(this->frame == nullptr ||
-	       this->frame_iterator < this->frame->end());
+	if (this->frame.end() <= this->frame_iterator) {
+		this->frame = this->av->Decode();
 
-	if (this->frame == nullptr) {
-		std::vector<char> *frame_ptr = this->av->Decode();
-		if (frame_ptr == nullptr) {
-			more = false;
-		} else {
-			assert(frame_ptr->begin() < frame_ptr->end());
-			this->frame = decltype(this->frame)(frame_ptr);
-			this->frame_iterator = this->frame->begin();
-		}
+		this->frame_iterator = this->frame.begin();
 	}
 
-	return more;
+	return !(this->frame.empty());
 }
 
 /**
@@ -300,13 +287,14 @@ void AudioOutput::AdvanceFrameIterator(unsigned long sample_count)
 	assert(0 < byte_count);
 
 	std::advance(this->frame_iterator, byte_count);
-	if (this->frame_iterator >= this->frame->end()) {
-		this->frame = nullptr;
+	if (this->frame_iterator >= this->frame.end()) {
+		this->frame.clear();
+		this->frame_iterator = this->frame.end();
 	}
 
-	assert(this->frame == nullptr ||
-	       (this->frame->begin() < this->frame_iterator &&
-	        this->frame_iterator < this->frame->end()));
+	assert(this->frame.empty() ||
+	       (this->frame.begin() < this->frame_iterator &&
+	        this->frame_iterator < this->frame.end()));
 }
 
 /**
@@ -380,9 +368,9 @@ unsigned long AudioOutput::RingBufferWriteCapacity()
  */
 unsigned long AudioOutput::RingBufferTransferCount()
 {
-	assert(this->frame != nullptr);
+	assert(!this->frame.empty());
 
-	long bytes = std::distance(this->frame_iterator, this->frame->end());
+	long bytes = std::distance(this->frame_iterator, this->frame.end());
 	assert(0 <= bytes);
 
 	size_t samples = SampleCountForByteCount(static_cast<size_t>(bytes));

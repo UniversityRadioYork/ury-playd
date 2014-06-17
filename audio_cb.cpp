@@ -113,6 +113,6 @@ unsigned long AudioOutput::ReadSamplesToOutput(char *&output,
 	                output,
 	                static_cast<ring_buffer_size_t>(transfer_sample_count));
 
-	AdvancePositionBySampleCount(transfer_sample_count);
+	this->position_sample_count += transfer_sample_count;
 	return transfer_sample_count;
 }

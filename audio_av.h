@@ -32,7 +32,7 @@ public:
 	AudioDecoder(const std::string &path);
 	~AudioDecoder();
 
-	std::vector<char> *Decode();
+	std::vector<char> Decode();
 
 	std::uint8_t ChannelCount() const;
 	double SampleRate() const;
@@ -75,7 +75,7 @@ private:
 	void InitialiseResampler();
 
 	bool DecodePacket();
-	std::vector<char> *Resample();
+	std::vector<char> Resample();
 	size_t BytesPerSample() const;
 };
 

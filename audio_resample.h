@@ -27,14 +27,14 @@ class Resampler : protected SampleByteConverter {
 public:
 	Resampler(const SampleByteConverter &out);
 
-	virtual std::vector<char> *Resample(AVFrame *frame) = 0;
+	virtual std::vector<char> Resample(AVFrame *frame) = 0;
 	virtual AVSampleFormat AVOutputFormat();
 
 protected:
 	size_t SampleCountForByteCount(size_t bytes) const;
 	size_t ByteCountForSampleCount(size_t samples) const;
+	std::vector<char> MakeFrameVector(char *start, int sample_count);
 
-	std::vector<char> *MakeFrameVector(char *start, int sample_count);
 	AVSampleFormat output_format;
 	const SampleByteConverter &out;
 };
@@ -43,7 +43,7 @@ protected:
 class PlanarResampler : public Resampler {
 public:
 	PlanarResampler(const SampleByteConverter &out, AVCodecContext *codec);
-	std::vector<char> *Resample(AVFrame *frame);
+	std::vector<char> Resample(AVFrame *frame);
 
 private:
 	std::unique_ptr<Swr> swr;
@@ -55,7 +55,7 @@ private:
 class PackedResampler : public Resampler {
 public:
 	PackedResampler(const SampleByteConverter &out, AVCodecContext *codec);
-	std::vector<char> *Resample(AVFrame *frame);
+	std::vector<char> Resample(AVFrame *frame);
 };
 
 #endif // AUDIO_RESAMPLE_H

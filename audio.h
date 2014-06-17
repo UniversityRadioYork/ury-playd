@@ -82,8 +82,8 @@ private:
 	ErrorCode last_error;
 	std::unique_ptr<AudioDecoder> av;
 	/* shared state */
-	std::unique_ptr<std::vector<char>> frame;
-	decltype(frame->begin()) frame_iterator;
+	std::vector<char> frame;
+	std::vector<char>::iterator frame_iterator;
 	std::unique_ptr<RingBuffer<char, long, RINGBUF_POWER>> ring_buf;
 	PaStream *out_strm;
 	int device_id;
@@ -107,7 +107,6 @@ private:
 	unsigned long ReadSamplesToOutput(char *&output,
 	                                  unsigned long output_capacity,
 	                                  unsigned long buffered_count);
-	void AdvancePositionBySampleCount(uint64_t sample_count);
 
 	bool DecodeIfFrameEmpty();
 
