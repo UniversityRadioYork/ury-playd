@@ -6,10 +6,20 @@
 #include "contrib/pa_ringbuffer.h"
 #include "errors.hpp"
 
-template <typename T1, typename T2, int P>
+template <typename T1, typename T2>
 class RingBuffer {
 public:
-	RingBuffer(int size = sizeof(T1))
+	virtual T2 WriteCapacity() const = 0;
+	virtual T2 ReadCapacity() const = 0;
+	virtual T2 Write(T1 *start, T2 count) = 0;
+	virtual T2 Read(T1 *start, T2 count) = 0;
+	virtual void Flush() = 0;
+};
+
+template <typename T1, typename T2, int P>
+class PaRingBuffer : public RingBuffer<T1, T2> {
+public:
+	PaRingBuffer(int size = sizeof(T1))
 	{
 		this->rb = new PaUtilRingBuffer;
 		this->buffer = new char[(1 << P) * size];
@@ -23,7 +33,7 @@ public:
 		}
 	}
 
-	~RingBuffer()
+	~PaRingBuffer()
 	{
 		assert(this->rb != nullptr);
 		delete this->rb;
@@ -32,13 +42,13 @@ public:
 		delete[] this->buffer;
 	}
 
-	T2 WriteCapacity()
+	T2 WriteCapacity() const
 	{
 		return static_cast<T2>(
 		                PaUtil_GetRingBufferWriteAvailable(this->rb));
 	}
 
-	T2 ReadCapacity()
+	T2 ReadCapacity() const
 	{
 		return static_cast<T2>(
 		                PaUtil_GetRingBufferReadAvailable(this->rb));

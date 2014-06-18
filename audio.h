@@ -84,7 +84,7 @@ private:
 	/* shared state */
 	std::vector<char> frame;
 	std::vector<char>::iterator frame_iterator;
-	std::unique_ptr<RingBuffer<char, long, RINGBUF_POWER>> ring_buf;
+	std::unique_ptr<RingBuffer<char, long>> ring_buf;
 	PaStream *out_strm;
 	int device_id;
 	uint64_t position_sample_count;

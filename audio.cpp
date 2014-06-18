@@ -347,8 +347,8 @@ void AudioOutput::InitialisePortAudio(int device)
  */
 void AudioOutput::InitialiseRingBuffer(size_t bytes_per_sample)
 {
-	this->ring_buf = std::unique_ptr<RingBuffer<char, long, RINGBUF_POWER>>(
-	                new RingBuffer<char, long, RINGBUF_POWER>(
+	this->ring_buf = std::unique_ptr<RingBuffer<char, long>>(
+	                new PaRingBuffer<char, long, RINGBUF_POWER>(
 	                                bytes_per_sample));
 }
 
