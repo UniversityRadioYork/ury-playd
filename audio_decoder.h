@@ -20,12 +20,12 @@
 #include "errors.hpp"
 #include "sample_formats.hpp"
 
-/* The audio input structure (thusly named in case we ever generalise
- * away from ffmpeg), containing all state pertaining to the input
- * decoder for a file.
+/**
+ * An object responsible for decoding an audio file.
  *
- * struct AudioDecoder is an opaque structure; only audio_av.c knows its true
- * definition.
+ * The AudioDecoder is an interface to the ffmpeg library, which represents all
+ * the ffmpeg state associated with one file.  It can be polled to decode
+ * frames of audio data, which are returned as byte vectors.
  */
 class AudioDecoder : public SampleByteConverter {
 public:
@@ -39,6 +39,10 @@ public:
 	SampleFormat SampleFormat() const;
 	size_t BufferSampleCapacity() const;
 
+	/**
+	 * Seeks to the given position, in microseconds.
+	 * @param position  The new position in the file, in microseconds.
+	 */
 	void SeekToPositionMicroseconds(std::chrono::microseconds position);
 
 	// Unit conversion
@@ -77,6 +81,8 @@ private:
 	bool DecodePacket();
 	std::vector<char> Resample();
 	size_t BytesPerSample() const;
+
+	bool UsingPlanarSampleFormat();
 };
 
 #endif /* not AUDIO_AV_H */

@@ -264,7 +264,7 @@ void AudioDecoder::InitialiseResampler()
 {
 	std::function<Resampler *(const SampleByteConverter &,
 	                          AVCodecContext *)> rs;
-	if (av_sample_fmt_is_planar(this->stream->codec->sample_fmt)) {
+	if (UsingPlanarSampleFormat()) {
 		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
 			return new PlanarResampler(s, c);
 		};
@@ -277,7 +277,10 @@ void AudioDecoder::InitialiseResampler()
 	                rs(*this, this->stream->codec));
 }
 
-/*  Also see the non-static functions for the frontend for frame decoding */
+bool AudioDecoder::UsingPlanarSampleFormat()
+{
+	return av_sample_fmt_is_planar(this->stream->codec->sample_fmt);
+}
 
 bool AudioDecoder::DecodePacket()
 {
