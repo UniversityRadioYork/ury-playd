@@ -83,6 +83,8 @@ private:
 	size_t BytesPerSample() const;
 
 	bool UsingPlanarSampleFormat();
+	std::int64_t AvPositionFromMicroseconds(
+	                std::chrono::microseconds position);
 };
 
 #endif /* not AUDIO_AV_H */

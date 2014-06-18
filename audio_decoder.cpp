@@ -110,21 +110,26 @@ size_t AudioDecoder::BytesPerSample() const
 void AudioDecoder::SeekToPositionMicroseconds(
                 std::chrono::microseconds position)
 {
+	std::int64_t ffmpeg_position = AvPositionFromMicroseconds(position);
+
+	Debug("Seeking to:", ffmpeg_position);
+
+	if (av_seek_frame(this->context.get(), this->stream_id, ffmpeg_position,
+	                  AVSEEK_FLAG_ANY) != 0) {
+		throw Error(ErrorCode::INTERNAL_ERROR, "seek failed");
+	}
+}
+
+std::int64_t AudioDecoder::AvPositionFromMicroseconds(
+                std::chrono::microseconds position)
+{
 	auto position_timebase_microseconds =
 	                (position * this->stream->time_base.den) /
 	                this->stream->time_base.num;
 	auto position_timebase_seconds =
 	                std::chrono::duration_cast<std::chrono::seconds>(
 	                                position_timebase_microseconds);
-	auto c = position_timebase_seconds.count();
-	Debug("Seeking to:", c);
-
-	if (av_seek_frame(this->context.get(), this->stream_id,
-	                  static_cast<int64_t>(
-	                                  position_timebase_seconds.count()),
-	                  AVSEEK_FLAG_ANY) != 0) {
-		throw Error(ErrorCode::INTERNAL_ERROR, "seek failed");
-	}
+	return position_timebase_seconds.count();
 }
 
 /* Tries to decode an entire frame and returns a vector of its contents.
