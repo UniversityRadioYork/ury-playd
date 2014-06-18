@@ -62,7 +62,7 @@ public:
 	            const std::uint8_t* in_arg[SWR_CH_MAX], int in_count);
 
 private:
-	SwrContext* context;  //< The internal libswresample context.
+	SwrContext* context; //< The internal libswresample context.
 };
 
 #endif // PS_SWR
