@@ -110,25 +110,16 @@ public:
 
 	T2 Write(T1 *start, T2 count)
 	{
-		T2 i;
-
-		for (i = 0; i < count * this->size; i++) {
-			this->rb->push_back(start[i]);
-		}
-
-		return (i + 1) / this->size;
+		return OnBuffer(start, count,
+		                [this](T1 *e) { this->rb->push_back(e); });
 	}
 
 	T2 Read(T1 *start, T2 count)
 	{
-		T2 i;
-
-		for (i = 0; i < count * this->size; i++) {
-			start[i] = this->rb->front();
+		return OnBuffer(start, count, [this](T1 *e) {
+			*e = this->rb->front();
 			this->rb->pop_front();
-		}
-
-		return (i + 1) / this->size;
+		});
 	}
 
 	void Flush()
@@ -137,8 +128,27 @@ public:
 	}
 
 private:
-	boost::circular_buffer<char> *rb; ///< The internal Boost ring buffer.
-	int size;                         ///< The size of one sample, in bytes.
+	boost::circular_buffer<T1> *rb; ///< The internal Boost ring buffer.
+	int size;                       ///< The size of one sample, in bytes.
+
+	/**
+	 * Transfers between this ring buffer and an external array buffer.
+	 * @param start  The start of the array buffer.
+	 * @param count  The number of samples in the array buffer.
+	 * @param f      A function to perform on each position in the array
+	 *               buffer.
+	 * @return       The number of samples affected in the array buffer.
+	 */
+	T2 OnBuffer(T1 *start, T2 count, std::function<void(T1 *)> f)
+	{
+		T2 i;
+
+		for (i = 0; i < count * this->size; i++) {
+			f(start + i);
+		}
+
+		return (i + 1) / this->size;
+	}
 };
 
 /**
