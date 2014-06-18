@@ -182,26 +182,24 @@ public:
 
 	T2 WriteCapacity() const
 	{
-		return static_cast<T2>(
-		                PaUtil_GetRingBufferWriteAvailable(this->rb));
+		return CountCast(PaUtil_GetRingBufferWriteAvailable(this->rb));
 	}
 
 	T2 ReadCapacity() const
 	{
-		return static_cast<T2>(
-		                PaUtil_GetRingBufferReadAvailable(this->rb));
+		return CountCast(PaUtil_GetRingBufferReadAvailable(this->rb));
 	}
 
 	T2 Write(T1 *start, T2 count)
 	{
-		return static_cast<T2>(PaUtil_WriteRingBuffer(
+		return CountCast(PaUtil_WriteRingBuffer(
 		                this->rb, start,
 		                static_cast<ring_buffer_size_t>(count)));
 	}
 
 	T2 Read(T1 *start, T2 count)
 	{
-		return static_cast<T2>(PaUtil_ReadRingBuffer(
+		return CountCast(PaUtil_ReadRingBuffer(
 		                this->rb, start,
 		                static_cast<ring_buffer_size_t>(count)));
 	}
@@ -214,6 +212,16 @@ public:
 private:
 	char *buffer;         ///< The array used by the ringbuffer.
 	PaUtilRingBuffer *rb; ///< The internal PortAudio ringbuffer.
+
+	/**
+	 * Converts a ring buffer size into an external size.
+	 * @param count  The size/count in PortAudio form.
+	 * @return       The size/count after casting to T2.
+	 */
+	T2 CountCast(ring_buffer_size_t count) const
+	{
+		return static_cast<T2>(count);
+	}
 };
 
 #endif // RINGBUFFER_H
