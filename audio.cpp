@@ -28,7 +28,7 @@ extern "C" {
 #include "contrib/pa_ringbuffer.h"
 
 #include "audio.h"
-#include "audio_av.h"
+#include "audio_decoder.h"
 #include "audio_cb.h" /* audio_cb_play */
 #include "constants.h"
 
