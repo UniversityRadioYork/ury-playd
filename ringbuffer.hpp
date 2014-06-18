@@ -137,8 +137,8 @@ public:
 	}
 
 private:
-	boost::circular_buffer<char> *rb;
-	int size;
+	boost::circular_buffer<char> *rb; ///< The internal Boost ring buffer.
+	int size;                         ///< The size of one sample, in bytes.
 };
 
 /**
@@ -153,6 +153,10 @@ private:
 template <typename T1, typename T2, int P>
 class PaRingBuffer : public RingBuffer<T1, T2> {
 public:
+	/**
+	 * Constructs a PaRingBuffer.
+	 * @param size  The size of one element in the ring buffer.
+	 */
 	PaRingBuffer(int size = sizeof(T1))
 	{
 		this->rb = new PaUtilRingBuffer;
@@ -208,8 +212,8 @@ public:
 	}
 
 private:
-	char *buffer;
-	PaUtilRingBuffer *rb;
+	char *buffer;         ///< The array used by the ringbuffer.
+	PaUtilRingBuffer *rb; ///< The internal PortAudio ringbuffer.
 };
 
 #endif // RINGBUFFER_H
