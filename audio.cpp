@@ -34,6 +34,12 @@ extern "C" {
 
 #include "sample_formats.hpp"
 
+#ifdef USE_BOOST_RINGBUF
+#define RINGBUF_CLASS BoostRingBuffer
+#else
+#define RINGBUF_CLASS PaRingBuffer
+#endif
+
 // Mappings from SampleFormats to their equivalent PaSampleFormats.
 static std::map<SampleFormat, PaSampleFormat> pa_from_sf = {
                 {SampleFormat::PACKED_UNSIGNED_INT_8, paUInt8},
@@ -348,7 +354,7 @@ void AudioOutput::InitialisePortAudio(int device)
 void AudioOutput::InitialiseRingBuffer(size_t bytes_per_sample)
 {
 	this->ring_buf = std::unique_ptr<RingBuffer<char, long>>(
-	                new PaRingBuffer<char, long, RINGBUF_POWER>(
+	                new RINGBUF_CLASS<char, long, RINGBUF_POWER>(
 	                                bytes_per_sample));
 }
 
