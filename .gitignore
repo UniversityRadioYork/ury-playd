@@ -6,3 +6,4 @@ playslave++
 !*.c
 !*.h
 objs/
+doc/
