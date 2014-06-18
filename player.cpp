@@ -143,11 +143,6 @@ static const TimeSuffixMap time_suffixes = {
                 // Default when there is no unit
                 {"", MkTime<std::chrono::microseconds>}};
 
-/**
- * Parses a seek time ('5m', '10000', etc) into a pair of unit suffix and value.
- * @param time_str The time string.
- * @return The unit/value pair.
- */
 std::pair<std::string, uint64_t> Player::ParseSeekTime(
                 const std::string &time_str) const
 {
@@ -189,7 +184,6 @@ State Player::CurrentState()
 	return this->current_state;
 }
 
-/* Performs an iteration of the player update loop. */
 void Player::Update()
 {
 	if (this->current_state == State::PLAYING) {
@@ -206,9 +200,6 @@ void Player::Update()
 	}
 }
 
-/* Throws an error if the current state is not in the state set provided by
- * the initializer_list.
- */
 bool Player::CurrentStateIn(std::initializer_list<State> states)
 {
 	return std::any_of(states.begin(), states.end(), [this](State state) {
@@ -216,7 +207,6 @@ bool Player::CurrentStateIn(std::initializer_list<State> states)
 	});
 }
 
-/* Sets the player state and honks accordingly. */
 void Player::SetState(State state)
 {
 	State last_state = this->current_state;
@@ -228,21 +218,11 @@ void Player::SetState(State state)
 	}
 }
 
-/**
- * Registers a listener for state changes.
- * @param listener The function to which state change signals shall be sent.
- */
 void Player::RegisterStateListener(StateListener listener)
 {
 	this->state_listener = listener;
 }
 
-/**
- * Sends a position signal to the outside environment, if ready to send one.
- * This only sends a signal if the requested amount of time has passed since the
- * last one.
- * It requires a handler to have been registered via SetTimeSignalHandler.
- */
 void Player::SendPositionIfReady()
 {
 	auto position = this->au->CurrentPosition<std::chrono::microseconds>();
@@ -253,12 +233,6 @@ void Player::SendPositionIfReady()
 	}
 }
 
-/**
- * Figures out whether it's time to send a position signal.
- * @param current_position The current position in the song.
- * @return True if enough time has elapsed for a signal to be sent; false
- * otherwise.
- */
 bool Player::IsReadyToSendPosition(std::chrono::microseconds current_position)
 {
 	bool ready = false;
@@ -273,12 +247,6 @@ bool Player::IsReadyToSendPosition(std::chrono::microseconds current_position)
 	return ready;
 }
 
-/**
- * Registers a listener for position signals.
- * @param listener The function to which position signals shall be sent.
- * @param period_usecs The approximate period, in microseconds, between position
- * signals.
- */
 void Player::RegisterPositionListener(PositionListener listener,
                                       const std::chrono::microseconds period)
 {
