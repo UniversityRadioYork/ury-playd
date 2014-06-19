@@ -15,13 +15,12 @@
 #include "audio_decoder.hpp"
 
 extern "C" {
-#include "contrib/pa_ringbuffer.h" /* PaUtilRingBuffer */
 #include <portaudio.h>
 }
 
 #include "constants.h"
 #include "errors.hpp"
-#include "ringbuffer.hpp"
+#include "ringbuffer/ringbuffer.hpp"
 
 
 typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;

@@ -30,12 +30,19 @@ extern "C" {
 
 #include "sample_formats.hpp"
 
+// Use the PortAudio ringbuffer by default.  This is because of unsettled bugs
+// with the Boost ringbuffer—if the latter can be fixed, it should be used
+// instead.
 #ifdef USE_BOOST_RINGBUF
+
 #define RINGBUF_CLASS BoostRingBuffer
-#include "ringbuffer_boost.hpp"
+#include "ringbufer/ringbuffer_boost.hpp"
+
 #else
+
 #define RINGBUF_CLASS PaRingBuffer
-#include "ringbuffer_pa.hpp"
+#include "ringbuffer/ringbuffer_pa.hpp"
+
 #endif
 
 // Mappings from SampleFormats to their equivalent PaSampleFormats.
