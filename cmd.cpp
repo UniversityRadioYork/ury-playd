@@ -34,10 +34,9 @@ typedef SSIZE_T ssize_t;
  * @param commands The map of commands to their handlers to use for this
  *   CommandHandler: this map will be copied.
  */
-CommandHandler::CommandHandler(const command_set &commands)
+CommandHandler::CommandHandler(const CommandHandler::CommandSet &commands)
 {
-	this->commands =
-	                std::unique_ptr<command_set>(new command_set(commands));
+	this->commands = std::unique_ptr<CommandSet>(new CommandSet(commands));
 }
 
 /**
@@ -46,7 +45,7 @@ CommandHandler::CommandHandler(const command_set &commands)
  *   the command name.
  * @return true if the command was valid; false otherwise.
  */
-bool CommandHandler::Run(const cmd_words &words)
+bool CommandHandler::Run(const CommandHandler::WordList &words)
 {
 	bool valid = false;
 
@@ -114,9 +113,9 @@ void CommandHandler::Handle()
  * @param line The line to split into words.
  * @return The list of words in the command line.
  */
-cmd_words CommandHandler::LineToWords(const std::string &line)
+CommandHandler::WordList CommandHandler::LineToWords(const std::string &line)
 {
-	cmd_words words;
+	WordList words;
 
 	typedef boost::tokenizer<boost::escaped_list_separator<char>> Tokeniser;
 	boost::escaped_list_separator<char> separator('\\', ' ', '\"');

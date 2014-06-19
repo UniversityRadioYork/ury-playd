@@ -23,24 +23,24 @@
 #undef IGNORE
 #endif
 
-typedef std::vector<std::string> cmd_words;
-typedef std::function<bool(cmd_words)> payload;
-typedef std::map<std::string, payload> command_set;
 
 class CommandHandler {
 public:
-	CommandHandler(const command_set &commands);
+	using WordList = std::vector<std::string>;
+	using Payload = std::function<bool(WordList)>;
+	using CommandSet = std::map<std::string, Payload>;
+
+	CommandHandler(const CommandSet &commands);
 	void Check();
 
 private:
-	std::unique_ptr<command_set> commands;
+	std::unique_ptr<CommandSet> commands;
 
-	cmd_words LineToWords(const std::string &line);
+	WordList LineToWords(const std::string &line);
 
-	bool Run(const cmd_words &words);
+	bool Run(const WordList &words);
 	bool RunLine(const std::string &line);
 	void Handle();
 };
-
 
 #endif // PS_CMD_HPP

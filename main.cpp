@@ -80,24 +80,25 @@ static void RegisterListeners(Player &player)
  */
 static void MainLoop(Player &player)
 {
-	/* Set of commands that can be performed on the player. */
-	command_set PLAYER_CMDS = {
-	                {"play",
-	                 [&](const cmd_words &) { return player.Play(); }},
-	                {"stop",
-	                 [&](const cmd_words &) { return player.Stop(); }},
-	                {"ejct",
-	                 [&](const cmd_words &) { return player.Eject(); }},
-	                {"quit",
-	                 [&](const cmd_words &) { return player.Quit(); }},
-	                {"load", [&](const cmd_words &words) {
-		                return player.Load(words[1]);
-		        }},
-	                {"seek", [&](const cmd_words &words) {
-		                return player.Seek(words[1]);
-		        }}};
-
-        CommandHandler handler(PLAYER_CMDS);
+	CommandHandler handler(
+	                {{"play", [&](const CommandHandler::WordList &) {
+		                 return player.Play();
+		         }},
+	                 {"stop", [&](const CommandHandler::WordList &) {
+		                 return player.Stop();
+		         }},
+	                 {"ejct", [&](const CommandHandler::WordList &) {
+		                 return player.Eject();
+		         }},
+	                 {"quit", [&](const CommandHandler::WordList &) {
+		                 return player.Quit();
+		         }},
+	                 {"load", [&](const CommandHandler::WordList &words) {
+		                 return player.Load(words[1]);
+		         }},
+	                 {"seek", [&](const CommandHandler::WordList &words) {
+		                 return player.Seek(words[1]);
+		         }}});
 
 	Respond(Response::OHAI, MSG_OHAI);
 
