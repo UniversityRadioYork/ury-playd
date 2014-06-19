@@ -5,15 +5,16 @@
  */
 
 #include <algorithm>
+#include <cstring>
 
-#include <string.h>
-
+extern "C" {
 #include <portaudio.h>
+#include "contrib/pa_ringbuffer.h" /* Ringbuffer */
+}
 
 #include "errors.hpp"
-#include "contrib/pa_ringbuffer.h" /* Ringbuffer */
 
-#include "audio.h" /* Manipulating the audio structure */
+#include "audio.hpp" /* Manipulating the audio structure */
 
 /* The callback proper, which is executed in a separate thread by PortAudio once
  * a stream is playing with the callback registered to it.

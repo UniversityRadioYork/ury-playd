@@ -1,7 +1,7 @@
 #include <cassert>
 #include <new>
 
-#include "swr.h"
+#include "swr.hpp"
 
 extern "C" {
 #include <libswresample/swresample.h>

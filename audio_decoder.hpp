@@ -13,10 +13,12 @@
 #include <string>
 #include <vector>
 
+extern "C" {
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
+}
 
-#include "audio_resample.h"
+#include "audio_resample.hpp"
 #include "errors.hpp"
 #include "sample_formats.hpp"
 

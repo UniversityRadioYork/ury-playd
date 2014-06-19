@@ -8,11 +8,11 @@
 #include <chrono>
 #include <iostream>
 
-#include "cmd.h"
+#include "cmd.hpp"
 #include "constants.h"
 #include "io.hpp"
 #include "messages.h"
-#include "player.h"
+#include "player.hpp"
 
 const static std::map<State, std::string> STATES = {
                 {State::EJECTED, "Ejected"},

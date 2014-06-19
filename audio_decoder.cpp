@@ -26,8 +26,8 @@ extern "C" {
 
 #include "errors.hpp"
 
-#include "audio_decoder.h"
-#include "audio_resample.h"
+#include "audio_decoder.hpp"
+#include "audio_resample.hpp"
 #include "constants.h"
 #include "sample_formats.hpp"
 

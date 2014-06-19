@@ -24,7 +24,7 @@ typedef SSIZE_T ssize_t;
 #endif
 
 #include "constants.h" /* WORD_LEN */
-#include "cmd.h"       /* struct cmd, enum cmd_type */
+#include "cmd.hpp"     /* struct cmd, enum cmd_type */
 #include "errors.hpp"
 #include "io.hpp"
 #include "messages.h" /* Messages (usually errors) */

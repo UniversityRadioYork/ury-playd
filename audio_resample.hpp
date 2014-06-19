@@ -14,7 +14,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-#include "swr.h"
+#include "swr.hpp"
 
 /**
  * Abstract class for things that convert between sample counts and byte counts.

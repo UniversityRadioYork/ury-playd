@@ -12,9 +12,9 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-#include "audio_resample.h"
+#include "audio_resample.hpp"
 #include "errors.hpp"
-#include "swr.h"
+#include "swr.hpp"
 
 Resampler::Resampler(const SampleByteConverter &conv) : out(conv)
 {
