@@ -39,6 +39,24 @@ CommandHandler::CommandHandler(const CommandHandler::CommandSet &commands)
 	this->commands = std::unique_ptr<CommandSet>(new CommandSet(commands));
 }
 
+CommandHandler::Payload CommandHandler::NullCommand(
+                CommandHandler::NullAction f)
+{
+	return [&f](WordList) { return f(); };
+}
+
+CommandHandler::Payload CommandHandler::SingleRequiredWordCommand(
+                CommandHandler::SingleRequiredWordAction f)
+{
+	return [&f](WordList words) {
+		bool success = false;
+		if (words.size() == 2 && !words[1].empty()) {
+			success = f(words[1]);
+		}
+		return success;
+	};
+}
+
 /**
  * Runs a command.
  * @param words The words that form the command: the first word is taken to be

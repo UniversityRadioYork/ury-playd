@@ -48,6 +48,11 @@ Player::Player(const std::string &device) : device(device)
 	this->position_last_invalid = true;
 }
 
+CommandHandler::NullAction Player::EjectAction()
+{
+	return [this] { return this->Eject(); };
+}
+
 bool Player::Eject()
 {
 	return IfCurrentStateIn({State::STOPPED, State::PLAYING}, [this] {
@@ -55,6 +60,11 @@ bool Player::Eject()
 		SetState(State::EJECTED);
 		this->position_last = std::chrono::microseconds(0);
 	});
+}
+
+CommandHandler::NullAction Player::PlayAction()
+{
+	return [this] { return this->Play(); };
 }
 
 bool Player::Play()
@@ -66,6 +76,11 @@ bool Player::Play()
 	});
 }
 
+CommandHandler::NullAction Player::QuitAction()
+{
+	return [this] { return this->Quit(); };
+}
+
 bool Player::Quit()
 {
 	Eject();
@@ -74,12 +89,22 @@ bool Player::Quit()
 	return true; // Always a valid command.
 }
 
+CommandHandler::NullAction Player::StopAction()
+{
+	return [this] { return this->Stop(); };
+}
+
 bool Player::Stop()
 {
 	return IfCurrentStateIn({State::PLAYING}, [this] {
 		this->au->Stop();
 		SetState(State::STOPPED);
 	});
+}
+
+CommandHandler::SingleRequiredWordAction Player::LoadAction()
+{
+	return [this] (std::string &filename) { return this->Load(filename); };
 }
 
 bool Player::Load(const std::string &filename)
@@ -146,6 +171,11 @@ std::pair<std::string, uint64_t> Player::ParseSeekTime(
 
 	is >> raw_time >> rest;
 	return std::make_pair(rest, raw_time);
+}
+
+CommandHandler::SingleRequiredWordAction Player::SeekAction()
+{
+	return [this] (std::string &time_str) { return this->Seek(time_str); };
 }
 
 bool Player::Seek(const std::string &time_str)

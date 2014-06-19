@@ -81,24 +81,18 @@ static void RegisterListeners(Player &player)
 static void MainLoop(Player &player)
 {
 	CommandHandler handler(
-	                {{"play", [&](const CommandHandler::WordList &) {
-		                 return player.Play();
-		         }},
-	                 {"stop", [&](const CommandHandler::WordList &) {
-		                 return player.Stop();
-		         }},
-	                 {"ejct", [&](const CommandHandler::WordList &) {
-		                 return player.Eject();
-		         }},
-	                 {"quit", [&](const CommandHandler::WordList &) {
-		                 return player.Quit();
-		         }},
-	                 {"load", [&](const CommandHandler::WordList &words) {
-		                 return player.Load(words[1]);
-		         }},
-	                 {"seek", [&](const CommandHandler::WordList &words) {
-		                 return player.Seek(words[1]);
-		         }}});
+	                {{"play",
+	                  CommandHandler::NullCommand(player.PlayAction())},
+	                 {"stop",
+	                  CommandHandler::NullCommand(player.StopAction())},
+	                 {"ejct",
+	                  CommandHandler::NullCommand(player.EjectAction())},
+	                 {"quit",
+	                  CommandHandler::NullCommand(player.QuitAction())},
+	                 {"load", CommandHandler::SingleRequiredWordCommand(
+	                                          player.LoadAction())},
+	                 {"seek", CommandHandler::SingleRequiredWordCommand(
+	                                          player.SeekAction())}});
 
 	Respond(Response::OHAI, MSG_OHAI);
 

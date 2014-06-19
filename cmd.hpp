@@ -23,15 +23,20 @@
 #undef IGNORE
 #endif
 
-
 class CommandHandler {
 public:
 	using WordList = std::vector<std::string>;
 	using Payload = std::function<bool(WordList)>;
 	using CommandSet = std::map<std::string, Payload>;
 
+	using NullAction = std::function<bool()>;
+	using SingleRequiredWordAction = std::function<bool(std::string &)>;
+
 	CommandHandler(const CommandSet &commands);
 	void Check();
+
+	static Payload NullCommand(NullAction f);
+	static Payload SingleRequiredWordCommand(SingleRequiredWordAction f);
 
 private:
 	std::unique_ptr<CommandSet> commands;
