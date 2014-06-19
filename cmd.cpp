@@ -6,8 +6,6 @@
  * details.
  */
 
-#define _POSIX_C_SOURCE 200809
-
 #include <iostream>
 #include <string>
 #include <vector>

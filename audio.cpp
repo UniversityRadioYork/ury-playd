@@ -4,8 +4,6 @@
  * details.
  */
 
-#define _POSIX_C_SOURCE 200809
-
 extern "C" {
 #ifdef WIN32
 #define inline __inline

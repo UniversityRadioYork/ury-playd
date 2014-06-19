@@ -4,8 +4,6 @@
  * details.
  */
 
-#define _POSIX_C_SOURCE 200809
-
 #include <memory>
 #include <sstream>
 #include <vector>
@@ -202,9 +200,8 @@ void Player::Update()
 
 bool Player::CurrentStateIn(std::initializer_list<State> states)
 {
-	return std::any_of(states.begin(), states.end(), [this](State state) {
-		return this->current_state == state;
-	});
+	return std::find(states.begin(), states.end(), this->current_state) !=
+	       states.end();
 }
 
 void Player::SetState(State state)
