@@ -9,7 +9,6 @@
 
 extern "C" {
 #include <portaudio.h>
-#include "contrib/pa_ringbuffer.h" /* Ringbuffer */
 }
 
 #include "errors.hpp"

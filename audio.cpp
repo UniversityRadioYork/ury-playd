@@ -23,8 +23,6 @@ extern "C" {
 
 #include <portaudio.h>
 
-#include "contrib/pa_ringbuffer.h"
-
 #include "audio.hpp"
 #include "audio_decoder.hpp"
 #include "audio_cb.h" /* audio_cb_play */
@@ -34,8 +32,10 @@ extern "C" {
 
 #ifdef USE_BOOST_RINGBUF
 #define RINGBUF_CLASS BoostRingBuffer
+#include "ringbuffer_boost.hpp"
 #else
 #define RINGBUF_CLASS PaRingBuffer
+#include "ringbuffer_pa.hpp"
 #endif
 
 // Mappings from SampleFormats to their equivalent PaSampleFormats.
