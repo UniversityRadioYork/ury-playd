@@ -41,13 +41,18 @@ public:
 	 * Type for position listeners.
 	 * @see RegisterPositionListener
 	 */
-	typedef std::function<void(std::chrono::microseconds)> PositionListener;
+	using PositionListener = std::function<void(std::chrono::microseconds)>;
 
 	/**
 	 * Type for state listeners.
 	 * @see RegisterStateListener
 	 */
-	typedef std::function<void(State, State)> StateListener;
+	using StateListener = std::function<void(State, State)>;
+
+	/**
+	 * A list of states.
+	 */
+	using StateList = std::initializer_list<State>;
 
 private:
 	const std::string &device;
@@ -152,11 +157,29 @@ public:
 
 private:
 	/**
-	 * Checks to see if the current state is one of the given states.
-	 * @return  Whether the current state is not in the states given by
-	 *          the initializer_list.
+	 * Executes a closure iff the current state is one of the given states.
+	 * @param states  The initialiser list of states.
+	 * @param f       The closure to execute if in the correct state.
+	 * @return        False if the state was not valid, or the result of the
+	 *                closure otherwise.
 	 */
-	bool CurrentStateIn(std::initializer_list<State> states);
+	bool IfCurrentStateIn(StateList states, std::function<bool()> f);
+
+	/**
+	 * Executes a closure iff the current state is one of the given states.
+	 * @param states  The initialiser list of states.
+	 * @param f       The closure to execute if in the correct state.
+	 * @return        False if the state was not valid, or true otherwise.
+	 */
+	bool IfCurrentStateIn(StateList states, std::function<void()> f);
+
+	/**
+	 * Checks to see if the current state is one of the given states.
+	 * @param states  The initialiser list of states.
+	 * @return        Whether the current state is not in the states given
+	 *                by the initializer_list.
+	 */
+	bool CurrentStateIn(StateList states);
 
 	/**
 	 * Sets the current player state.

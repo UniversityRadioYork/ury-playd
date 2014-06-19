@@ -8,6 +8,7 @@
 #include <sstream>
 #include <vector>
 
+#include <cassert>
 #include <cstdarg>  /* CurrentStateIn */
 #include <cstdbool> /* bool */
 #include <cstdint>
@@ -49,23 +50,20 @@ Player::Player(const std::string &device) : device(device)
 
 bool Player::Eject()
 {
-	bool valid = CurrentStateIn({State::STOPPED, State::PLAYING});
-	if (valid) {
+	return IfCurrentStateIn({State::STOPPED, State::PLAYING}, [this] {
 		this->au = nullptr;
 		SetState(State::EJECTED);
 		this->position_last = std::chrono::microseconds(0);
-	}
-	return valid;
+	});
 }
 
 bool Player::Play()
 {
-	bool valid = CurrentStateIn({State::STOPPED}) && (this->au != nullptr);
-	if (valid) {
+	return IfCurrentStateIn({State::STOPPED}, [this] {
+		assert(this->au != nullptr);
 		this->au->Start();
 		SetState(State::PLAYING);
-	}
-	return valid;
+	});
 }
 
 bool Player::Quit()
@@ -78,12 +76,10 @@ bool Player::Quit()
 
 bool Player::Stop()
 {
-	bool valid = CurrentStateIn({State::PLAYING});
-	if (valid) {
+	return IfCurrentStateIn({State::PLAYING}, [this] {
 		this->au->Stop();
 		SetState(State::STOPPED);
-	}
-	return valid;
+	});
 }
 
 bool Player::Load(const std::string &filename)
@@ -154,8 +150,10 @@ std::pair<std::string, uint64_t> Player::ParseSeekTime(
 
 bool Player::Seek(const std::string &time_str)
 {
-	bool valid = CurrentStateIn({State::PLAYING, State::STOPPED});
-	if (valid) {
+	return IfCurrentStateIn({State::PLAYING, State::STOPPED},
+	                        [this, &time_str] {
+		bool success = true;
+
 		auto seek = ParseSeekTime(time_str);
 		std::chrono::microseconds position(0);
 
@@ -165,16 +163,16 @@ bool Player::Seek(const std::string &time_str)
 		}
 		catch (std::out_of_range)
 		{
-			valid = false;
+			success = false;
 		}
 
-		if (valid) {
+		if (success) {
 			this->au->SeekToPosition(position);
 			this->position_last_invalid = true;
 		}
-	}
 
-	return valid;
+		return success;
+	});
 }
 
 State Player::CurrentState()
@@ -198,7 +196,26 @@ void Player::Update()
 	}
 }
 
-bool Player::CurrentStateIn(std::initializer_list<State> states)
+bool Player::IfCurrentStateIn(Player::StateList states, std::function<void()> f)
+{
+	return IfCurrentStateIn(states, [f] {
+		f();
+		return true;
+	});
+}
+
+bool Player::IfCurrentStateIn(Player::StateList states, std::function<bool()> f)
+{
+	bool result = false;
+
+	if (CurrentStateIn(states)) {
+		result = f();
+	}
+
+	return result;
+}
+
+bool Player::CurrentStateIn(Player::StateList states)
 {
 	return std::find(states.begin(), states.end(), this->current_state) !=
 	       states.end();
