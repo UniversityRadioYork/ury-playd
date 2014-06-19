@@ -97,6 +97,8 @@ static void MainLoop(Player &player)
 		                return player.Seek(words[1]);
 		        }}};
 
+        CommandHandler handler(PLAYER_CMDS);
+
 	Respond(Response::OHAI, MSG_OHAI);
 
 	while (player.CurrentState() != State::QUITTING) {
@@ -105,7 +107,7 @@ static void MainLoop(Player &player)
 		 * intensive and thus impairs the command checking latency.
 		 * Do this if it doesn't make the code too complex.
 		 */
-		check_commands(PLAYER_CMDS);
+		handler.Check();
 		player.Update();
 
 		std::this_thread::sleep_for(LOOP_PERIOD);

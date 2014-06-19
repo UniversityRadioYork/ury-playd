@@ -30,16 +30,17 @@ typedef std::map<std::string, payload> command_set;
 class CommandHandler {
 public:
 	CommandHandler(const command_set &commands);
-	bool Run(const cmd_words &words);
-	bool RunLine(const std::string &line);
+	void Check();
 
 private:
 	std::unique_ptr<command_set> commands;
 
 	cmd_words LineToWords(const std::string &line);
+
+	bool Run(const cmd_words &words);
+	bool RunLine(const std::string &line);
+	void Handle();
 };
 
-void check_commands(const command_set &cmds);
-void handle_cmd(const command_set &cmds);
 
 #endif // PS_CMD_HPP

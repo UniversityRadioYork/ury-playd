@@ -78,17 +78,17 @@ bool CommandHandler::RunLine(const std::string &line)
  * commands; 'cmds' is a pointer to an END_CMDS-terminated array of command
  * definitions (see cmd.h for details).
  */
-void check_commands(const command_set &cmds)
+void CommandHandler::Check()
 {
 	if (input_waiting()) {
-		handle_cmd(cmds);
+		Handle();
 	}
 }
 /* Processes the command currently waiting on the given stream.
  * If the command is set to be handled by PROPAGATE, it will be sent through
  * prop; it is an error if prop is NULL and PROPAGATE is reached.
  */
-void handle_cmd(const command_set &cmds)
+void CommandHandler::Handle()
 {
 	std::string input;
 
@@ -101,9 +101,7 @@ void handle_cmd(const command_set &cmds)
 		throw Error(ErrorCode::END_OF_FILE, "TODO: Handle this better");
 	}
 
-	CommandHandler ch = CommandHandler(cmds);
-	bool valid = ch.RunLine(input);
-
+	bool valid = RunLine(input);
 	if (valid) {
 		Respond(Response::OKAY, input);
 	} else {
