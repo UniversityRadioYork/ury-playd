@@ -7,8 +7,6 @@
 #ifndef AUDIO_CB_H
 #define AUDIO_CB_H
 
-#include <stdint.h> /* uint64_t */
-
 #include "contrib/pa_ringbuffer.h" /* PaUtilRingBuffer */
 
 int audio_cb_play(const void *in, void *out, unsigned long frames_per_buf,

@@ -19,8 +19,6 @@ extern "C" {
 
 #include <chrono>
 
-#include <stdint.h> /* int64_t */
-
 /* HOUSEKEEPING: Only put things in macros if they have to be constant at
  * compile-time (for example, array sizes).
  */
