@@ -1,10 +1,13 @@
-#ifndef RINGBUFFER_H
-#define RINGBUFFER_H
+#ifndef PS_RINGBUFFER_HPP
+#define PS_RINGBUFFER_HPP
 
 #include <cassert>
 
-#include <boost/circular_buffer.hpp>
+extern "C" {
 #include "contrib/pa_ringbuffer.h"
+}
+
+#include <boost/circular_buffer.hpp>
 #include "errors.hpp"
 
 /**
@@ -234,4 +237,4 @@ private:
 	}
 };
 
-#endif // RINGBUFFER_H
+#endif // PS_RINGBUFFER_HPP

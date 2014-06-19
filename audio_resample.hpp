@@ -4,8 +4,8 @@
  * details.
  */
 
-#ifndef AUDIO_RESAMPLE_H
-#define AUDIO_RESAMPLE_H
+#ifndef PS_AUDIO_RESAMPLE_HPP
+#define PS_AUDIO_RESAMPLE_HPP
 
 #include <functional>
 #include <memory>
@@ -153,4 +153,4 @@ public:
 	std::vector<char> Resample(AVFrame *frame);
 };
 
-#endif // AUDIO_RESAMPLE_H
+#endif // PS_AUDIO_RESAMPLE_HPP

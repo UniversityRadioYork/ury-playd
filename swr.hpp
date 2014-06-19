@@ -1,5 +1,5 @@
-#ifndef PS_SWR
-#define PS_SWR
+#ifndef PS_SWR_HPP
+#define PS_SWR_HPP
 
 #include <cstdint>
 
@@ -65,4 +65,4 @@ private:
 	SwrContext* context; //< The internal libswresample context.
 };
 
-#endif // PS_SWR
+#endif // PS_SWR_HPP

@@ -9,8 +9,8 @@
  * Definition of Player and associated types.
  */
 
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef PS_PLAYER_HPP
+#define PS_PLAYER_HPP
 
 #include <string>
 #include <memory>
@@ -188,4 +188,4 @@ private:
 	bool IsReadyToSendPosition(std::chrono::microseconds current_position);
 };
 
-#endif /* !PLAYER_H */
+#endif // PS_PLAYER_HPP

@@ -4,8 +4,8 @@
  * details.
  */
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef PS_CONSTANTS_H
+#define PS_CONSTANTS_H
 
 extern "C" {
 #ifdef WIN32
@@ -32,6 +32,4 @@ const size_t BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 const size_t RINGBUF_POWER = (size_t)16;
 const size_t RINGBUF_SIZE = (size_t)(1 << 16);
 
-/* See constants.c for more constants (especially macro-based ones) */
-
-#endif /* not CONSTANTS_H */
+#endif // PS_CONSTANTS_H

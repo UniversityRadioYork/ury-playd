@@ -11,8 +11,8 @@
  * details.
  */
 
-#ifndef CUPPA_CMD_H
-#define CUPPA_CMD_H
+#ifndef PS_CMD_HPP
+#define PS_CMD_HPP
 
 #include <memory>
 #include <functional>
@@ -42,4 +42,4 @@ private:
 void check_commands(const command_set &cmds);
 void handle_cmd(const command_set &cmds);
 
-#endif /* !CUPPA_CMD_H */
+#endif // PS_CMD_HPP

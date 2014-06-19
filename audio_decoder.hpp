@@ -4,8 +4,8 @@
  * details.
  */
 
-#ifndef AUDIO_AV_H
-#define AUDIO_AV_H
+#ifndef PS_AUDIO_DECODER_HPP
+#define PS_AUDIO_DECODER_HPP
 
 #include <chrono>
 #include <cstdint>
@@ -89,4 +89,4 @@ private:
 	                std::chrono::microseconds position);
 };
 
-#endif /* not AUDIO_AV_H */
+#endif // PS_AUDIO_DECODER_HPP

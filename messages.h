@@ -4,8 +4,8 @@
  * details.
  */
 
-#ifndef MESSAGES_H
-#define MESSAGES_H
+#ifndef PS_MESSAGES_H
+#define PS_MESSAGES_H
 
 #include <string>
 
@@ -22,4 +22,4 @@ const std::string MSG_CMD_NOSUCH = "Command not recognised";
 const std::string MSG_CMD_NOWORD = "Need at least a command word";
 const std::string MSG_ERR_NOMEM = "(ran out of memory to write error!)";
 
-#endif /* !MESSAGES_H  */
+#endif // PS_MESSAGES_H

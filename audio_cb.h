@@ -4,8 +4,8 @@
  * details.
  */
 
-#ifndef AUDIO_CB_H
-#define AUDIO_CB_H
+#ifndef PS_AUDIO_CB_H
+#define PS_AUDIO_CB_H
 
 #include "contrib/pa_ringbuffer.h" /* PaUtilRingBuffer */
 
@@ -13,4 +13,4 @@ int audio_cb_play(const void *in, void *out, unsigned long frames_per_buf,
                   const PaStreamCallbackTimeInfo *timeInfo,
                   PaStreamCallbackFlags statusFlags, void *v_au);
 
-#endif /* not AUDIO_CB_H */
+#endif // PS_AUDIO_CB_H

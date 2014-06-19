@@ -6,8 +6,8 @@
  * details.
  */
 
-#ifndef CUPPA_ERRORS_H
-#define CUPPA_ERRORS_H
+#ifndef PS_ERRORS_HPP
+#define PS_ERRORS_HPP
 
 #include <string>
 #include <iostream>
@@ -63,4 +63,4 @@ inline void Debug(Ts &... ts)
 	std::cerr << std::endl;
 }
 
-#endif /* !CUPPA_ERRORS_H */
+#endif // PS_ERRORS_HPP

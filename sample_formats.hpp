@@ -1,7 +1,7 @@
 #include <cstdint>
 
-#ifndef PS_SAMPLE_FORMATS
-#define PS_SAMPLE_FORMATS
+#ifndef PS_SAMPLE_FORMATS_HPP
+#define PS_SAMPLE_FORMATS_HPP
 
 /**
  * Sample formats available in playslave++.
@@ -22,4 +22,4 @@ enum class SampleFormat : std::uint8_t {
 	PACKED_FLOAT_32        ///< Packed 32-bit floating point.
 };
 
-#endif // PS_SAMPLE_FORMATS
+#endif // PS_SAMPLE_FORMATS_HPP
