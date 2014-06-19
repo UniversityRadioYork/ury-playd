@@ -58,7 +58,7 @@ public:
 private:
 	const std::string &device;
 
-	std::unique_ptr<AudioOutput> au;
+	std::unique_ptr<AudioOutput> audio;
 
 	PositionListener position_listener;
 	std::chrono::microseconds position_period;

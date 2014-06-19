@@ -38,7 +38,7 @@ struct timespec {
 Player::Player(const std::string &device) : device(device)
 {
 	this->current_state = State::EJECTED;
-	this->au = nullptr;
+	this->audio = nullptr;
 
 	this->position_listener = nullptr;
 	this->position_period = std::chrono::microseconds(0);
@@ -54,14 +54,14 @@ State Player::CurrentState()
 void Player::Update()
 {
 	if (this->current_state == State::PLAYING) {
-		if (this->au->IsHalted()) {
+		if (this->audio->IsHalted()) {
 			Eject();
 		} else {
 			SendPositionIfReady();
 		}
 	}
 	if (CurrentStateIn({State::PLAYING, State::STOPPED})) {
-		if (!this->au->Update()) {
+		if (!this->audio->Update()) {
 			Eject();
 		}
 	}
@@ -110,7 +110,7 @@ void Player::RegisterStateListener(StateListener listener)
 
 void Player::SendPositionIfReady()
 {
-	auto position = this->au->CurrentPosition<std::chrono::microseconds>();
+	auto position = this->audio->CurrentPosition<std::chrono::microseconds>();
 	if (IsReadyToSendPosition(position)) {
 		this->position_listener(position);
 		this->position_last = position;

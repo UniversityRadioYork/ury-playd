@@ -9,7 +9,7 @@ CommandHandler::NullAction Player::EjectAction()
 bool Player::Eject()
 {
 	return IfCurrentStateIn({State::STOPPED, State::PLAYING}, [this] {
-		this->au = nullptr;
+		this->audio = nullptr;
 		SetState(State::EJECTED);
 		this->position_last = std::chrono::microseconds(0);
 	});

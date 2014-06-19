@@ -9,8 +9,8 @@ CommandHandler::NullAction Player::PlayAction()
 bool Player::Play()
 {
 	return IfCurrentStateIn({State::STOPPED}, [this] {
-		assert(this->au != nullptr);
-		this->au->Start();
+		assert(this->audio != nullptr);
+		this->audio->Start();
 		SetState(State::PLAYING);
 	});
 }

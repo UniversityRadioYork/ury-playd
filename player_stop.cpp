@@ -9,7 +9,7 @@ CommandHandler::NullAction Player::StopAction()
 bool Player::Stop()
 {
 	return IfCurrentStateIn({State::PLAYING}, [this] {
-		this->au->Stop();
+		this->audio->Stop();
 		SetState(State::STOPPED);
 	});
 }

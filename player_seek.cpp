@@ -75,7 +75,7 @@ bool Player::Seek(const std::string &time_str)
 		}
 
 		if (success) {
-			this->au->SeekToPosition(position);
+			this->audio->SeekToPosition(position);
 			this->position_last_invalid = true;
 		}
 

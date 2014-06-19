@@ -13,7 +13,7 @@ bool Player::Load(const std::string &filename)
 
 	try
 	{
-		this->au = std::unique_ptr<AudioOutput>(
+		this->audio = std::unique_ptr<AudioOutput>(
 		                new AudioOutput(filename, this->device));
 		this->position_last_invalid = true;
 		Debug("Loaded ", filename);
