@@ -46,32 +46,6 @@ Player::Player(const std::string& device) : device(device)
 	this->position_last_invalid = true;
 }
 
-bool Player::IsRunning() const
-{
-	return CurrentState() != State::QUITTING;
-}
-
-const std::map<Player::State, std::string> Player::STATE_STRINGS = {
-                {State::STARTING, "Starting"},
-                {State::EJECTED, "Ejected"},
-                {State::STOPPED, "Stopped"},
-                {State::PLAYING, "Playing"},
-                {State::QUITTING, "Quitting"}};
-
-const std::string& Player::CurrentStateString() const
-{
-	return Player::StateString(CurrentState());
-}
-
-const std::string& Player::StateString(State state)
-{
-	return Player::STATE_STRINGS.at(state);
-}
-
-Player::State Player::CurrentState() const
-{
-	return this->current_state;
-}
 
 void Player::Update()
 {
@@ -89,46 +63,6 @@ void Player::Update()
 	}
 }
 
-bool Player::IfCurrentStateIn(Player::StateList states, std::function<void()> f)
-{
-	return IfCurrentStateIn(states, [f] {
-		f();
-		return true;
-	});
-}
-
-bool Player::IfCurrentStateIn(Player::StateList states, std::function<bool()> f)
-{
-	bool result = false;
-
-	if (CurrentStateIn(states)) {
-		result = f();
-	}
-
-	return result;
-}
-
-bool Player::CurrentStateIn(Player::StateList states) const
-{
-	return std::find(states.begin(), states.end(), this->current_state) !=
-	       states.end();
-}
-
-void Player::SetState(State state)
-{
-	State last_state = this->current_state;
-
-	this->current_state = state;
-
-	if (this->state_listener != nullptr) {
-		this->state_listener(last_state, state);
-	}
-}
-
-void Player::RegisterStateListener(StateListener listener)
-{
-	this->state_listener = listener;
-}
 
 void Player::SendPositionIfReady()
 {
