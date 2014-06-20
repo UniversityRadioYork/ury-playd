@@ -18,6 +18,8 @@
 #include "../audio.hpp"
 #include "../cmd.hpp"
 
+#include "player_position.hpp"
+
 /**
  * A player contains a loaded audio file and the state of its playback.
  * Player connects to the audio system via PortAudio, given a device handle.
@@ -39,12 +41,6 @@ public:
 	};
 
 	/**
-	 * Type for position listeners.
-	 * @see RegisterPositionListener
-	 */
-	using PositionListener = std::function<void(std::chrono::microseconds)>;
-
-	/**
 	 * Type for state listeners.
 	 * @see RegisterStateListener
 	 */
@@ -60,10 +56,7 @@ private:
 
 	std::unique_ptr<AudioOutput> audio;
 
-	PositionListener position_listener;
-	std::chrono::microseconds position_period;
-	std::chrono::microseconds position_last;
-	bool position_last_invalid;
+	PlayerPosition position;
 
 	StateListener state_listener;
 	State current_state;
@@ -192,10 +185,15 @@ public:
 	 * This listener is sent the current song position, in microseconds,
 	 * roughly every @a period microseconds.
 	 * @param listener  The listener callback.
-	 * @param period    The period between callback executions.
 	 */
-	void RegisterPositionListener(PositionListener listener,
-	                              const std::chrono::microseconds period);
+	void RegisterPositionListener(PlayerPosition::Listener listener);
+
+        /**
+         * Sets the period between position signals.
+         * This is shared across all listeners.
+         * @param period  The period to wait between listener callbacks.
+         */
+        void SetPositionListenerPeriod(PlayerPosition::Unit period);
 
 	/**
 	 * Registers a position listener.
@@ -258,22 +256,19 @@ private:
 	                const std::string &time_str) const;
 
 	/**
-	 * Sends a position signal to the outside environment, if ready.
-	 * This only sends a signal if the requested amount of time has passed
-	 * since the last one.
-	 * It requires a handler to have been registered via
-	 * SetTimeSignalHandler.
+	 * Updates the player position to reflect changes in the audio system.
+	 * Call this whenever the audio position has changed.
+	 * @see ResetPosition
 	 */
-	void SendPositionIfReady();
+	void UpdatePosition();
 
 	/**
-	 * Figures out whether it's time to send a position signal.
-	 * @param current_position The current position in the song.
-	 * @return True if enough time has elapsed for a signal to be sent;
-	 * false
-	 * otherwise.
+	 * Resets the player position.
+	 * Call this whenever the audio position has changed drastically (eg a
+	 * seek has happened, or a new file has been loaded).
+	 * @see UpdatePosition
 	 */
-	bool IsReadyToSendPosition(std::chrono::microseconds current_position);
+	void ResetPosition();
 };
 
 #endif // PS_PLAYER_HPP

@@ -48,7 +48,7 @@ CommandHandler::Payload CommandHandler::NullCommand(
 CommandHandler::Payload CommandHandler::SingleRequiredWordCommand(
                 CommandHandler::SingleRequiredWordAction f)
 {
-	return [&f](WordList words) {
+	return [&f](const WordList &words) {
 		bool success = false;
 		if (words.size() == 2 && !words[1].empty()) {
 			success = f(words[1]);

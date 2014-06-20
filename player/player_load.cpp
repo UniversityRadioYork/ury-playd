@@ -4,7 +4,7 @@
 
 CommandHandler::SingleRequiredWordAction Player::LoadAction()
 {
-	return [this] (std::string &filename) { return this->Load(filename); };
+	return [this](const std::string &path) { return this->Load(path); };
 }
 
 bool Player::Load(const std::string &filename)
@@ -15,7 +15,7 @@ bool Player::Load(const std::string &filename)
 	{
 		this->audio = std::unique_ptr<AudioOutput>(
 		                new AudioOutput(filename, this->device));
-		this->position_last_invalid = true;
+		ResetPosition();
 		Debug("Loaded ", filename);
 		SetState(State::STOPPED);
 	}

@@ -39,13 +39,7 @@ Player::Player(const std::string& device) : device(device)
 {
 	this->current_state = State::EJECTED;
 	this->audio = nullptr;
-
-	this->position_listener = nullptr;
-	this->position_period = std::chrono::microseconds(0);
-	this->position_last = std::chrono::microseconds(0);
-	this->position_last_invalid = true;
 }
-
 
 void Player::Update()
 {
@@ -53,7 +47,7 @@ void Player::Update()
 		if (this->audio->IsHalted()) {
 			Eject();
 		} else {
-			SendPositionIfReady();
+			UpdatePosition();
 		}
 	}
 	if (CurrentStateIn({State::PLAYING, State::STOPPED})) {

@@ -53,7 +53,9 @@ std::pair<std::string, uint64_t> Player::ParseSeekTime(
 
 CommandHandler::SingleRequiredWordAction Player::SeekAction()
 {
-	return [this] (std::string &time_str) { return this->Seek(time_str); };
+	return [this](const std::string &time_str) {
+		return this->Seek(time_str);
+	};
 }
 
 bool Player::Seek(const std::string &time_str)
@@ -76,7 +78,8 @@ bool Player::Seek(const std::string &time_str)
 
 		if (success) {
 			this->audio->SeekToPosition(position);
-			this->position_last_invalid = true;
+			this->ResetPosition();
+			this->UpdatePosition();
 		}
 
 		return success;

@@ -54,11 +54,11 @@ static std::string DeviceId(int argc, char *argv[])
  */
 static void RegisterListeners(Player &player)
 {
+	player.SetPositionListenerPeriod(POSITION_PERIOD);
 	player.RegisterPositionListener([](std::chrono::microseconds position) {
-		                                uint64_t p = position.count();
-		                                Respond(Response::TIME, p);
-		                        },
-	                                POSITION_PERIOD);
+		uint64_t p = position.count();
+		Respond(Response::TIME, p);
+	});
 	player.RegisterStateListener([](Player::State old_state,
 	                                Player::State new_state) {
 		Respond(Response::STAT, Player::StateString(old_state),

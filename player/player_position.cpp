@@ -1,34 +1,73 @@
 #include <chrono>
 #include "player.hpp"
 
-void Player::SendPositionIfReady()
+// Player
+
+void Player::RegisterPositionListener(PlayerPosition::Listener listener)
 {
-	auto position = this->audio->CurrentPosition<
-	                std::chrono::microseconds>();
-	if (IsReadyToSendPosition(position)) {
-		this->position_listener(position);
-		this->position_last = position;
-		this->position_last_invalid = false;
+	this->position.RegisterListener(listener);
+}
+
+void Player::SetPositionListenerPeriod(PlayerPosition::Unit period)
+{
+	this->position.SetListenerPeriod(period);
+}
+
+void Player::UpdatePosition()
+{
+	auto pos = this->audio->CurrentPosition<PlayerPosition::Unit>();
+	this->position.Update(pos);
+}
+
+void Player::ResetPosition()
+{
+	this->position.Reset();
+}
+
+// PlayerPosition
+PlayerPosition::PlayerPosition()
+{
+        this->listeners = decltype(this->listeners)();
+
+        // Default to broadcasting the position every time it is changed.
+        this->period = decltype(this->period)(0);
+
+        Reset();
+}
+
+void PlayerPosition::Update(const PlayerPosition::Unit position)
+{
+	this->current = position;
+
+	if (IsReadyToSend()) {
+		Send();
 	}
 }
 
-bool Player::IsReadyToSendPosition(std::chrono::microseconds current_position)
-{
-	bool ready = false;
-
-	if (this->position_last_invalid) {
-		ready = true;
-	} else if (this->position_listener != nullptr) {
-		auto difference = current_position - this->position_last;
-		ready = difference >= this->position_period;
-	}
-
-	return ready;
+void PlayerPosition::Reset() {
+	this->current = decltype(this->current)(0);
+	this->last = decltype(this->last)();
 }
 
-void Player::RegisterPositionListener(PositionListener listener,
-                                      const std::chrono::microseconds period)
+void PlayerPosition::Send()
 {
-	this->position_listener = listener;
-	this->position_period = period;
+	for (auto listener : this->listeners) {
+		listener(this->current);
+	}
+	this->last = decltype(this->last)(this->current);
+}
+
+bool PlayerPosition::IsReadyToSend()
+{
+	return (!this->last) || ((*this->last) + this->period <= this->current);
+}
+
+void PlayerPosition::RegisterListener(PlayerPosition::Listener listener)
+{
+        this->listeners.push_back(listener);
+}
+
+void PlayerPosition::SetListenerPeriod(PlayerPosition::Unit period)
+{
+        this->period = period;
 }
