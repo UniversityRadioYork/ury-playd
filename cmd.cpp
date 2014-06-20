@@ -8,26 +8,13 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include <boost/tokenizer.hpp>
 
-#include <ctype.h>
-#include <stdbool.h> /* bool */
-#include <stdio.h>   /* getline */
-#include <stdlib.h>
-#include <string.h>
-
-#if defined(_MSC_VER)
-#include <BaseTsd.h>
-typedef SSIZE_T ssize_t;
-#endif
-
-#include "constants.h" /* WORD_LEN */
-#include "cmd.hpp"     /* struct cmd, enum cmd_type */
+#include "cmd.hpp"
 #include "errors.hpp"
 #include "io.hpp"
-#include "messages.h" /* Messages (usually errors) */
+#include "messages.h"
 
 /**
  * Constructs a CommandHandler.
