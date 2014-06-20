@@ -12,7 +12,7 @@
 #include "constants.h"
 #include "io.hpp"
 #include "messages.h"
-#include "player.hpp"
+#include "player/player.hpp"
 
 const static std::map<State, std::string> STATES = {
                 {State::EJECTED, "Ejected"},

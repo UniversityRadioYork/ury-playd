@@ -1,5 +1,5 @@
 #include "player.hpp"
-#include "cmd.hpp"
+#include "../cmd.hpp"
 
 CommandHandler::NullAction Player::QuitAction()
 {

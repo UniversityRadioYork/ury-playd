@@ -15,8 +15,8 @@
 #include <string>
 #include <memory>
 
-#include "audio.hpp"
-#include "cmd.hpp"
+#include "../audio.hpp"
+#include "../cmd.hpp"
 
 /**
  * Enumeration of states that the player can be in.

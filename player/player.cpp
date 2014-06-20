@@ -27,13 +27,13 @@ struct timespec {
 #include <time.h> /* struct timespec */
 #endif
 
-#include "cmd.hpp"
-#include "io.hpp"
-
-#include "audio.hpp"
-#include "constants.h"
-#include "messages.h"
 #include "player.hpp"
+
+#include "../audio.hpp"
+#include "../cmd.hpp"
+#include "../constants.h"
+#include "../io.hpp"
+#include "../messages.h"
 
 Player::Player(const std::string &device) : device(device)
 {
