@@ -19,25 +19,25 @@
 #include "../cmd.hpp"
 
 /**
- * Enumeration of states that the player can be in.
- * The player is effectively a finite-state machine whose behaviour
- * at any given time is dictated by the current state, which is
- * represented by an instance of State.
- */
-enum class State {
-	STARTING,
-	EJECTED,
-	STOPPED,
-	PLAYING,
-	QUITTING
-};
-
-/**
  * A player contains a loaded audio file and the state of its playback.
  * Player connects to the audio system via PortAudio, given a device handle.
  */
 class Player {
 public:
+	/**
+	 * Enumeration of states that the player can be in.
+	 * The player is effectively a finite-state machine whose behaviour
+	 * at any given time is dictated by the current state, which is
+	 * represented by an instance of State.
+	 */
+	enum class State {
+		STARTING, ///< The player has just initialised.
+		EJECTED,  ///< The player has no song loaded.
+		STOPPED,  ///< The player has a song loaded and not playing.
+		PLAYING,  ///< The player has a song loaded and playing.
+		QUITTING  ///< The player is about to terminate.
+	};
+
 	/**
 	 * Type for position listeners.
 	 * @see RegisterPositionListener
@@ -76,6 +76,13 @@ public:
 	 *                will be the device ID.
 	 */
 	Player(const std::string &device);
+
+	/**
+	 * Returns whether this Player is still running.
+	 * @return  True if this player is not in the QUITTING state; false
+	 *          otherwise.
+	 */
+	bool IsRunning() const;
 
 	/**
 	 * Creates a function object that ejects this player.
@@ -161,10 +168,16 @@ public:
 	bool Seek(const std::string &time_str);
 
 	/**
+	 * A human-readable string representation of the current state.
+	 * @return The current state, as a human-readable string..
+	 */
+	const std::string &CurrentStateString() const;
+
+	/**
 	 * The current state of the Player.
 	 * @return The current state.
 	 */
-	State CurrentState();
+	State CurrentState() const;
 
 	/**
 	 * Instructs the Player to perform a cycle of work.
@@ -192,7 +205,19 @@ public:
 	 */
 	void RegisterStateListener(StateListener listener);
 
+	/**
+	 * The human-readable name of the given player state.
+	 * @param state  The state whose name is to be returned.
+	 * @return       The human-readable name of @a state.
+	 */
+	static const std::string &StateString(State state);
+
 private:
+	/**
+	 * A mapping between states and their human-readable names.
+	 */
+	const static std::map<State, std::string> STATE_STRINGS;
+
 	/**
 	 * Executes a closure iff the current state is one of the given states.
 	 * @param states  The initialiser list of states.
@@ -216,7 +241,7 @@ private:
 	 * @return        Whether the current state is not in the states given
 	 *                by the initializer_list.
 	 */
-	bool CurrentStateIn(StateList states);
+	bool CurrentStateIn(StateList states) const;
 
 	/**
 	 * Sets the current player state.
@@ -229,20 +254,23 @@ private:
 	 * @param time_str  The time string to parse.
 	 * @return          A pair of unit prefix and timestamp.
 	 */
-	std::pair<std::string, uint64_t> ParseSeekTime(const std::string &time_str) const;
+	std::pair<std::string, uint64_t> ParseSeekTime(
+	                const std::string &time_str) const;
 
 	/**
 	 * Sends a position signal to the outside environment, if ready.
 	 * This only sends a signal if the requested amount of time has passed
 	 * since the last one.
-	 * It requires a handler to have been registered via SetTimeSignalHandler.
+	 * It requires a handler to have been registered via
+	 * SetTimeSignalHandler.
 	 */
 	void SendPositionIfReady();
 
 	/**
 	 * Figures out whether it's time to send a position signal.
 	 * @param current_position The current position in the song.
-	 * @return True if enough time has elapsed for a signal to be sent; false
+	 * @return True if enough time has elapsed for a signal to be sent;
+	 * false
 	 * otherwise.
 	 */
 	bool IsReadyToSendPosition(std::chrono::microseconds current_position);

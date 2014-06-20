@@ -35,7 +35,7 @@ struct timespec {
 #include "../io.hpp"
 #include "../messages.h"
 
-Player::Player(const std::string &device) : device(device)
+Player::Player(const std::string& device) : device(device)
 {
 	this->current_state = State::EJECTED;
 	this->audio = nullptr;
@@ -46,7 +46,29 @@ Player::Player(const std::string &device) : device(device)
 	this->position_last_invalid = true;
 }
 
-State Player::CurrentState()
+bool Player::IsRunning() const
+{
+	return CurrentState() != State::QUITTING;
+}
+
+const std::map<Player::State, std::string> Player::STATE_STRINGS = {
+                {State::STARTING, "Starting"},
+                {State::EJECTED, "Ejected"},
+                {State::STOPPED, "Stopped"},
+                {State::PLAYING, "Playing"},
+                {State::QUITTING, "Quitting"}};
+
+const std::string& Player::CurrentStateString() const
+{
+	return Player::StateString(CurrentState());
+}
+
+const std::string& Player::StateString(State state)
+{
+	return Player::STATE_STRINGS.at(state);
+}
+
+Player::State Player::CurrentState() const
 {
 	return this->current_state;
 }
@@ -86,7 +108,7 @@ bool Player::IfCurrentStateIn(Player::StateList states, std::function<bool()> f)
 	return result;
 }
 
-bool Player::CurrentStateIn(Player::StateList states)
+bool Player::CurrentStateIn(Player::StateList states) const
 {
 	return std::find(states.begin(), states.end(), this->current_state) !=
 	       states.end();
@@ -110,7 +132,8 @@ void Player::RegisterStateListener(StateListener listener)
 
 void Player::SendPositionIfReady()
 {
-	auto position = this->audio->CurrentPosition<std::chrono::microseconds>();
+	auto position = this->audio->CurrentPosition<
+	                std::chrono::microseconds>();
 	if (IsReadyToSendPosition(position)) {
 		this->position_listener(position);
 		this->position_last = position;

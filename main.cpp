@@ -14,12 +14,6 @@
 #include "messages.h"
 #include "player/player.hpp"
 
-const static std::map<State, std::string> STATES = {
-                {State::EJECTED, "Ejected"},
-                {State::STOPPED, "Stopped"},
-                {State::PLAYING, "Playing"},
-                {State::QUITTING, "Quitting"}};
-
 /**
  * Lists on stdout all sound devices to which the audio output may connect.
  * This is mainly for the benefit of the end user.
@@ -65,9 +59,10 @@ static void RegisterListeners(Player &player)
 		                                Respond(Response::TIME, p);
 		                        },
 	                                POSITION_PERIOD);
-	player.RegisterStateListener([](State old_state, State new_state) {
-		Respond(Response::STAT, STATES.at(old_state),
-		        STATES.at(new_state));
+	player.RegisterStateListener([](Player::State old_state,
+	                                Player::State new_state) {
+		Respond(Response::STAT, Player::StateString(old_state),
+		        Player::StateString(new_state));
 	});
 }
 
@@ -96,7 +91,7 @@ static void MainLoop(Player &player)
 
 	Respond(Response::OHAI, MSG_OHAI);
 
-	while (player.CurrentState() != State::QUITTING) {
+	while (player.IsRunning()) {
 		/* Possible Improvement: separate command checking and player
 		 * updating into two threads.  Player updating is quite
 		 * intensive and thus impairs the command checking latency.
