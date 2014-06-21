@@ -25,23 +25,23 @@ public:
 		delete this->rb;
 	}
 
-	T2 WriteCapacity() const
+	T2 WriteCapacity() const override
 	{
 		return static_cast<T2>(this->rb->reserve() / this->size);
 	}
 
-	T2 ReadCapacity() const
+	T2 ReadCapacity() const override
 	{
 		return static_cast<T2>(this->rb->size() / this->size);
 	}
 
-	T2 Write(T1 *start, T2 count)
+	T2 Write(T1 *start, T2 count) override
 	{
 		return OnBuffer(start, count,
 		                [this](T1 *e) { this->rb->push_back(e); });
 	}
 
-	T2 Read(T1 *start, T2 count)
+	T2 Read(T1 *start, T2 count) override
 	{
 		return OnBuffer(start, count, [this](T1 *e) {
 			*e = this->rb->front();
@@ -49,7 +49,7 @@ public:
 		});
 	}
 
-	void Flush()
+	void Flush() override
 	{
 		this->rb->clear();
 	}

@@ -48,31 +48,31 @@ public:
 		delete[] this->buffer;
 	}
 
-	T2 WriteCapacity() const
+	T2 WriteCapacity() const override
 	{
 		return CountCast(PaUtil_GetRingBufferWriteAvailable(this->rb));
 	}
 
-	T2 ReadCapacity() const
+	T2 ReadCapacity() const override
 	{
 		return CountCast(PaUtil_GetRingBufferReadAvailable(this->rb));
 	}
 
-	T2 Write(T1 *start, T2 count)
+	T2 Write(T1 *start, T2 count) override
 	{
 		return CountCast(PaUtil_WriteRingBuffer(
 		                this->rb, start,
 		                static_cast<ring_buffer_size_t>(count)));
 	}
 
-	T2 Read(T1 *start, T2 count)
+	T2 Read(T1 *start, T2 count) override
 	{
 		return CountCast(PaUtil_ReadRingBuffer(
 		                this->rb, start,
 		                static_cast<ring_buffer_size_t>(count)));
 	}
 
-	void Flush()
+	void Flush() override
 	{
 		PaUtil_FlushRingBuffer(this->rb);
 	}
