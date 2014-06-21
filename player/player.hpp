@@ -15,8 +15,8 @@
 #include <string>
 #include <memory>
 
-#include "../audio_output.hpp"
-#include "../audio_system.hpp"
+#include "../audio/audio_output.hpp"
+#include "../audio/audio_system.hpp"
 #include "../cmd.hpp"
 
 #include "player_position.hpp"

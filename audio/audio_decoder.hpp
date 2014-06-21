@@ -18,9 +18,10 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
+#include "../errors.hpp"
+#include "../sample_formats.hpp"
+
 #include "audio_resample.hpp"
-#include "errors.hpp"
-#include "sample_formats.hpp"
 
 /**
  * An object responsible for decoding an audio file.

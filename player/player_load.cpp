@@ -1,6 +1,7 @@
-#include "player.hpp"
-#include "../audio_output.hpp"
+#include "../audio/audio_output.hpp"
 #include "../cmd.hpp"
+
+#include "player.hpp"
 
 CommandHandler::SingleRequiredWordAction Player::LoadAction()
 {

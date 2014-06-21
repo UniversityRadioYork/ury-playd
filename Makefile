@@ -6,6 +6,7 @@ CFLAGS+=-c -Wall -Wextra -Werror -pedantic -g -std=c99
 CXXFLAGS+=-c -Wall -Wextra -Werror -pedantic -g -std=c++11
 LDFLAGS+=-lavcodec -lavformat -lavutil -lswresample -lportaudiocpp -lportaudio -lasound -lm -lpthread
 SOURCES=$(wildcard *.cpp)
+SOURCES+=$(wildcard audio/*.cpp)
 SOURCES+=$(wildcard player/*.cpp)
 SOURCES+=$(wildcard ringbuffer/*.cpp)
 CSOURCES=contrib/pa_ringbuffer.c
@@ -30,6 +31,7 @@ clean:
 
 mkdir:
 	mkdir -p $(OBJDIR)
+	mkdir -p $(OBJDIR)/audio
 	mkdir -p $(OBJDIR)/player
 	mkdir -p $(OBJDIR)/ringbuffer
 	mkdir -p $(OBJDIR)/contrib

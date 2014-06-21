@@ -24,12 +24,12 @@ extern "C" {
 #include <libavutil/opt.h>
 }
 
-#include "errors.hpp"
+#include "../errors.hpp"
+#include "../constants.h"
+#include "../sample_formats.hpp"
 
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
-#include "constants.h"
-#include "sample_formats.hpp"
 
 AudioDecoder::AudioDecoder(const std::string &path)
 {

@@ -24,12 +24,13 @@ extern "C" {
 #include <portaudio.h>
 #include "portaudiocpp/PortAudioCpp.hxx"
 
+#include "../constants.h"
+#include "../sample_formats.hpp"
+
 #include "audio_output.hpp"
 #include "audio_decoder.hpp"
 #include "audio_cb.h" /* audio_cb_play */
-#include "constants.h"
 
-#include "sample_formats.hpp"
 
 // Use the PortAudio ringbuffer by default.  This is because of unsettled bugs
 // with the Boost ringbuffer—if the latter can be fixed, it should be used
@@ -37,12 +38,12 @@ extern "C" {
 #ifdef USE_BOOST_RINGBUF
 
 #define RINGBUF_CLASS BoostRingBuffer
-#include "ringbufer/ringbuffer_boost.hpp"
+#include "../ringbuffer/ringbuffer_boost.hpp"
 
 #else
 
 #define RINGBUF_CLASS PaRingBuffer
-#include "ringbuffer/ringbuffer_pa.hpp"
+#include "../ringbuffer/ringbuffer_pa.hpp"
 
 #endif
 

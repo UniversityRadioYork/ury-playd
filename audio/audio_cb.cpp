@@ -11,7 +11,7 @@ extern "C" {
 #include <portaudio.h>
 }
 
-#include "errors.hpp"
+#include "../errors.hpp"
 
 #include "audio_output.hpp"
 

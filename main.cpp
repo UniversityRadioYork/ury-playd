@@ -13,7 +13,7 @@
 #include "io.hpp"
 #include "messages.h"
 #include "player/player.hpp"
-#include "audio_system.hpp"
+#include "audio/audio_system.hpp"
 
 /**
  * Lists on stdout all sound devices to which the audio output may connect.

@@ -12,15 +12,15 @@
 #include <string>
 #include <cstdint>
 
-#include "audio_decoder.hpp"
-
 extern "C" {
 #include <portaudio.h>
 }
 
-#include "constants.h"
-#include "errors.hpp"
-#include "ringbuffer/ringbuffer.hpp"
+#include "../constants.h"
+#include "../errors.hpp"
+#include "../ringbuffer/ringbuffer.hpp"
+
+#include "audio_decoder.hpp"
 
 using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
 

@@ -7,7 +7,7 @@
 #include <string>
 
 #include "player.hpp"
-#include "../audio_system.hpp"
+#include "../audio/audio_system.hpp"
 
 Player::Player(const AudioSystem &audio_system) : audio_system(audio_system)
 {
