@@ -1,0 +1,64 @@
+/*
+ * This file is part of Playslave-C++.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
+ */
+
+#ifndef PS_AUDIO_SYSTEM_HPP
+#define PS_AUDIO_SYSTEM_HPP
+
+#include <string>
+#include "audio_output.hpp"
+
+/**
+ * An AudioSystem represents the entire audio stack used by Playslave++.
+ *
+ * The AudioSystem is responsible for creating AudioOutput instances,
+ * enumerating and resolving device IDs, and initialising and terminating the
+ * audio libraries.
+ *
+ * AudioSystem is a RAII-style class: it loads the audio libraries on
+ * construction and unloads them on termination.  As such, it's probably not
+ * wise to construct multiple AudioSystem instances.
+ */
+class AudioSystem {
+public:
+	/// Type for device entries.
+	using Device = std::pair<std::string, std::string>;
+
+	/**
+	 * Constructs an AudioSystem, initialising its libraries.
+	 * This sets the current device ID to a sane default; use SetDeviceID
+	 * to change it.
+	 */
+	AudioSystem();
+
+	/**
+	 * Destructs an AudioSystem, uninitialising its libraries.
+	 */
+	~AudioSystem();
+
+	/**
+	 * Loads a file, creating an AudioOutput for it.
+	 * @param path  The path to a file.
+	 * @return      The AudioOutput for that file.
+	 */
+	AudioOutput *Load(const std::string &file) const;
+
+	/**
+	 * Sets the current device ID.
+	 * @param id  The device ID to use for subsequent AudioOutputs.
+	 */
+	void SetDeviceID(const std::string &id);
+
+	/**
+	 * Performs a function on each device entry in the AudioSystem.
+	 * @param f  The function to call on each device.
+	 */
+	void OnDevices(std::function<void(const Device &)>) const;
+
+private:
+	std::string device_id; //< The current device ID.
+};
+
+#endif // PS_AUDIO_SYSTEM_HPP

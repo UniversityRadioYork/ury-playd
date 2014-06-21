@@ -22,8 +22,9 @@ extern "C" {
 #include <sstream>
 
 #include <portaudio.h>
+#include "portaudiocpp/PortAudioCpp.hxx"
 
-#include "audio.hpp"
+#include "audio_output.hpp"
 #include "audio_decoder.hpp"
 #include "audio_cb.h" /* audio_cb_play */
 #include "constants.h"

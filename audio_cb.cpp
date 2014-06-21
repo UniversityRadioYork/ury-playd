@@ -13,7 +13,7 @@ extern "C" {
 
 #include "errors.hpp"
 
-#include "audio.hpp" /* Manipulating the audio structure */
+#include "audio_output.hpp"
 
 /* The callback proper, which is executed in a separate thread by PortAudio once
  * a stream is playing with the callback registered to it.

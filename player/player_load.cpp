@@ -1,5 +1,5 @@
 #include "player.hpp"
-#include "../audio.hpp"
+#include "../audio_output.hpp"
 #include "../cmd.hpp"
 
 CommandHandler::SingleRequiredWordAction Player::LoadAction()
@@ -14,7 +14,7 @@ bool Player::Load(const std::string &filename)
 	try
 	{
 		this->audio = std::unique_ptr<AudioOutput>(
-		                new AudioOutput(filename, this->device));
+		                this->audio_system.Load(filename));
 		ResetPosition();
 		Debug("Loaded ", filename);
 		SetState(State::STOPPED);

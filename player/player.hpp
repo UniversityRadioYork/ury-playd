@@ -15,7 +15,8 @@
 #include <string>
 #include <memory>
 
-#include "../audio.hpp"
+#include "../audio_output.hpp"
+#include "../audio_system.hpp"
 #include "../cmd.hpp"
 
 #include "player_position.hpp"
@@ -52,7 +53,7 @@ public:
 	using StateList = std::initializer_list<State>;
 
 private:
-	const std::string &device;
+	const AudioSystem &audio_system;
 
 	std::unique_ptr<AudioOutput> audio;
 
@@ -64,11 +65,9 @@ private:
 public:
 	/**
 	 * Constructs a Player.
-	 * @param device  A string uniquely identifying the target audio device
-	 *                to the audio backend.  For example, for PortAudio this
-	 *                will be the device ID.
+	 * @param audio_system  The audio system object.
 	 */
-	Player(const std::string &device);
+	Player(const AudioSystem &audio_system);
 
 	/**
 	 * Returns whether this Player is still running.

@@ -7,9 +7,9 @@
 #include <string>
 
 #include "player.hpp"
-#include "../audio.hpp"
+#include "../audio_system.hpp"
 
-Player::Player(const std::string& device) : device(device)
+Player::Player(const AudioSystem &audio_system) : audio_system(audio_system)
 {
 	this->current_state = State::EJECTED;
 	this->audio = nullptr;

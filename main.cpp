@@ -13,32 +13,35 @@
 #include "io.hpp"
 #include "messages.h"
 #include "player/player.hpp"
+#include "audio_system.hpp"
 
 /**
  * Lists on stdout all sound devices to which the audio output may connect.
  * This is mainly for the benefit of the end user.
+ * @param system The audio system.
  */
-static void ListOutputDevices()
+static void ListOutputDevices(const AudioSystem &system)
 {
-	for (auto device : AudioOutput::ListDevices()) {
+	system.OnDevices([](const AudioSystem::Device &device) {
 		std::cout << device.first << ": " << device.second << std::endl;
-	}
+	});
 }
 
 /**
  * Tries to get the output device ID from stdin.
  * If there is no stdin, the program prints up the available devices and dies.
+ * @param system The audio system.
  * @param argc The program argument count (from main()).
  * @param argv The program argument vector (from main()).
  * @return The device ID, as a string.
  */
-static std::string DeviceId(int argc, char *argv[])
+static std::string DeviceID(const AudioSystem &system, int argc, char *argv[])
 {
 	std::string device = "";
 
 	/* TODO: Perhaps make this section more robust. */
 	if (argc < 2) {
-		ListOutputDevices();
+		ListOutputDevices(system);
 		throw Error(ErrorCode::BAD_CONFIG, MSG_DEV_NOID);
 	} else {
 		device = std::string(argv[1]);
@@ -115,15 +118,15 @@ int main(int argc, char *argv[])
 {
 	int exit_code = EXIT_SUCCESS;
 
+	// When this goes out of scope, it'll clean up the audio libraries.
+	AudioSystem audio;
+
 	try
 	{
-		AudioOutput::InitialiseLibraries();
+		// Don't roll this into the constructor: it'll go out of scope!
+		audio.SetDeviceID(DeviceID(audio, argc, argv));
 
-		/* Don't roll this into the constructor: it'll go out of scope!
-		 */
-		std::string device_id = DeviceId(argc, argv);
-
-		Player player(device_id);
+		Player player(audio);
 		RegisterListeners(player);
 		MainLoop(player);
 	}
@@ -133,8 +136,6 @@ int main(int argc, char *argv[])
 		Debug("Unhandled exception caught, going away now.");
 		exit_code = EXIT_FAILURE;
 	}
-
-	AudioOutput::CleanupLibraries();
 
 	return exit_code;
 }

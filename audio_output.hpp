@@ -4,8 +4,8 @@
  * details.
  */
 
-#ifndef PS_AUDIO_HPP
-#define PS_AUDIO_HPP
+#ifndef PS_AUDIO_OUTPUT_HPP
+#define PS_AUDIO_OUTPUT_HPP
 
 #include <map>
 #include <memory>
@@ -121,4 +121,4 @@ private:
 	PaSampleFormat PaSampleFormatFrom(SampleFormat fmt);
 };
 
-#endif // PS_AUDIO_HPP
+#endif // PS_AUDIO_OUTPUT_HPP
