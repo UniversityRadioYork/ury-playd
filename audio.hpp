@@ -22,7 +22,7 @@ extern "C" {
 #include "errors.hpp"
 #include "ringbuffer/ringbuffer.hpp"
 
-typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
+using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
 
 /* The audio structure contains all state pertaining to the currently
  * playing audio file.
@@ -32,7 +32,7 @@ typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
  */
 class AudioOutput {
 public:
-	typedef std::map<std::string, const std::string> DeviceList;
+	using DeviceList = std::map<std::string, const std::string>;
 
 	static void InitialiseLibraries();
 	static void CleanupLibraries();

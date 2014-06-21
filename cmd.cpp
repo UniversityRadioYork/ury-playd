@@ -122,8 +122,9 @@ CommandHandler::WordList CommandHandler::LineToWords(const std::string &line)
 {
 	WordList words;
 
-	typedef boost::tokenizer<boost::escaped_list_separator<char>> Tokeniser;
-	boost::escaped_list_separator<char> separator('\\', ' ', '\"');
+	using Separator = boost::escaped_list_separator<char>;
+	using Tokeniser = boost::tokenizer<Separator>;
+	Separator separator('\\', ' ', '\"');
 	Tokeniser tok(line, separator);
 
 	words.assign(tok.begin(), tok.end());

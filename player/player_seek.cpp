@@ -19,9 +19,9 @@ T2 MkTime(std::uint64_t raw_time)
 	return std::chrono::duration_cast<T2>(T1(raw_time));
 }
 
-typedef std::map<std::string,
-                 std::function<std::chrono::microseconds(uint64_t)>>
-                TimeSuffixMap;
+using TimeSuffixMap =
+                std::map<std::string,
+                         std::function<std::chrono::microseconds(uint64_t)>>;
 
 /**
  * Mapping from unit suffixes for seek command times to functions converting
