@@ -8,6 +8,9 @@
 #define PS_AUDIO_SYSTEM_HPP
 
 #include <string>
+#include "portaudiocpp/PortAudioCpp.hxx"
+#include "../sample_formats.hpp"
+
 #include "audio_output.hpp"
 
 /**
@@ -21,7 +24,7 @@
  * construction and unloads them on termination.  As such, it's probably not
  * wise to construct multiple AudioSystem instances.
  */
-class AudioSystem {
+class AudioSystem : public StreamConfigurator {
 public:
 	/// Type for device entries.
 	using Device = std::pair<std::string, std::string>;
@@ -57,8 +60,26 @@ public:
 	 */
 	void OnDevices(std::function<void(const Device &)>) const;
 
+	portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
+	                             const AudioDecoder &av) const override;
+
 private:
-	std::string device_id; //< The current device ID.
+	std::string device_id; ///< The current device ID.
+
+	/**
+	 * Converts a string device ID to a PortAudio device.
+	 * @param id_string The device ID, as a string.
+	 * @return The device.
+	 */
+	const portaudio::Device &PaDeviceFrom(const std::string &id_string)
+	                const;
+
+	/**
+	 * Converts a sample format identifier from playslave++ to PortAudio.
+	 * @param fmt The playslave++ sample format identifier.
+	 * @return The PortAudio equivalent of the given SampleFormat.
+	 */
+	portaudio::SampleDataFormat PaSampleFormatFrom(SampleFormat fmt) const;
 };
 
 #endif // PS_AUDIO_SYSTEM_HPP

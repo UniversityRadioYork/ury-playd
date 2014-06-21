@@ -7,9 +7,7 @@
 #include <algorithm>
 #include <cstring>
 
-extern "C" {
-#include <portaudio.h>
-}
+#include "portaudiocpp/PortAudioCpp.hxx"
 
 #include "../errors.hpp"
 
@@ -18,23 +16,17 @@ extern "C" {
 /* The callback proper, which is executed in a separate thread by PortAudio once
  * a stream is playing with the callback registered to it.
  */
-int audio_cb_play(const void * /*in*/, void *out, unsigned long frames_per_buf,
-                  const PaStreamCallbackTimeInfo * /*timeInfo*/,
-                  PaStreamCallbackFlags /*statusFlags*/, void *v_au)
+int AudioOutput::paCallbackFun(const void *, void *out, unsigned long frames_per_buf,
+                  const PaStreamCallbackTimeInfo *,
+                  PaStreamCallbackFlags)
 {
-	char *cout = static_cast<char *>(out);
-	auto f = static_cast<std::function<int(char *, unsigned long)> *>(v_au);
+        char *cout = static_cast<char *>(out);
 
-	return (*f)(cout, frames_per_buf);
-}
-
-int AudioOutput::PlayCallback(char *out, unsigned long frames_per_buf)
-{
 	std::pair<PaStreamCallbackResult, unsigned long> result =
 	                std::make_pair(paContinue, 0);
 
 	while (result.first == paContinue && result.second < frames_per_buf) {
-		result = PlayCallbackStep(out, frames_per_buf, result);
+		result = PlayCallbackStep(cout, frames_per_buf, result);
 	}
 	return static_cast<int>(result.first);
 }

@@ -17,11 +17,8 @@ extern "C" {
 
 #include <cassert>
 #include <algorithm>
-#include <map>
 #include <string>
-#include <sstream>
 
-#include <portaudio.h>
 #include "portaudiocpp/PortAudioCpp.hxx"
 
 #include "../constants.h"
@@ -30,7 +27,6 @@ extern "C" {
 #include "audio_output.hpp"
 #include "audio_decoder.hpp"
 #include "audio_cb.h" /* audio_cb_play */
-
 
 // Use the PortAudio ringbuffer by default.  This is because of unsettled bugs
 // with the Boost ringbuffer—if the latter can be fixed, it should be used
@@ -47,95 +43,40 @@ extern "C" {
 
 #endif
 
-// Mappings from SampleFormats to their equivalent PaSampleFormats.
-static std::map<SampleFormat, PaSampleFormat> pa_from_sf = {
-                {SampleFormat::PACKED_UNSIGNED_INT_8, paUInt8},
-                {SampleFormat::PACKED_SIGNED_INT_16, paInt16},
-                {SampleFormat::PACKED_SIGNED_INT_32, paInt32},
-                {SampleFormat::PACKED_FLOAT_32, paFloat32}};
-
-/**
- * Initialises the libraries required for the audio subsystem.
- */
-void AudioOutput::InitialiseLibraries()
-{
-	if (Pa_Initialize() != (int)paNoError) {
-		throw Error(ErrorCode::AUDIO_INIT_FAIL,
-		            "couldn't init portaudio");
-	}
-	av_register_all();
-}
-
-/**
- * Cleans up the libraries initialised by InitialiseLibraries.
- */
-void AudioOutput::CleanupLibraries()
-{
-	Pa_Terminate();
-}
-
-AudioOutput::DeviceList AudioOutput::ListDevices()
-{
-	DeviceList devices = {};
-
-	PaDeviceIndex num_devices = Pa_GetDeviceCount();
-	for (PaDeviceIndex i = 0; i < num_devices; i++) {
-		const PaDeviceInfo *dev = Pa_GetDeviceInfo(i);
-		devices.emplace(std::to_string(i), std::string(dev->name));
-	}
-
-	return devices;
-}
-
-AudioOutput::AudioOutput(const std::string &path, const std::string &device_id)
+AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
 {
 	this->last_error = ErrorCode::INCOMPLETE;
 	this->av = std::unique_ptr<AudioDecoder>(new AudioDecoder(path));
 
-	InitialisePortAudio(DeviceIdToPa(device_id));
+	InitialisePortAudio(c);
 	InitialiseRingBuffer(ByteCountForSampleCount(1L));
 
 	this->position_sample_count = 0;
 
 	this->frame = std::vector<char>();
 	this->frame_iterator = this->frame.end();
-
-	this->callback = [this](char *out, unsigned long frames_per_buf) {
-		return this->PlayCallback(out, frames_per_buf);
-	};
 }
 
 AudioOutput::~AudioOutput()
 {
-	if (this->out_strm != nullptr) {
-		Pa_CloseStream(this->out_strm);
-		this->out_strm = nullptr;
-		Debug("closed output stream");
-	}
+	this->out_strm = nullptr;
+	Debug("closed output stream");
 }
 
 void AudioOutput::Start()
 {
 	PreFillRingBuffer();
 
-	PaError pa_err = Pa_StartStream(this->out_strm);
-	if (pa_err != paNoError) {
-		throw Error(ErrorCode::INTERNAL_ERROR, "couldn't start stream");
-	}
-
+	this->out_strm->start();
 	Debug("audio started");
 }
 
 void AudioOutput::Stop()
 {
-	PaError pa_err = Pa_AbortStream(this->out_strm);
-	if (pa_err != paNoError) {
-		throw Error(ErrorCode::INTERNAL_ERROR, "couldn't stop stream");
-	}
-
+	this->out_strm->abort();
 	Debug("audio stopped");
 
-	/* TODO: Possibly recover from dropping frames due to abort. */
+	// TODO: Possibly recover from dropping frames due to abort.
 }
 
 /* Returns the last decoding error, or E_OK if the last decode succeeded. */
@@ -152,7 +93,7 @@ ErrorCode AudioOutput::LastError()
  */
 bool AudioOutput::IsHalted()
 {
-	return !Pa_IsStreamActive(this->out_strm);
+	return !this->out_strm->isActive();
 }
 
 /* Gets the current played position in the song, in microseconds.
@@ -166,12 +107,12 @@ std::chrono::microseconds AudioOutput::CurrentPositionMicroseconds()
 	                this->position_sample_count);
 }
 
-size_t AudioOutput::ByteCountForSampleCount(size_t samples)
+size_t AudioOutput::ByteCountForSampleCount(size_t samples) const
 {
 	return this->av->ByteCountForSampleCount(samples);
 }
 
-size_t AudioOutput::SampleCountForByteCount(size_t bytes)
+size_t AudioOutput::SampleCountForByteCount(size_t bytes) const
 {
 	return this->av->SampleCountForByteCount(bytes);
 }
@@ -310,44 +251,10 @@ void AudioOutput::AdvanceFrameIterator(unsigned long sample_count)
 	        this->frame_iterator < this->frame.end()));
 }
 
-/**
- * Converts a sample format identifier from playslave++ to PortAudio.
- * @param fmt The playslave++ sample format identifier.
- * @return The PortAudio equivalent of the given SampleFormat.
- */
-PaSampleFormat AudioOutput::PaSampleFormatFrom(SampleFormat fmt)
+void AudioOutput::InitialisePortAudio(const StreamConfigurator &c)
 {
-	try
-	{
-		return pa_from_sf.at(fmt);
-	}
-	catch (std::out_of_range)
-	{
-		throw Error(ErrorCode::BAD_FILE, "unusable sample rate");
-	}
-}
-
-void AudioOutput::InitialisePortAudio(int device)
-{
-	double sample_rate = this->av->SampleRate();
-	PaStreamParameters pars;
-	memset(&pars, 0, sizeof(pars));
-
-	pars.channelCount = this->av->ChannelCount();
-	pars.device = device;
-	pars.hostApiSpecificStreamInfo = nullptr;
-	pars.sampleFormat = PaSampleFormatFrom(this->av->SampleFormat());
-	pars.suggestedLatency =
-	                Pa_GetDeviceInfo(device)->defaultLowOutputLatency;
-
-	size_t samples_per_buf = this->av->BufferSampleCapacity();
-	PaError pa_err =
-	                Pa_OpenStream(&this->out_strm, NULL, &pars, sample_rate,
-	                              samples_per_buf, paClipOff, audio_cb_play,
-	                              static_cast<void *>(&this->callback));
-	if (pa_err != paNoError) {
-		throw Error(ErrorCode::AUDIO_INIT_FAIL, "couldn't open stream");
-	}
+	this->out_strm = std::unique_ptr<portaudio::Stream>(
+	                c.Configure(*this, *(this->av)));
 }
 
 /* Initialises an audio structure's ring buffer so that decoded
@@ -388,23 +295,4 @@ unsigned long AudioOutput::RingBufferTransferCount()
 
 	size_t samples = SampleCountForByteCount(static_cast<size_t>(bytes));
 	return std::min(samples, RingBufferWriteCapacity());
-}
-
-/**
- * Converts a string device ID to a PaDeviceID.
- * @param id_string The device ID, as a string.
- * @return The device ID, as a PaDeviceID.
- */
-PaDeviceIndex AudioOutput::DeviceIdToPa(const std::string &id_string)
-{
-	PaDeviceIndex id_pa = 0;
-
-	std::istringstream is(id_string);
-	is >> id_pa;
-
-	if (id_pa >= Pa_GetDeviceCount()) {
-		throw Error(ErrorCode::BAD_CONFIG, "Bad PortAudio ID.");
-	}
-
-	return id_pa;
 }

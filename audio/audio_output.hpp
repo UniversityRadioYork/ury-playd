@@ -12,17 +12,31 @@
 #include <string>
 #include <cstdint>
 
-extern "C" {
-#include <portaudio.h>
-}
+#include "portaudiocpp/PortAudioCpp.hxx"
 
 #include "../constants.h"
 #include "../errors.hpp"
 #include "../ringbuffer/ringbuffer.hpp"
 
 #include "audio_decoder.hpp"
+#include "audio_resample.hpp"
 
 using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
+
+/**
+ * Abstract class for objects that can configure PortAudio streams for audio
+ * files.
+ */
+class StreamConfigurator {
+public:
+	/**
+	 * Configures and returns a PortAudio stream for the given decoder.
+	 * @param decoder  The decoder whose output will be fed into the stream.
+	 * @return         The configured PortAudio stream.
+	 */
+	virtual portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
+	                                     const AudioDecoder &av) const = 0;
+};
 
 /* The audio structure contains all state pertaining to the currently
  * playing audio file.
@@ -30,19 +44,12 @@ using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
  * struct audio is an opaque structure; only audio.c knows its true
  * definition.
  */
-class AudioOutput {
+class AudioOutput : portaudio::CallbackInterface, SampleByteConverter {
 public:
-	using DeviceList = std::map<std::string, const std::string>;
-
-	static void InitialiseLibraries();
-	static void CleanupLibraries();
-
-	static DeviceList ListDevices();
-
 	/* Loads a file and constructs an audio structure to hold the playback
 	* state.
 	*/
-	AudioOutput(const std::string &path, const std::string &device_id);
+	AudioOutput(const std::string &path, const StreamConfigurator &c);
 	~AudioOutput();
 
 	void Start();
@@ -81,22 +88,25 @@ public:
 private:
 	ErrorCode last_error;
 	std::unique_ptr<AudioDecoder> av;
-	/* shared state */
+
 	std::vector<char> frame;
 	std::vector<char>::iterator frame_iterator;
 	std::unique_ptr<RingBuffer<char, long>> ring_buf;
-	PaStream *out_strm;
-	int device_id;
-	uint64_t position_sample_count;
-	std::function<int(char *, unsigned long)> callback;
 
-	void InitialisePortAudio(int device);
+	std::unique_ptr<portaudio::Stream> out_strm;
+
+	uint64_t position_sample_count;
+
+	void InitialisePortAudio(const StreamConfigurator &c);
 	void InitialiseRingBuffer(size_t bytes_per_sample);
 
-	size_t ByteCountForSampleCount(size_t sample_count);
-	size_t SampleCountForByteCount(size_t sample_count);
+	size_t ByteCountForSampleCount(size_t sample_count) const override;
+	size_t SampleCountForByteCount(size_t sample_count) const override;
 
-	int PlayCallback(char *out, unsigned long frames_per_buf);
+	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
+	                  unsigned long numFrames,
+	                  const PaStreamCallbackTimeInfo *timeInfo,
+	                  PaStreamCallbackFlags statusFlags) override;
 	PlayCallbackStepResult PlayCallbackStep(char *out,
 	                                        unsigned long frames_per_buf,
 	                                        PlayCallbackStepResult in);
@@ -116,9 +126,6 @@ private:
 	unsigned long RingBufferWriteCapacity();
 	unsigned long RingBufferTransferCount();
 	void AdvanceFrameIterator(unsigned long sample_count);
-
-	PaDeviceIndex DeviceIdToPa(const std::string &id_string);
-	PaSampleFormat PaSampleFormatFrom(SampleFormat fmt);
 };
 
 #endif // PS_AUDIO_OUTPUT_HPP
