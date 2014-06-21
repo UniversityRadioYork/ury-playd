@@ -30,7 +30,8 @@ public:
 	using CommandSet = std::map<std::string, Payload>;
 
 	using NullAction = std::function<bool()>;
-	using SingleRequiredWordAction = std::function<bool(const std::string &)>;
+	using SingleRequiredWordAction =
+	                std::function<bool(const std::string &)>;
 
 	CommandHandler(const CommandSet &commands);
 	void Check();

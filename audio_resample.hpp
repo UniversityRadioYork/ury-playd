@@ -104,8 +104,8 @@ protected:
 	 */
 	std::vector<char> MakeFrameVector(char *start, int sample_count);
 
-	AVSampleFormat output_format;    ///< ffmpeg output format.
-	const SampleByteConverter &out;  ///< Output sample rate converter.
+	AVSampleFormat output_format;   ///< ffmpeg output format.
+	const SampleByteConverter &out; ///< Output sample rate converter.
 };
 
 /**
@@ -130,7 +130,7 @@ public:
 private:
 	std::unique_ptr<Swr> swr; ///< The software resampler objct.
 	std::unique_ptr<uint8_t, std::function<void(uint8_t *)>>
-	                resample_buffer;  ///< The buffer used for resampling.
+	                resample_buffer; ///< The buffer used for resampling.
 };
 
 /**

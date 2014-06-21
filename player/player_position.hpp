@@ -50,10 +50,10 @@ private:
 	boost::optional<Unit> last;
 
 public:
-        /**
-         * Constructs a PlayerPosition.
-         */
-        PlayerPosition();
+	/**
+	 * Constructs a PlayerPosition.
+	 */
+	PlayerPosition();
 
 	/**
 	 * Registers a position listener.
@@ -61,23 +61,23 @@ public:
 	 * every time the PlayerPosition reaches its internal listener firing
 	 * period.
 	 * @param listener  The listener callback.
-         * @see SetListenerPeriod
+	 * @see SetListenerPeriod
 	 */
 	void RegisterListener(PlayerPosition::Listener listener);
 
-        /**
-         * Sets the period between position signals.
-         * This is shared across all listeners.
-         * @param period  The period to wait between listener callbacks.
-         * @see RegisterListener
-         */
-        void SetListenerPeriod(Unit period);
+	/**
+	 * Sets the period between position signals.
+	 * This is shared across all listeners.
+	 * @param period  The period to wait between listener callbacks.
+	 * @see RegisterListener
+	 */
+	void SetListenerPeriod(Unit period);
 
 	/**
 	 * Updates the position tracker with the new position.
 	 * This fires the position listeners if necessary.
 	 * @param position  The new position, in @a PositionUnit units.
-         * @see Reset
+	 * @see Reset
 	 */
 	void Update(Unit position);
 
@@ -85,9 +85,10 @@ public:
 	 * Resets the position tracker's position data.
 	 * This does not deregister the listeners.
 	 * Call this whenever the song changes, or before a skip.
-         * @see Update
+	 * @see Update
 	 */
 	void Reset();
+
 private:
 	/**
 	 * Figures out whether it's time to send a position signal.

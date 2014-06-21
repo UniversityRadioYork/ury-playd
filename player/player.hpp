@@ -188,12 +188,12 @@ public:
 	 */
 	void RegisterPositionListener(PlayerPosition::Listener listener);
 
-        /**
-         * Sets the period between position signals.
-         * This is shared across all listeners.
-         * @param period  The period to wait between listener callbacks.
-         */
-        void SetPositionListenerPeriod(PlayerPosition::Unit period);
+	/**
+	 * Sets the period between position signals.
+	 * This is shared across all listeners.
+	 * @param period  The period to wait between listener callbacks.
+	 */
+	void SetPositionListenerPeriod(PlayerPosition::Unit period);
 
 	/**
 	 * Registers a position listener.

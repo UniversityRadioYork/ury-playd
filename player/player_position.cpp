@@ -27,12 +27,12 @@ void Player::ResetPosition()
 // PlayerPosition
 PlayerPosition::PlayerPosition()
 {
-        this->listeners = decltype(this->listeners)();
+	this->listeners = decltype(this->listeners)();
 
-        // Default to broadcasting the position every time it is changed.
-        this->period = decltype(this->period)(0);
+	// Default to broadcasting the position every time it is changed.
+	this->period = decltype(this->period)(0);
 
-        Reset();
+	Reset();
 }
 
 void PlayerPosition::Update(const PlayerPosition::Unit position)
@@ -44,7 +44,8 @@ void PlayerPosition::Update(const PlayerPosition::Unit position)
 	}
 }
 
-void PlayerPosition::Reset() {
+void PlayerPosition::Reset()
+{
 	this->current = decltype(this->current)(0);
 	this->last = decltype(this->last)();
 }
@@ -64,10 +65,10 @@ bool PlayerPosition::IsReadyToSend()
 
 void PlayerPosition::RegisterListener(PlayerPosition::Listener listener)
 {
-        this->listeners.push_back(listener);
+	this->listeners.push_back(listener);
 }
 
 void PlayerPosition::SetListenerPeriod(PlayerPosition::Unit period)
 {
-        this->period = period;
+	this->period = period;
 }

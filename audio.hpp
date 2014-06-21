@@ -22,7 +22,6 @@ extern "C" {
 #include "errors.hpp"
 #include "ringbuffer/ringbuffer.hpp"
 
-
 typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
 
 /* The audio structure contains all state pertaining to the currently
@@ -98,12 +97,12 @@ private:
 	size_t SampleCountForByteCount(size_t sample_count);
 
 	int PlayCallback(char *out, unsigned long frames_per_buf);
-	PlayCallbackStepResult PlayCallbackStep(
-                char *out, unsigned long frames_per_buf,
-                PlayCallbackStepResult in);
-	PlayCallbackStepResult PlayCallbackFailure(
-                char *out, unsigned long frames_per_buf,
-                PlayCallbackStepResult in);
+	PlayCallbackStepResult PlayCallbackStep(char *out,
+	                                        unsigned long frames_per_buf,
+	                                        PlayCallbackStepResult in);
+	PlayCallbackStepResult PlayCallbackFailure(char *out,
+	                                           unsigned long frames_per_buf,
+	                                           PlayCallbackStepResult in);
 
 	unsigned long ReadSamplesToOutput(char *&output,
 	                                  unsigned long output_capacity,

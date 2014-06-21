@@ -110,8 +110,7 @@ unsigned long AudioOutput::ReadSamplesToOutput(char *&output,
 
 	// TODO: handle the ulong->long cast more gracefully, perhaps.
 	output += this->ring_buf->Read(
-	                output,
-	                static_cast<long>(transfer_sample_count));
+	                output, static_cast<long>(transfer_sample_count));
 
 	this->position_sample_count += transfer_sample_count;
 	return transfer_sample_count;

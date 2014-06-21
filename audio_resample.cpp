@@ -89,5 +89,7 @@ PackedResampler::PackedResampler(const SampleByteConverter &out,
 
 std::vector<char> PackedResampler::Resample(AVFrame *frame)
 {
-	return MakeFrameVector(reinterpret_cast<char *>(frame->extended_data[0]), frame->nb_samples);
+	return MakeFrameVector(
+	                reinterpret_cast<char *>(frame->extended_data[0]),
+	                frame->nb_samples);
 }

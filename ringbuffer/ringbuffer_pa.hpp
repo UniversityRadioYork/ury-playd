@@ -9,7 +9,6 @@ extern "C" {
 
 #include "../errors.hpp"
 
-
 /**
  * Implementation of RingBuffer using the PortAudio C ring buffer.
  *
