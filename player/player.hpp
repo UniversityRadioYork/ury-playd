@@ -225,14 +225,6 @@ private:
 	bool IfCurrentStateIn(StateList states, std::function<bool()> f);
 
 	/**
-	 * Executes a closure iff the current state is one of the given states.
-	 * @param states  The initialiser list of states.
-	 * @param f       The closure to execute if in the correct state.
-	 * @return        False if the state was not valid, or true otherwise.
-	 */
-	bool IfCurrentStateIn(StateList states, std::function<void()> f);
-
-	/**
 	 * Checks to see if the current state is one of the given states.
 	 * @param states  The initialiser list of states.
 	 * @return        Whether the current state is not in the states given

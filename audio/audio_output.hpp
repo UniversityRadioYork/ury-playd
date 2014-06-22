@@ -91,17 +91,17 @@ private:
 
 	std::vector<char> frame;
 	std::vector<char>::iterator frame_iterator;
-	std::unique_ptr<RingBuffer<char, long>> ring_buf;
+	std::unique_ptr<RingBuffer<char, std::uint64_t>> ring_buf;
 
 	std::unique_ptr<portaudio::Stream> out_strm;
 
 	uint64_t position_sample_count;
 
 	void InitialisePortAudio(const StreamConfigurator &c);
-	void InitialiseRingBuffer(size_t bytes_per_sample);
+	void InitialiseRingBuffer(std::uint64_t bytes_per_sample);
 
-	size_t ByteCountForSampleCount(size_t sample_count) const override;
-	size_t SampleCountForByteCount(size_t sample_count) const override;
+	std::uint64_t ByteCountForSampleCount(std::uint64_t sample_count) const override;
+	std::uint64_t SampleCountForByteCount(std::uint64_t sample_count) const override;
 
 	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
 	                  unsigned long numFrames,
@@ -121,11 +121,11 @@ private:
 	bool DecodeIfFrameEmpty();
 
 	void WriteAllAvailableToRingBuffer();
-	void WriteToRingBuffer(unsigned long count);
+	void WriteToRingBuffer(std::uint64_t count);
 
-	unsigned long RingBufferWriteCapacity();
-	unsigned long RingBufferTransferCount();
-	void AdvanceFrameIterator(unsigned long sample_count);
+	std::uint64_t RingBufferWriteCapacity();
+	std::uint64_t RingBufferTransferCount();
+	void AdvanceFrameIterator(std::uint64_t sample_count);
 };
 
 #endif // PS_AUDIO_OUTPUT_HPP

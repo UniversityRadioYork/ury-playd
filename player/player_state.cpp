@@ -20,14 +20,6 @@ bool Player::CurrentStateIn(Player::StateList states) const
 	       states.end();
 }
 
-bool Player::IfCurrentStateIn(Player::StateList states, std::function<void()> f)
-{
-	return IfCurrentStateIn(states, [f] {
-		f();
-		return true;
-	});
-}
-
 bool Player::IfCurrentStateIn(Player::StateList states, std::function<bool()> f)
 {
 	bool result = false;

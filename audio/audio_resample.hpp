@@ -39,7 +39,7 @@ public:
 	 * @return       The corresponding sample count.
 	 * @see          ByteCountForSampleCount
 	 */
-	virtual size_t SampleCountForByteCount(size_t bytes) const = 0;
+	virtual std::uint64_t SampleCountForByteCount(std::uint64_t bytes) const = 0;
 
 	/**
 	 * Converts from a sample count to a byte count.
@@ -50,7 +50,8 @@ public:
 	 * @return         The corresponding byte count.
 	 * @see            SampleCountForByteCount
 	 */
-	virtual size_t ByteCountForSampleCount(size_t samples) const = 0;
+
+	virtual std::uint64_t ByteCountForSampleCount(std::uint64_t samples) const = 0;
 };
 
 /**
@@ -93,8 +94,8 @@ public:
 	virtual AVSampleFormat AVOutputFormat();
 
 protected:
-	size_t SampleCountForByteCount(size_t bytes) const;
-	size_t ByteCountForSampleCount(size_t samples) const;
+	std::uint64_t SampleCountForByteCount(std::uint64_t bytes) const;
+	std::uint64_t ByteCountForSampleCount(std::uint64_t samples) const;
 
 	/**
 	 * Makes a frame vector from a sample data array and sample count.

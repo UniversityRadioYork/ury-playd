@@ -69,7 +69,7 @@ double AudioDecoder::SampleRate() const
 }
 
 /* Converts stream position (in microseconds) to estimated sample count. */
-size_t AudioDecoder::SampleCountForPositionMicroseconds(
+std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
                 std::chrono::microseconds usec) const
 {
 	auto sample_micros = usec * SampleRate();
@@ -79,7 +79,7 @@ size_t AudioDecoder::SampleCountForPositionMicroseconds(
 
 /* Converts sample count to estimated stream position (in microseconds). */
 std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
-                size_t samples) const
+                std::uint64_t samples) const
 {
 	auto position_secs = std::chrono::seconds(samples) / SampleRate();
 	return std::chrono::duration_cast<std::chrono::microseconds>(
@@ -87,13 +87,13 @@ std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
 }
 
 /* Converts buffer size (in bytes) to sample count (in samples). */
-size_t AudioDecoder::SampleCountForByteCount(size_t bytes) const
+std::uint64_t AudioDecoder::SampleCountForByteCount(std::uint64_t bytes) const
 {
 	return ((bytes / this->stream->codec->channels) / BytesPerSample());
 }
 
 /* Converts sample count (in samples) to buffer size (in bytes). */
-size_t AudioDecoder::ByteCountForSampleCount(size_t samples) const
+std::uint64_t AudioDecoder::ByteCountForSampleCount(std::uint64_t samples) const
 {
 	return (samples * this->stream->codec->channels * BytesPerSample());
 }

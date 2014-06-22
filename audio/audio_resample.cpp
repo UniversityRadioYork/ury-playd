@@ -26,12 +26,12 @@ AVSampleFormat Resampler::AVOutputFormat()
 	return this->output_format;
 }
 
-size_t Resampler::SampleCountForByteCount(size_t bytes) const
+std::uint64_t Resampler::SampleCountForByteCount(std::uint64_t bytes) const
 {
 	return this->out.SampleCountForByteCount(bytes);
 }
 
-size_t Resampler::ByteCountForSampleCount(size_t samples) const
+std::uint64_t Resampler::ByteCountForSampleCount(std::uint64_t samples) const
 {
 	return this->out.ByteCountForSampleCount(samples);
 }

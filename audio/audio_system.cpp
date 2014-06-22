@@ -4,6 +4,7 @@
  * details.
  */
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <sstream>

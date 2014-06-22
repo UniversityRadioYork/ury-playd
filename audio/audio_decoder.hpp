@@ -50,12 +50,12 @@ public:
 
 	// Unit conversion
 	std::chrono::microseconds PositionMicrosecondsForSampleCount(
-	                size_t samples) const;
-	size_t SampleCountForPositionMicroseconds(
+	                std::uint64_t samples) const;
+	std::uint64_t SampleCountForPositionMicroseconds(
 	                std::chrono::microseconds position) const;
 
-	size_t SampleCountForByteCount(size_t bytes) const;
-	size_t ByteCountForSampleCount(size_t samples) const;
+	std::uint64_t SampleCountForByteCount(std::uint64_t bytes) const override;
+	std::uint64_t ByteCountForSampleCount(std::uint64_t samples) const override;
 
 private:
 	AVStream *stream;

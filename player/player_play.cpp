@@ -14,5 +14,6 @@ bool Player::Play()
 		assert(this->audio != nullptr);
 		this->audio->Start();
 		SetState(State::PLAYING);
+		return true;
 	});
 }

@@ -107,12 +107,12 @@ std::chrono::microseconds AudioOutput::CurrentPositionMicroseconds()
 	                this->position_sample_count);
 }
 
-size_t AudioOutput::ByteCountForSampleCount(size_t samples) const
+std::uint64_t AudioOutput::ByteCountForSampleCount(std::uint64_t samples) const
 {
 	return this->av->ByteCountForSampleCount(samples);
 }
 
-size_t AudioOutput::SampleCountForByteCount(size_t bytes) const
+std::uint64_t AudioOutput::SampleCountForByteCount(std::uint64_t bytes) const
 {
 	return this->av->SampleCountForByteCount(bytes);
 }
@@ -131,7 +131,7 @@ void AudioOutput::PreFillRingBuffer()
 	 * thus delaying playback.)
 	 */
 	bool more = true;
-	unsigned long c = RingBufferWriteCapacity();
+	std::uint64_t c = RingBufferWriteCapacity();
 	while (more && c > 0 && RINGBUF_SIZE - c < SPINUP_SIZE) {
 		more = Update();
 		c = RingBufferWriteCapacity();
@@ -144,7 +144,7 @@ void AudioOutput::SeekToPositionMicroseconds(
 {
 	this->av->SeekToPositionMicroseconds(microseconds);
 
-	size_t new_position_sample_count =
+	std::uint64_t new_position_sample_count =
 	                this->av->SampleCountForPositionMicroseconds(
 	                                microseconds);
 	this->frame.clear();
@@ -201,7 +201,7 @@ bool AudioOutput::DecodeIfFrameEmpty()
  */
 void AudioOutput::WriteAllAvailableToRingBuffer()
 {
-	unsigned long count = RingBufferTransferCount();
+	std::uint64_t count = RingBufferTransferCount();
 	if (0 < count) {
 		WriteToRingBuffer(count);
 	}
@@ -211,11 +211,11 @@ void AudioOutput::WriteAllAvailableToRingBuffer()
  * Write a given number of samples from the current frame to the ring buffer.
  * @param sample_count The number of samples to write to the ring buffer.
  */
-void AudioOutput::WriteToRingBuffer(unsigned long sample_count)
+void AudioOutput::WriteToRingBuffer(std::uint64_t sample_count)
 {
 	assert(0 < sample_count);
 
-	unsigned long written_count = this->ring_buf->Write(
+	std::uint64_t written_count = this->ring_buf->Write(
 	                &(*this->frame_iterator),
 	                static_cast<ring_buffer_size_t>(sample_count));
 	if (written_count != sample_count) {
@@ -234,7 +234,7 @@ void AudioOutput::WriteToRingBuffer(unsigned long sample_count)
  *
  * @param sample_count The number of samples to move the markers.
  */
-void AudioOutput::AdvanceFrameIterator(unsigned long sample_count)
+void AudioOutput::AdvanceFrameIterator(std::uint64_t sample_count)
 {
 	auto byte_count = this->av->ByteCountForSampleCount(sample_count);
 	assert(sample_count <= byte_count);
@@ -265,10 +265,10 @@ void AudioOutput::InitialisePortAudio(const StreamConfigurator &c)
  * The number of bytes for each sample must be provided; see
  * audio_av_samples2bytes for one way of getting this.
  */
-void AudioOutput::InitialiseRingBuffer(size_t bytes_per_sample)
+void AudioOutput::InitialiseRingBuffer(std::uint64_t bytes_per_sample)
 {
-	this->ring_buf = std::unique_ptr<RingBuffer<char, long>>(
-	                new RINGBUF_CLASS<char, long, RINGBUF_POWER>(
+	this->ring_buf = decltype(this->ring_buf)(
+	                new RINGBUF_CLASS<char, std::uint64_t, RINGBUF_POWER>(
 	                                bytes_per_sample));
 }
 
@@ -276,7 +276,7 @@ void AudioOutput::InitialiseRingBuffer(size_t bytes_per_sample)
  * Gets the current write capacity of the ring buffer.
  * @return The write capacity, in samples.
  */
-unsigned long AudioOutput::RingBufferWriteCapacity()
+std::uint64_t AudioOutput::RingBufferWriteCapacity()
 {
 	return this->ring_buf->WriteCapacity();
 }
@@ -286,13 +286,13 @@ unsigned long AudioOutput::RingBufferWriteCapacity()
  * the ring buffer.
  * @return The transfer count, in samples.
  */
-unsigned long AudioOutput::RingBufferTransferCount()
+std::uint64_t AudioOutput::RingBufferTransferCount()
 {
 	assert(!this->frame.empty());
 
 	long bytes = std::distance(this->frame_iterator, this->frame.end());
 	assert(0 <= bytes);
 
-	size_t samples = SampleCountForByteCount(static_cast<size_t>(bytes));
+	std::uint64_t samples = SampleCountForByteCount(static_cast<std::uint64_t>(bytes));
 	return std::min(samples, RingBufferWriteCapacity());
 }

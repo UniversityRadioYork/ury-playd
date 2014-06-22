@@ -29,13 +29,13 @@ CommandHandler::CommandHandler(const CommandHandler::CommandSet &commands)
 CommandHandler::Payload CommandHandler::NullCommand(
                 CommandHandler::NullAction f)
 {
-	return [&f](WordList) { return f(); };
+	return [f](WordList) { return f(); };
 }
 
 CommandHandler::Payload CommandHandler::SingleRequiredWordCommand(
                 CommandHandler::SingleRequiredWordAction f)
 {
-	return [&f](const WordList &words) {
+	return [f](const WordList &words) {
 		bool success = false;
 		if (words.size() == 2 && !words[1].empty()) {
 			success = f(words[1]);
