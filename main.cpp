@@ -14,56 +14,55 @@
 #include "messages.h"
 #include "player/player.hpp"
 #include "audio/audio_system.hpp"
+#include "main.hpp"
+
+/**
+ * The main entry point.
+ * @param argc Program argument count.
+ * @param argv Program argument vector.
+ */
+int main(int argc, char *argv[])
+{
+	Playslave ps{argc, argv};
+	return ps.Run();
+}
 
 /**
  * Lists on stdout all sound devices to which the audio output may connect.
  * This is mainly for the benefit of the end user.
- * @param system The audio system.
  */
-static void ListOutputDevices(const AudioSystem &system)
+void Playslave::ListOutputDevices()
 {
-	system.OnDevices([](const AudioSystem::Device &device) {
+	this->audio.OnDevices([](const AudioSystem::Device &device) {
 		std::cout << device.first << ": " << device.second << std::endl;
 	});
 }
 
-/**
- * Tries to get the output device ID from stdin.
- * If there is no stdin, the program prints up the available devices and dies.
- * @param system The audio system.
- * @param argc The program argument count (from main()).
- * @param argv The program argument vector (from main()).
- * @return The device ID, as a string.
- */
-static std::string DeviceID(const AudioSystem &system, int argc, char *argv[])
+std::string Playslave::DeviceID()
 {
 	std::string device = "";
 
-	/* TODO: Perhaps make this section more robust. */
-	if (argc < 2) {
-		ListOutputDevices(system);
+	// TODO: Perhaps make this section more robust.
+	if (this->arguments.size() < 2) {
+		ListOutputDevices();
 		throw Error(ErrorCode::BAD_CONFIG, MSG_DEV_NOID);
 	} else {
-		device = std::string(argv[1]);
+		device = std::string(this->arguments[1]);
 	}
 
 	return device;
 }
 
-/**
- * Registers various listeners with the Player.
- * This is so time and state changes can be sent out on stdout.
- * @param player The player to which the listeners will subscribe.
- */
-static void RegisterListeners(Player &player)
+void Playslave::RegisterListeners()
 {
-	player.SetPositionListenerPeriod(POSITION_PERIOD);
-	player.RegisterPositionListener([](std::chrono::microseconds position) {
-		uint64_t p = position.count();
+	this->player->SetPositionListenerPeriod(POSITION_PERIOD);
+	this->player->RegisterPositionListener([](
+	                std::chrono::microseconds position) {
+		std::uint64_t p = position.count();
 		Respond(Response::TIME, p);
 	});
-	player.RegisterStateListener([](Player::State old_state,
-	                                Player::State new_state) {
+	this->player->RegisterStateListener([](Player::State old_state,
+	                                       Player::State new_state) {
 		Respond(Response::STAT, Player::StateString(old_state),
 		        Player::StateString(new_state));
 	});
@@ -76,59 +75,58 @@ static void RegisterListeners(Player &player)
  * @todo Possibly separate command check and player updating into separate
  * threads?
  */
-static void MainLoop(Player &player)
+void Playslave::MainLoop()
 {
-	CommandHandler handler(
-	                {{"play",
-	                  CommandHandler::NullCommand(player.PlayAction())},
-	                 {"stop",
-	                  CommandHandler::NullCommand(player.StopAction())},
-	                 {"ejct",
-	                  CommandHandler::NullCommand(player.EjectAction())},
-	                 {"quit",
-	                  CommandHandler::NullCommand(player.QuitAction())},
-	                 {"load", CommandHandler::SingleRequiredWordCommand(
-	                                          player.LoadAction())},
-	                 {"seek", CommandHandler::SingleRequiredWordCommand(
-	                                          player.SeekAction())}});
-
-	Respond(Response::OHAI, MSG_OHAI);
-
-	while (player.IsRunning()) {
+	while (this->player->IsRunning()) {
 		/* Possible Improvement: separate command checking and player
 		 * updating into two threads.  Player updating is quite
 		 * intensive and thus impairs the command checking latency.
 		 * Do this if it doesn't make the code too complex.
 		 */
-		handler.Check();
-		player.Update();
+		this->handler->Check();
+		this->player->Update();
 
 		std::this_thread::sleep_for(LOOP_PERIOD);
 	}
-
-	Respond(Response::TTFN, MSG_TTFN);
 }
 
-/**
- * The main entry point.
- * @param argc Program argument count.
- * @param argv Program argument vector.
- */
-int main(int argc, char *argv[])
+Playslave::Playslave(int argc, char *argv[])
+{
+	for (int i = 0; i < argc; i++) {
+		this->arguments.push_back(std::string(argv[i]));
+	}
+
+	this->player = decltype(this->player) {new Player{this->audio}};
+	this->handler = decltype(this->handler) {
+		new CommandHandler {
+	                {{"play",
+	                  CommandHandler::NullCommand(this->player->PlayAction())},
+	                 {"stop",
+	                  CommandHandler::NullCommand(this->player->StopAction())},
+	                 {"ejct",
+	                  CommandHandler::NullCommand(this->player->EjectAction())},
+	                 {"quit",
+	                  CommandHandler::NullCommand(this->player->QuitAction())},
+	                 {"load", CommandHandler::SingleRequiredWordCommand(
+	                                          this->player->LoadAction())},
+	                 {"seek", CommandHandler::SingleRequiredWordCommand(
+	                                          this->player->SeekAction())}}}};
+}
+
+int Playslave::Run()
 {
 	int exit_code = EXIT_SUCCESS;
-
-	// When this goes out of scope, it'll clean up the audio libraries.
-	AudioSystem audio;
 
 	try
 	{
 		// Don't roll this into the constructor: it'll go out of scope!
-		audio.SetDeviceID(DeviceID(audio, argc, argv));
+		this->audio.SetDeviceID(DeviceID());
 
-		Player player(audio);
-		RegisterListeners(player);
-		MainLoop(player);
+		RegisterListeners();
+
+		Respond(Response::OHAI, MSG_OHAI);
+		MainLoop();
+		Respond(Response::TTFN, MSG_TTFN);
 	}
 	catch (Error &error)
 	{
