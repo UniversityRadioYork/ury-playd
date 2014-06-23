@@ -2,29 +2,29 @@
 #include "../cmd.hpp"
 
 #include "player.hpp"
+#include <cassert>
 
 CommandHandler::SingleRequiredWordAction Player::LoadAction()
 {
 	return [this](const std::string &path) { return this->Load(path); };
 }
 
-bool Player::Load(const std::string &filename)
+bool Player::Load(const std::string &path)
 {
-	if (filename.length() == 0) return false;
-
-	try
-	{
-		this->audio = std::unique_ptr<AudioOutput>(
-		                this->audio_system.Load(filename));
-		ResetPosition();
-		Debug("Loaded ", filename);
-		SetState(State::STOPPED);
+	bool valid = !path.empty();
+	if (valid) {
+		try
+		{
+			this->audio = decltype(this->audio)(this->audio_system.Load(path));
+			ResetPosition();
+			Debug("Loaded ", path);
+			SetState(State::STOPPED);
+		}
+		catch (Error &error)
+		{
+			error.ToResponse();
+			Eject();
+		}
 	}
-	catch (Error &error)
-	{
-		error.ToResponse();
-		Eject();
-	}
-
-	return true; // Always a valid command.
+	return valid;
 }
