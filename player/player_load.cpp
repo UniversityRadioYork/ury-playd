@@ -15,7 +15,7 @@ bool Player::Load(const std::string &path)
 	if (valid) {
 		try
 		{
-			this->audio = decltype(this->audio)(this->audio_system.Load(path));
+			OpenFile(path);
 			ResetPosition();
 			Debug("Loaded ", path);
 			SetState(State::STOPPED);
@@ -27,4 +27,9 @@ bool Player::Load(const std::string &path)
 		}
 	}
 	return valid;
+}
+
+void Player::OpenFile(const std::string &path)
+{
+	this->audio = decltype(this->audio)(this->audio_system.Load(path));
 }

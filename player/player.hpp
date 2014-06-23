@@ -135,7 +135,6 @@ public:
 
 	/**
 	 * Loads a track.
-	 *
 	 * @param path  The absolute path to a track to load.
 	 * @return      Whether the load succeeded.
 	 */
@@ -260,6 +259,13 @@ private:
 	 * @see UpdatePosition
 	 */
 	void ResetPosition();
+
+	/**
+	 * Opens a file, setting this->audio to the resulting file.
+	 * Generally, you should use Load instead.
+	 * @param path  The absolute path to a track to load.
+	 */
+	void OpenFile(const std::string &path);
 };
 
 #endif // PS_PLAYER_HPP
