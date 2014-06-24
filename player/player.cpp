@@ -11,6 +11,9 @@
 #include "../audio/audio_system.hpp"
 #include "../time_parser.hpp"
 
+const Player::StateList Player::AUDIO_LOADED_STATES = {State::PLAYING,
+                                                       State::STOPPED};
+
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
     : audio_system(audio_system), time_parser(time_parser)
 {
@@ -27,9 +30,9 @@ void Player::Update()
 			UpdatePosition();
 		}
 	}
-	if (CurrentStateIn({State::PLAYING, State::STOPPED})) {
+	if (CurrentStateIn(AUDIO_LOADED_STATES)) {
 		this->audio->Update();
-        }
+	}
 }
 
 void Player::OpenFile(const std::string &path)
@@ -43,7 +46,7 @@ void Player::OpenFile(const std::string &path)
 
 bool Player::Eject()
 {
-	return IfCurrentStateIn({State::STOPPED, State::PLAYING}, [this] {
+	return IfCurrentStateIn(AUDIO_LOADED_STATES, [this] {
 		this->audio = nullptr;
 		SetState(State::EJECTED);
 		return true;
@@ -90,8 +93,7 @@ bool Player::Quit()
 
 bool Player::Seek(const std::string &time_str)
 {
-	return IfCurrentStateIn({State::PLAYING, State::STOPPED},
-	                        [this, &time_str] {
+	return IfCurrentStateIn(AUDIO_LOADED_STATES, [this, &time_str] {
 		bool success = true;
 		std::chrono::microseconds position(0);
 

@@ -177,10 +177,11 @@ public:
 	static const std::string &StateString(State state);
 
 private:
-	/**
-	 * A mapping between states and their human-readable names.
-	 */
+	/// A mapping between states and their human-readable names.
 	const static std::map<State, std::string> STATE_STRINGS;
+
+	/// Shorthand for {State::PLAYING, State::STOPPED}.
+	const static StateList AUDIO_LOADED_STATES;
 
 	/**
 	 * Executes a closure iff the current state is one of the given states.
