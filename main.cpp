@@ -90,27 +90,27 @@ void Playslave::MainLoop()
 	}
 }
 
-Playslave::Playslave(int argc, char *argv[])
+Playslave::Playslave(int argc, char *argv[]) : audio{}
 {
 	for (int i = 0; i < argc; i++) {
 		this->arguments.push_back(std::string(argv[i]));
 	}
 
 	this->player = decltype(this->player) {new Player{this->audio}};
-	this->handler = decltype(this->handler) {
-		new CommandHandler {
-	                {{"play",
-	                  CommandHandler::NullCommand(this->player->PlayAction())},
-	                 {"stop",
-	                  CommandHandler::NullCommand(this->player->StopAction())},
-	                 {"ejct",
-	                  CommandHandler::NullCommand(this->player->EjectAction())},
-	                 {"quit",
-	                  CommandHandler::NullCommand(this->player->QuitAction())},
-	                 {"load", CommandHandler::SingleRequiredWordCommand(
-	                                          this->player->LoadAction())},
-	                 {"seek", CommandHandler::SingleRequiredWordCommand(
-	                                          this->player->SeekAction())}}}};
+
+	CommandHandler *h = new CommandHandler;
+
+	using std::string;
+
+	h->Add("play", [&]() { return this->player->Play(); });
+	h->Add("stop", [&]() { return this->player->Stop(); });
+	h->Add("ejct", [&]() { return this->player->Eject(); });
+	h->Add("quit", [&]() { return this->player->Quit(); });
+
+	h->Add("load", [&](const string &s) { return this->player->Load(s); });
+	h->Add("seek", [&](const string &s) { return this->player->Seek(s); });
+
+	this->handler = decltype(this->handler) {h};
 }
 
 int Playslave::Run()

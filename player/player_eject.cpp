@@ -1,10 +1,4 @@
 #include "player.hpp"
-#include "../cmd.hpp"
-
-CommandHandler::NullAction Player::EjectAction()
-{
-	return [this] { return this->Eject(); };
-}
 
 bool Player::Eject()
 {

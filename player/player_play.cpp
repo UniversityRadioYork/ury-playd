@@ -1,12 +1,6 @@
 #include "player.hpp"
-#include "../cmd.hpp"
 
 #include <cassert>
-
-CommandHandler::NullAction Player::PlayAction()
-{
-	return [this] { return this->Play(); };
-}
 
 bool Player::Play()
 {

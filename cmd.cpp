@@ -26,22 +26,24 @@ CommandHandler::CommandHandler(const CommandHandler::CommandSet &commands)
 	this->commands = std::unique_ptr<CommandSet>(new CommandSet(commands));
 }
 
-CommandHandler::Payload CommandHandler::NullCommand(
-                CommandHandler::NullAction f)
+CommandHandler *CommandHandler::Add(const std::string &word,
+                                    std::function<bool()> f)
 {
-	return [f](WordList) { return f(); };
+	this->commands->emplace(word, [f](const WordList &) { return f(); });
+	return this;
 }
 
-CommandHandler::Payload CommandHandler::SingleRequiredWordCommand(
-                CommandHandler::SingleRequiredWordAction f)
+CommandHandler *CommandHandler::Add(const std::string &word,
+                                    std::function<bool(const std::string &)> f)
 {
-	return [f](const WordList &words) {
-		bool success = false;
+	this->commands->emplace(word, [f](const WordList &words) {
+		bool valid = false;
 		if (words.size() == 2 && !words[1].empty()) {
-			success = f(words[1]);
+			valid = f(words[1]);
 		}
-		return success;
-	};
+		return valid;
+	});
+	return this;
 }
 
 /**

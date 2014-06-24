@@ -1,13 +1,7 @@
 #include "../audio/audio_output.hpp"
-#include "../cmd.hpp"
 
 #include "player.hpp"
 #include <cassert>
-
-CommandHandler::SingleRequiredWordAction Player::LoadAction()
-{
-	return [this](const std::string &path) { return this->Load(path); };
-}
 
 bool Player::Load(const std::string &path)
 {

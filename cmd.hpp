@@ -33,11 +33,13 @@ public:
 	using SingleRequiredWordAction =
 	                std::function<bool(const std::string &)>;
 
+	CommandHandler() : CommandHandler(CommandSet{}) {};
 	CommandHandler(const CommandSet &commands);
 	void Check();
 
-	static Payload NullCommand(NullAction f);
-	static Payload SingleRequiredWordCommand(SingleRequiredWordAction f);
+	CommandHandler *Add(const std::string &word, std::function<bool()> f);
+	CommandHandler *Add(const std::string &word,
+	                    std::function<bool(const std::string &)> f);
 
 private:
 	std::unique_ptr<CommandSet> commands;

@@ -1,10 +1,4 @@
 #include "player.hpp"
-#include "../cmd.hpp"
-
-CommandHandler::NullAction Player::StopAction()
-{
-	return [this] { return this->Stop(); };
-}
 
 bool Player::Stop()
 {

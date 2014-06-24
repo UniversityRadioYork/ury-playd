@@ -17,7 +17,6 @@
 
 #include "../audio/audio_output.hpp"
 #include "../audio/audio_system.hpp"
-#include "../cmd.hpp"
 
 #include "player_position.hpp"
 
@@ -77,22 +76,10 @@ public:
 	bool IsRunning() const;
 
 	/**
-	 * Creates a function object that ejects this player.
-	 * @return A function binding Eject.
-	 */
-	CommandHandler::NullAction EjectAction();
-
-	/**
 	 * Ejects the current loaded song, if any.
 	 * @return  Whether the ejection succeeded.
 	 */
 	bool Eject();
-
-	/**
-	 * Creates a function object that starts this player.
-	 * @return A function binding Play.
-	 */
-	CommandHandler::NullAction PlayAction();
 
 	/**
 	 * Plays the current loaded song, if any.
@@ -101,22 +88,10 @@ public:
 	bool Play();
 
 	/**
-	 * Creates a function object that closes this player.
-	 * @return A function binding Quit.
-	 */
-	CommandHandler::NullAction QuitAction();
-
-	/**
 	 * Quits Playslave++.
 	 * @return  Whether the quit succeeded.
 	 */
 	bool Quit();
-
-	/**
-	 * Creates a function object that stops this player.
-	 * @return A function binding Stop.
-	 */
-	CommandHandler::NullAction StopAction();
 
 	/**
 	 * Stops the currently playing track, if any.
@@ -128,23 +103,11 @@ public:
 	bool Stop();
 
 	/**
-	 * Creates a function object that loads into this player.
-	 * @return A function binding Load.
-	 */
-	CommandHandler::SingleRequiredWordAction LoadAction();
-
-	/**
 	 * Loads a track.
 	 * @param path  The absolute path to a track to load.
 	 * @return      Whether the load succeeded.
 	 */
 	bool Load(const std::string &path);
-
-	/**
-	 * Creates a function object that seeks this player.
-	 * @return A function binding Seek.
-	 */
-	CommandHandler::SingleRequiredWordAction SeekAction();
 
 	/**
 	 * Seeks to a given position in the current track.
