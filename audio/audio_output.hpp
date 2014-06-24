@@ -56,8 +56,15 @@ public:
 	void Stop();
 	bool Update();
 
-	ErrorCode LastError();
 	bool IsHalted();
+
+	/**
+	 * Returns whether the audio file has ended.
+	 * This does NOT mean that playback has ended; the ring buffer may still
+	 * have samples waiting to send to the audio library.
+	 * @return  True if there is no audio left to decode; false otherwise.
+	 */
+	bool FileEnded();
 
 	/**
 	 * Return the current position, as a std::chrono::duration.
@@ -86,7 +93,8 @@ public:
 	void PreFillRingBuffer();
 
 private:
-	ErrorCode last_error;
+	bool file_ended; ///< Whether the current file has stopped decoding.
+
 	std::unique_ptr<AudioDecoder> av;
 
 	std::vector<char> frame;
@@ -96,6 +104,8 @@ private:
 	std::unique_ptr<portaudio::Stream> out_strm;
 
 	uint64_t position_sample_count;
+
+	void ClearFrame();
 
 	void InitialisePortAudio(const StreamConfigurator &c);
 	void InitialiseRingBuffer(std::uint64_t bytes_per_sample);

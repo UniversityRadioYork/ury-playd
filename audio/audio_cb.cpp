@@ -58,28 +58,12 @@ PlayCallbackStepResult AudioOutput::PlayCallbackFailure(
 {
 	decltype(in) result;
 
-	switch (LastError()) {
-		case ErrorCode::END_OF_FILE:
-			// We've just hit the end of the file.  This is ok.
-			result = std::make_pair(paComplete, in.second);
-			break;
-		case ErrorCode::OK: // Fallthrough intentional
-		case ErrorCode::INCOMPLETE:
-			/*
-			 * Looks like we're just waiting for the
-			 * decoding to go through. In other
-			 * words,
-			 * this is a buffer underflow.
-			 */
-			Debug("buffer underflow");
-			// Break out of the loop inelegantly
-			memset(out, 0, ByteCountForSampleCount(frames_per_buf));
-			result.second = frames_per_buf;
-			break;
-		default:
-			// Something genuinely went tits-up.  Abort!
-			result = std::make_pair(paAbort, in.second);
-			break;
+        if (FileEnded()) {
+		result = std::make_pair(paComplete, in.second);
+        } else {
+                // Make up some silence to plug the gap.
+                memset(out, 0, ByteCountForSampleCount(frames_per_buf));
+		result = std::make_pair(paContinue, frames_per_buf);
 	}
 
 	return result;

@@ -28,10 +28,8 @@ void Player::Update()
 		}
 	}
 	if (CurrentStateIn({State::PLAYING, State::STOPPED})) {
-		if (!this->audio->Update()) {
-			Eject();
-		}
-	}
+		this->audio->Update();
+        }
 }
 
 void Player::OpenFile(const std::string &path)
