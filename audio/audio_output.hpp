@@ -54,6 +54,14 @@ public:
 
 	void Start();
 	void Stop();
+
+	/**
+	 * Performs an update cycle on this AudioOutput.
+	 * This ensures the ring buffer has output to offer to the sound driver.
+	 * It does this by by asking the AudioDecoder to decode if necessary.
+	 * @return True if there is more output to send to the sound card; false
+	 *   otherwise.
+	 */
 	bool Update();
 
 	/* Checks to see if audio playback has halted of its own accord.
@@ -145,6 +153,11 @@ private:
 	std::uint64_t SampleCountForByteCount(std::uint64_t sample_count) const
 	                override;
 
+	/**
+	 * The callback proper.
+	 * This is executed in a separate thread by PortAudio once a stream is
+	 * playing with the callback registered to it.
+	 */
 	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
 	                  unsigned long numFrames,
 	                  const PaStreamCallbackTimeInfo *timeInfo,
@@ -156,14 +169,23 @@ private:
 	                                           unsigned long frames_per_buf,
 	                                           PlayCallbackStepResult in);
 
+	/**
+	 * Reads from the ringbuffer to output, updating the used samples count.
+	 * @param output A reference to the output buffer's current pointer.
+	 * @param output_capacity The capacity of the output buffer, in samples.
+	 * @param buffered_count The number of samples available in the ring
+	 *   buffer.
+	 * @return The number of samples successfully written to the output
+	 *   buffer.
+	 */
 	unsigned long ReadSamplesToOutput(char *&output,
 	                                  unsigned long output_capacity,
 	                                  unsigned long buffered_count);
 
 	/**
 	 * Decode the next frame if the current frame has been fully used.
-	 * @return  True if there were some samples left to decode; false
-	 *          otherwise.
+	 * @return True if there were some samples left to decode; false
+	 *   otherwise.
 	 */
 	bool DecodeIfFrameEmpty();
 
@@ -196,12 +218,16 @@ private:
 	void WriteToRingBuffer(std::uint64_t sample_count);
 
 	/**
-	 * Gets the current write capacity of the ring buffer.
+	 * The current write capacity of the ring buffer.
 	 * @return The write capacity, in samples.
 	 */
 	std::uint64_t RingBufferWriteCapacity();
 
-
+	/**
+	 * The number of samples that may currently be placed in the ringbuffer.
+	 * the ring buffer.
+	 * @return The transfer count, in samples.
+	 */
 	std::uint64_t RingBufferTransferCount();
 
 	/**
