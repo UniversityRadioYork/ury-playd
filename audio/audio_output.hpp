@@ -56,7 +56,23 @@ public:
 	void Stop();
 	bool Update();
 
+	/* Checks to see if audio playback has halted of its own accord.
+	 *
+	 * If audio is still playing, E_OK will be returned; otherwise the
+	 *decoding
+	 * error that caused playback to halt will be returned.  E_UNKNOWN is
+	 *returned
+	 * if playback has halted but the last error report was E_OK.
+	 */
 	bool IsHalted();
+
+	/**
+	 * Returns whether the current frame has been finished.
+	 * If this is true, then either the frame is empty, or all of the
+	 * samples in the frame have been fed to the ringbuffer.
+	 * @return  True if the frame is finished; false otherwise.
+	 */
+	bool FrameFinished();
 
 	/**
 	 * Returns whether the audio file has ended.
@@ -76,6 +92,12 @@ public:
 		return std::chrono::duration_cast<R>(
 		                CurrentPositionMicroseconds());
 	}
+
+	/* Gets the current played position in the song, in microseconds.
+	 *
+	 * As this may be executing whilst the playing callback is running,
+	 * do not expect it to be highly accurate.
+	 */
 	std::chrono::microseconds CurrentPositionMicroseconds();
 
 	/**
@@ -88,8 +110,17 @@ public:
 		SeekToPositionMicroseconds(std::chrono::duration_cast<
 		                std::chrono::microseconds>(position));
 	}
+
+	/* Attempts to seek to the given position in microseconds. */
 	void SeekToPositionMicroseconds(std::chrono::microseconds microseconds);
 
+	/* Tries to place enough audio into the audio buffer to prevent a
+	 * buffer underrun during a player start.
+	 *
+	 * If end of file is reached, it is ignored and converted to E_OK so
+	 *that it
+	 * can later be caught by the player callback once it runs out of sound.
+	 */
 	void PreFillRingBuffer();
 
 private:
@@ -108,10 +139,11 @@ private:
 	void ClearFrame();
 
 	void InitialisePortAudio(const StreamConfigurator &c);
-	void InitialiseRingBuffer(std::uint64_t bytes_per_sample);
 
-	std::uint64_t ByteCountForSampleCount(std::uint64_t sample_count) const override;
-	std::uint64_t SampleCountForByteCount(std::uint64_t sample_count) const override;
+	std::uint64_t ByteCountForSampleCount(std::uint64_t sample_count) const
+	                override;
+	std::uint64_t SampleCountForByteCount(std::uint64_t sample_count) const
+	                override;
 
 	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
 	                  unsigned long numFrames,
@@ -128,13 +160,59 @@ private:
 	                                  unsigned long output_capacity,
 	                                  unsigned long buffered_count);
 
+	/**
+	 * Decode the next frame if the current frame has been fully used.
+	 * @return  True if there were some samples left to decode; false
+	 *          otherwise.
+	 */
 	bool DecodeIfFrameEmpty();
 
-	void WriteAllAvailableToRingBuffer();
-	void WriteToRingBuffer(std::uint64_t count);
+	//
+	// Ring buffer
+	//
 
+	/* Initialises an audio structure's ring buffer so that decoded
+	 * samples can be placed into it.
+	 *
+	 * Any existing ring buffer will be freed.
+	 *
+	 * The number of bytes for each sample must be provided; see
+	 * audio_av_samples2bytes for one way of getting this.
+	 */
+	void InitialiseRingBuffer(std::uint64_t bytes_per_sample);
+
+	/**
+	 * Writes all samples currently waiting to be transferred to the ring
+	 * buffer.
+	 */
+	void WriteAllAvailableToRingBuffer();
+
+	/**
+	 * Write a given number of samples from the current frame to the ring
+	 * buffer.
+	 * @param sample_count  The number of samples to write to the ring
+	 *                      buffer.
+	 */
+	void WriteToRingBuffer(std::uint64_t sample_count);
+
+	/**
+	 * Gets the current write capacity of the ring buffer.
+	 * @return The write capacity, in samples.
+	 */
 	std::uint64_t RingBufferWriteCapacity();
+
+
 	std::uint64_t RingBufferTransferCount();
+
+	/**
+	 * Moves the decoded data iterator forwards by a number of samples.
+	 *
+	 * If the iterator runs off the end of the decoded data vector, the data
+	 * vector is freed and set to nullptr, so that a new decoding run can
+	 * occur.
+	 *
+	 * @param sample_count The number of samples to move the markers.
+	 */
 	void AdvanceFrameIterator(std::uint64_t sample_count);
 };
 
