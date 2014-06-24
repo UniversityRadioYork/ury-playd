@@ -13,7 +13,13 @@
 template <typename OutUnit, typename IntType = std::uint64_t>
 class TimeParser {
 public:
+	/**
+	 * The type of the map from unit suffixes to functions that convert
+	 * from an amount of that time unit to a chrono duration of type OutUnit
+	 * capturing the same duration.
+	 */
 	using UnitMap = std::map<std::string, std::function<OutUnit(IntType)>>;
+
 	/**
 	 * Constructs a TimeParser.
 	 * @param unit_map  The map from units to their parsers.
@@ -31,6 +37,11 @@ public:
 	 * seconds and returns a std::chrono::microseconds: applying this to
 	 * the integer 1 will result in a microseconds variable representing
 	 * 1,000,000 microseconds.
+	 *
+	 * @param raw_time The raw time, as an integer whose units are those
+	 *   used by InUnit.
+	 * @return An OutUnit capturing the input duration, but in terms of the
+	 *   units used by OutUnit.
 	 */
 	template <typename InUnit>
 	static OutUnit MkTime(IntType raw_time)
