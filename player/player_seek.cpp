@@ -1,5 +1,4 @@
 #include "player.hpp"
-#include "../cmd.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -49,13 +48,6 @@ std::pair<std::string, uint64_t> Player::ParseSeekTime(
 
 	is >> raw_time >> rest;
 	return std::make_pair(rest, raw_time);
-}
-
-CommandHandler::SingleRequiredWordAction Player::SeekAction()
-{
-	return [this](const std::string &time_str) {
-		return this->Seek(time_str);
-	};
 }
 
 bool Player::Seek(const std::string &time_str)
