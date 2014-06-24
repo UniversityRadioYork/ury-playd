@@ -17,6 +17,7 @@
 
 #include "../audio/audio_output.hpp"
 #include "../audio/audio_system.hpp"
+#include "../time_parser.hpp"
 
 #include "player_position.hpp"
 
@@ -51,8 +52,11 @@ public:
 	 */
 	using StateList = std::initializer_list<State>;
 
+	/// The type of TimeParser the Player expects.
+	using TP = TimeParser<std::chrono::microseconds>;
 private:
 	const AudioSystem &audio_system;
+	const TP &time_parser;
 
 	std::unique_ptr<AudioOutput> audio;
 
@@ -65,8 +69,9 @@ public:
 	/**
 	 * Constructs a Player.
 	 * @param audio_system  The audio system object.
+	 * @param time_parser   The parser used to interpret Seek commands.
 	 */
-	Player(const AudioSystem &audio_system);
+	Player(const AudioSystem &audio_system, const TP &time_parser);
 
 	/**
 	 * Returns whether this Player is still running.

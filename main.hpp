@@ -4,6 +4,7 @@
 #include "audio/audio_system.hpp" // AudioSystem
 #include "cmd.hpp"                // CommandHandler
 #include "player/player.hpp"      // Player
+#include "time_parser.hpp"        // TimeParser
 
 /**
  * The Playslave++ application.
@@ -30,10 +31,12 @@ public:
 	int Run();
 
 private:
-	std::vector<std::string> arguments;      ///< The argument vector.
-	AudioSystem audio;                       ///< The audio subsystem.
+	std::vector<std::string> arguments; ///< The argument vector.
+	AudioSystem audio;                  ///< The audio subsystem.
+
 	std::unique_ptr<Player> player;          ///< The player subsystem.
 	std::unique_ptr<CommandHandler> handler; ///< The command handler.
+	std::unique_ptr<Player::TP> time_parser; ///< The seek time parser.
 
 	/**
 	 * Tries to get the output device ID from stdin.

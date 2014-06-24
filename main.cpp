@@ -96,7 +96,22 @@ Playslave::Playslave(int argc, char *argv[]) : audio{}
 		this->arguments.push_back(std::string(argv[i]));
 	}
 
-	this->player = decltype(this->player) {new Player{this->audio}};
+	this->time_parser = decltype(
+	                this->time_parser) {new Player::TP{Player::TP::UnitMap{
+	                {"s", Player::TP::MkTime<std::chrono::seconds>},
+	                {"sec", Player::TP::MkTime<std::chrono::seconds>},
+	                {"secs", Player::TP::MkTime<std::chrono::seconds>},
+	                {"m", Player::TP::MkTime<std::chrono::minutes>},
+	                {"min", Player::TP::MkTime<std::chrono::minutes>},
+	                {"mins", Player::TP::MkTime<std::chrono::minutes>},
+	                {"h", Player::TP::MkTime<std::chrono::hours>},
+	                {"hour", Player::TP::MkTime<std::chrono::hours>},
+	                {"hours", Player::TP::MkTime<std::chrono::hours>},
+	                // Default when there is no unit
+	                {"", Player::TP::MkTime<std::chrono::microseconds>}}}};
+
+	this->player = decltype(this->player) {
+	                new Player{this->audio, *this->time_parser}};
 
 	CommandHandler *h = new CommandHandler;
 
