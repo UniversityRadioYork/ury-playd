@@ -2,7 +2,8 @@
 
 /*
  * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more details.
+ * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
+ * details.
  */
 
 #include <string>
