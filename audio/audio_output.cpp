@@ -1,7 +1,10 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Implementation of the AudioOutput class.
+ * @see audio/audio_output.hpp
  */
 
 extern "C" {
@@ -36,11 +39,15 @@ extern "C" {
 #ifdef USE_BOOST_RINGBUF
 
 #include "../ringbuffer/ringbuffer_boost.hpp"
+/// Type of the concrete ring buffer used by the AudioOutput.
+/// In this instance, it is a BoostRingBuffer.
 using ConcreteRingBuffer = BoostRingBuffer<char, std::uint64_t, RINGBUF_POWER>;
 
 #else
 
 #include "../ringbuffer/ringbuffer_pa.hpp"
+/// Type of the concrete ring buffer used by the AudioOutput.
+/// In this instance, it is a PaRingBuffer.
 using ConcreteRingBuffer = PaRingBuffer<char, std::uint64_t, RINGBUF_POWER>;
 
 #endif

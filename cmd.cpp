@@ -1,9 +1,10 @@
-/* cmd.cpp - command parser */
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+/**
+ * @file
+ * Implementation of the CommandHandler class.
+ * @see cmd.hpp
  */
 
 #include <iostream>

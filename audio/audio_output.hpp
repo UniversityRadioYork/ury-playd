@@ -1,7 +1,10 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Declaration of the AudioOutput class.
+ * @see audio/audio_output.cpp
  */
 
 #ifndef PS_AUDIO_OUTPUT_HPP
@@ -26,6 +29,7 @@ class RingBuffer;
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
 
+/// Type of results emitted during the play callback step.
 using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
 
 /**
@@ -66,7 +70,18 @@ public:
 	AudioOutput(const std::string &path, const StreamConfigurator &c);
 	~AudioOutput();
 
+	/**
+	 * Starts the audio stream.
+	 * @see Stop
+	 * @see IsHalted
+	 */
 	void Start();
+
+	/**
+	 * Stops the audio stream.
+	 * @see Start
+	 * @see IsHalted
+	 */
 	void Stop();
 
 	/**
@@ -78,13 +93,11 @@ public:
 	 */
 	bool Update();
 
-	/* Checks to see if audio playback has halted of its own accord.
-	 *
-	 * If audio is still playing, E_OK will be returned; otherwise the
-	 *decoding
-	 * error that caused playback to halt will be returned.  E_UNKNOWN is
-	 *returned
-	 * if playback has halted but the last error report was E_OK.
+	/**
+	 * Checks to see if audio playback has stopped.
+	 * @return True if the audio stream is inactive; false otherwise.
+	 * @see Start
+	 * @see Stop
 	 */
 	bool IsStopped();
 
@@ -115,10 +128,11 @@ public:
 		                CurrentPositionMicroseconds());
 	}
 
-	/* Gets the current played position in the song, in microseconds.
-	 *
+	/**
+	 * Gets the current played position in the song, in microseconds.
 	 * As this may be executing whilst the playing callback is running,
 	 * do not expect it to be highly accurate.
+	 * @return The current position, in microseconds.
 	 */
 	std::chrono::microseconds CurrentPositionMicroseconds();
 
@@ -133,31 +147,42 @@ public:
 		                std::chrono::microseconds>(position));
 	}
 
-	/* Attempts to seek to the given position in microseconds. */
+	/**
+	 * Attempts to seek to the given position in microseconds.
+	 * @param microseconds The position to seek to, in microseconds.
+	 */
 	void SeekToPositionMicroseconds(std::chrono::microseconds microseconds);
 
-	/* Tries to place enough audio into the audio buffer to prevent a
+	/**
+	 * Tries to place enough audio into the audio buffer to prevent a
 	 * buffer underrun during a player start.
-	 *
-	 * If end of file is reached, it is ignored and converted to E_OK so
-	 *that it
-	 * can later be caught by the player callback once it runs out of sound.
 	 */
 	void PreFillRingBuffer();
 
 private:
 	bool file_ended; ///< Whether the current file has stopped decoding.
 
+	/// The audio decoder providing the actual audio data.
 	std::unique_ptr<AudioDecoder> av;
 
+	/// The current decoded frame.
 	std::vector<char> frame;
+
+	/// The current position in the current decoded frame.
 	std::vector<char>::iterator frame_iterator;
+
+	/// The ring buffer used to transfer samples to the playing callback.
 	std::unique_ptr<RingBuffer<char, std::uint64_t>> ring_buf;
 
+	/// The PortAudio stream to which this AudioOutput outputs.
 	std::unique_ptr<portaudio::Stream> out_strm;
 
+	/// The current position, in samples.
 	uint64_t position_sample_count;
 
+	/**
+	 * Clears the current frame and its iterator.
+	 */
 	void ClearFrame();
 
 	std::uint64_t ByteCountForSampleCount(std::uint64_t sample_count) const

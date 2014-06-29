@@ -1,7 +1,10 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Implementation of the AudioSystem class.
+ * @see audio/audio_system.hpp
  */
 
 #include <algorithm>

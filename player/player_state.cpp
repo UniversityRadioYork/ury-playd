@@ -1,3 +1,16 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Implementation of aspects of the Player class pertaining to its state.
+ * @see player/player.hpp
+ * @see player/player.cpp
+ * @see player/player_position.hpp
+ * @see player/player_position.cpp
+ */
+
+
 #include "player.hpp"
 
 // Basic state queries

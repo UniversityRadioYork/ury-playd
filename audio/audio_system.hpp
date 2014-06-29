@@ -1,7 +1,10 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Declaration of the AudioSystem class.
+ * @see audio/audio_system.cpp
  */
 
 #ifndef PS_AUDIO_SYSTEM_HPP
@@ -56,7 +59,7 @@ public:
 	 * @param path  The path to a file.
 	 * @return      The AudioOutput for that file.
 	 */
-	AudioOutput *Load(const std::string &file) const;
+	AudioOutput *Load(const std::string &path) const;
 
 	/**
 	 * Sets the current device ID.

@@ -1,3 +1,11 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * The SampleFormat enumeration.
+ */
+
 #include <cstdint>
 
 #ifndef PS_SAMPLE_FORMATS_HPP

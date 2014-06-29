@@ -1,3 +1,13 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * The BoostRingBuffer class template.
+ * @see ringbuffer/ringbuffer.hpp
+ * @see ringbuffer/ringbuffer_pa.hpp
+ */
+
 #ifndef PS_RINGBUFFER_BOOST_HPP
 #define PS_RINGBUFFER_BOOST_HPP
 
@@ -13,12 +23,19 @@
 template <typename T1, typename T2, int P>
 class BoostRingBuffer : public RingBuffer<T1, T2> {
 public:
-	BoostRingBuffer(int size = sizeof(T1))
+	/**
+	 * Constructs a BoostRingBuffer.
+	 * @param size  The size of one element in the ring buffer.
+	 */
+	BoostRingBuffer(int size)
 	{
 		this->rb = new boost::circular_buffer<char>((1 << P) * size);
 		this->size = size;
 	}
 
+	/**
+	 * Destructs a BoostRingBuffer.
+	 */
 	~BoostRingBuffer()
 	{
 		assert(this->rb != nullptr);

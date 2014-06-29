@@ -1,3 +1,13 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * The RingBuffer abstract class template.
+ * @see ringbuffer/ringbuffer_boost.hpp
+ * @see ringbuffer/ringbuffer_pa.hpp
+ */
+
 #ifndef PS_RINGBUFFER_HPP
 #define PS_RINGBUFFER_HPP
 

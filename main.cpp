@@ -1,7 +1,10 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Implementation of the main() function and Playslave class.
+ * @see main.hpp
  */
 
 #include <thread>
@@ -20,6 +23,7 @@
  * The main entry point.
  * @param argc Program argument count.
  * @param argv Program argument vector.
+ * @return The exit code of the application.
  */
 int main(int argc, char *argv[])
 {

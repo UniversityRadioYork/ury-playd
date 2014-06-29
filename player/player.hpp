@@ -1,12 +1,13 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
- */
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
- * Definition of Player and associated types.
+ * Declaration of the Player class, and associated types.
+ * @see player/player.cpp
+ * @see player/player_position.hpp
+ * @see player/player_position.cpp
+ * @see player/player_state.cpp
  */
 
 #ifndef PS_PLAYER_HPP

@@ -1,12 +1,10 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
- */
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
- * Definition of PlayerPosition.
+ * Declaration of the PlayerPosition class.
+ * @see player/player_position.cpp
  */
 
 #ifndef PS_PLAYER_POSITION_HPP

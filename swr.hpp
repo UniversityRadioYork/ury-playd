@@ -1,3 +1,12 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Declaration of the Swr class.
+ * @see swr.hpp
+ */
+
 #ifndef PS_SWR_HPP
 #define PS_SWR_HPP
 

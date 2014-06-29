@@ -1,3 +1,13 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * The PaRingBuffer class template.
+ * @see ringbuffer/ringbuffer.hpp
+ * @see ringbuffer/ringbuffer_boost.hpp
+ */
+
 #ifndef PS_RINGBUFFER_PA_HPP
 #define PS_RINGBUFFER_PA_HPP
 
@@ -28,7 +38,7 @@ public:
 	 * Constructs a PaRingBuffer.
 	 * @param size  The size of one element in the ring buffer.
 	 */
-	PaRingBuffer(int size = sizeof(T1))
+	PaRingBuffer(int size)
 	{
 		this->rb = new PaUtilRingBuffer;
 		this->buffer = new char[(1 << P) * size];
@@ -42,6 +52,9 @@ public:
 		}
 	}
 
+	/**
+	 * Destructs a PaRingBuffer.
+	 */
 	~PaRingBuffer()
 	{
 		assert(this->rb != nullptr);
