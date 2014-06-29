@@ -31,24 +31,32 @@ class StreamConfigurator {
 public:
 	/**
 	 * Configures and returns a PortAudio stream for the given decoder.
-	 * @param decoder  The decoder whose output will be fed into the stream.
-	 * @return         The configured PortAudio stream.
+	 * @param cb The object that PortAudio will call to receive audio.
+	 * @param decoder The decoder whose output will be fed into the stream.
+	 * @return The configured PortAudio stream.
 	 */
 	virtual portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
-	                                     const AudioDecoder &av) const = 0;
+	                                     const AudioDecoder &decoder) const = 0;
 };
 
-/* The audio structure contains all state pertaining to the currently
- * playing audio file.
+/**
+ * An audio file and its associated decoder, ringbuffer and output stream.
  *
- * struct audio is an opaque structure; only audio.c knows its true
- * definition.
+ * AudioOutput contains all state pertaining to the output of one file to one
+ * stream.  It contains an AudioDecoder, a RingBuffer, and implements the
+ * portaudio::CallbackInterface (allowing it to send PortAudio decoded audio)
+ * and SampleByteConverter (allowing it to be queried for conversions from
+ * sample counts to byte counts).
  */
 class AudioOutput : portaudio::CallbackInterface, SampleByteConverter {
 public:
-	/* Loads a file and constructs an audio structure to hold the playback
-	* state.
-	*/
+	/**
+	 * Loads a file and constructs an AudioOutput for it.
+	 * @param path The absolute path to the file to open.
+	 * @param c An object that can configure PortAudio streams.  This will
+	 *   usually be the AudioSystem.
+	 * @see AudioSystem::Load
+	 */
 	AudioOutput(const std::string &path, const StreamConfigurator &c);
 	~AudioOutput();
 

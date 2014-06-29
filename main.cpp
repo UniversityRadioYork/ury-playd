@@ -98,6 +98,12 @@ Playslave::Playslave(int argc, char *argv[]) : audio{}
 
 	this->time_parser = decltype(
 	                this->time_parser) {new Player::TP{Player::TP::UnitMap{
+	                {"us", Player::TP::MkTime<std::chrono::microseconds>},
+	                {"usec", Player::TP::MkTime<std::chrono::microseconds>},
+	                {"usecs", Player::TP::MkTime<std::chrono::microseconds>},
+	                {"ms", Player::TP::MkTime<std::chrono::milliseconds>},
+	                {"msec", Player::TP::MkTime<std::chrono::milliseconds>},
+	                {"msecs", Player::TP::MkTime<std::chrono::milliseconds>},
 	                {"s", Player::TP::MkTime<std::chrono::seconds>},
 	                {"sec", Player::TP::MkTime<std::chrono::seconds>},
 	                {"secs", Player::TP::MkTime<std::chrono::seconds>},
