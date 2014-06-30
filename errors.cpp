@@ -11,15 +11,9 @@
 #include "errors.hpp"
 #include "io.hpp"
 
-Error::Error(ErrorCode error_code, std::string message)
+Error::Error(const std::string &message)
 {
-	this->error_code = error_code;
-	this->message = message;
-}
-
-ErrorCode Error::Code()
-{
-	return this->error_code;
+	this->message = std::string(message);
 }
 
 void Error::ToResponse()

@@ -39,7 +39,7 @@ public:
 
 	std::uint8_t ChannelCount() const;
 	double SampleRate() const;
-	SampleFormat SampleFormat() const;
+	SampleFormat OutputSampleFormat() const;
 	size_t BufferSampleCapacity() const;
 
 	/**

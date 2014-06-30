@@ -12,14 +12,21 @@
 #ifndef PS_PLAYER_HPP
 #define PS_PLAYER_HPP
 
-#include <string>
+#include <chrono>
+#include <cstdint>
+#include <functional>
+#include <initializer_list>
+#include <map>
 #include <memory>
+#include <string>
+#include <utility>
 
 #include "../audio/audio_output.hpp"
-#include "../audio/audio_system.hpp"
 #include "../time_parser.hpp"
 
 #include "player_position.hpp"
+
+class AudioSystem;
 
 /**
  * A player contains a loaded audio file and the state of its playback.
@@ -33,7 +40,7 @@ public:
 	 * at any given time is dictated by the current state, which is
 	 * represented by an instance of State.
 	 */
-	enum class State {
+	enum class State : std::uint8_t {
 		STARTING, ///< The player has just initialised.
 		EJECTED,  ///< The player has no song loaded.
 		STOPPED,  ///< The player has a song loaded and not playing.
@@ -211,7 +218,7 @@ private:
 	 * @param time_str  The time string to parse.
 	 * @return          A pair of unit prefix and timestamp.
 	 */
-	std::pair<std::string, uint64_t> ParseSeekTime(
+	std::pair<std::string, std::uint64_t> ParseSeekTime(
 	                const std::string &time_str) const;
 
 	/**

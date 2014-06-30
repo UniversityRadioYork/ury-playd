@@ -16,14 +16,16 @@ extern "C" {
 }
 
 #include <cassert>
+#include <climits>
 #include <algorithm>
 #include <string>
 
 #include "portaudiocpp/PortAudioCpp.hxx"
 
 #include "../constants.h"
-#include "../sample_formats.hpp"
 #include "../errors.hpp"
+#include "../sample_formats.hpp"
+#include "../messages.h"
 
 #include "audio_output.hpp"
 #include "audio_decoder.hpp"
@@ -33,22 +35,23 @@ extern "C" {
 // instead.
 #ifdef USE_BOOST_RINGBUF
 
-#define RINGBUF_CLASS BoostRingBuffer
 #include "../ringbuffer/ringbuffer_boost.hpp"
+using ConcreteRingBuffer = BoostRingBuffer<char, std::uint64_t, RINGBUF_POWER>;
 
 #else
 
-#define RINGBUF_CLASS PaRingBuffer
 #include "../ringbuffer/ringbuffer_pa.hpp"
+using ConcreteRingBuffer = PaRingBuffer<char, std::uint64_t, RINGBUF_POWER>;
 
 #endif
 
 AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
 {
-	this->av = std::unique_ptr<AudioDecoder>(new AudioDecoder(path));
-
-	InitialisePortAudio(c);
-	InitialiseRingBuffer(ByteCountForSampleCount(1L));
+	this->av = decltype(this->av)(new AudioDecoder(path));
+	this->out_strm = decltype(this->out_strm)(
+	                c.Configure(*this, *(this->av)));
+	this->ring_buf = decltype(this->ring_buf)(
+	                new ConcreteRingBuffer(ByteCountForSampleCount(1L)));
 
 	this->position_sample_count = 0;
 
@@ -77,7 +80,7 @@ void AudioOutput::Stop()
 	// TODO: Possibly recover from dropping frames due to abort.
 }
 
-bool AudioOutput::IsHalted()
+bool AudioOutput::IsStopped()
 {
 	return !this->out_strm->isActive();
 }
@@ -182,7 +185,7 @@ void AudioOutput::WriteToRingBuffer(std::uint64_t sample_count)
 	                &(*this->frame_iterator),
 	                static_cast<ring_buffer_size_t>(sample_count));
 	if (written_count != sample_count) {
-		throw Error(ErrorCode::INTERNAL_ERROR, "ringbuf write error");
+		throw InternalError(MSG_OUTPUT_RINGWRITE);
 	}
 	assert(0 < written_count);
 
@@ -214,19 +217,6 @@ void AudioOutput::AdvanceFrameIterator(std::uint64_t sample_count)
 	assert(this->frame.empty() ||
 	       (this->frame.begin() < this->frame_iterator &&
 	        this->frame_iterator < this->frame.end()));
-}
-
-void AudioOutput::InitialisePortAudio(const StreamConfigurator &c)
-{
-	this->out_strm = std::unique_ptr<portaudio::Stream>(
-	                c.Configure(*this, *(this->av)));
-}
-
-void AudioOutput::InitialiseRingBuffer(std::uint64_t bytes_per_sample)
-{
-	this->ring_buf = decltype(this->ring_buf)(
-	                new RINGBUF_CLASS<char, std::uint64_t, RINGBUF_POWER>(
-	                                bytes_per_sample));
 }
 
 std::uint64_t AudioOutput::RingBufferWriteCapacity()
@@ -266,25 +256,25 @@ PlayCallbackStepResult AudioOutput::PlayCallbackStep(
                 char *out, unsigned long frames_per_buf,
                 PlayCallbackStepResult in)
 {
-	decltype(in) result;
-
 	unsigned long avail = this->ring_buf->ReadCapacity();
-	if (avail == 0) {
-		result = PlayCallbackFailure(out, frames_per_buf, in);
-	} else {
-		result = std::make_pair(
-		                paContinue,
-		                in.second + ReadSamplesToOutput(
-		                                            out, avail,
-		                                            frames_per_buf -
-		                                                            in.second));
-	}
 
-	return result;
+	auto fn = (avail == 0) ? &AudioOutput::PlayCallbackFailure
+	                       : &AudioOutput::PlayCallbackSuccess;
+	return (this->*fn)(out, avail, frames_per_buf, in);
+}
+
+PlayCallbackStepResult AudioOutput::PlayCallbackSuccess(
+                char *out, unsigned long avail, unsigned long frames_per_buf,
+                PlayCallbackStepResult in)
+{
+	auto samples_pa_wants = frames_per_buf - in.second;
+	auto samples_read = ReadSamplesToOutput(out, avail, samples_pa_wants);
+
+	return std::make_pair(paContinue, in.second + samples_read);
 }
 
 PlayCallbackStepResult AudioOutput::PlayCallbackFailure(
-                char *out, unsigned long frames_per_buf,
+                char *out, unsigned long, unsigned long frames_per_buf,
                 PlayCallbackStepResult in)
 {
 	decltype(in) result;
@@ -304,12 +294,11 @@ unsigned long AudioOutput::ReadSamplesToOutput(char *&output,
                                                unsigned long output_capacity,
                                                unsigned long buffered_count)
 {
-	unsigned long transfer_sample_count =
-	                std::min(output_capacity, buffered_count);
+	long transfer_sample_count = static_cast<long>(
+	                std::min({output_capacity, buffered_count,
+	                          static_cast<unsigned long>(LONG_MAX)}));
 
-	// TODO: handle the ulong->long cast more gracefully, perhaps.
-	output += this->ring_buf->Read(
-	                output, static_cast<long>(transfer_sample_count));
+	output += this->ring_buf->Read(output, transfer_sample_count);
 
 	this->position_sample_count += transfer_sample_count;
 	return transfer_sample_count;

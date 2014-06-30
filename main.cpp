@@ -45,7 +45,7 @@ std::string Playslave::DeviceID()
 	// TODO: Perhaps make this section more robust.
 	if (this->arguments.size() < 2) {
 		ListOutputDevices();
-		throw Error(ErrorCode::BAD_CONFIG, MSG_DEV_NOID);
+		throw ConfigError(MSG_DEV_NOID);
 	} else {
 		device = std::string(this->arguments[1]);
 	}

@@ -104,14 +104,14 @@ void CommandHandler::Handle()
 	/* Silently fail if the command is actually end of file */
 	if (std::cin.eof()) {
 		Debug("end of file");
-		throw Error(ErrorCode::END_OF_FILE, "TODO: Handle this better");
+		throw Error("TODO: Handle this better");
 	}
 
 	bool valid = RunLine(input);
 	if (valid) {
 		Respond(Response::OKAY, input);
 	} else {
-		Respond(Response::WHAT, "Invalid command.");
+		Respond(Response::WHAT, MSG_CMD_INVALID);
 	}
 }
 

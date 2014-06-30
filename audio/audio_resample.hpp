@@ -39,7 +39,8 @@ public:
 	 * @return       The corresponding sample count.
 	 * @see          ByteCountForSampleCount
 	 */
-	virtual std::uint64_t SampleCountForByteCount(std::uint64_t bytes) const = 0;
+	virtual std::uint64_t SampleCountForByteCount(std::uint64_t bytes)
+	                const = 0;
 
 	/**
 	 * Converts from a sample count to a byte count.
@@ -51,7 +52,8 @@ public:
 	 * @see            SampleCountForByteCount
 	 */
 
-	virtual std::uint64_t ByteCountForSampleCount(std::uint64_t samples) const = 0;
+	virtual std::uint64_t ByteCountForSampleCount(std::uint64_t samples)
+	                const = 0;
 };
 
 /**
@@ -78,6 +80,11 @@ public:
 	 *              samples and bytes for the output format.
 	 */
 	Resampler(const SampleByteConverter &conv);
+
+	/**
+	 * Virtual destructor for Resampler.
+	 */
+	virtual ~Resampler() {};
 
 	/**
 	 * Resamples the contents of an ffmpeg frame.

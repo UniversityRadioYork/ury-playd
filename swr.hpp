@@ -4,6 +4,7 @@
 #include <cstdint>
 
 extern "C" {
+#include <libavutil/samplefmt.h>
 #include <libswresample/swresample.h>
 }
 

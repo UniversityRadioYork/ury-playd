@@ -17,6 +17,11 @@ template <typename RepT, typename SampleCountT>
 class RingBuffer {
 public:
 	/**
+	 * Virtual destructor for RingBuffer.
+	 */
+	virtual ~RingBuffer() {};
+
+	/**
 	 * The current write capacity.
 	 *
 	 * @return The number of samples this ring buffer has space to store.

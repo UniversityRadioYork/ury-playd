@@ -8,6 +8,9 @@ extern "C" {
 }
 
 #include "../errors.hpp"
+#include "../messages.h"
+
+#include "ringbuffer.hpp"
 
 /**
  * Implementation of RingBuffer using the PortAudio C ring buffer.
@@ -30,12 +33,12 @@ public:
 		this->rb = new PaUtilRingBuffer;
 		this->buffer = new char[(1 << P) * size];
 
-		if (PaUtil_InitializeRingBuffer(
-		                    this->rb, size,
-		                    static_cast<ring_buffer_size_t>(1 << P),
-		                    this->buffer) != 0) {
-			throw Error(ErrorCode::INTERNAL_ERROR,
-			            "ringbuf failed to init");
+		int init_result = PaUtil_InitializeRingBuffer(
+		                this->rb, size,
+		                static_cast<ring_buffer_size_t>(1 << P),
+		                this->buffer);
+		if (init_result != 0) {
+			throw InternalError(MSG_OUTPUT_RINGINIT);
 		}
 	}
 

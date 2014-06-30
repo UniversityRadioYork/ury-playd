@@ -7,16 +7,21 @@
 #ifndef PS_AUDIO_OUTPUT_HPP
 #define PS_AUDIO_OUTPUT_HPP
 
-#include <map>
+#include <chrono>
+#include <cstdint>
 #include <memory>
 #include <string>
-#include <cstdint>
+#include <utility>
+#include <vector>
 
-#include "portaudiocpp/PortAudioCpp.hxx"
+#include "portaudio.h"
+#include "portaudiocpp/CallbackInterface.hxx"
+namespace portaudio {
+class Stream;
+}
 
-#include "../constants.h"
-#include "../errors.hpp"
-#include "../ringbuffer/ringbuffer.hpp"
+template <typename RepT, typename SampleCountT>
+class RingBuffer;
 
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
@@ -36,7 +41,8 @@ public:
 	 * @return The configured PortAudio stream.
 	 */
 	virtual portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
-	                                     const AudioDecoder &decoder) const = 0;
+	                                     const AudioDecoder &decoder)
+	                const = 0;
 };
 
 /**
@@ -80,7 +86,7 @@ public:
 	 *returned
 	 * if playback has halted but the last error report was E_OK.
 	 */
-	bool IsHalted();
+	bool IsStopped();
 
 	/**
 	 * Returns whether the current frame has been finished.
@@ -154,8 +160,6 @@ private:
 
 	void ClearFrame();
 
-	void InitialisePortAudio(const StreamConfigurator &c);
-
 	std::uint64_t ByteCountForSampleCount(std::uint64_t sample_count) const
 	                override;
 	std::uint64_t SampleCountForByteCount(std::uint64_t sample_count) const
@@ -173,7 +177,12 @@ private:
 	PlayCallbackStepResult PlayCallbackStep(char *out,
 	                                        unsigned long frames_per_buf,
 	                                        PlayCallbackStepResult in);
+	PlayCallbackStepResult PlayCallbackSuccess(char *out,
+	                                           unsigned long avail,
+	                                           unsigned long frames_per_buf,
+	                                           PlayCallbackStepResult in);
 	PlayCallbackStepResult PlayCallbackFailure(char *out,
+	                                           unsigned long avail,
 	                                           unsigned long frames_per_buf,
 	                                           PlayCallbackStepResult in);
 
@@ -200,16 +209,6 @@ private:
 	//
 	// Ring buffer
 	//
-
-	/* Initialises an audio structure's ring buffer so that decoded
-	 * samples can be placed into it.
-	 *
-	 * Any existing ring buffer will be freed.
-	 *
-	 * The number of bytes for each sample must be provided; see
-	 * audio_av_samples2bytes for one way of getting this.
-	 */
-	void InitialiseRingBuffer(std::uint64_t bytes_per_sample);
 
 	/**
 	 * Writes all samples currently waiting to be transferred to the ring

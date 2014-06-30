@@ -4,12 +4,14 @@
  * details.
  */
 
+#include <stdexcept>
 #include <string>
 #include <cassert>
 
 #include "player.hpp"
+#include "../audio/audio_output.hpp"
 #include "../audio/audio_system.hpp"
-#include "../time_parser.hpp"
+#include "../errors.hpp"
 
 const Player::StateList Player::AUDIO_LOADED_STATES = {State::PLAYING,
                                                        State::STOPPED};
@@ -24,7 +26,7 @@ Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
 void Player::Update()
 {
 	if (this->current_state == State::PLAYING) {
-		if (this->audio->IsHalted()) {
+		if (this->audio->IsStopped()) {
 			Eject();
 		} else {
 			UpdatePosition();

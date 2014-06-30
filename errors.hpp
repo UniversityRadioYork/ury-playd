@@ -12,37 +12,61 @@
 #include <string>
 #include <iostream>
 
-/* Categories of error.
+/**
+ * A Playslave exception.
+ * @todo Replace the enum with subclasses.
  */
-enum class ErrorCode {
-	OK,               // No error
-	NO_FILE,          // Tried to read nonexistent file
-	BAD_STATE,        // State transition not allowed
-	BAD_COMMAND,      // Command was malformed
-	COMMAND_REJECTED, // Command was valid but refused
-	COMMAND_IGNORED,  // Command was silently ignored
-	BAD_FILE,         // Tried to read corrupt file
-	BAD_CONFIG,       // Program improperly configured
-	AUDIO_INIT_FAIL,  // Couldn't open audio backend
-	INTERNAL_ERROR,   // General system error, usually fatal
-	NO_MEM,           // Allocation of memory failed
-	END_OF_FILE,      // Reached end of file while reading
-	INCOMPLETE,       // Incomplete computation, try again
-	UNKNOWN,          // Unknown error
-};
-
 class Error {
 public:
-	Error(ErrorCode error_code, std::string message);
+	/**
+	 * Constructs an Error.
+	 * @param message The human-readable message of the error.
+	 */
+	Error(const std::string &message);
 
 	void ToResponse();
-	ErrorCode Code();
+
+	/**
+	 * The human-readable message for this error.
+	 * @return A reference to the string describing this Error.
+	 */
 	const std::string &Message();
 
 private:
-	ErrorCode error_code;
-	std::string message;
+	std::string message; ///< The human-readable message for this Error.
 };
+
+//
+// Error sub-categories
+//
+
+/**
+ * An Error signifying that Playslave has been improperly configured.
+ */
+class ConfigError : public Error {
+public:
+	ConfigError(const std::string &message) : Error(message) {};
+};
+
+/**
+ * An Error signifying that Playslave has hit an internal snag.
+ */
+class InternalError : public Error {
+public:
+	InternalError(const std::string &message) : Error(message) {};
+};
+
+/**
+ * An Error signifying that Playslave can't read a file.
+ */
+class FileError : public Error {
+public:
+	FileError(const std::string &message) : Error(message) {};
+};
+
+//
+// Debugging
+//
 
 inline void DebugArgs()
 {

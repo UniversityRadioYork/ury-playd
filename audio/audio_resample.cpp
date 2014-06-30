@@ -4,6 +4,7 @@
  * details.
  */
 
+#include <cassert>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -19,10 +20,14 @@ extern "C" {
 
 Resampler::Resampler(const SampleByteConverter &conv) : out(conv)
 {
+	this->output_format = AV_SAMPLE_FMT_NONE;
 }
 
 AVSampleFormat Resampler::AVOutputFormat()
 {
+	// Output format should be set by derived classes.
+	assert(this->output_format != AV_SAMPLE_FMT_NONE);
+
 	return this->output_format;
 }
 
@@ -65,8 +70,7 @@ std::vector<char> PlanarResampler::Resample(AVFrame *frame)
 
 	if (av_samples_alloc(&rbuf, nullptr, av_frame_get_channels(frame),
 	                     out_samples, this->output_format, 0) < 0) {
-		throw Error(ErrorCode::INTERNAL_ERROR,
-		            "Couldn't allocate samples for reallocation!");
+		throw std::bad_alloc();
 	}
 
 	size_t n = static_cast<size_t>(this->swr->Convert(
