@@ -52,9 +52,11 @@ public:
 	CommandHandler(const CommandSet &commands);
 
 	/**
-	 * Checks for, and handles, commands waiting on this CommandHandler.
+	 * Handles a command line.
+	 * @param line A reference to the line to handle as a command.
+	 * @return Whether the command succeeded.
 	 */
-	void Check();
+	bool Handle(const std::string &line);
 
 	/**
 	 * Adds a nullary command.
@@ -82,7 +84,6 @@ private:
 
 	bool Run(const WordList &words);
 	bool RunLine(const std::string &line);
-	void Handle();
 };
 
 #endif // PS_CMD_HPP

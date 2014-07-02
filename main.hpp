@@ -12,6 +12,7 @@
 
 #include "audio/audio_system.hpp" // AudioSystem
 #include "cmd.hpp"                // CommandHandler
+#include "io.hpp"                 // IoHandler
 #include "player/player.hpp"      // Player
 #include "time_parser.hpp"        // TimeParser
 
@@ -46,6 +47,7 @@ private:
 	std::unique_ptr<Player> player;          ///< The player subsystem.
 	std::unique_ptr<CommandHandler> handler; ///< The command handler.
 	std::unique_ptr<Player::TP> time_parser; ///< The seek time parser.
+	std::unique_ptr<IoReactor> io;           ///< The I/O handler.
 
 	/**
 	 * Tries to get the output device ID from stdin.

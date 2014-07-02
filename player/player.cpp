@@ -74,8 +74,8 @@ bool Player::Load(const std::string &path)
 		}
 		catch (Error &error)
 		{
-			error.ToResponse();
 			Eject();
+                        throw error;
 		}
 	}
 	return valid;
