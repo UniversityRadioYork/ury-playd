@@ -1,9 +1,10 @@
-/* io.h - input/output  */
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+/**
+ * @file
+ * Declarations of input/output related code.
+ * @see io.cpp
  */
 
 #ifndef PS_IO_HPP
@@ -13,9 +14,10 @@
 #include <iostream>
 #include <string>
 
-/* Four-character response codes.
- *
- * NOTE: If you're adding new responses here, PLEASE update RESPONSES in io.c.
+/**
+ * Four-character response codes.
+ * @note If you're adding new responses here, update RESPONSES.
+ * @see RESPONSES
  */
 enum class Response {
 	/* 'Pull' responses (initiated by client command) */
@@ -37,12 +39,27 @@ enum class Response {
 	QNUM  /* Reminder of current number of queue items */
 };
 
+/**
+ * A map from Response codes to their string equivalents.
+ * @see Response
+ */
 extern const std::map<Response, std::string> RESPONSES;
 
+/**
+ * Base case for the RespondArgs template, for when there are no arguments.
+ */
 inline void RespondArgs()
 {
 }
 
+/**
+ * Outputs a response body, with a variadic number of arguments.
+ * This is defined inductively, with RespondArgs() being the base case.
+ * @tparam Arg1 The type of the leftmost argument.
+ * @tparam Args Parameter pack of remaining arguments.
+ * @param arg1 The leftmost argument.
+ * @param args The remaining arguments.
+ */
 template <typename Arg1, typename... Args>
 inline void RespondArgs(const Arg1 &arg1, const Args &... args)
 {
@@ -50,11 +67,22 @@ inline void RespondArgs(const Arg1 &arg1, const Args &... args)
 	RespondArgs(args...);
 }
 
+/**
+ * Base case for the Respond template, for when there are no arguments.
+ * @param code The response code to emit.
+ */
 inline void Respond(Response code)
 {
 	std::cout << RESPONSES.at(code) << std::endl;
 }
 
+/**
+ * Outputs a response, with a variadic number of arguments.
+ * This is defined on RespondArgs.
+ * @tparam Args Parameter pack of arguments.
+ * @param code The response code to emit.
+ * @param args The arguments, if any.
+ */
 template <typename... Args>
 inline void Respond(Response code, Args &... args)
 {
@@ -63,6 +91,11 @@ inline void Respond(Response code, Args &... args)
 	std::cout << std::endl;
 }
 
+/**
+ * Checks whether input is waiting from the client.
+ * @return A truthy value if input is waiting; a falsy value otherwise.
+ * @todo Move into a class/replace with asynchronous I/O.
+ */
 int input_waiting(void);
 
 #endif // PS_IO_HPP

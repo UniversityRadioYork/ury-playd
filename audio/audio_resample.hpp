@@ -1,7 +1,10 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Declarations of the audio resampler classes.
+ * @see audio/audio_resample.cpp
  */
 
 #ifndef PS_AUDIO_RESAMPLE_HPP
@@ -39,7 +42,8 @@ public:
 	 * @return       The corresponding sample count.
 	 * @see          ByteCountForSampleCount
 	 */
-	virtual std::uint64_t SampleCountForByteCount(std::uint64_t bytes) const = 0;
+	virtual std::uint64_t SampleCountForByteCount(std::uint64_t bytes)
+	                const = 0;
 
 	/**
 	 * Converts from a sample count to a byte count.
@@ -51,7 +55,8 @@ public:
 	 * @see            SampleCountForByteCount
 	 */
 
-	virtual std::uint64_t ByteCountForSampleCount(std::uint64_t samples) const = 0;
+	virtual std::uint64_t ByteCountForSampleCount(std::uint64_t samples)
+	                const = 0;
 };
 
 /**
@@ -78,6 +83,11 @@ public:
 	 *              samples and bytes for the output format.
 	 */
 	Resampler(const SampleByteConverter &conv);
+
+	/**
+	 * Virtual destructor for Resampler.
+	 */
+	virtual ~Resampler() {};
 
 	/**
 	 * Resamples the contents of an ffmpeg frame.

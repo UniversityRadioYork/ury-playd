@@ -1,9 +1,10 @@
-/* errors.cpp - error reporting */
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+/**
+ * @file
+ * Implementation of the Playslave Error exception set.
+ * @see errors.hpp
  */
 
 #include <string>
@@ -11,15 +12,9 @@
 #include "errors.hpp"
 #include "io.hpp"
 
-Error::Error(ErrorCode error_code, std::string message)
+Error::Error(const std::string &message)
 {
-	this->error_code = error_code;
-	this->message = message;
-}
-
-ErrorCode Error::Code()
-{
-	return this->error_code;
+	this->message = std::string(message);
 }
 
 void Error::ToResponse()

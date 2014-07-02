@@ -1,9 +1,10 @@
-/* errors.c - error reporting */
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+/**
+ * @file
+ * Declarations of the Playslave Error exception set.
+ * @see errors.cpp
  */
 
 #ifndef PS_ERRORS_HPP
@@ -12,51 +13,108 @@
 #include <string>
 #include <iostream>
 
-/* Categories of error.
+/**
+ * A Playslave exception.
+ * @todo Replace the enum with subclasses.
  */
-enum class ErrorCode {
-	OK,               // No error
-	NO_FILE,          // Tried to read nonexistent file
-	BAD_STATE,        // State transition not allowed
-	BAD_COMMAND,      // Command was malformed
-	COMMAND_REJECTED, // Command was valid but refused
-	COMMAND_IGNORED,  // Command was silently ignored
-	BAD_FILE,         // Tried to read corrupt file
-	BAD_CONFIG,       // Program improperly configured
-	AUDIO_INIT_FAIL,  // Couldn't open audio backend
-	INTERNAL_ERROR,   // General system error, usually fatal
-	NO_MEM,           // Allocation of memory failed
-	END_OF_FILE,      // Reached end of file while reading
-	INCOMPLETE,       // Incomplete computation, try again
-	UNKNOWN,          // Unknown error
-};
-
 class Error {
 public:
-	Error(ErrorCode error_code, std::string message);
+	/**
+	 * Constructs an Error.
+	 * @param message The human-readable message of the error.
+	 */
+	Error(const std::string &message);
 
+	/**
+	 * Converts the Error to a response, and sends it.
+	 * @todo Support sockets.
+	 */
 	void ToResponse();
-	ErrorCode Code();
+
+	/**
+	 * The human-readable message for this error.
+	 * @return A reference to the string describing this Error.
+	 */
 	const std::string &Message();
 
 private:
-	ErrorCode error_code;
-	std::string message;
+	std::string message; ///< The human-readable message for this Error.
 };
 
+//
+// Error sub-categories
+//
+
+/**
+ * An Error signifying that Playslave has been improperly configured.
+ */
+class ConfigError : public Error {
+public:
+	/**
+	 * Constructs an ConfigError.
+	 * @param message The human-readable message of the error.
+	 */
+	ConfigError(const std::string &message) : Error(message) {};
+};
+
+/**
+ * An Error signifying that Playslave has hit an internal snag.
+ */
+class InternalError : public Error {
+public:
+	/**
+	 * Constructs an InternalError.
+	 * @param message The human-readable message of the error.
+	 */
+	InternalError(const std::string &message) : Error(message) {};
+};
+
+/**
+ * An Error signifying that Playslave can't read a file.
+ */
+class FileError : public Error {
+public:
+	/**
+	 * Constructs a FileError.
+	 * @param message The human-readable message of the error.
+	 */
+	FileError(const std::string &message) : Error(message) {};
+};
+
+//
+// Debugging
+//
+
+/**
+ * Base case for DebugArgs, when there are no arguments.
+ */
 inline void DebugArgs()
 {
 }
 
-template <typename T1, typename... Ts>
-inline void DebugArgs(T1 &t1, Ts &... ts)
+/**
+ * Outputs a debug message, with a variadic number of arguments (at least one).
+ * This is defined inductively, with DebugArgs() being the base case.
+ * @tparam Arg1 The type of the leftmost argument.
+ * @tparam Args Parameter pack of remaining arguments.
+ * @param arg1 The leftmost argument.
+ * @param args The remaining arguments.
+ */
+template <typename Arg1, typename... Args>
+inline void DebugArgs(Arg1 &arg1, Args &... args)
 {
-	std::cerr << " " << t1;
-	DebugArgs(ts...);
+	std::cerr << " " << arg1;
+	DebugArgs(args...);
 }
 
-template <typename... Ts>
-inline void Debug(Ts &... ts)
+/**
+ * Outputs a debug message, with a variadic number of arguments.
+ * @tparam Args Parameter pack of arguments.
+ * @param args The arguments.
+ * @see DebugArgs
+ */
+template <typename... Args>
+inline void Debug(Args &... args)
 {
 	std::cerr << "DEBUG:";
 	DebugArgs(ts...);

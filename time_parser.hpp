@@ -1,3 +1,11 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * The TimeParser template class.
+ */
+
 #ifndef PS_TIME_PARSER_HPP
 #define PS_TIME_PARSER_HPP
 

@@ -1,7 +1,10 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Implementation of the AudioDecoder class.
+ * @see audio/audio_decoder.hpp
  */
 
 #include <functional>
@@ -26,6 +29,7 @@ extern "C" {
 
 #include "../errors.hpp"
 #include "../constants.h"
+#include "../messages.h"
 #include "../sample_formats.hpp"
 
 #include "audio_decoder.hpp"
@@ -114,7 +118,7 @@ void AudioDecoder::SeekToPositionMicroseconds(
 
 	if (av_seek_frame(this->context.get(), this->stream_id, ffmpeg_position,
 	                  AVSEEK_FLAG_ANY) != 0) {
-		throw Error(ErrorCode::INTERNAL_ERROR, "seek failed");
+		throw InternalError(MSG_SEEK_FAIL);
 	}
 }
 
@@ -171,7 +175,7 @@ static std::map<AVSampleFormat, SampleFormat> sf_from_av = {
 /**
  * @return The sample format of the data returned by this decoder.
  */
-SampleFormat AudioDecoder::SampleFormat() const
+SampleFormat AudioDecoder::OutputSampleFormat() const
 {
 	try
 	{
@@ -179,7 +183,7 @@ SampleFormat AudioDecoder::SampleFormat() const
 	}
 	catch (std::out_of_range)
 	{
-		throw Error(ErrorCode::BAD_FILE, "unusable sample rate");
+		throw FileError(MSG_DECODE_BADRATE);
 	}
 }
 
@@ -190,7 +194,7 @@ void AudioDecoder::Open(const std::string &path)
 	if (avformat_open_input(&ctx, path.c_str(), NULL, NULL) < 0) {
 		std::ostringstream os;
 		os << "couldn't open " << path;
-		throw Error(ErrorCode::NO_FILE, os.str());
+		throw FileError(os.str());
 	}
 
 	auto free_context = [](AVFormatContext *ctx) {
@@ -210,7 +214,7 @@ void AudioDecoder::InitialiseStream()
 void AudioDecoder::FindStreamInfo()
 {
 	if (avformat_find_stream_info(this->context.get(), NULL) < 0) {
-		throw Error(ErrorCode::BAD_FILE, "no audio stream in file");
+		throw FileError(MSG_DECODE_NOAUDIO);
 	}
 }
 
@@ -221,7 +225,7 @@ void AudioDecoder::FindStreamAndInitialiseCodec()
 	                                 AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
 
 	if (stream < 0) {
-		throw Error(ErrorCode::BAD_FILE, "can't open codec for file");
+		throw FileError(MSG_DECODE_NOSTREAM);
 	}
 
 	InitialiseCodec(stream, codec);
@@ -231,7 +235,7 @@ void AudioDecoder::InitialiseCodec(int stream, AVCodec *codec)
 {
 	AVCodecContext *codec_context = this->context->streams[stream]->codec;
 	if (avcodec_open2(codec_context, codec, NULL) < 0) {
-		throw Error(ErrorCode::BAD_FILE, "can't open codec for file");
+		throw FileError(MSG_DECODE_NOCODEC);
 	}
 
 	this->stream = this->context->streams[stream];
@@ -244,7 +248,7 @@ void AudioDecoder::InitialiseFrame()
 	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(
 	                av_frame_alloc(), frame_deleter);
 	if (this->frame == nullptr) {
-		throw Error(ErrorCode::NO_MEM, "can't alloc frame");
+		throw std::bad_alloc();
 	}
 }
 
@@ -291,7 +295,7 @@ bool AudioDecoder::DecodePacket()
 
 	if (avcodec_decode_audio4(this->stream->codec, this->frame.get(),
 	                          &frame_finished, this->packet.get()) < 0) {
-		throw Error(ErrorCode::BAD_FILE, "decoding error");
+		throw FileError(MSG_DECODE_FAIL);
 	}
 	return frame_finished;
 }

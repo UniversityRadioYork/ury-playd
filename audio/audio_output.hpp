@@ -1,26 +1,35 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Declaration of the AudioOutput class.
+ * @see audio/audio_output.cpp
  */
 
 #ifndef PS_AUDIO_OUTPUT_HPP
 #define PS_AUDIO_OUTPUT_HPP
 
-#include <map>
+#include <chrono>
+#include <cstdint>
 #include <memory>
 #include <string>
-#include <cstdint>
+#include <utility>
+#include <vector>
 
-#include "portaudiocpp/PortAudioCpp.hxx"
+#include "portaudio.h"
+#include "portaudiocpp/CallbackInterface.hxx"
+namespace portaudio {
+class Stream;
+}
 
-#include "../constants.h"
-#include "../errors.hpp"
-#include "../ringbuffer/ringbuffer.hpp"
+template <typename RepT, typename SampleCountT>
+class RingBuffer;
 
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
 
+/// Type of results emitted during the play callback step.
 using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
 
 /**
@@ -36,7 +45,8 @@ public:
 	 * @return The configured PortAudio stream.
 	 */
 	virtual portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
-	                                     const AudioDecoder &decoder) const = 0;
+	                                     const AudioDecoder &decoder)
+	                const = 0;
 };
 
 /**
@@ -60,7 +70,18 @@ public:
 	AudioOutput(const std::string &path, const StreamConfigurator &c);
 	~AudioOutput();
 
+	/**
+	 * Starts the audio stream.
+	 * @see Stop
+	 * @see IsHalted
+	 */
 	void Start();
+
+	/**
+	 * Stops the audio stream.
+	 * @see Start
+	 * @see IsHalted
+	 */
 	void Stop();
 
 	/**
@@ -72,15 +93,13 @@ public:
 	 */
 	bool Update();
 
-	/* Checks to see if audio playback has halted of its own accord.
-	 *
-	 * If audio is still playing, E_OK will be returned; otherwise the
-	 *decoding
-	 * error that caused playback to halt will be returned.  E_UNKNOWN is
-	 *returned
-	 * if playback has halted but the last error report was E_OK.
+	/**
+	 * Checks to see if audio playback has stopped.
+	 * @return True if the audio stream is inactive; false otherwise.
+	 * @see Start
+	 * @see Stop
 	 */
-	bool IsHalted();
+	bool IsStopped();
 
 	/**
 	 * Returns whether the current frame has been finished.
@@ -109,10 +128,11 @@ public:
 		                CurrentPositionMicroseconds());
 	}
 
-	/* Gets the current played position in the song, in microseconds.
-	 *
+	/**
+	 * Gets the current played position in the song, in microseconds.
 	 * As this may be executing whilst the playing callback is running,
 	 * do not expect it to be highly accurate.
+	 * @return The current position, in microseconds.
 	 */
 	std::chrono::microseconds CurrentPositionMicroseconds();
 
@@ -127,34 +147,43 @@ public:
 		                std::chrono::microseconds>(position));
 	}
 
-	/* Attempts to seek to the given position in microseconds. */
+	/**
+	 * Attempts to seek to the given position in microseconds.
+	 * @param microseconds The position to seek to, in microseconds.
+	 */
 	void SeekToPositionMicroseconds(std::chrono::microseconds microseconds);
 
-	/* Tries to place enough audio into the audio buffer to prevent a
+	/**
+	 * Tries to place enough audio into the audio buffer to prevent a
 	 * buffer underrun during a player start.
-	 *
-	 * If end of file is reached, it is ignored and converted to E_OK so
-	 *that it
-	 * can later be caught by the player callback once it runs out of sound.
 	 */
 	void PreFillRingBuffer();
 
 private:
 	bool file_ended; ///< Whether the current file has stopped decoding.
 
+	/// The audio decoder providing the actual audio data.
 	std::unique_ptr<AudioDecoder> av;
 
+	/// The current decoded frame.
 	std::vector<char> frame;
+
+	/// The current position in the current decoded frame.
 	std::vector<char>::iterator frame_iterator;
+
+	/// The ring buffer used to transfer samples to the playing callback.
 	std::unique_ptr<RingBuffer<char, std::uint64_t>> ring_buf;
 
+	/// The PortAudio stream to which this AudioOutput outputs.
 	std::unique_ptr<portaudio::Stream> out_strm;
 
+	/// The current position, in samples.
 	uint64_t position_sample_count;
 
+	/**
+	 * Clears the current frame and its iterator.
+	 */
 	void ClearFrame();
-
-	void InitialisePortAudio(const StreamConfigurator &c);
 
 	std::uint64_t ByteCountForSampleCount(std::uint64_t sample_count) const
 	                override;
@@ -173,7 +202,12 @@ private:
 	PlayCallbackStepResult PlayCallbackStep(char *out,
 	                                        unsigned long frames_per_buf,
 	                                        PlayCallbackStepResult in);
+	PlayCallbackStepResult PlayCallbackSuccess(char *out,
+	                                           unsigned long avail,
+	                                           unsigned long frames_per_buf,
+	                                           PlayCallbackStepResult in);
 	PlayCallbackStepResult PlayCallbackFailure(char *out,
+	                                           unsigned long avail,
 	                                           unsigned long frames_per_buf,
 	                                           PlayCallbackStepResult in);
 
@@ -200,16 +234,6 @@ private:
 	//
 	// Ring buffer
 	//
-
-	/* Initialises an audio structure's ring buffer so that decoded
-	 * samples can be placed into it.
-	 *
-	 * Any existing ring buffer will be freed.
-	 *
-	 * The number of bytes for each sample must be provided; see
-	 * audio_av_samples2bytes for one way of getting this.
-	 */
-	void InitialiseRingBuffer(std::uint64_t bytes_per_sample);
 
 	/**
 	 * Writes all samples currently waiting to be transferred to the ring

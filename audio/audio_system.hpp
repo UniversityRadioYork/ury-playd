@@ -1,16 +1,29 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Declaration of the AudioSystem class.
+ * @see audio/audio_system.cpp
  */
 
 #ifndef PS_AUDIO_SYSTEM_HPP
 #define PS_AUDIO_SYSTEM_HPP
 
+#include <functional>
 #include <string>
-#include "portaudiocpp/PortAudioCpp.hxx"
+#include <utility>
+
+#include "portaudiocpp/SampleDataFormat.hxx"
+#include "portaudiocpp/Stream.hxx"
+namespace portaudio {
+class CallbackInterface;
+class Device;
+}
+
 #include "../sample_formats.hpp"
 
+#include "audio_decoder.hpp"
 #include "audio_output.hpp"
 
 /**
@@ -46,7 +59,7 @@ public:
 	 * @param path  The path to a file.
 	 * @return      The AudioOutput for that file.
 	 */
-	AudioOutput *Load(const std::string &file) const;
+	AudioOutput *Load(const std::string &path) const;
 
 	/**
 	 * Sets the current device ID.
@@ -58,7 +71,7 @@ public:
 	 * Performs a function on each device entry in the AudioSystem.
 	 * @param f  The function to call on each device.
 	 */
-	void OnDevices(std::function<void(const Device &)>) const;
+	void OnDevices(std::function<void(const Device &)> f) const;
 
 	portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
 	                             const AudioDecoder &av) const override;

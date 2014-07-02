@@ -1,3 +1,13 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * The PaRingBuffer class template.
+ * @see ringbuffer/ringbuffer.hpp
+ * @see ringbuffer/ringbuffer_boost.hpp
+ */
+
 #ifndef PS_RINGBUFFER_PA_HPP
 #define PS_RINGBUFFER_PA_HPP
 
@@ -8,6 +18,9 @@ extern "C" {
 }
 
 #include "../errors.hpp"
+#include "../messages.h"
+
+#include "ringbuffer.hpp"
 
 /**
  * Implementation of RingBuffer using the PortAudio C ring buffer.
@@ -25,20 +38,23 @@ public:
 	 * Constructs a PaRingBuffer.
 	 * @param size  The size of one element in the ring buffer.
 	 */
-	PaRingBuffer(int size = sizeof(T1))
+	PaRingBuffer(int size)
 	{
 		this->rb = new PaUtilRingBuffer;
 		this->buffer = new char[(1 << P) * size];
 
-		if (PaUtil_InitializeRingBuffer(
-		                    this->rb, size,
-		                    static_cast<ring_buffer_size_t>(1 << P),
-		                    this->buffer) != 0) {
-			throw Error(ErrorCode::INTERNAL_ERROR,
-			            "ringbuf failed to init");
+		int init_result = PaUtil_InitializeRingBuffer(
+		                this->rb, size,
+		                static_cast<ring_buffer_size_t>(1 << P),
+		                this->buffer);
+		if (init_result != 0) {
+			throw InternalError(MSG_OUTPUT_RINGINIT);
 		}
 	}
 
+	/**
+	 * Destructs a PaRingBuffer.
+	 */
 	~PaRingBuffer()
 	{
 		assert(this->rb != nullptr);

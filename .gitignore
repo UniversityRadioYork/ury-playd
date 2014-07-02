@@ -11,3 +11,8 @@ doc/
 *.sdf
 *.suo
 *.vcxproj.*
+
+# Coverity
+cov-int/
+build-log.txt
+playslave-plusplus.tgz

@@ -1,9 +1,10 @@
-/* cmd.cpp - command parser */
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+/**
+ * @file
+ * Implementation of the CommandHandler class.
+ * @see cmd.hpp
  */
 
 #include <iostream>
@@ -104,14 +105,14 @@ void CommandHandler::Handle()
 	/* Silently fail if the command is actually end of file */
 	if (std::cin.eof()) {
 		Debug("end of file");
-		throw Error(ErrorCode::END_OF_FILE, "TODO: Handle this better");
+		throw Error("TODO: Handle this better");
 	}
 
 	bool valid = RunLine(input);
 	if (valid) {
 		Respond(Response::OKAY, input);
 	} else {
-		Respond(Response::WHAT, "Invalid command.");
+		Respond(Response::WHAT, MSG_CMD_INVALID);
 	}
 }
 

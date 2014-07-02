@@ -1,16 +1,24 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file player/player.cpp
+ * Main implementation file for the Player class.
+ * @see player/player.hpp
+ * @see player/player_position.cpp
+ * @see player/player_state.cpp
  */
 
+#include <stdexcept>
 #include <string>
 #include <cassert>
 
 #include "player.hpp"
+#include "../audio/audio_output.hpp"
 #include "../audio/audio_system.hpp"
-#include "../time_parser.hpp"
+#include "../errors.hpp"
 
+/// List of states in which some audio is loaded.
 const Player::StateList Player::AUDIO_LOADED_STATES = {State::PLAYING,
                                                        State::STOPPED};
 
@@ -24,7 +32,7 @@ Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
 void Player::Update()
 {
 	if (this->current_state == State::PLAYING) {
-		if (this->audio->IsHalted()) {
+		if (this->audio->IsStopped()) {
 			Eject();
 		} else {
 			UpdatePosition();

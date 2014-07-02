@@ -1,16 +1,40 @@
-/*
- * This file is part of Playslave-C++.
- * Playslave-C++ is licenced under MIT License. See LICENSE.txt for more
- * details.
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Implementation of the AudioSystem class.
+ * @see audio/audio_system.hpp
  */
 
 #include <algorithm>
 #include <map>
-#include <string>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
-#include "portaudiocpp/PortAudioCpp.hxx"
+extern "C" {
+#include "libavformat/avformat.h"
+#include "portaudio.h"
+}
 
+#include "portaudiocpp/Device.hxx"
+#include "portaudiocpp/DirectionSpecificStreamParameters.hxx"
+#include "portaudiocpp/InterfaceCallbackStream.hxx"
+#include "portaudiocpp/SampleDataFormat.hxx"
+#include "portaudiocpp/Stream.hxx"
+#include "portaudiocpp/StreamParameters.hxx"
+#include "portaudiocpp/System.hxx"
+#include "portaudiocpp/SystemDeviceIterator.hxx"
+namespace portaudio {
+	class CallbackInterface;
+}
+
+#include "../errors.hpp"
+#include "../messages.h"
+#include "../sample_formats.hpp"
+
+#include "audio_decoder.hpp"
 #include "audio_output.hpp"
 #include "audio_system.hpp"
 
@@ -55,7 +79,7 @@ portaudio::Stream *AudioSystem::Configure(portaudio::CallbackInterface &cb,
 
 	portaudio::DirectionSpecificStreamParameters out_pars(
 	                device, av.ChannelCount(),
-	                PaSampleFormatFrom(av.SampleFormat()), true,
+	                PaSampleFormatFrom(av.OutputSampleFormat()), true,
 	                device.defaultLowOutputLatency(), nullptr);
 
 	portaudio::StreamParameters pars(
@@ -77,7 +101,7 @@ const portaudio::Device &AudioSystem::PaDeviceFrom(const std::string &id_string)
 	is >> id_pa;
 
 	if (id_pa >= pa.deviceCount()) {
-		throw Error(ErrorCode::BAD_CONFIG, "Bad PortAudio ID.");
+		throw ConfigError(MSG_DEV_BADID);
 	}
 
 	return pa.deviceByIndex(id_pa);
@@ -99,6 +123,6 @@ portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(SampleFormat fmt)
 	}
 	catch (std::out_of_range)
 	{
-		throw Error(ErrorCode::BAD_FILE, "unusable sample rate");
+		throw FileError(MSG_DECODE_BADRATE);
 	}
 }

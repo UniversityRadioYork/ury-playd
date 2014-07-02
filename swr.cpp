@@ -1,3 +1,12 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Implementation of the Swr class.
+ * @see swr.hpp
+ */
+
 #include <cassert>
 #include <new>
 

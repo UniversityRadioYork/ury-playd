@@ -1,3 +1,12 @@
+// This file is part of Playslave-C++.
+// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+
+/**
+ * @file
+ * Declaration of the Playslave class.
+ * @see main.cpp
+ */
+
 #ifndef PS_MAIN_HPP
 #define PS_MAIN_HPP
 
