@@ -117,7 +117,7 @@ template <typename... Args>
 inline void Debug(Args &... args)
 {
 	std::cerr << "DEBUG:";
-	DebugArgs(ts...);
+	DebugArgs(args...);
 	std::cerr << std::endl;
 }
 
