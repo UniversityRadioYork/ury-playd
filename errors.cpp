@@ -7,7 +7,6 @@
  * @see errors.hpp
  */
 
-#include <string>
 #include "errors.hpp"
 
 Error::Error(const std::string &message)

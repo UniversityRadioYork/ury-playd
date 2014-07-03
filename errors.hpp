@@ -10,7 +10,6 @@
 #ifndef PS_ERRORS_HPP
 #define PS_ERRORS_HPP
 
-#include <string>
 #include <iostream>
 
 /**

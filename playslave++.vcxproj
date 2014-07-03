@@ -106,7 +106,7 @@
     <ClInclude Include="contrib\pa_memorybarrier.h" />
     <ClInclude Include="contrib\pa_ringbuffer.h" />
     <ClInclude Include="errors.hpp" />
-    <ClInclude Include="io.hpp" />
+    <ClInclude Include="io/io.hpp" />
     <ClInclude Include="messages.h" />
     <ClInclude Include="player\player.hpp" />
     <ClInclude Include="player\player_position.hpp" />

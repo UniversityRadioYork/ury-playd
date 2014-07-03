@@ -9,7 +9,10 @@
 
 #include "constants.h" // POSITION_PERIOD
 #include "cmd.hpp"
-#include "io.hpp"
+#include "io/io_responder.hpp"
+#include "io/io_reactor.hpp"
+#include "io/io_reactor_asio.hpp"
+#include "io/io_reactor_std.hpp"
 #include "messages.h"
 #include "player/player.hpp"
 #include "audio/audio_system.hpp"
