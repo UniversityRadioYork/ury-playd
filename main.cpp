@@ -64,6 +64,9 @@ void Playslave::RegisterListeners()
 	                                           Player::State new_state) {
 		io->Respond(Response::STAT, Player::StateString(old_state),
 		            Player::StateString(new_state));
+		if (new_state == Player::State::QUITTING) {
+			io->End();
+		}
 	});
 }
 
@@ -124,8 +127,15 @@ Playslave::Playslave(int argc, char *argv[]) : audio{}
 
 	this->handler = decltype(this->handler)(h);
 
-	this->io = decltype(this->io)(
-	                new StdIoReactor((*this->player), (*this->handler)));
+	IoReactor *io = nullptr;
+	if (this->arguments.size() == 4) {
+		io = new AsioIoReactor((*this->player), (*this->handler),
+		                       this->arguments.at(2),
+		                       this->arguments.at(3));
+	} else {
+		io = new StdIoReactor((*this->player), (*this->handler));
+	}
+	this->io = decltype(this->io)(io);
 }
 
 int Playslave::Run()

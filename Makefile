@@ -4,7 +4,7 @@ CC=clang
 CXX=clang++
 CFLAGS+=-c -Wall -Wextra -Werror -pedantic -g -std=c99
 CXXFLAGS+=-c -Wall -Wextra -Werror -pedantic -g -std=c++11
-LDFLAGS+=-lavcodec -lavformat -lavutil -lswresample -lportaudiocpp -lportaudio -lasound -lm -lpthread
+LDFLAGS+=-lavcodec -lavformat -lavutil -lswresample -lportaudiocpp -lportaudio -lasound -lm -lpthread -lboost_system
 SOURCES=$(wildcard *.cpp)
 SOURCES+=$(wildcard audio/*.cpp)
 SOURCES+=$(wildcard player/*.cpp)
