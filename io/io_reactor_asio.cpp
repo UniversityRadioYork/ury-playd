@@ -26,7 +26,6 @@
 #define BOOST_ASIO_HAS_STD_CHRONO
 #include <boost/asio/high_resolution_timer.hpp>
 
-
 #include "../constants.h" // LOOP_PERIOD
 #include "../cmd.hpp"
 #include "../errors.hpp"
@@ -34,13 +33,13 @@
 #include "../player/player.hpp"
 #include "io_reactor_asio.hpp"
 
-
 //
 // AsioIoReactor
 //
 
 AsioIoReactor::AsioIoReactor(Player &player, CommandHandler &handler,
-                             std::string address, std::string port)
+                             const std::string &address,
+                             const std::string &port)
     : IoReactor(player, handler),
       io_service(),
       signals(io_service),
@@ -54,15 +53,7 @@ AsioIoReactor::AsioIoReactor(Player &player, CommandHandler &handler,
 #endif // SIGQUIT
 
 	DoAwaitStop();
-
-	boost::asio::ip::tcp::resolver resolver(io_service);
-	boost::asio::ip::tcp::endpoint endpoint =
-	                *resolver.resolve({address, port});
-	this->acceptor.open(endpoint.protocol());
-	this->acceptor.set_option(
-	                boost::asio::ip::tcp::acceptor::reuse_address(true));
-	this->acceptor.bind(endpoint);
-	this->acceptor.listen();
+	InitAcceptor(address, port);
 
 	DoAccept();
 
@@ -74,11 +65,25 @@ void AsioIoReactor::MainLoop()
 	io_service.run();
 }
 
+void AsioIoReactor::InitAcceptor(const std::string &address,
+                                 const std::string &port)
+{
+	boost::asio::ip::tcp::resolver resolver(io_service);
+	boost::asio::ip::tcp::endpoint endpoint =
+	                *resolver.resolve({address, port});
+	this->acceptor.open(endpoint.protocol());
+	this->acceptor.set_option(
+	                boost::asio::ip::tcp::acceptor::reuse_address(true));
+	this->acceptor.bind(endpoint);
+	this->acceptor.listen();
+}
+
 void AsioIoReactor::DoAccept()
 {
-        auto cmd = [this](const std::string &line) { HandleCommand(line); };
-	TcpConnection *con = new TcpConnection(cmd, this->manager, this->io_service);
-        TcpConnection::Pointer connection(con);
+	auto cmd = [this](const std::string &line) { HandleCommand(line); };
+	TcpConnection *con =
+	                new TcpConnection(cmd, this->manager, this->io_service);
+	TcpConnection::Pointer connection(con);
 	auto on_accept = [this, connection](boost::system::error_code ec) {
 		if (!ec) {
 			this->manager.Start(connection);
@@ -119,7 +124,7 @@ void AsioIoReactor::End()
 {
 	this->acceptor.close();
 	this->manager.StopAll();
-        this->io_service.stop();
+	this->io_service.stop();
 }
 
 //
@@ -145,13 +150,13 @@ void TcpConnection::Start()
 
 void TcpConnection::Stop()
 {
-        this->socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+	this->socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 	this->socket.close();
 }
 
 boost::asio::ip::tcp::socket &TcpConnection::Socket()
 {
-        return socket;
+	return socket;
 }
 
 void TcpConnection::DoRead()

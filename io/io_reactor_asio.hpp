@@ -39,8 +39,8 @@ public:
 
 	/**
 	 * Creates a new TcpConnection.
-         * @param cmd A function that sends a command line to be handled.
-         * @param manager The manager that is handling this connection.
+	 * @param cmd A function that sends a command line to be handled.
+	 * @param manager The manager that is handling this connection.
 	 * @param io_service The IO service to be used for this connection.
 	 * @return A TcpConnection.
 	 */
@@ -48,20 +48,20 @@ public:
 	                       TcpConnectionManager &manager,
 	                       boost::asio::io_service &io_service);
 
-        /// Deleted copy constructor.
+	/// Deleted copy constructor.
 	TcpConnection(const TcpConnection &) = delete;
 
-        /// Deleted copy-assignment.
+	/// Deleted copy-assignment.
 	TcpConnection &operator=(const TcpConnection &) = delete;
 
-        /**
-         * Starts this TcpConnection.
-         */
+	/**
+	 * Starts this TcpConnection.
+	 */
 	void Start();
 
-        /**
-         * Stops this TcpConnection.
-         */
+	/**
+	 * Stops this TcpConnection.
+	 */
 	void Stop();
 
 	/**
@@ -70,10 +70,10 @@ public:
 	 */
 	void Send(const std::string &string);
 
-        /**
-         * Gets the socket to which this connection is attached.
-         * @return A reference to the TCP socket.
-         */
+	/**
+	 * Gets the socket to which this connection is attached.
+	 * @return A reference to the TCP socket.
+	 */
 	boost::asio::ip::tcp::socket &Socket();
 
 protected:
@@ -96,10 +96,10 @@ private:
  */
 class TcpConnectionManager {
 public:
-        /// Deleted copy constructor.
+	/// Deleted copy constructor.
 	TcpConnectionManager(const TcpConnectionManager &) = delete;
 
-        /// Deleted copy-assignment.
+	/// Deleted copy-assignment.
 	TcpConnectionManager &operator=(const TcpConnectionManager &) = delete;
 
 	explicit TcpConnectionManager();
@@ -161,12 +161,13 @@ public:
 	 * @param port The port on which AsioIoReactor will listen for clients.
 	 */
 	explicit AsioIoReactor(Player &player, CommandHandler &handler,
-	                       std::string address, std::string port);
+	                       const std::string &address,
+	                       const std::string &port);
 
-        /// Deleted copy constructor.
+	/// Deleted copy constructor.
 	AsioIoReactor(const AsioIoReactor &) = delete;
 
-        /// Deleted copy-assignment.
+	/// Deleted copy-assignment.
 	AsioIoReactor &operator=(const AsioIoReactor &) = delete;
 
 	void End() override;
@@ -182,6 +183,8 @@ private:
 	void DoAwaitStop();
 
 	void DoUpdateTimer();
+
+	void InitAcceptor(const std::string &address, const std::string &port);
 
 	/// The IO service used by the reactor.
 	boost::asio::io_service io_service;
