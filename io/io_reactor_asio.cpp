@@ -46,13 +46,7 @@ AsioIoReactor::AsioIoReactor(Player &player, CommandHandler &handler,
       acceptor(io_service),
       manager()
 {
-	this->signals.add(SIGINT);
-	this->signals.add(SIGTERM);
-#ifdef SIGQUIT
-	this->signals.add(SIGQUIT);
-#endif // SIGQUIT
-
-	DoAwaitStop();
+        InitSignals();
 	InitAcceptor(address, port);
 
 	DoAccept();
@@ -76,6 +70,18 @@ void AsioIoReactor::InitAcceptor(const std::string &address,
 	                boost::asio::ip::tcp::acceptor::reuse_address(true));
 	this->acceptor.bind(endpoint);
 	this->acceptor.listen();
+}
+
+void AsioIoReactor::InitSignals()
+{
+	this->signals.add(SIGINT);
+	this->signals.add(SIGTERM);
+#ifdef SIGQUIT
+	this->signals.add(SIGQUIT);
+#endif // SIGQUIT
+
+	this->signals.async_wait([this](boost::system::error_code,
+	                                int) { End(); });
 }
 
 void AsioIoReactor::DoAccept()
@@ -104,12 +110,6 @@ void AsioIoReactor::DoUpdateTimer()
 		this->player.Update();
 		DoUpdateTimer();
 	});
-}
-
-void AsioIoReactor::DoAwaitStop()
-{
-	this->signals.async_wait([this](boost::system::error_code,
-	                                int) { End(); });
 }
 
 void AsioIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)

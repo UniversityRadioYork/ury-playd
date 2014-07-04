@@ -180,11 +180,10 @@ private:
 
 	void DoAccept();
 
-	void DoAwaitStop();
-
 	void DoUpdateTimer();
 
 	void InitAcceptor(const std::string &address, const std::string &port);
+	void InitSignals();
 
 	/// The IO service used by the reactor.
 	boost::asio::io_service io_service;
