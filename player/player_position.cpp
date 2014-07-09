@@ -56,7 +56,7 @@ void PlayerPosition::Update(const PlayerPosition::Unit position)
 void PlayerPosition::Reset()
 {
 	this->current = decltype(this->current)(0);
-	this->last = decltype(this->last)();
+	this->last = boost::none;
 }
 
 void PlayerPosition::Send()
@@ -64,7 +64,7 @@ void PlayerPosition::Send()
 	for (auto listener : this->listeners) {
 		listener(this->current);
 	}
-	this->last = decltype(this->last)(this->current);
+	this->last = this->current;
 }
 
 bool PlayerPosition::IsReadyToSend()
