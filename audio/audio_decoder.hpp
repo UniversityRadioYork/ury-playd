@@ -26,6 +26,8 @@ extern "C" {
 
 #include "audio_resample.hpp"
 
+#include <boost/optional.hpp>
+
 /**
  * An object responsible for decoding an audio file.
  *
@@ -35,6 +37,9 @@ extern "C" {
  */
 class AudioDecoder : public SampleByteConverter {
 public:
+	/// Type of the result of Decode().
+	using DecodeResult = boost::optional<Resampler::ResultVector>;
+
 	/**
 	 * Constructs an AudioDecoder.
 	 * @param path The path to the file to load and decode using this
@@ -49,12 +54,19 @@ public:
 
 	/**
 	 * Performs a round of decoding.
-	 * The decode may return an empty vector, in which case there is no
-	 * longer
-	 * any data left to decode.
-	 * @return A vector, which may be empty, of decoded sample data.
+	 * The decoder may return one of three types of result:
+	 *
+	 * - An empty optional value, which means the decoder has run out of data
+	 *   to decode (for example, the file has ended);
+	 * - A full optional value containing an empty buffer, which means the
+	 *   decoder is still processing the current packet;
+	 * - A full optional value containing a non-empty buffer, which means the
+	 *   decoder successfully finished a packet.
+	 *
+	 * @return An optional result which may contain a vector of sample data
+	 *   decoded in this round.
 	 */
-	std::vector<char> Decode();
+	DecodeResult Decode();
 
 	/**
 	 * Returns the channel count.
@@ -113,13 +125,20 @@ public:
 	                override;
 
 private:
+	enum class DecodeState : std::uint8_t {
+		WAITING_FOR_FRAME,
+		DECODING,
+		END_OF_FILE
+	};
+
+	DecodeState decode_state; ///< Current state of decoding.
+
 	AVStream *stream; ///< The FFmpeg stream being decoded.
 	int stream_id; ///< The ID of the input file's audio stream to decode.
 
 	std::unique_ptr<AVFormatContext, std::function<void(AVFormatContext *)>>
 	                context; ///< The input codec context.
-	std::unique_ptr<AVPacket, std::function<void(AVPacket *)>>
-	                packet; ///< The last undecoded packet.
+	AVPacket packet; ///< The last undecoded packet.
 	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
 	                frame;                   ///< The last decoded frame.
 	std::unique_ptr<unsigned char[]> buffer; ///< The decoding buffer.
@@ -137,9 +156,14 @@ private:
 	void InitialisePacket();
 	void InitialiseResampler();
 
+	DecodeResult DoFrame();
+	DecodeResult DoDecode();
+
+	bool ReadFrame();
 	bool DecodePacket();
-	std::vector<char> Resample();
+	Resampler::ResultVector Resample();
 	size_t BytesPerSample() const;
+	std::pair<int, bool> AvCodecDecode();
 
 	bool UsingPlanarSampleFormat();
 	std::int64_t AvPositionFromMicroseconds(

@@ -35,6 +35,8 @@ extern "C" {
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
 
+#include <boost/optional.hpp>
+
 AudioDecoder::AudioDecoder(const std::string &path)
 {
 	this->buffer = std::unique_ptr<unsigned char[]>(
@@ -45,6 +47,8 @@ AudioDecoder::AudioDecoder(const std::string &path)
 	InitialisePacket();
 	InitialiseFrame();
 	InitialiseResampler();
+
+	this->decode_state = DecodeState::WAITING_FOR_FRAME;
 
 	Debug("stream id:", this->stream_id);
 	Debug("codec:", this->stream->codec->codec->long_name);
@@ -120,6 +124,9 @@ void AudioDecoder::SeekToPositionMicroseconds(
 	                  AVSEEK_FLAG_ANY) != 0) {
 		throw InternalError(MSG_SEEK_FAIL);
 	}
+
+	this->decode_state = DecodeState::WAITING_FOR_FRAME;
+	InitialisePacket();
 }
 
 std::int64_t AudioDecoder::AvPositionFromMicroseconds(
@@ -134,26 +141,63 @@ std::int64_t AudioDecoder::AvPositionFromMicroseconds(
 	return position_timebase_seconds.count();
 }
 
-std::vector<char> AudioDecoder::Decode()
+AudioDecoder::DecodeResult AudioDecoder::Decode()
 {
-	bool complete = false;
-	bool more = true;
-	std::vector<char> vec;
+	DecodeResult result = boost::none;
 
-	while (!complete && more) {
-		if (av_read_frame(this->context.get(), this->packet.get()) <
-		    0) {
-			more = false;
-		} else if (this->packet->stream_index == this->stream_id) {
-			complete = DecodePacket();
-			if (complete) {
-				vec = Resample();
-			}
-		}
+	switch (this->decode_state) {
+	case DecodeState::WAITING_FOR_FRAME:
+		result = DoFrame();
+		break;
+	case DecodeState::DECODING:
+		result = DoDecode();
+		break;
 	}
 
-	return vec;
+	return result;
 }
+
+AudioDecoder::DecodeResult AudioDecoder::DoFrame()
+{
+	DecodeResult result;
+
+	// If we need a frame, we have to keep trying to read a frame until we get
+	// one.
+	bool read_frame = ReadFrame();
+	if (read_frame) {
+		if (this->packet.stream_index == this->stream_id) {
+			this->decode_state = DecodeState::DECODING;
+		}
+		result = std::vector<char>();
+	} else {
+		this->decode_state = DecodeState::END_OF_FILE;
+		result = boost::none;
+	}
+
+	return result;
+}
+
+AudioDecoder::DecodeResult AudioDecoder::DoDecode()
+{
+	DecodeResult result;
+
+	bool finished_decoding = DecodePacket();
+	if (finished_decoding) {
+		result = Resample();
+		InitialisePacket();
+		this->decode_state = DecodeState::WAITING_FOR_FRAME;
+	} else {
+		result = std::vector<char>();
+	}
+
+	return result;
+}
+
+bool AudioDecoder::ReadFrame() {
+	int read_result = av_read_frame(this->context.get(), &this->packet);
+	return 0 == read_result;
+}
+
 
 std::vector<char> AudioDecoder::Resample()
 {
@@ -248,17 +292,9 @@ void AudioDecoder::InitialiseFrame()
 
 void AudioDecoder::InitialisePacket()
 {
-	auto packet_deleter = [](AVPacket *packet) {
-		av_free_packet(packet);
-		delete packet;
-	};
-	this->packet = std::unique_ptr<AVPacket, decltype(packet_deleter)>(
-	                new AVPacket, packet_deleter);
-
-	AVPacket *pkt = this->packet.get();
-	av_init_packet(pkt);
-	pkt->data = this->buffer.get();
-	pkt->size = BUFFER_SIZE;
+	av_init_packet(&this->packet);
+	this->packet.data = this->buffer.get();
+	this->packet.size = BUFFER_SIZE;
 }
 
 void AudioDecoder::InitialiseResampler()
@@ -285,11 +321,27 @@ bool AudioDecoder::UsingPlanarSampleFormat()
 
 bool AudioDecoder::DecodePacket()
 {
-	int frame_finished = 0;
+	assert(this->packet.data != nullptr);
+	assert(0 < this->packet.size);
 
-	if (avcodec_decode_audio4(this->stream->codec, this->frame.get(),
-	                          &frame_finished, this->packet.get()) < 0) {
+	auto decode_result = AvCodecDecode();
+
+	int bytes_decoded = decode_result.first;
+	if (bytes_decoded < 0) {
 		throw FileError(MSG_DECODE_FAIL);
 	}
-	return frame_finished;
+	this->packet.data += bytes_decoded;
+	this->packet.size -= bytes_decoded;
+	assert(0 <= this->packet.size);
+
+	bool frame_finished = decode_result.second;
+	return frame_finished || (0 < this->packet.size);
+}
+
+std::pair<int, bool> AudioDecoder::AvCodecDecode() {
+	int frame_finished = 0;
+	int bytes_decoded = avcodec_decode_audio4(this->stream->codec, this->frame.get(),
+		&frame_finished, &this->packet);
+
+	return std::make_pair(bytes_decoded, frame_finished != 0);
 }

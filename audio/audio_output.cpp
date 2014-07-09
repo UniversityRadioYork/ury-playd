@@ -144,8 +144,7 @@ bool AudioOutput::Update()
 {
 	bool more_frames_available = DecodeIfFrameEmpty();
 
-	if (more_frames_available) {
-		assert(!this->frame.empty());
+	if (!FrameFinished()) {
 		WriteAllAvailableToRingBuffer();
 	}
 
@@ -160,14 +159,19 @@ bool AudioOutput::DecodeIfFrameEmpty()
 	// frame as soon as it finishes.
 	assert(this->frame.empty() || !FrameFinished());
 
+	bool more_frames_available = true;
+
 	if (FrameFinished()) {
-		this->frame = this->av->Decode();
+		AudioDecoder::DecodeResult result = this->av->Decode();
+
+		this->frame = result.get_value_or(std::vector<char>());
 		this->frame_iterator = this->frame.begin();
+
+		// If the decoder result wasn't initialised, then the decoder has finished.
+		more_frames_available = result.is_initialized();
 	}
 
-	// If the frame is empty, then the decoder has finished.
-	// Otherwise, it has successfully decoded a frame.
-	return !(this->frame.empty());
+	return more_frames_available;
 }
 
 bool AudioOutput::FileEnded()

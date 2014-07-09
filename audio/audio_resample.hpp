@@ -77,6 +77,9 @@ public:
  */
 class Resampler : protected SampleByteConverter {
 public:
+	/// Type for output byte vectors from this Resampler.
+	using ResultVector = std::vector<char>;
+
 	/**
 	 * Constructs a Resampler.
 	 * @param conv  A SampleByteConverter providing conversions between
