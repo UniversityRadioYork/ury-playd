@@ -10,7 +10,6 @@
  * @see player/player_position.cpp
  */
 
-
 #include "player.hpp"
 
 // Basic state queries
