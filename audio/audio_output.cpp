@@ -190,7 +190,7 @@ void AudioOutput::WriteToRingBuffer(std::uint64_t sample_count)
 
 	std::uint64_t written_count = this->ring_buf->Write(
 	                &(*this->frame_iterator),
-	                static_cast<ring_buffer_size_t>(sample_count));
+	                sample_count);
 	if (written_count != sample_count) {
 		throw InternalError(MSG_OUTPUT_RINGWRITE);
 	}
