@@ -29,10 +29,6 @@ int main(int argc, char *argv[])
 	return ps.Run();
 }
 
-/**
- * Lists on stdout all sound devices to which the audio output may connect.
- * This is mainly for the benefit of the end user.
- */
 void Playslave::ListOutputDevices()
 {
 	this->audio.OnDevices([](const AudioSystem::Device &device) {
@@ -73,13 +69,6 @@ void Playslave::RegisterListeners()
 	});
 }
 
-/**
- * Performs the playslave main loop.
- * This involves listening for commands and asking the player to do some work.
- * @todo Make the command check asynchronous/event based.
- * @todo Possibly separate command check and player updating into separate
- * threads?
- */
 void Playslave::MainLoop()
 {
 	io->Run();
