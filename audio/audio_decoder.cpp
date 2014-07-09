@@ -58,25 +58,21 @@ AudioDecoder::~AudioDecoder()
 {
 }
 
-/* @return The number of channels this decoder outputs. */
 std::uint8_t AudioDecoder::ChannelCount() const
 {
 	return this->stream->codec->channels;
 }
 
-/* @return The size of this decoder's buffer, in samples. */
 size_t AudioDecoder::BufferSampleCapacity() const
 {
 	return SampleCountForByteCount(BUFFER_SIZE);
 }
 
-/* @return The sample rate. */
 double AudioDecoder::SampleRate() const
 {
 	return (double)this->stream->codec->sample_rate;
 }
 
-/* Converts stream position (in microseconds) to estimated sample count. */
 std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
                 std::chrono::microseconds usec) const
 {
@@ -85,7 +81,6 @@ std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
 	                .count();
 }
 
-/* Converts sample count to estimated stream position (in microseconds). */
 std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
                 std::uint64_t samples) const
 {
@@ -94,25 +89,21 @@ std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
 	                position_secs);
 }
 
-/* Converts buffer size (in bytes) to sample count (in samples). */
 std::uint64_t AudioDecoder::SampleCountForByteCount(std::uint64_t bytes) const
 {
 	return (bytes / ChannelCount()) / BytesPerSample();
 }
 
-/* Converts sample count (in samples) to buffer size (in bytes). */
 std::uint64_t AudioDecoder::ByteCountForSampleCount(std::uint64_t samples) const
 {
 	return (samples * ChannelCount()) * BytesPerSample();
 }
 
-/* Returns the current number of bytes per sample. */
 size_t AudioDecoder::BytesPerSample() const
 {
 	return av_get_bytes_per_sample(this->resampler->AVOutputFormat());
 }
 
-/* Attempts to seek to the position 'usec' milliseconds into the file. */
 void AudioDecoder::SeekToPositionMicroseconds(
                 std::chrono::microseconds position)
 {
