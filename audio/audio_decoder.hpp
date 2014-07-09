@@ -10,6 +10,7 @@
 #ifndef PS_AUDIO_DECODER_HPP
 #define PS_AUDIO_DECODER_HPP
 
+#include <array>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -21,6 +22,7 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
+#include "../constants.h"
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
 
@@ -141,7 +143,7 @@ private:
 	AVPacket packet; ///< The last undecoded packet.
 	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
 	                frame;                   ///< The last decoded frame.
-	std::unique_ptr<unsigned char[]> buffer; ///< The decoding buffer.
+	std::array<uint8_t, BUFFER_SIZE> buffer; ///< The decoding buffer.
 	std::unique_ptr<Resampler> resampler;    ///< The object providing
 	                                         ///resampling.
 

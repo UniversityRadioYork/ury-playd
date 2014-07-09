@@ -39,9 +39,6 @@ extern "C" {
 
 AudioDecoder::AudioDecoder(const std::string &path)
 {
-	this->buffer = std::unique_ptr<unsigned char[]>(
-	                new unsigned char[BUFFER_SIZE]);
-
 	Open(path);
 	InitialiseStream();
 	InitialisePacket();
@@ -284,7 +281,7 @@ void AudioDecoder::InitialiseFrame()
 void AudioDecoder::InitialisePacket()
 {
 	av_init_packet(&this->packet);
-	this->packet.data = this->buffer.get();
+	this->packet.data = &*this->buffer.begin();
 	this->packet.size = BUFFER_SIZE;
 }
 
