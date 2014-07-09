@@ -23,23 +23,17 @@
 template <typename T1, typename T2, int P>
 class BoostRingBuffer : public RingBuffer<T1, T2> {
 public:
+	using InternalBuffer = boost::circular_buffer<T1>;
+	using InternalBufferPtr = std::unique_ptr<InternalBuffer>;
+
 	/**
 	 * Constructs a BoostRingBuffer.
 	 * @param size  The size of one element in the ring buffer.
 	 */
 	BoostRingBuffer(int size)
 	{
-		this->rb = new boost::circular_buffer<char>((1 << P) * size);
+		this->rb = InternalBufferPtr(new InternalBuffer((1 << P) * size));
 		this->size = size;
-	}
-
-	/**
-	 * Destructs a BoostRingBuffer.
-	 */
-	~BoostRingBuffer()
-	{
-		assert(this->rb != nullptr);
-		delete this->rb;
 	}
 
 	T2 WriteCapacity() const override
@@ -55,7 +49,7 @@ public:
 	T2 Write(T1 *start, T2 count) override
 	{
 		return OnBuffer(start, count,
-		                [this](T1 *e) { this->rb->push_back(e); });
+		                [this](T1 *e) { this->rb->push_back(*e); });
 	}
 
 	T2 Read(T1 *start, T2 count) override
@@ -72,8 +66,8 @@ public:
 	}
 
 private:
-	boost::circular_buffer<T1> *rb; ///< The internal Boost ring buffer.
-	int size;                       ///< The size of one sample, in bytes.
+	InternalBufferPtr rb; ///< The internal Boost ring buffer.
+	int size;             ///< The size of one sample, in bytes.
 
 	/**
 	 * Transfers between this ring buffer and an external array buffer.
@@ -85,13 +79,13 @@ private:
 	 */
 	T2 OnBuffer(T1 *start, T2 count, std::function<void(T1 *)> f)
 	{
-		T2 i;
+		T1 *end = start + (count * this->size);
 
-		for (i = 0; i < count * this->size; i++) {
-			f(start + i);
+		for (T1 *ptr = start; ptr < end; ptr++) {
+			f(ptr);
 		}
 
-		return (i + 1) / this->size;
+		return count;
 	}
 };
 
