@@ -65,7 +65,7 @@ public:
 	 *   word @a word is read.
 	 * @return A pointer to this CommandHandler, for method chaining.
 	 */
-	CommandHandler *Add(const std::string &word, std::function<bool()> f);
+	CommandHandler *AddNullary(const std::string &word, std::function<bool()> f);
 
 	/**
 	 * Adds a unary command.
@@ -74,8 +74,8 @@ public:
 	 *   word @a word is read.
 	 * @return A pointer to this CommandHandler, for method chaining.
 	 */
-	CommandHandler *Add(const std::string &word,
-	                    std::function<bool(const std::string &)> f);
+	CommandHandler *AddUnary(const std::string &word,
+	                         std::function<bool(const std::string &)> f);
 
 private:
 	std::unique_ptr<CommandSet> commands;

@@ -27,15 +27,15 @@ CommandHandler::CommandHandler(const CommandHandler::CommandSet &commands)
 	this->commands = std::unique_ptr<CommandSet>(new CommandSet(commands));
 }
 
-CommandHandler *CommandHandler::Add(const std::string &word,
-                                    std::function<bool()> f)
+CommandHandler *CommandHandler::AddNullary(const std::string &word,
+                                           std::function<bool()> f)
 {
 	this->commands->emplace(word, [f](const WordList &) { return f(); });
 	return this;
 }
 
-CommandHandler *CommandHandler::Add(const std::string &word,
-                                    std::function<bool(const std::string &)> f)
+CommandHandler *CommandHandler::AddUnary(const std::string &word,
+                                         std::function<bool(const std::string &)> f)
 {
 	this->commands->emplace(word, [f](const WordList &words) {
 		bool valid = false;

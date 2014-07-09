@@ -120,13 +120,13 @@ Playslave::Playslave(int argc, char *argv[]) : audio{}
 
 	using std::string;
 
-	h->Add("play", [&]() { return this->player->Play(); });
-	h->Add("stop", [&]() { return this->player->Stop(); });
-	h->Add("ejct", [&]() { return this->player->Eject(); });
-	h->Add("quit", [&]() { return this->player->Quit(); });
+	h->AddNullary("play", [&]() { return this->player->Play(); });
+	h->AddNullary("stop", [&]() { return this->player->Stop(); });
+	h->AddNullary("ejct", [&]() { return this->player->Eject(); });
+	h->AddNullary("quit", [&]() { return this->player->Quit(); });
 
-	h->Add("load", [&](const string &s) { return this->player->Load(s); });
-	h->Add("seek", [&](const string &s) { return this->player->Seek(s); });
+	h->AddUnary("load", [&](const string &s) { return this->player->Load(s); });
+	h->AddUnary("seek", [&](const string &s) { return this->player->Seek(s); });
 
 	this->handler = decltype(this->handler)(h);
 
