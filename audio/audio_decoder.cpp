@@ -134,12 +134,6 @@ std::int64_t AudioDecoder::AvPositionFromMicroseconds(
 	return position_timebase_seconds.count();
 }
 
-/* Tries to decode an entire frame and returns a vector of its contents.
- *
- * If successful, returns a pointer to the resulting vector of decoded data,
- * which is owned by the caller.  If the return value is nullptr, we have run
- * out of frames to decode.
- */
 std::vector<char> AudioDecoder::Decode()
 {
 	bool complete = false;
