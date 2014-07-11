@@ -37,39 +37,18 @@
 // AsioIoReactor
 //
 
-AsioIoReactor::AsioIoReactor(Player &player, CommandHandler &handler,
-                             const std::string &address,
-                             const std::string &port)
+AsioIoReactor::AsioIoReactor(Player &player, CommandHandler &handler)
     : IoReactor(player, handler),
       io_service(),
-      signals(io_service),
-      acceptor(io_service),
-      manager()
+      signals(io_service)
 {
-        InitSignals();
-	InitAcceptor(address, port);
-
-	DoAccept();
-
+	InitSignals();
 	DoUpdateTimer();
 }
 
 void AsioIoReactor::MainLoop()
 {
 	io_service.run();
-}
-
-void AsioIoReactor::InitAcceptor(const std::string &address,
-                                 const std::string &port)
-{
-	boost::asio::ip::tcp::resolver resolver(io_service);
-	boost::asio::ip::tcp::endpoint endpoint =
-	                *resolver.resolve({address, port});
-	this->acceptor.open(endpoint.protocol());
-	this->acceptor.set_option(
-	                boost::asio::ip::tcp::acceptor::reuse_address(true));
-	this->acceptor.bind(endpoint);
-	this->acceptor.listen();
 }
 
 void AsioIoReactor::InitSignals()
@@ -81,10 +60,56 @@ void AsioIoReactor::InitSignals()
 #endif // SIGQUIT
 
 	this->signals.async_wait([this](boost::system::error_code,
-	                                int) { End(); });
+		int) { End(); });
 }
 
-void AsioIoReactor::DoAccept()
+void AsioIoReactor::DoUpdateTimer()
+{
+	boost::asio::high_resolution_timer t(
+		this->io_service,
+		std::chrono::duration_cast<
+		std::chrono::high_resolution_clock::
+		duration>(LOOP_PERIOD));
+	t.async_wait([this](boost::system::error_code) {
+		this->player.Update();
+		DoUpdateTimer();
+	});
+}
+
+void AsioIoReactor::End()
+{
+	this->io_service.stop();
+}
+
+//
+// AsioTcpIoReactor
+//
+
+AsioTcpIoReactor::AsioTcpIoReactor(Player &player, CommandHandler &handler,
+	const std::string &address,
+	const std::string &port)
+	: AsioIoReactor(player, handler),
+	acceptor(io_service),
+	manager()
+{
+	InitAcceptor(address, port);
+	DoAccept();
+}
+
+void AsioTcpIoReactor::InitAcceptor(const std::string &address,
+                                    const std::string &port)
+{
+	boost::asio::ip::tcp::resolver resolver(io_service);
+	boost::asio::ip::tcp::endpoint endpoint =
+	                *resolver.resolve({address, port});
+	this->acceptor.open(endpoint.protocol());
+	this->acceptor.set_option(
+	                boost::asio::ip::tcp::acceptor::reuse_address(true));
+	this->acceptor.bind(endpoint);
+	this->acceptor.listen();
+}
+
+void AsioTcpIoReactor::DoAccept()
 {
 	auto cmd = [this](const std::string &line) { HandleCommand(line); };
 	TcpConnection *con =
@@ -99,20 +124,7 @@ void AsioIoReactor::DoAccept()
 	this->acceptor.async_accept(connection->Socket(), on_accept);
 }
 
-void AsioIoReactor::DoUpdateTimer()
-{
-	boost::asio::high_resolution_timer t(
-	                this->io_service,
-	                std::chrono::duration_cast<
-	                                std::chrono::high_resolution_clock::
-	                                                duration>(LOOP_PERIOD));
-	t.async_wait([this](boost::system::error_code) {
-		this->player.Update();
-		DoUpdateTimer();
-	});
-}
-
-void AsioIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
+void AsioTcpIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
 {
 	std::ostringstream os;
 	f(os);
@@ -120,11 +132,12 @@ void AsioIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
 	this->manager.Send(os.str());
 }
 
-void AsioIoReactor::End()
+void AsioTcpIoReactor::End()
 {
 	this->acceptor.close();
 	this->manager.StopAll();
-	this->io_service.stop();
+	
+	AsioIoReactor::End();
 }
 
 //

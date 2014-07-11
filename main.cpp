@@ -124,7 +124,7 @@ Playslave::Playslave(int argc, char *argv[]) : audio{}
 
 	IoReactor *io = nullptr;
 	if (this->arguments.size() == 4) {
-		io = new AsioIoReactor((*this->player), (*this->handler),
+		io = new AsioTcpIoReactor((*this->player), (*this->handler),
 		                       this->arguments.at(2),
 		                       this->arguments.at(3));
 	} else {

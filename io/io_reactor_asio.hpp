@@ -134,35 +134,27 @@ private:
 /**
  * An IoReactor using boost::asio.
  *
- * The AsioIoReactor uses asynchronous, socket-based IO.  It exposes a server on
- * a given TCP port and address, which takes commands as input and emits
- * responses as output.  An AsioIoReactor can support multiple clients at once,
- * all of whom are broadcast each response and all of whom may send commands.
+ * This is an abstract class, implemented by AsioTcpIoReactor, AsioWinIoReactor,
+ * and AsioPosixIoReactor.
  *
  * Similarly to StdIoReactor, the player is polled at a frequent rate to update
  * itself.  Unlike StdIoReactor, the polling and TCP communications occur
  * asynchronously.
  *
- * AsioIoReactor is several orders of magnitude more complex than StdIoReactor,
- * and is less well-tested.  It also requires more resources (a port and address
- * to which it will bind).  However, it is more flexible and portable.
- *
  * @see IoReactor
- * @see StdIoReactor
+ * @see AsioTcpIoReactor
+ * @see AsioWinIoReactor
+ * @see AsioPosixIoReactor
  */
 class AsioIoReactor : public IoReactor {
 public:
 	/**
-	 * Constructs an AsioIoReactor.
-	 * @param player The player to which periodic update requests shall be
-	 *   sent.
-	 * @param handler The handler to which command inputs shall be sent.
-	 * @param address The address to which AsioIoReactor will bind.
-	 * @param port The port on which AsioIoReactor will listen for clients.
-	 */
-	explicit AsioIoReactor(Player &player, CommandHandler &handler,
-	                       const std::string &address,
-	                       const std::string &port);
+	* Constructs an AsioIoReactor.
+	* @param player The player to which periodic update requests shall be
+	*   sent.
+	* @param handler The handler to which command inputs shall be sent.
+	*/
+	explicit AsioIoReactor(Player &player, CommandHandler &handler);
 
 	/// Deleted copy constructor.
 	AsioIoReactor(const AsioIoReactor &) = delete;
@@ -173,23 +165,59 @@ public:
 	void End() override;
 
 protected:
-	void ResponseViaOstream(std::function<void(std::ostream &)> f) override;
-
-private:
-	void MainLoop() override;
-
-	void DoAccept();
-
-	void DoUpdateTimer();
-
-	void InitAcceptor(const std::string &address, const std::string &port);
-	void InitSignals();
-
 	/// The IO service used by the reactor.
 	boost::asio::io_service io_service;
 
+private:
+	void MainLoop() override;
+	void DoUpdateTimer();
+	void InitSignals();
+
 	/// The signal set used to shut the server down on terminations.
 	boost::asio::signal_set signals;
+};
+
+/**
+ * An IoReactor using boost::asio and TCP/IP.
+ *
+ * The AsioTcpIoReactor uses asynchronous, socket-based IO.  It exposes a server on
+ * a given TCP port and address, which takes commands as input and emits
+ * responses as output.  An AsioTcpIoReactor can support multiple clients at once,
+ * all of whom are broadcast each response and all of whom may send commands.
+ *
+ * @see IoReactor
+ * @see AsioIoReactor
+ * @see AsioWinReactor
+ * @see AsioPosixReactor
+ */
+class AsioTcpIoReactor : public AsioIoReactor {
+public:
+	/**
+	 * Constructs an AsioTcpIoReactor.
+	 * @param player The player to which periodic update requests shall be
+	 *   sent.
+	 * @param handler The handler to which command inputs shall be sent.
+	 * @param address The address to which AsioIoReactor will bind.
+	 * @param port The port on which AsioIoReactor will listen for clients.
+	 */
+	explicit AsioTcpIoReactor(Player &player, CommandHandler &handler,
+	                       const std::string &address,
+	                       const std::string &port);
+
+	/// Deleted copy constructor.
+	AsioTcpIoReactor(const AsioIoReactor &) = delete;
+
+	/// Deleted copy-assignment.
+	AsioTcpIoReactor &operator=(const AsioIoReactor &) = delete;
+
+	void End() override;
+
+protected:
+	void ResponseViaOstream(std::function<void(std::ostream &)> f) override;
+
+private:
+	void DoAccept();
+	void InitAcceptor(const std::string &address, const std::string &port);
 
 	/// The acceptor used to listen for incoming connections.
 	boost::asio::ip::tcp::acceptor acceptor;
