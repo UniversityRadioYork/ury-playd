@@ -16,6 +16,8 @@
 #ifndef PS_IO_REACTOR_POSIX_HPP
 #define PS_IO_REACTOR_POSIX_HPP
 
+#include <boost/asio.hpp>
+
 #ifdef BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR
 
 #include <functional>                  // std::function

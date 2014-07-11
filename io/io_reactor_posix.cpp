@@ -13,6 +13,8 @@
  * @see io/io_reactor_win.cpp
  */
 
+#include <boost/asio.hpp>
+
 #ifdef BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR
 
 #include <functional>                  // std::function
