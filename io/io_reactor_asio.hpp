@@ -205,10 +205,10 @@ public:
 	                       const std::string &port);
 
 	/// Deleted copy constructor.
-	AsioTcpIoReactor(const AsioIoReactor &) = delete;
+	AsioTcpIoReactor(const AsioTcpIoReactor &) = delete;
 
 	/// Deleted copy-assignment.
-	AsioTcpIoReactor &operator=(const AsioIoReactor &) = delete;
+	AsioTcpIoReactor &operator=(const AsioTcpIoReactor &) = delete;
 
 	void End() override;
 
@@ -225,5 +225,61 @@ private:
 	/// The object responsible for managing live connections.
 	TcpConnectionManager manager;
 };
+
+#ifdef BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE
+
+//
+// Windows-specific code
+//
+
+#include <windows.h>
+#include "../contrib/stdin_stream.hpp"
+
+/**
+* An IoReactor using the Windows API.
+*
+* The AsioWinIoReactor allows Playslave to take input from, and send output to,
+* a Windows console.
+*
+* @see IoReactor
+* @see AsioIoReactor
+* @see AsioTcpIoReactor
+* @see AsioPosixReactor
+*/
+class AsioWinIoReactor : public AsioIoReactor {
+public:
+	/**
+	 * Constructs an AsioWinIoReactor.
+	 * @param player The player to which periodic update requests shall be
+	 *   sent.
+	 * @param handler The handler to which command inputs shall be sent.
+	 */
+	explicit AsioWinIoReactor(Player &player, CommandHandler &handler);
+
+	/// Deleted copy constructor.
+	AsioWinIoReactor(const AsioWinIoReactor &) = delete;
+
+	/// Deleted copy-assignment.
+	AsioWinIoReactor &operator=(const AsioWinIoReactor &) = delete;
+protected:
+	void ResponseViaOstream(std::function<void(std::ostream &)> f) override;
+
+private:
+	void SetupWaitForInput();
+
+	/// The handle pointing to the console input.
+	HANDLE input_handle;
+
+	/// The handle pointing to the console output.
+	HANDLE output_handle;
+
+	/// The ASIO wrapper for the console input handle.
+	stdin_stream input;
+
+	/// The data buffer for the console input stream.
+	boost::asio::streambuf data;
+};
+
+#endif // BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE
 
 #endif // PS_IO_REACTOR_ASIO_HPP

@@ -79,7 +79,7 @@ bool CommandHandler::RunLine(const std::string &line)
 
 bool CommandHandler::Handle(const std::string &line)
 {
-	Debug("got command: ", line);
+	Debug("got command: <", line, ">");
 
 	/* Silently fail if the command is actually end of file */
 	if (std::cin.eof()) {

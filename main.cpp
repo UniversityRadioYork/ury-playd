@@ -128,7 +128,11 @@ Playslave::Playslave(int argc, char *argv[]) : audio{}
 		                       this->arguments.at(2),
 		                       this->arguments.at(3));
 	} else {
+#ifdef _WIN32
+		io = new AsioWinIoReactor((*this->player), (*this->handler));
+#else
 		io = new StdIoReactor((*this->player), (*this->handler));
+#endif // _WIN32
 	}
 	this->io = decltype(this->io)(io);
 }

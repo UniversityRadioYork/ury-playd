@@ -261,3 +261,53 @@ void TcpConnectionManager::Send(const std::string &string)
 		c->Send(string);
 	}
 }
+
+//
+// AsioWinIoReactor (Windows-only)
+//
+
+#ifdef BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE
+
+#include <Windows.h>
+#include "../contrib/stdin_stream.hpp"
+
+AsioWinIoReactor::AsioWinIoReactor(Player &player, CommandHandler &handler)
+	: AsioIoReactor(player, handler),
+	input_handle(GetStdHandle(STD_INPUT_HANDLE)),
+	input(io_service, input_handle)
+{
+	if (this->input_handle == INVALID_HANDLE_VALUE) {
+		throw new InternalError("Couldn't get input console handle");
+	}
+
+	SetupWaitForInput();
+}
+
+void AsioWinIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
+{
+	f(std::cout);
+}
+
+void AsioWinIoReactor::SetupWaitForInput()
+{
+	boost::asio::async_read_until(input, data, "\r\n",
+		[this](const boost::system::error_code &ec, std::size_t) {
+		if (!ec) {
+			std::istream is(&data);
+			std::string s;
+			std::getline(is, s);
+
+			// Windows uses CRLF endings, but std::getline can ignore the CR.
+			// Let's fix that in an awful way fitting of Windows's awfulness.
+			if (s.back() == '\r') {
+				s.pop_back();
+			}
+
+			HandleCommand(s);
+
+			SetupWaitForInput();
+		}
+	});
+}
+
+#endif // BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE
