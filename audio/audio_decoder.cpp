@@ -50,9 +50,7 @@ AudioDecoder::AudioDecoder(const std::string &path)
 	Debug("codec:", this->stream->codec->codec->long_name);
 }
 
-AudioDecoder::~AudioDecoder()
-{
-}
+AudioDecoder::~AudioDecoder() {}
 
 std::uint8_t AudioDecoder::ChannelCount() const
 {
@@ -133,15 +131,15 @@ AudioDecoder::DecodeResult AudioDecoder::Decode()
 	Resampler::ResultVector decoded;
 
 	switch (this->decode_state) {
-	case DecodeState::WAITING_FOR_FRAME:
-		DoFrame();
-		break;
-	case DecodeState::DECODING:
-		decoded = DoDecode();
-		break;
-	case DecodeState::END_OF_FILE:
-		// Intentionally ignore
-		break;
+		case DecodeState::WAITING_FOR_FRAME:
+			DoFrame();
+			break;
+		case DecodeState::DECODING:
+			decoded = DoDecode();
+			break;
+		case DecodeState::END_OF_FILE:
+			// Intentionally ignore
+			break;
 	}
 
 	return std::make_pair(this->decode_state, decoded);
@@ -156,8 +154,8 @@ void AudioDecoder::DoFrame()
 		// (TODO: Start flushing the buffer here?)
 		this->decode_state = DecodeState::END_OF_FILE;
 	} else if (this->packet.stream_index == this->stream_id) {
-		// Only switch to decoding if the frame belongs to the audio stream.
-		// Else, we ignore it.
+		// Only switch to decoding if the frame belongs to the audio
+		// stream.  Else, we ignore it.
 		this->decode_state = DecodeState::DECODING;
 	}
 }
@@ -174,15 +172,16 @@ AudioDecoder::DecodeVector AudioDecoder::DoDecode()
 		InitialisePacket();
 		this->decode_state = DecodeState::WAITING_FOR_FRAME;
 	} else {
-		// Send through an empty vector, so that the audio output will safely
-		// run its course and make way for the next decode round.
+		// Send through an empty vector, so that the audio output will
+		// safely run its course and make way for the next decode round.
 		result = std::vector<char>();
 	}
 
 	return result;
 }
 
-bool AudioDecoder::ReadFrame() {
+bool AudioDecoder::ReadFrame()
+{
 	int read_result = av_read_frame(this->context.get(), &this->packet);
 	return 0 == read_result;
 }
@@ -203,14 +202,8 @@ static std::map<AVSampleFormat, SampleFormat> sf_from_av = {
  */
 SampleFormat AudioDecoder::OutputSampleFormat() const
 {
-	try
-	{
-		return sf_from_av.at(this->resampler->AVOutputFormat());
-	}
-	catch (std::out_of_range)
-	{
-		throw FileError(MSG_DECODE_BADRATE);
-	}
+	try { return sf_from_av.at(this->resampler->AVOutputFormat()); }
+	catch (std::out_of_range) { throw FileError(MSG_DECODE_BADRATE); }
 }
 
 void AudioDecoder::Open(const std::string &path)
@@ -326,10 +319,12 @@ bool AudioDecoder::DecodePacket()
 	return frame_finished || (0 < this->packet.size);
 }
 
-std::pair<int, bool> AudioDecoder::AvCodecDecode() {
+std::pair<int, bool> AudioDecoder::AvCodecDecode()
+{
 	int frame_finished = 0;
-	int bytes_decoded = avcodec_decode_audio4(this->stream->codec, this->frame.get(),
-		&frame_finished, &this->packet);
+	int bytes_decoded = avcodec_decode_audio4(
+	                this->stream->codec, this->frame.get(), &frame_finished,
+	                &this->packet);
 
 	return std::make_pair(bytes_decoded, frame_finished != 0);
 }

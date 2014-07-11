@@ -14,7 +14,4 @@ Error::Error(const std::string &message)
 	this->message = std::string(message);
 }
 
-const std::string &Error::Message() const
-{
-	return this->message;
-}
+const std::string &Error::Message() const { return this->message; }

@@ -61,17 +61,18 @@ public:
 	/**
 	 * Adds a nullary command.
 	 * @param word The command word to associate with @a f.
-	 * @param f The command, taking no arguments, to execute when the command
-	 *   word @a word is read.
+	 * @param f The command, taking no arguments, to execute when the
+	 *   command word @a word is read.
 	 * @return A pointer to this CommandHandler, for method chaining.
 	 */
-	CommandHandler *AddNullary(const std::string &word, std::function<bool()> f);
+	CommandHandler *AddNullary(const std::string &word,
+	                           std::function<bool()> f);
 
 	/**
 	 * Adds a unary command.
 	 * @param word The command word to associate with @a f.
-	 * @param f The command, taking one argument, to execute when the command
-	 *   word @a word is read.
+	 * @param f The command, taking one argument, to execute when the
+	 *   command word @a word is read.
 	 * @return A pointer to this CommandHandler, for method chaining.
 	 */
 	CommandHandler *AddUnary(const std::string &word,

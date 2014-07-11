@@ -28,10 +28,7 @@ void Player::UpdatePosition()
 	this->position.Update(pos);
 }
 
-void Player::ResetPosition()
-{
-	this->position.Reset();
-}
+void Player::ResetPosition() { this->position.Reset(); }
 
 // PlayerPosition
 PlayerPosition::PlayerPosition()

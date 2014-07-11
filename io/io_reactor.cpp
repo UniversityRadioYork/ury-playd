@@ -22,10 +22,7 @@
 #include <boost/asio/high_resolution_timer.hpp> // boost::asio::high_resolution_timer
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler)
-    : player(player),
-	  handler(handler),
-      io_service(),
-	  signals(io_service)
+    : player(player), handler(handler), io_service(), signals(io_service)
 {
 	InitSignals();
 	DoUpdateTimer();
@@ -48,10 +45,7 @@ void IoReactor::HandleCommand(const std::string &line)
 	}
 }
 
-void IoReactor::MainLoop()
-{
-	io_service.run();
-}
+void IoReactor::MainLoop() { io_service.run(); }
 
 void IoReactor::InitSignals()
 {
@@ -62,24 +56,20 @@ void IoReactor::InitSignals()
 #endif // SIGQUIT
 
 	this->signals.async_wait([this](boost::system::error_code,
-		int) { End(); });
+	                                int) { End(); });
 }
 
 void IoReactor::DoUpdateTimer()
 {
 	boost::asio::high_resolution_timer t(
-		this->io_service,
-		std::chrono::duration_cast<
-		std::chrono::high_resolution_clock::
-		duration>(LOOP_PERIOD));
+	                this->io_service,
+	                std::chrono::duration_cast<
+	                                std::chrono::high_resolution_clock::
+	                                                duration>(LOOP_PERIOD));
 	t.async_wait([this](boost::system::error_code) {
 		this->player.Update();
 		DoUpdateTimer();
 	});
 }
 
-void IoReactor::End()
-{
-	this->io_service.stop();
-}
-
+void IoReactor::End() { this->io_service.stop(); }

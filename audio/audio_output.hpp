@@ -44,9 +44,9 @@ public:
 	 * @param decoder The decoder whose output will be fed into the stream.
 	 * @return The configured PortAudio stream.
 	 */
-	virtual portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
-	                                     const AudioDecoder &decoder)
-	                const = 0;
+	virtual portaudio::Stream *Configure(
+	                portaudio::CallbackInterface &cb,
+	                const AudioDecoder &decoder) const = 0;
 };
 
 /**
@@ -185,10 +185,10 @@ private:
 	 */
 	void ClearFrame();
 
-	std::uint64_t ByteCountForSampleCount(std::uint64_t sample_count) const
-	                override;
-	std::uint64_t SampleCountForByteCount(std::uint64_t sample_count) const
-	                override;
+	std::uint64_t ByteCountForSampleCount(
+	                std::uint64_t sample_count) const override;
+	std::uint64_t SampleCountForByteCount(
+	                std::uint64_t sample_count) const override;
 
 	/**
 	 * The callback proper.

@@ -34,8 +34,9 @@ CommandHandler *CommandHandler::AddNullary(const std::string &word,
 	return this;
 }
 
-CommandHandler *CommandHandler::AddUnary(const std::string &word,
-                                         std::function<bool(const std::string &)> f)
+CommandHandler *CommandHandler::AddUnary(
+                const std::string &word,
+                std::function<bool(const std::string &)> f)
 {
 	this->commands->emplace(word, [f](const WordList &words) {
 		bool valid = false;

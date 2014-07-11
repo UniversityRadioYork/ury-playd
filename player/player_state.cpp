@@ -14,15 +14,9 @@
 
 // Basic state queries
 
-Player::State Player::CurrentState() const
-{
-	return this->current_state;
-}
+Player::State Player::CurrentState() const { return this->current_state; }
 
-bool Player::IsRunning() const
-{
-	return CurrentState() != State::QUITTING;
-}
+bool Player::IsRunning() const { return CurrentState() != State::QUITTING; }
 
 // State conditionals
 

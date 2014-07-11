@@ -22,9 +22,9 @@
 #include <Windows.h>
 
 WinIoReactor::WinIoReactor(Player &player, CommandHandler &handler)
-	: IoReactor(player, handler),
-	input_handle(GetStdHandle(STD_INPUT_HANDLE)),
-	input(io_service, input_handle)
+    : IoReactor(player, handler),
+      input_handle(GetStdHandle(STD_INPUT_HANDLE)),
+      input(io_service, input_handle)
 {
 	if (this->input_handle == INVALID_HANDLE_VALUE) {
 		throw new InternalError("Couldn't get input console handle");
@@ -41,24 +41,28 @@ void WinIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
 
 void WinIoReactor::SetupWaitForInput()
 {
-	boost::asio::async_read_until(input, data, "\r\n",
-		[this](const boost::system::error_code &ec, std::size_t) {
-		if (!ec) {
-			std::istream is(&data);
-			std::string s;
-			std::getline(is, s);
+	boost::asio::async_read_until(
+	                input, data, "\r\n",
+	                [this](const boost::system::error_code &ec,
+	                       std::size_t) {
+		                if (!ec) {
+			                std::istream is(&data);
+			                std::string s;
+			                std::getline(is, s);
 
-			// Windows uses CRLF endings, but std::getline can ignore the CR.
-			// Let's fix that in an awful way fitting of Windows's awfulness.
-			if (s.back() == '\r') {
-				s.pop_back();
-			}
+			                // Windows uses CRLF endings, but
+			                // std::getline can ignore the CR.
+			                // Let's fix that in an awful way
+			                // fitting of Windows's awfulness.
+			                if (s.back() == '\r') {
+				                s.pop_back();
+			                }
 
-			HandleCommand(s);
+			                HandleCommand(s);
 
-			SetupWaitForInput();
-		}
-	});
+			                SetupWaitForInput();
+		                }
+		        });
 }
 
 #endif // _WIN32

@@ -62,6 +62,7 @@ public:
 
 	/// The type of TimeParser the Player expects.
 	using TP = TimeParser<std::chrono::microseconds>;
+
 private:
 	const AudioSystem &audio_system;
 	const TP &time_parser;

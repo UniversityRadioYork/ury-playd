@@ -50,7 +50,7 @@ public:
 protected:
 	Player &player;                     ///< The player.
 	CommandHandler &handler;            ///< The command handler.
-	boost::asio::io_service io_service;	///< The ASIO IO service.
+	boost::asio::io_service io_service; ///< The ASIO IO service.
 
 	/**
 	 * Sends a command to the command handler.
@@ -59,7 +59,9 @@ protected:
 	 */
 	void HandleCommand(const std::string &line);
 
-	virtual void ResponseViaOstream(std::function<void(std::ostream &)> f) override = 0;
+	virtual void ResponseViaOstream(
+	                std::function<void(std::ostream &)> f) override = 0;
+
 private:
 	/**
 	 * The reactor's main loop.

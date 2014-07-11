@@ -29,8 +29,6 @@
 #define BOOST_ASIO_HAS_STD_CHRONO
 #endif
 
-
-
 #include "../constants.h" // LOOP_PERIOD
 #include "../cmd.hpp"
 #include "../errors.hpp"
@@ -43,25 +41,22 @@
 //
 
 TcpIoReactor::TcpIoReactor(Player &player, CommandHandler &handler,
-	const std::string &address,
-	const std::string &port)
-	: IoReactor(player, handler),
-	acceptor(io_service),
-	manager()
+                           const std::string &address, const std::string &port)
+    : IoReactor(player, handler), acceptor(io_service), manager()
 {
 	InitAcceptor(address, port);
 	DoAccept();
 }
 
 void TcpIoReactor::InitAcceptor(const std::string &address,
-	const std::string &port)
+                                const std::string &port)
 {
 	boost::asio::ip::tcp::resolver resolver(io_service);
 	boost::asio::ip::tcp::endpoint endpoint =
-		*resolver.resolve({ address, port });
+	                *resolver.resolve({address, port});
 	this->acceptor.open(endpoint.protocol());
 	this->acceptor.set_option(
-		boost::asio::ip::tcp::acceptor::reuse_address(true));
+	                boost::asio::ip::tcp::acceptor::reuse_address(true));
 	this->acceptor.bind(endpoint);
 	this->acceptor.listen();
 }
@@ -70,7 +65,7 @@ void TcpIoReactor::DoAccept()
 {
 	auto cmd = [this](const std::string &line) { HandleCommand(line); };
 	TcpConnection *con =
-		new TcpConnection(cmd, this->manager, this->io_service);
+	                new TcpConnection(cmd, this->manager, this->io_service);
 	TcpConnection::Pointer connection(con);
 	auto on_accept = [this, connection](boost::system::error_code ec) {
 		if (!ec) {
@@ -102,13 +97,13 @@ void TcpIoReactor::End()
 //
 
 TcpConnection::TcpConnection(std::function<void(const std::string &)> cmd,
-	TcpConnectionManager &manager,
-	boost::asio::io_service &io_service)
-	: socket(io_service),
-	strand(io_service),
-	outbox(),
-	cmd(cmd),
-	manager(manager)
+                             TcpConnectionManager &manager,
+                             boost::asio::io_service &io_service)
+    : socket(io_service),
+      strand(io_service),
+      outbox(),
+      cmd(cmd),
+      manager(manager)
 {
 }
 
@@ -124,17 +119,14 @@ void TcpConnection::Stop()
 	this->socket.close();
 }
 
-boost::asio::ip::tcp::socket &TcpConnection::Socket()
-{
-	return socket;
-}
+boost::asio::ip::tcp::socket &TcpConnection::Socket() { return socket; }
 
 void TcpConnection::DoRead()
 {
 	boost::asio::async_read_until(socket, data, "\n",
-		[this](const boost::system::error_code &
-		ec,
-		std::size_t) {
+	                              [this](const boost::system::error_code &
+	                                                     ec,
+	                                     std::size_t) {
 		if (!ec) {
 			std::istream is(&data);
 			std::string s;
@@ -143,8 +135,7 @@ void TcpConnection::DoRead()
 			this->cmd(s);
 
 			DoRead();
-		}
-		else if (ec != boost::asio::error::operation_aborted) {
+		} else if (ec != boost::asio::error::operation_aborted) {
 			this->manager.Stop(shared_from_this());
 		}
 	});
@@ -171,9 +162,9 @@ void TcpConnection::DoWrite()
 	};
 
 	boost::asio::async_write(
-		this->socket,
-		boost::asio::buffer(string.c_str(), string.size()),
-		this->strand.wrap(write_cb));
+	                this->socket,
+	                boost::asio::buffer(string.c_str(), string.size()),
+	                this->strand.wrap(write_cb));
 }
 
 void TcpConnection::ResponseViaOstream(std::function<void(std::ostream &)> f)
@@ -188,9 +179,7 @@ void TcpConnection::ResponseViaOstream(std::function<void(std::ostream &)> f)
 // TcpConnectionManager
 //
 
-TcpConnectionManager::TcpConnectionManager()
-{
-}
+TcpConnectionManager::TcpConnectionManager() {}
 
 void TcpConnectionManager::Start(TcpConnection::Pointer c)
 {

@@ -87,10 +87,7 @@ void AudioOutput::Stop()
 	// TODO: Possibly recover from dropping frames due to abort.
 }
 
-bool AudioOutput::IsStopped()
-{
-	return !this->out_strm->isActive();
-}
+bool AudioOutput::IsStopped() { return !this->out_strm->isActive(); }
 
 std::chrono::microseconds AudioOutput::CurrentPositionMicroseconds()
 {
@@ -167,16 +164,14 @@ bool AudioOutput::DecodeIfFrameEmpty()
 		this->frame = result.second;
 		this->frame_iterator = this->frame.begin();
 
-		more_frames_available = result.first != AudioDecoder::DecodeState::END_OF_FILE;
+		more_frames_available = result.first !=
+		                        AudioDecoder::DecodeState::END_OF_FILE;
 	}
 
 	return more_frames_available;
 }
 
-bool AudioOutput::FileEnded()
-{
-	return this->file_ended;
-}
+bool AudioOutput::FileEnded() { return this->file_ended; }
 
 void AudioOutput::WriteAllAvailableToRingBuffer()
 {
@@ -192,8 +187,7 @@ void AudioOutput::WriteToRingBuffer(std::uint64_t sample_count)
 	assert(0 < sample_count);
 
 	std::uint64_t written_count = this->ring_buf->Write(
-	                &(*this->frame_iterator),
-	                sample_count);
+	                &(*this->frame_iterator), sample_count);
 	if (written_count != sample_count) {
 		throw InternalError(MSG_OUTPUT_RINGWRITE);
 	}

@@ -34,7 +34,7 @@ class TcpConnectionManager;
 * A connection using the TCP server.
 */
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>,
-	public Responder {
+                      public Responder {
 public:
 	/// A shared pointer to a TcpConnection.
 	using Pointer = std::shared_ptr<TcpConnection>;
@@ -47,8 +47,8 @@ public:
 	* @return A TcpConnection.
 	*/
 	explicit TcpConnection(std::function<void(const std::string &)> cmd,
-		TcpConnectionManager &manager,
-		boost::asio::io_service &io_service);
+	                       TcpConnectionManager &manager,
+	                       boost::asio::io_service &io_service);
 
 	/// Deleted copy constructor.
 	TcpConnection(const TcpConnection &) = delete;
@@ -157,8 +157,8 @@ public:
 	* @param port The port on which IoReactor will listen for clients.
 	*/
 	explicit TcpIoReactor(Player &player, CommandHandler &handler,
-		const std::string &address,
-		const std::string &port);
+	                      const std::string &address,
+	                      const std::string &port);
 
 	/// Deleted copy constructor.
 	TcpIoReactor(const TcpIoReactor &) = delete;

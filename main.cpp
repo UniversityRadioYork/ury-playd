@@ -77,7 +77,7 @@ void Playslave::RegisterListeners()
 		io->Respond(Response::TIME, p);
 	});
 	this->player.RegisterStateListener([this](Player::State old_state,
-	                                           Player::State new_state) {
+	                                          Player::State new_state) {
 		io->Respond(Response::STAT, Player::StateString(old_state),
 		            Player::StateString(new_state));
 		if (new_state == Player::State::QUITTING) {
@@ -86,36 +86,29 @@ void Playslave::RegisterListeners()
 	});
 }
 
-void Playslave::MainLoop()
-{
-	io->Run();
-}
+void Playslave::MainLoop() { io->Run(); }
 
 const Player::TP::UnitMap UNITS = {
-	{ "us", Player::TP::MkTime<std::chrono::microseconds> },
-	{ "usec", Player::TP::MkTime<std::chrono::microseconds> },
-	{ "usecs", Player::TP::MkTime<std::chrono::microseconds> },
-	{ "ms", Player::TP::MkTime<std::chrono::milliseconds> },
-	{ "msec", Player::TP::MkTime<std::chrono::milliseconds> },
-	{ "msecs", Player::TP::MkTime<std::chrono::milliseconds> },
-	{ "s", Player::TP::MkTime<std::chrono::seconds> },
-	{ "sec", Player::TP::MkTime<std::chrono::seconds> },
-	{ "secs", Player::TP::MkTime<std::chrono::seconds> },
-	{ "m", Player::TP::MkTime<std::chrono::minutes> },
-	{ "min", Player::TP::MkTime<std::chrono::minutes> },
-	{ "mins", Player::TP::MkTime<std::chrono::minutes> },
-	{ "h", Player::TP::MkTime<std::chrono::hours> },
-	{ "hour", Player::TP::MkTime<std::chrono::hours> },
-	{ "hours", Player::TP::MkTime<std::chrono::hours> },
-	// Default when there is no unit
-	{ "", Player::TP::MkTime<std::chrono::microseconds> }
-};
+                {"us", Player::TP::MkTime<std::chrono::microseconds>},
+                {"usec", Player::TP::MkTime<std::chrono::microseconds>},
+                {"usecs", Player::TP::MkTime<std::chrono::microseconds>},
+                {"ms", Player::TP::MkTime<std::chrono::milliseconds>},
+                {"msec", Player::TP::MkTime<std::chrono::milliseconds>},
+                {"msecs", Player::TP::MkTime<std::chrono::milliseconds>},
+                {"s", Player::TP::MkTime<std::chrono::seconds>},
+                {"sec", Player::TP::MkTime<std::chrono::seconds>},
+                {"secs", Player::TP::MkTime<std::chrono::seconds>},
+                {"m", Player::TP::MkTime<std::chrono::minutes>},
+                {"min", Player::TP::MkTime<std::chrono::minutes>},
+                {"mins", Player::TP::MkTime<std::chrono::minutes>},
+                {"h", Player::TP::MkTime<std::chrono::hours>},
+                {"hour", Player::TP::MkTime<std::chrono::hours>},
+                {"hours", Player::TP::MkTime<std::chrono::hours>},
+                // Default when there is no unit
+                {"", Player::TP::MkTime<std::chrono::microseconds>}};
 
 Playslave::Playslave(int argc, char *argv[])
-	: audio(),
-	player(audio, time_parser),
-	handler(),
-	time_parser(UNITS)
+    : audio(), player(audio, time_parser), handler(), time_parser(UNITS)
 {
 	for (int i = 0; i < argc; i++) {
 		this->arguments.push_back(std::string(argv[i]));
@@ -126,13 +119,14 @@ Playslave::Playslave(int argc, char *argv[])
 	IoReactor *io = nullptr;
 	if (this->arguments.size() == 4) {
 		io = new TcpIoReactor(this->player, this->handler,
-		                       this->arguments.at(2),
-		                       this->arguments.at(3));
+		                      this->arguments.at(2),
+		                      this->arguments.at(3));
 	} else {
 #ifdef HAVE_STD_IO_REACTOR
 		io = new StdIoReactor(this->player, this->handler);
 #else
-		throw Error("Cannot use standard IO, not supported on this platform.");
+		throw Error("Cannot use standard IO, not supported on this "
+		            "platform.");
 #endif // HAVE_STD_IO_REACTOR
 	}
 	this->io = decltype(this->io)(io);

@@ -20,9 +20,9 @@
 
 #ifdef BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR
 
-#include <functional>                  // std::function
-#include <ostream>                     // std::ostream
-#include "io_reactor.hpp"              // IoReactor
+#include <functional>     // std::function
+#include <ostream>        // std::ostream
+#include "io_reactor.hpp" // IoReactor
 
 /**
  * An IoReactor using POSIX streams.

@@ -81,9 +81,7 @@ public:
 /**
  * Base case for DebugArgs, when there are no arguments.
  */
-inline void DebugArgs()
-{
-}
+inline void DebugArgs() {}
 
 /**
  * Outputs a debug message, with a variadic number of arguments (at least one).

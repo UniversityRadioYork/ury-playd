@@ -43,16 +43,15 @@ public:
 private:
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.
-
 	Player player;                      ///< The player subsystem.
 	CommandHandler handler;             ///< The command handler.
 	Player::TP time_parser;             ///< The seek time parser.
-	std::unique_ptr<IoReactor> io;           ///< The I/O handler.
+	std::unique_ptr<IoReactor> io;      ///< The I/O handler.
 
 	/**
 	 * Tries to get the output device ID from stdin.
 	 * If there is no stdin, the program lists the available devices and
-	 * dies.
+	 *   dies.
 	 * @param system The audio system.
 	 * @param argc The program argument count (from main()).
 	 * @param argv The program argument vector (from main()).
@@ -62,7 +61,7 @@ private:
 
 	/**
 	 * Lists on stdout all sound devices to which the audio output may
-	 * connect.
+	 *   connect.
 	 * This is mainly for the benefit of the end user.
 	 */
 	void ListOutputDevices();

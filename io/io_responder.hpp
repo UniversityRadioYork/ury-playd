@@ -56,9 +56,7 @@ public:
 	 * Base case for the RespondArgs template, for when there are no
 	 * arguments.
 	 */
-	inline void RespondArgs(std::ostream &)
-	{
-	}
+	inline void RespondArgs(std::ostream &) {}
 
 	/**
 	 * Outputs a response body, with a variadic number of arguments.

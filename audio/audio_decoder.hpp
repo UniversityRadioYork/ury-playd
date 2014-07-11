@@ -56,7 +56,7 @@ public:
 	/**
 	 * Constructs an AudioDecoder.
 	 * @param path The path to the file to load and decode using this
-	 * decoder.
+	 *   decoder.
 	 */
 	AudioDecoder(const std::string &path);
 
@@ -67,9 +67,9 @@ public:
 
 	/**
 	 * Performs a round of decoding.
-	 * @return A pair of the decoder's state upon finishing the decoding round
-	 *   and the vector of bytes decoded.  The vector may be empty, if the
-	 *   decoding round did not finish off a frame.
+	 * @return A pair of the decoder's state upon finishing the decoding
+	 *   round and the vector of bytes decoded.  The vector may be empty,
+	 *   if the decoding round did not finish off a frame.
 	 */
 	DecodeResult Decode();
 
@@ -124,10 +124,10 @@ public:
 	std::uint64_t SampleCountForPositionMicroseconds(
 	                std::chrono::microseconds position) const;
 
-	std::uint64_t SampleCountForByteCount(std::uint64_t bytes) const
-	                override;
-	std::uint64_t ByteCountForSampleCount(std::uint64_t samples) const
-	                override;
+	std::uint64_t SampleCountForByteCount(
+	                std::uint64_t bytes) const override;
+	std::uint64_t ByteCountForSampleCount(
+	                std::uint64_t samples) const override;
 
 private:
 	DecodeState decode_state; ///< Current state of decoding.
@@ -137,12 +137,12 @@ private:
 
 	std::unique_ptr<AVFormatContext, std::function<void(AVFormatContext *)>>
 	                context; ///< The input codec context.
-	AVPacket packet; ///< The last undecoded packet.
+	AVPacket packet;         ///< The last undecoded packet.
 	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
 	                frame;                   ///< The last decoded frame.
 	std::array<uint8_t, BUFFER_SIZE> buffer; ///< The decoding buffer.
 	std::unique_ptr<Resampler> resampler;    ///< The object providing
-	                                         ///resampling.
+	/// resampling.
 
 	void Open(const std::string &path);
 
