@@ -23,7 +23,10 @@
 
 #include <boost/asio.hpp>
 
+#ifndef BOOST_ASIO_HAS_STD_CHRONO
 #define BOOST_ASIO_HAS_STD_CHRONO
+#endif
+
 #include <boost/asio/high_resolution_timer.hpp>
 
 #include "../constants.h" // LOOP_PERIOD
