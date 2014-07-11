@@ -139,6 +139,9 @@ AudioDecoder::DecodeResult AudioDecoder::Decode()
 	case DecodeState::DECODING:
 		decoded = DoDecode();
 		break;
+	case DecodeState::END_OF_FILE:
+		// Intentionally ignore
+		break;
 	}
 
 	return std::make_pair(this->decode_state, decoded);

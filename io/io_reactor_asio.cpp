@@ -337,9 +337,9 @@ void AsioPosixIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> 
 	f(std::cout);
 }
 
-void AsioWinIoReactor::SetupWaitForInput()
+void AsioPosixIoReactor::SetupWaitForInput()
 {
-	boost::asio::async_read_until(input, data, "\r\n",
+	boost::asio::async_read_until(input, data, "\n",
 		[this](const boost::system::error_code &ec, std::size_t) {
 		if (!ec) {
 			std::istream is(&data);
