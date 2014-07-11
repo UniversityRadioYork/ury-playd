@@ -113,9 +113,9 @@ const Player::TP::UnitMap UNITS = {
 
 Playslave::Playslave(int argc, char *argv[])
 	: audio(),
-	time_parser(UNITS),
 	player(audio, time_parser),
-	handler()
+	handler(),
+	time_parser(UNITS)
 {
 	for (int i = 0; i < argc; i++) {
 		this->arguments.push_back(std::string(argv[i]));
