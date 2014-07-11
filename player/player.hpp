@@ -81,6 +81,12 @@ public:
 	 */
 	Player(const AudioSystem &audio_system, const TP &time_parser);
 
+	/// Deleted copy constructor.
+	Player(const Player &) = delete;
+
+	/// Deleted copy-assignment constructor.
+	Player &operator=(const Player &) = delete;
+
 	/**
 	 * Returns whether this Player is still running.
 	 * @return  True if this player is not in the QUITTING state; false

@@ -75,7 +75,7 @@ bool Player::Load(const std::string &path)
 		catch (Error &error)
 		{
 			Eject();
-                        throw error;
+            throw error;
 		}
 	}
 	return valid;

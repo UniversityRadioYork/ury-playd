@@ -44,9 +44,9 @@ private:
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.
 
-	std::unique_ptr<Player> player;          ///< The player subsystem.
-	std::unique_ptr<CommandHandler> handler; ///< The command handler.
-	std::unique_ptr<Player::TP> time_parser; ///< The seek time parser.
+	Player player;                      ///< The player subsystem.
+	CommandHandler handler;             ///< The command handler.
+	Player::TP time_parser;             ///< The seek time parser.
 	std::unique_ptr<IoReactor> io;           ///< The I/O handler.
 
 	/**

@@ -42,7 +42,7 @@ using StdIoReactor = PosixIoReactor;
  */
 int main(int argc, char *argv[])
 {
-	Playslave ps{argc, argv};
+	Playslave ps(argc, argv);
 	return ps.Run();
 }
 
@@ -70,13 +70,13 @@ std::string Playslave::DeviceID()
 
 void Playslave::RegisterListeners()
 {
-	this->player->SetPositionListenerPeriod(POSITION_PERIOD);
-	this->player->RegisterPositionListener([this](
+	this->player.SetPositionListenerPeriod(POSITION_PERIOD);
+	this->player.RegisterPositionListener([this](
 	                std::chrono::microseconds position) {
 		std::uint64_t p = position.count();
 		io->Respond(Response::TIME, p);
 	});
-	this->player->RegisterStateListener([this](Player::State old_state,
+	this->player.RegisterStateListener([this](Player::State old_state,
 	                                           Player::State new_state) {
 		io->Respond(Response::STAT, Player::StateString(old_state),
 		            Player::StateString(new_state));
@@ -91,59 +91,57 @@ void Playslave::MainLoop()
 	io->Run();
 }
 
-Playslave::Playslave(int argc, char *argv[]) : audio{}
+const Player::TP::UnitMap UNITS = {
+	{ "us", Player::TP::MkTime<std::chrono::microseconds> },
+	{ "usec", Player::TP::MkTime<std::chrono::microseconds> },
+	{ "usecs", Player::TP::MkTime<std::chrono::microseconds> },
+	{ "ms", Player::TP::MkTime<std::chrono::milliseconds> },
+	{ "msec", Player::TP::MkTime<std::chrono::milliseconds> },
+	{ "msecs", Player::TP::MkTime<std::chrono::milliseconds> },
+	{ "s", Player::TP::MkTime<std::chrono::seconds> },
+	{ "sec", Player::TP::MkTime<std::chrono::seconds> },
+	{ "secs", Player::TP::MkTime<std::chrono::seconds> },
+	{ "m", Player::TP::MkTime<std::chrono::minutes> },
+	{ "min", Player::TP::MkTime<std::chrono::minutes> },
+	{ "mins", Player::TP::MkTime<std::chrono::minutes> },
+	{ "h", Player::TP::MkTime<std::chrono::hours> },
+	{ "hour", Player::TP::MkTime<std::chrono::hours> },
+	{ "hours", Player::TP::MkTime<std::chrono::hours> },
+	// Default when there is no unit
+	{ "", Player::TP::MkTime<std::chrono::microseconds> }
+};
+
+Playslave::Playslave(int argc, char *argv[])
+	: audio(),
+	time_parser(UNITS),
+	player(audio, time_parser),
+	handler()
 {
 	for (int i = 0; i < argc; i++) {
 		this->arguments.push_back(std::string(argv[i]));
 	}
 
-	this->time_parser = decltype(
-	                this->time_parser) {new Player::TP{Player::TP::UnitMap{
-	                {"us", Player::TP::MkTime<std::chrono::microseconds>},
-	                {"usec", Player::TP::MkTime<std::chrono::microseconds>},
-	                {"usecs",
-	                 Player::TP::MkTime<std::chrono::microseconds>},
-	                {"ms", Player::TP::MkTime<std::chrono::milliseconds>},
-	                {"msec", Player::TP::MkTime<std::chrono::milliseconds>},
-	                {"msecs",
-	                 Player::TP::MkTime<std::chrono::milliseconds>},
-	                {"s", Player::TP::MkTime<std::chrono::seconds>},
-	                {"sec", Player::TP::MkTime<std::chrono::seconds>},
-	                {"secs", Player::TP::MkTime<std::chrono::seconds>},
-	                {"m", Player::TP::MkTime<std::chrono::minutes>},
-	                {"min", Player::TP::MkTime<std::chrono::minutes>},
-	                {"mins", Player::TP::MkTime<std::chrono::minutes>},
-	                {"h", Player::TP::MkTime<std::chrono::hours>},
-	                {"hour", Player::TP::MkTime<std::chrono::hours>},
-	                {"hours", Player::TP::MkTime<std::chrono::hours>},
-	                // Default when there is no unit
-	                {"", Player::TP::MkTime<std::chrono::microseconds>}}}};
-
-	this->player = decltype(this->player) {
-	                new Player{this->audio, *this->time_parser}};
-
 	CommandHandler *h = new CommandHandler;
 
-	using std::string;
+	using std::bind;
+	using std::placeholders::_1;
 
-	h->AddNullary("play", [&]() { return this->player->Play(); });
-	h->AddNullary("stop", [&]() { return this->player->Stop(); });
-	h->AddNullary("ejct", [&]() { return this->player->Eject(); });
-	h->AddNullary("quit", [&]() { return this->player->Quit(); });
+	this->handler.AddNullary("play", bind(&Player::Play, &this->player));
+	this->handler.AddNullary("stop", bind(&Player::Stop, &this->player));
+	this->handler.AddNullary("ejct", bind(&Player::Eject, &this->player));
+	this->handler.AddNullary("quit", bind(&Player::Quit, &this->player));
 
-	h->AddUnary("load", [&](const string &s) { return this->player->Load(s); });
-	h->AddUnary("seek", [&](const string &s) { return this->player->Seek(s); });
-
-	this->handler = decltype(this->handler)(h);
+	this->handler.AddUnary("load", bind(&Player::Load, &this->player, _1));
+	this->handler.AddUnary("seek", bind(&Player::Seek, &this->player, _1));
 
 	IoReactor *io = nullptr;
 	if (this->arguments.size() == 4) {
-		io = new TcpIoReactor((*this->player), (*this->handler),
+		io = new TcpIoReactor(this->player, this->handler,
 		                       this->arguments.at(2),
 		                       this->arguments.at(3));
 	} else {
 #ifdef HAVE_STD_IO_REACTOR
-		io = new StdIoReactor((*this->player), (*this->handler));
+		io = new StdIoReactor(this->player, this->handler);
 #else
 		throw Error("Cannot use standard IO, not supported on this platform.");
 #endif // HAVE_STD_IO_REACTOR
