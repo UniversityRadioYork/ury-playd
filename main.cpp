@@ -121,8 +121,6 @@ Playslave::Playslave(int argc, char *argv[])
 		this->arguments.push_back(std::string(argv[i]));
 	}
 
-	CommandHandler *h = new CommandHandler;
-
 	using std::bind;
 	using std::placeholders::_1;
 
