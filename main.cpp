@@ -14,19 +14,25 @@
 #include "cmd.hpp"
 #include "io/io_responder.hpp"
 #include "io/io_reactor.hpp"
-#include "io/io_reactor_asio.hpp"
+#include "io/io_reactor_tcp.hpp"
 #include "messages.h"
 #include "player/player.hpp"
 #include "audio/audio_system.hpp"
 #include "main.hpp"
 
-#include "boost/asio.hpp"
+#include <boost/asio.hpp>
 #if defined(_WIN32)
+
 #define HAVE_STD_IO_REACTOR
-using StdIoReactor = AsioWinIoReactor;
+#include "io/io_reactor_win.hpp"
+using StdIoReactor = WinIoReactor;
+
 #elif defined(BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR)
+
+#include "io/io_reactor_posix.hpp"
 #define HAVE_STD_IO_REACTOR
-using StdIoReactor = AsioPosixIoReactor;
+using StdIoReactor = PosixIoReactor;
+
 #endif
 
 /**
@@ -132,7 +138,7 @@ Playslave::Playslave(int argc, char *argv[]) : audio{}
 
 	IoReactor *io = nullptr;
 	if (this->arguments.size() == 4) {
-		io = new AsioTcpIoReactor((*this->player), (*this->handler),
+		io = new TcpIoReactor((*this->player), (*this->handler),
 		                       this->arguments.at(2),
 		                       this->arguments.at(3));
 	} else {
