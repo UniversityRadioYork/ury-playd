@@ -7,7 +7,7 @@
 #include <functional>
 
 #include "boost/asio.hpp"
-#include "boost/function.hpp"
+#include "boost/system/error_code.hpp"
 #include "boost/noncopyable.hpp"
 #include <Windows.h>
 
