@@ -14,6 +14,7 @@
 #ifndef PS_IO_REACTOR_HPP
 #define PS_IO_REACTOR_HPP
 
+#include <boost/asio.hpp>
 #include "io_responder.hpp"
 
 class Player;
@@ -44,11 +45,12 @@ public:
 	 * This should be called by the parent object when the player is
 	 * quitting.
 	 */
-	virtual void End() = 0;
+	virtual void End();
 
 protected:
-	Player &player;          ///< The player.
-	CommandHandler &handler; ///< The command handler.
+	Player &player;                     ///< The player.
+	CommandHandler &handler;            ///< The command handler.
+	boost::asio::io_service io_service;	///< The ASIO IO service.
 
 	/**
 	 * Sends a command to the command handler.
@@ -57,12 +59,19 @@ protected:
 	 */
 	void HandleCommand(const std::string &line);
 
+	virtual void ResponseViaOstream(std::function<void(std::ostream &)> f) override = 0;
+private:
 	/**
 	 * The reactor's main loop.
 	 * It will block until a quit command is received.
 	 * @return The exit code of the main loop.
 	 */
-	virtual void MainLoop() = 0;
+	void MainLoop();
+	void DoUpdateTimer();
+	void InitSignals();
+
+	/// The signal set used to shut the server down on terminations.
+	boost::asio::signal_set signals;
 };
 
 #endif // PS_IO_REACTOR_HPP
