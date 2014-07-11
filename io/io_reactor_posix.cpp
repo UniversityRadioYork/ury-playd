@@ -22,7 +22,7 @@
 #include <unistd.h>                    // STDIN_FILENO
 #include "../cmd.hpp"                  // CommandHandler
 #include "../player/player.hpp"        // Player
-#include "io_reactor.hpp"              // IoReactor
+#include "io_reactor_posix.hpp"        // PosixIoReactor
 
 PosixIoReactor::PosixIoReactor(Player &player, CommandHandler &handler)
 	: IoReactor(player, handler),
