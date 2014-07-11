@@ -77,6 +77,12 @@ private:
 	 * This is so time and state changes can be sent out on stdout.
 	 */
 	void RegisterListeners();
+
+	/**
+	 * Registers the Playslave command set on the given Player.
+	 * @param p The Player on which the commands will act.
+	 */
+	void Playslave::RegisterCommands(Player *p);
 };
 
 #endif // PS_MAIN_HPP

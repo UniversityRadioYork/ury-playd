@@ -121,16 +121,7 @@ Playslave::Playslave(int argc, char *argv[])
 		this->arguments.push_back(std::string(argv[i]));
 	}
 
-	using std::bind;
-	using std::placeholders::_1;
-
-	this->handler.AddNullary("play", bind(&Player::Play, &this->player));
-	this->handler.AddNullary("stop", bind(&Player::Stop, &this->player));
-	this->handler.AddNullary("ejct", bind(&Player::Eject, &this->player));
-	this->handler.AddNullary("quit", bind(&Player::Quit, &this->player));
-
-	this->handler.AddUnary("load", bind(&Player::Load, &this->player, _1));
-	this->handler.AddUnary("seek", bind(&Player::Seek, &this->player, _1));
+	RegisterCommands(&this->player);
 
 	IoReactor *io = nullptr;
 	if (this->arguments.size() == 4) {
@@ -145,6 +136,20 @@ Playslave::Playslave(int argc, char *argv[])
 #endif // HAVE_STD_IO_REACTOR
 	}
 	this->io = decltype(this->io)(io);
+}
+
+void Playslave::RegisterCommands(Player *p)
+{
+	using std::bind;
+	using std::placeholders::_1;
+
+	this->handler.AddNullary("play", bind(&Player::Play, p));
+	this->handler.AddNullary("stop", bind(&Player::Stop, p));
+	this->handler.AddNullary("ejct", bind(&Player::Eject, p));
+	this->handler.AddNullary("quit", bind(&Player::Quit, p));
+
+	this->handler.AddUnary("load", bind(&Player::Load, p, _1));
+	this->handler.AddUnary("seek", bind(&Player::Seek, p, _1));
 }
 
 int Playslave::Run()
