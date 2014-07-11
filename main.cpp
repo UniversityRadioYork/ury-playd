@@ -15,11 +15,19 @@
 #include "io/io_responder.hpp"
 #include "io/io_reactor.hpp"
 #include "io/io_reactor_asio.hpp"
-#include "io/io_reactor_std.hpp"
 #include "messages.h"
 #include "player/player.hpp"
 #include "audio/audio_system.hpp"
 #include "main.hpp"
+
+#include "boost/asio.hpp"
+#if defined(_WIN32)
+#define HAVE_STD_IO_REACTOR
+using StdIoReactor = AsioWinIoReactor;
+#elif defined(BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR)
+#define HAVE_STD_IO_REACTOR
+using StdIoReactor = AsioPosixIoReactor;
+#endif
 
 /**
  * The main entry point.
@@ -128,11 +136,11 @@ Playslave::Playslave(int argc, char *argv[]) : audio{}
 		                       this->arguments.at(2),
 		                       this->arguments.at(3));
 	} else {
-#ifdef _WIN32
-		io = new AsioWinIoReactor((*this->player), (*this->handler));
-#else
+#ifdef HAVE_STD_IO_REACTOR
 		io = new StdIoReactor((*this->player), (*this->handler));
-#endif // _WIN32
+#else
+		throw Error("Cannot use standard IO, not supported on this platform.");
+#endif // HAVE_STD_IO_REACTOR
 	}
 	this->io = decltype(this->io)(io);
 }

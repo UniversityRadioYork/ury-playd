@@ -266,7 +266,7 @@ void TcpConnectionManager::Send(const std::string &string)
 // AsioWinIoReactor (Windows-only)
 //
 
-#ifdef BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE
+#ifdef _WIN32
 
 #include <Windows.h>
 #include "../contrib/stdin_stream.hpp"
@@ -285,6 +285,7 @@ AsioWinIoReactor::AsioWinIoReactor(Player &player, CommandHandler &handler)
 
 void AsioWinIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
 {
+	// There's no need for this to be asynchronous, so we just use iostream.
 	f(std::cout);
 }
 
@@ -310,4 +311,42 @@ void AsioWinIoReactor::SetupWaitForInput()
 	});
 }
 
-#endif // BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE
+#endif // _WIN32
+
+//
+// AsioPosixIoReactor
+//
+
+#ifdef BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR
+
+#include <unistd.h>
+
+AsioPosixIoReactor::AsioPosixIoReactor(Player &player, CommandHandler &handler)
+	: AsioIoReactor(player, handler),
+	input(io_service, ::dup(STDIN_FILENO))
+{
+	SetupWaitForInput();
+}
+
+void AsioPosixIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
+{
+	// There's no need for this to be asynchronous, so we just use iostream.
+	f(std::cout);
+}
+
+void AsioWinIoReactor::SetupWaitForInput()
+{
+	boost::asio::async_read_until(input, data, "\r\n",
+		[this](const boost::system::error_code &ec, std::size_t) {
+		if (!ec) {
+			std::istream is(&data);
+			std::string s;
+			std::getline(is, s);
+
+			HandleCommand(s);
+			SetupWaitForInput();
+		}
+	});
+}
+
+#endif // BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR

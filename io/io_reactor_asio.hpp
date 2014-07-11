@@ -236,16 +236,16 @@ private:
 #include "../contrib/stdin_stream.hpp"
 
 /**
-* An IoReactor using the Windows API.
-*
-* The AsioWinIoReactor allows Playslave to take input from, and send output to,
-* a Windows console.
-*
-* @see IoReactor
-* @see AsioIoReactor
-* @see AsioTcpIoReactor
-* @see AsioPosixReactor
-*/
+ * An IoReactor using standard input/output.
+ *
+ * The AsioWinIoReactor allows Playslave to take input from, and send output to,
+ * a Windows console or POSIX .
+ *
+ * @see IoReactor
+ * @see AsioIoReactor
+ * @see AsioTcpIoReactor
+ * @see AsioPosixIoReactor
+ */
 class AsioWinIoReactor : public AsioIoReactor {
 public:
 	/**
@@ -270,9 +270,6 @@ private:
 	/// The handle pointing to the console input.
 	HANDLE input_handle;
 
-	/// The handle pointing to the console output.
-	HANDLE output_handle;
-
 	/// The ASIO wrapper for the console input handle.
 	stdin_stream input;
 
@@ -281,5 +278,53 @@ private:
 };
 
 #endif // BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE
+
+//
+// POSIX-specific code
+//
+
+#ifdef BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR
+
+/**
+ * An IoReactor using POSIX streams.
+ *
+ * The AsioWinIoReactor allows Playslave to take input from, and send output to,
+ * standard input/output on a POSIX-compliant OS.
+ *
+ * @see IoReactor
+ * @see AsioIoReactor
+ * @see AsioTcpIoReactor
+ * @see AsioWinIoReactor
+ */
+class AsioPosixIoReactor : public AsioIoReactor {
+public:
+	/**
+	 * Constructs an AsioPosixIoReactor.
+	 * @param player The player to which periodic update requests shall be
+	 *   sent.
+	 * @param handler The handler to which command inputs shall be sent.
+	 */
+	explicit AsioPosixIoReactor(Player &player, CommandHandler &handler);
+
+	/// Deleted copy constructor.
+	AsioPosixIoReactor(const AsioPosixIoReactor &) = delete;
+
+	/// Deleted copy-assignment.
+	AsioPosixIoReactor &operator=(const AsioPosixIoReactor &) = delete;
+
+protected:
+	void ResponseViaOstream(std::function<void(std::ostream &)> f) override;
+
+private:
+	void SetupWaitForInput();
+
+	/// The ASIO wrapper for POSIX stdin.
+	boost::asio::posix::stream_descriptor input;
+
+	/// The data buffer for the console input stream.
+	boost::asio::streambuf data;
+};
+
+#endif // BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR
 
 #endif // PS_IO_REACTOR_ASIO_HPP
