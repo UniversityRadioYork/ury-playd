@@ -28,8 +28,6 @@ extern "C" {
 
 #include "audio_resample.hpp"
 
-#include <boost/optional.hpp>
-
 /**
  * An object responsible for decoding an audio file.
  *
@@ -39,8 +37,21 @@ extern "C" {
  */
 class AudioDecoder : public SampleByteConverter {
 public:
+	/// An enumeration of possible states the decoder can be in.
+	enum class DecodeState : std::uint8_t {
+		/// The decoder is currently trying to acquire a frame.
+		WAITING_FOR_FRAME,
+		/// The decoder is currently decoding a frame.
+		DECODING,
+		/// The decoder has run out of things to decode.
+		END_OF_FILE
+	};
+
+	/// Type of decoded sample vectors.
+	using DecodeVector = Resampler::ResultVector;
+
 	/// Type of the result of Decode().
-	using DecodeResult = boost::optional<Resampler::ResultVector>;
+	using DecodeResult = std::pair<DecodeState, DecodeVector>;
 
 	/**
 	 * Constructs an AudioDecoder.
@@ -56,17 +67,9 @@ public:
 
 	/**
 	 * Performs a round of decoding.
-	 * The decoder may return one of three types of result:
-	 *
-	 * - An empty optional value, which means the decoder has run out of data
-	 *   to decode (for example, the file has ended);
-	 * - A full optional value containing an empty buffer, which means the
-	 *   decoder is still processing the current packet;
-	 * - A full optional value containing a non-empty buffer, which means the
-	 *   decoder successfully finished a packet.
-	 *
-	 * @return An optional result which may contain a vector of sample data
-	 *   decoded in this round.
+	 * @return A pair of the decoder's state upon finishing the decoding round
+	 *   and the vector of bytes decoded.  The vector may be empty, if the
+	 *   decoding round did not finish off a frame.
 	 */
 	DecodeResult Decode();
 
@@ -127,12 +130,6 @@ public:
 	                override;
 
 private:
-	enum class DecodeState : std::uint8_t {
-		WAITING_FOR_FRAME,
-		DECODING,
-		END_OF_FILE
-	};
-
 	DecodeState decode_state; ///< Current state of decoding.
 
 	AVStream *stream; ///< The FFmpeg stream being decoded.
@@ -158,8 +155,8 @@ private:
 	void InitialisePacket();
 	void InitialiseResampler();
 
-	DecodeResult DoFrame();
-	DecodeResult DoDecode();
+	void DoFrame();
+	DecodeVector DoDecode();
 
 	bool ReadFrame();
 	bool DecodePacket();

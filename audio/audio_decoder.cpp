@@ -10,6 +10,7 @@
 #include <functional>
 #include <string>
 #include <memory>
+#include <cassert>
 #include <cstdlib>
 #include <cstdint>
 #include <iostream>
@@ -34,8 +35,6 @@ extern "C" {
 
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
-
-#include <boost/optional.hpp>
 
 AudioDecoder::AudioDecoder(const std::string &path)
 {
@@ -131,50 +130,49 @@ std::int64_t AudioDecoder::AvPositionFromMicroseconds(
 
 AudioDecoder::DecodeResult AudioDecoder::Decode()
 {
-	DecodeResult result = boost::none;
+	Resampler::ResultVector decoded;
 
 	switch (this->decode_state) {
 	case DecodeState::WAITING_FOR_FRAME:
-		result = DoFrame();
+		DoFrame();
 		break;
 	case DecodeState::DECODING:
-		result = DoDecode();
+		decoded = DoDecode();
 		break;
 	}
 
-	return result;
+	return std::make_pair(this->decode_state, decoded);
 }
 
-AudioDecoder::DecodeResult AudioDecoder::DoFrame()
+void AudioDecoder::DoFrame()
 {
-	DecodeResult result;
-
-	// If we need a frame, we have to keep trying to read a frame until we get
-	// one.
 	bool read_frame = ReadFrame();
-	if (read_frame) {
-		if (this->packet.stream_index == this->stream_id) {
-			this->decode_state = DecodeState::DECODING;
-		}
-		result = std::vector<char>();
-	} else {
-		this->decode_state = DecodeState::END_OF_FILE;
-		result = boost::none;
-	}
 
-	return result;
+	if (!read_frame) {
+		// We've run out of frames to decode.
+		// (TODO: Start flushing the buffer here?)
+		this->decode_state = DecodeState::END_OF_FILE;
+	} else if (this->packet.stream_index == this->stream_id) {
+		// Only switch to decoding if the frame belongs to the audio stream.
+		// Else, we ignore it.
+		this->decode_state = DecodeState::DECODING;
+	}
 }
 
-AudioDecoder::DecodeResult AudioDecoder::DoDecode()
+AudioDecoder::DecodeVector AudioDecoder::DoDecode()
 {
-	DecodeResult result;
+	DecodeVector result;
 
 	bool finished_decoding = DecodePacket();
 	if (finished_decoding) {
 		result = Resample();
+
+		// Get ready to process the next frame.
 		InitialisePacket();
 		this->decode_state = DecodeState::WAITING_FOR_FRAME;
 	} else {
+		// Send through an empty vector, so that the audio output will safely
+		// run its course and make way for the next decode round.
 		result = std::vector<char>();
 	}
 
@@ -186,8 +184,7 @@ bool AudioDecoder::ReadFrame() {
 	return 0 == read_result;
 }
 
-
-std::vector<char> AudioDecoder::Resample()
+Resampler::ResultVector AudioDecoder::Resample()
 {
 	return this->resampler->Resample(this->frame.get());
 }

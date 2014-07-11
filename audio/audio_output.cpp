@@ -164,11 +164,10 @@ bool AudioOutput::DecodeIfFrameEmpty()
 	if (FrameFinished()) {
 		AudioDecoder::DecodeResult result = this->av->Decode();
 
-		this->frame = result.get_value_or(std::vector<char>());
+		this->frame = result.second;
 		this->frame_iterator = this->frame.begin();
 
-		// If the decoder result wasn't initialised, then the decoder has finished.
-		more_frames_available = result.is_initialized();
+		more_frames_available = result.first != AudioDecoder::DecodeState::END_OF_FILE;
 	}
 
 	return more_frames_available;
