@@ -105,7 +105,7 @@ const portaudio::Device &AudioSystem::PaDeviceFrom(const std::string &id_string)
 }
 
 /// Mappings from SampleFormats to their equivalent PaSampleFormats.
-static std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
+static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
                 {SampleFormat::PACKED_UNSIGNED_INT_8, portaudio::UINT8},
                 {SampleFormat::PACKED_SIGNED_INT_16, portaudio::INT16},
                 {SampleFormat::PACKED_SIGNED_INT_32, portaudio::INT32},

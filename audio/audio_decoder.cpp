@@ -189,7 +189,7 @@ Resampler::ResultVector AudioDecoder::Resample()
 	return this->resampler->Resample(this->frame.get());
 }
 
-static std::map<AVSampleFormat, SampleFormat> sf_from_av = {
+static const std::map<AVSampleFormat, SampleFormat> sf_from_av = {
                 {AV_SAMPLE_FMT_U8, SampleFormat::PACKED_UNSIGNED_INT_8},
                 {AV_SAMPLE_FMT_S16, SampleFormat::PACKED_SIGNED_INT_16},
                 {AV_SAMPLE_FMT_S32, SampleFormat::PACKED_SIGNED_INT_32},
