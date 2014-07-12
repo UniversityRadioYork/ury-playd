@@ -31,21 +31,22 @@ extern "C" {
  *
  * The PortAudio ring buffer is provided in the contrib/ directory.
  */
-template <typename T1, typename T2, int P>
+template <typename T1, typename T2>
 class PaRingBuffer : public RingBuffer<T1, T2> {
 public:
 	/**
 	 * Constructs a PaRingBuffer.
-	 * @param size  The size of one element in the ring buffer.
+	 * @param power n, where 2^n is the number of elements in the ring buffer.
+	 * @param size The size of one element in the ring buffer.
 	 */
-	PaRingBuffer(int size)
+	PaRingBuffer(int power, int size)
 	{
 		this->rb = new PaUtilRingBuffer;
-		this->buffer = new char[(1 << P) * size];
+		this->buffer = new char[(1 << power) * size];
 
 		int init_result = PaUtil_InitializeRingBuffer(
 		                this->rb, size,
-		                static_cast<ring_buffer_size_t>(1 << P),
+		                static_cast<ring_buffer_size_t>(1 << power),
 		                this->buffer);
 		if (init_result != 0) {
 			throw InternalError(MSG_OUTPUT_RINGINIT);
