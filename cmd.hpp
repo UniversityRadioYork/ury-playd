@@ -30,9 +30,6 @@ public:
 	/// The type of functions called on receipt of commands.
 	using Payload = std::function<bool(WordList)>;
 
-	/// The type of a set of commands.
-	using CommandSet = std::map<std::string, Payload>;
-
 	/// The type of a command action that takes no command words.
 	using NullAction = std::function<bool()>;
 
@@ -68,7 +65,8 @@ public:
 	                         std::function<bool(const std::string &)> f);
 
 private:
-	CommandSet commands;
+	/// The map of command words to their payload functions.
+	std::map<std::string, Payload> commands;
 
 	/**
 	 * Parses a command line into a list of words.
