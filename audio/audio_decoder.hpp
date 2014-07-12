@@ -59,9 +59,7 @@ public:
 	 */
 	AudioDecoder(const std::string &path);
 
-	/**
-	 * Destructs an AudioDecoder.
-	 */
+	/// Destructs an AudioDecoder.
 	~AudioDecoder();
 
 	/**

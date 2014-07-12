@@ -68,6 +68,8 @@ public:
 	 * @see AudioSystem::Load
 	 */
 	AudioOutput(const std::string &path, const StreamConfigurator &c);
+
+	/// Destructs an AudioOutput.
 	~AudioOutput();
 
 	/**
