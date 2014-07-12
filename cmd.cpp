@@ -38,12 +38,6 @@ CommandHandler *CommandHandler::AddUnary(
 	return this;
 }
 
-/**
- * Runs a command.
- * @param words The words that form the command: the first word is taken to be
- *   the command name.
- * @return true if the command was valid; false otherwise.
- */
 bool CommandHandler::Run(const CommandHandler::WordList &words)
 {
 	bool valid = false;
@@ -58,11 +52,6 @@ bool CommandHandler::Run(const CommandHandler::WordList &words)
 	return valid;
 }
 
-/**
- * Parses a string as a command line and runs the result.
- * @param line The string that represents the command line.
- * @return true if the command was valid; false otherwise.
- */
 bool CommandHandler::RunLine(const std::string &line)
 {
 	return Run(LineToWords(line));
@@ -81,11 +70,6 @@ bool CommandHandler::Handle(const std::string &line)
 	return RunLine(line);
 }
 
-/**
- * Parses a command line into a list of words.
- * @param line The line to split into words.
- * @return The list of words in the command line.
- */
 CommandHandler::WordList CommandHandler::LineToWords(const std::string &line)
 {
 	WordList words;

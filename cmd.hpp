@@ -70,9 +70,26 @@ public:
 private:
 	CommandSet commands;
 
+	/**
+	 * Parses a command line into a list of words.
+	 * @param line The line to split into words.
+	 * @return The list of words in the command line.
+	 */
 	WordList LineToWords(const std::string &line);
 
+	/**
+	 * Runs a command.
+	 * @param words The words that form the command: the first word is taken to be
+	 *   the command name.
+	 * @return true if the command was valid; false otherwise.
+	 */
 	bool Run(const WordList &words);
+
+	/**
+	 * Parses a string as a command line and runs the result.
+	 * @param line The string that represents the command line.
+	 * @return true if the command was valid; false otherwise.
+	 */
 	bool RunLine(const std::string &line);
 };
 
