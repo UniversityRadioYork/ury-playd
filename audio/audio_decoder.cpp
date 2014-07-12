@@ -37,17 +37,14 @@ extern "C" {
 #include "audio_resample.hpp"
 
 AudioDecoder::AudioDecoder(const std::string &path)
+	: decode_state(DecodeState::WAITING_FOR_FRAME),
+	buffer(BUFFER_SIZE)
 {
 	Open(path);
 	InitialiseStream();
 	InitialisePacket();
 	InitialiseFrame();
 	InitialiseResampler();
-
-	this->decode_state = DecodeState::WAITING_FOR_FRAME;
-
-	Debug("stream id:", this->stream_id);
-	Debug("codec:", this->stream->codec->codec->long_name);
 }
 
 AudioDecoder::~AudioDecoder() {}
@@ -275,7 +272,7 @@ void AudioDecoder::InitialisePacket()
 {
 	av_init_packet(&this->packet);
 	this->packet.data = &*this->buffer.begin();
-	this->packet.size = BUFFER_SIZE;
+	this->packet.size = this->buffer.size();
 }
 
 void AudioDecoder::InitialiseResampler()

@@ -140,7 +140,7 @@ private:
 	AVPacket packet;         ///< The last undecoded packet.
 	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
 	                frame;                   ///< The last decoded frame.
-	std::array<uint8_t, BUFFER_SIZE> buffer; ///< The decoding buffer.
+	std::vector<uint8_t> buffer;             ///< The decoding buffer.
 	std::unique_ptr<Resampler> resampler;    ///< The object providing
 	/// resampling.
 

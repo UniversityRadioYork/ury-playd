@@ -22,13 +22,6 @@ extern "C" {
 
 #include <chrono>
 
-/* HOUSEKEEPING: Only put things in macros if they have to be constant at
- * compile-time (for example, array sizes).
- */
-
-/// The number of bytes to pre-load into the buffer before playing.
-#define SPINUP_SIZE (2 * BUFFER_SIZE)
-
 /// The period between position announcements from the Player object.
 const std::chrono::microseconds POSITION_PERIOD(500000);
 
@@ -37,6 +30,9 @@ const std::chrono::nanoseconds LOOP_PERIOD(1000);
 
 /// The size of the internal decoding buffer.
 const size_t BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
+
+/// The number of bytes to pre-load into the buffer before playing.
+const size_t SPINUP_SIZE = 2 * BUFFER_SIZE;
 
 /// n, where 2^n is the capacity of the AudioOutput ring buffer.
 /// @see RINGBUF_SIZE
