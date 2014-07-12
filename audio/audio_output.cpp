@@ -7,17 +7,6 @@
  * @see audio/audio_output.hpp
  */
 
-extern "C" {
-#ifdef WIN32
-#define inline __inline
-#endif
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#ifdef WIN32
-#undef inline
-#endif
-}
-
 #include <cassert>
 #include <climits>
 #include <algorithm>
