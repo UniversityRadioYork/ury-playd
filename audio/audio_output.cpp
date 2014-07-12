@@ -27,24 +27,17 @@ const size_t AudioOutput::RINGBUF_POWER = 16;
 
 AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
     : av(path),
-	ring_buf(RINGBUF_POWER, av.ByteCountForSampleCount(1L)),
-	position_sample_count(0)
+      ring_buf(RINGBUF_POWER, av.ByteCountForSampleCount(1L)),
+      position_sample_count(0)
 {
-	this->out_strm = decltype(this->out_strm)(
-	                c.Configure(*this, this->av));
+	this->out_strm = decltype(this->out_strm)(c.Configure(*this, this->av));
 
 	ClearFrame();
 }
 
-void AudioOutput::Start()
-{
-	this->out_strm->start();
-}
+void AudioOutput::Start() { this->out_strm->start(); }
 
-void AudioOutput::Stop()
-{
-	this->out_strm->abort();
-}
+void AudioOutput::Stop() { this->out_strm->abort(); }
 
 bool AudioOutput::IsStopped() { return !this->out_strm->isActive(); }
 

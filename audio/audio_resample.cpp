@@ -21,8 +21,10 @@ extern "C" {
 
 #include "audio_resample.hpp"
 
-Resampler::Resampler(AVCodecContext *input_context, AVSampleFormat output_format)
-    : bytes_per_sample(av_get_bytes_per_sample(output_format) * input_context->channels),
+Resampler::Resampler(AVCodecContext *input_context,
+                     AVSampleFormat output_format)
+    : bytes_per_sample(av_get_bytes_per_sample(output_format) *
+                       input_context->channels),
       output_format(output_format)
 {
 }
@@ -42,10 +44,10 @@ std::vector<char> Resampler::MakeFrameVector(char *start, int sample_count)
 }
 
 PlanarResampler::PlanarResampler(AVCodecContext *codec)
-	: Resampler(codec, av_get_packed_sample_fmt(codec->sample_fmt)),
-	swr(codec->channel_layout, this->output_format,
-	codec->sample_rate, codec->channel_layout,
-	codec->sample_fmt, codec->sample_rate, 0, nullptr)
+    : Resampler(codec, av_get_packed_sample_fmt(codec->sample_fmt)),
+      swr(codec->channel_layout, this->output_format, codec->sample_rate,
+          codec->channel_layout, codec->sample_fmt, codec->sample_rate, 0,
+          nullptr)
 {
 }
 
@@ -76,7 +78,8 @@ std::vector<char> PlanarResampler::Resample(AVFrame *frame)
 
 PackedResampler::PackedResampler(AVCodecContext *codec)
     : Resampler(codec, codec->sample_fmt)
-{}
+{
+}
 
 std::vector<char> PackedResampler::Resample(AVFrame *frame)
 {

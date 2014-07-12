@@ -139,9 +139,9 @@ private:
 	                context; ///< The input codec context.
 	AVPacket packet;         ///< The last undecoded packet.
 	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
-	                frame;                   ///< The last decoded frame.
-	std::vector<uint8_t> buffer;             ///< The decoding buffer.
-	std::unique_ptr<Resampler> resampler;    ///< The object providing
+	                frame;                ///< The last decoded frame.
+	std::vector<uint8_t> buffer;          ///< The decoding buffer.
+	std::unique_ptr<Resampler> resampler; ///< The object providing
 	/// resampling.
 
 	void Open(const std::string &path);

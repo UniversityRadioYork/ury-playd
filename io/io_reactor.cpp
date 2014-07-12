@@ -61,7 +61,9 @@ void IoReactor::InitSignals()
 
 void IoReactor::DoUpdateTimer()
 {
-	auto tick = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration> (PLAYER_UPDATE_PERIOD);
+	auto tick = std::chrono::duration_cast<
+	                std::chrono::high_resolution_clock::duration>(
+	                PLAYER_UPDATE_PERIOD);
 	boost::asio::high_resolution_timer t(this->io_service, tick);
 	t.async_wait([this](boost::system::error_code) {
 		this->player.Update();

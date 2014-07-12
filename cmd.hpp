@@ -77,8 +77,8 @@ private:
 
 	/**
 	 * Runs a command.
-	 * @param words The words that form the command: the first word is taken to be
-	 *   the command name.
+	 * @param words The words that form the command: the first word is taken
+	 *   to be the command name.
 	 * @return true if the command was valid; false otherwise.
 	 */
 	bool Run(const WordList &words);
