@@ -3,47 +3,83 @@
 
 /**
  * @file
- * The RingBuffer abstract class template.
- * @see ringbuffer/ringbuffer_boost.hpp
- * @see ringbuffer/ringbuffer_pa.hpp
+ * The RingBuffer class template.
  */
 
 #ifndef PS_RINGBUFFER_HPP
 #define PS_RINGBUFFER_HPP
 
+extern "C" {
+#include "../contrib/pa_ringbuffer.h"
+}
+
 /**
- * Abstraction over a ring buffer.
+ * A ring buffer.
  *
- * This generic abstract class represents a general concept of a ring buffer
- * for samples.  It can be implemented, for example, by adapters over the
- * PortAudio or Boost ring buffers.
+ * This ring buffer is based on the PortAudio ring buffer, provided in the
+ * contrib/ directory.
  *
- * Note that all quantities are represented in terms of sample counts, not
- * the underlying representation RepT.  Implementations should ensure that they
- * implement the virtual methods of this class in terms of the former and not
- * the latter.
+ * This is stable and performs well, but, as it is C code, necessitates some
+ * hoop jumping to integrate and could do with being replaced with a native
+ * solution.
  */
 template <typename RepT, typename SampleCountT>
 class RingBuffer {
 public:
 	/**
-	 * Virtual destructor for RingBuffer.
+	 * Constructs a RingBuffer.
+	 * @param power n, where 2^n is the number of elements in the ring buffer.
+	 * @param size The size of one element in the ring buffer.
 	 */
-	virtual ~RingBuffer() {};
+	RingBuffer(int power, int size)
+	{
+		this->rb = new PaUtilRingBuffer;
+		this->buffer = new char[(1 << power) * size];
+
+		int init_result = PaUtil_InitializeRingBuffer(
+			this->rb, size,
+			static_cast<ring_buffer_size_t>(1 << power),
+			this->buffer);
+		if (init_result != 0) {
+			throw InternalError(MSG_OUTPUT_RINGINIT);
+		}
+	}
+
+	/// Destructs a PaRingBuffer.
+	~RingBuffer()
+	{
+		assert(this->rb != nullptr);
+		delete this->rb;
+
+		assert(this->buffer != nullptr);
+		delete[] this->buffer;
+	}
+
+	/// Deleted copy constructor.
+	RingBuffer(const RingBuffer &) = delete;
+
+	/// Deleted copy-assignment.
+	RingBuffer &operator=(const RingBuffer &) = delete;
 
 	/**
 	 * The current write capacity.
 	 *
 	 * @return The number of samples this ring buffer has space to store.
 	 */
-	virtual SampleCountT WriteCapacity() const = 0;
+	SampleCountT WriteCapacity() const
+	{
+		return CountCast(PaUtil_GetRingBufferWriteAvailable(this->rb));
+	}
 
 	/**
 	 * The current read capacity.
 	 *
 	 * @return The number of samples available in this ring buffer.
 	 */
-	virtual SampleCountT ReadCapacity() const = 0;
+	SampleCountT ReadCapacity() const
+	{
+		return CountCast(PaUtil_GetRingBufferReadAvailable(this->rb));
+	}
 
 	/**
 	 * Writes samples from an array into the ring buffer.
@@ -63,7 +99,12 @@ public:
 	 *
 	 * @return The number of samples written, which should not exceed count.
 	 */
-	virtual SampleCountT Write(RepT *start, SampleCountT count) = 0;
+	SampleCountT Write(RepT *start, SampleCountT count)
+	{
+		return CountCast(PaUtil_WriteRingBuffer(
+		this->rb, start,
+		static_cast<ring_buffer_size_t>(count)));
+	}
 
 	/**
 	 * Reads samples from the ring buffer into an array.
@@ -78,12 +119,34 @@ public:
 	 *
 	 * @return The number of samples read, which should not exceed count.
 	 */
-	virtual SampleCountT Read(RepT *start, SampleCountT count) = 0;
+	SampleCountT Read(RepT *start, SampleCountT count)
+	{
+		return CountCast(PaUtil_ReadRingBuffer(
+			this->rb, start,
+			static_cast<ring_buffer_size_t>(count)));
+	}
 
 	/**
 	 * Empties the ring buffer.
 	 */
-	virtual void Flush() = 0;
+	void Flush()
+	{
+		PaUtil_FlushRingBuffer(this->rb);
+	}
+
+private:
+	char *buffer;         ///< The array used by the ringbuffer.
+	PaUtilRingBuffer *rb; ///< The internal PortAudio ringbuffer.
+
+	/**
+	* Converts a ring buffer size into an external size.
+	* @param count  The size/count in PortAudio form.
+	* @return       The size/count after casting to SampleCountT.
+	*/
+	SampleCountT CountCast(ring_buffer_size_t count) const
+	{
+		return static_cast<SampleCountT>(count);
+	}
 };
 
 #endif // PS_RINGBUFFER_HPP

@@ -174,6 +174,8 @@ private:
 	/// @see RINGBUF_POWER
 	static const size_t RINGBUF_SIZE = (1 << 16);
 
+	// Type for the ring buffer.
+	using RingBuf = RingBuffer<char, std::uint64_t>;
 
 	bool file_ended; ///< Whether the current file has stopped decoding.
 
@@ -187,7 +189,7 @@ private:
 	std::vector<char>::iterator frame_iterator;
 
 	/// The ring buffer used to transfer samples to the playing callback.
-	std::unique_ptr<RingBuffer<char, std::uint64_t>> ring_buf;
+	std::unique_ptr<RingBuf> ring_buf;
 
 	/// The PortAudio stream to which this AudioOutput outputs.
 	std::unique_ptr<portaudio::Stream> out_strm;

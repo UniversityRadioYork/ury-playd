@@ -33,19 +33,17 @@ extern "C" {
 #include "audio_output.hpp"
 #include "audio_decoder.hpp"
 
-#include "../ringbuffer/ringbuffer_pa.hpp"
+#include "../ringbuffer/ringbuffer.hpp"
 
 const size_t AudioOutput::SPINUP_SIZE = 2 * BUFFER_SIZE;
 
 AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
 {
-	using ConcreteRingBuffer = PaRingBuffer<char, std::uint64_t>;
-
 	this->av = decltype(this->av)(new AudioDecoder(path));
 	this->out_strm = decltype(this->out_strm)(
 	                c.Configure(*this, *(this->av)));
 	this->ring_buf = decltype(this->ring_buf)(
-	                new ConcreteRingBuffer(RINGBUF_POWER, ByteCountForSampleCount(1L)));
+	                new RingBuf(RINGBUF_POWER, ByteCountForSampleCount(1L)));
 
 	this->position_sample_count = 0;
 
