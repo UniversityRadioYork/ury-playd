@@ -161,9 +161,6 @@ private:
 	/// @see RINGBUF_SIZE
 	static const size_t RINGBUF_POWER;
 
-	/// The number of bytes to pre-load into the buffer before playing.
-	static const size_t SPINUP_SIZE;
-
 	bool file_ended; ///< Whether the current file has stopped decoding.
 
 	/// The audio decoder providing the actual audio data.
