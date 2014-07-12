@@ -71,11 +71,6 @@ private:
 	void ListOutputDevices();
 
 	/**
-	 * Performs the Playslave's main loop.
-	 */
-	void MainLoop();
-
-	/**
 	 * Registers various listeners with the Player.
 	 * This is so time and state changes can be sent out on stdout.
 	 */

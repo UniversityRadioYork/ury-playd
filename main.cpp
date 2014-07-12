@@ -91,8 +91,6 @@ void Playslave::RegisterListeners()
 	});
 }
 
-void Playslave::MainLoop() { io->Run(); }
-
 const Player::TP::UnitMap UNITS = {
                 {"us", Player::TP::MkTime<std::chrono::microseconds>},
                 {"usec", Player::TP::MkTime<std::chrono::microseconds>},
@@ -159,7 +157,7 @@ int Playslave::Run()
 		// Don't roll this into the constructor: it'll go out of scope!
 		this->audio.SetDeviceID(DeviceID());
 		RegisterListeners();
-		MainLoop();
+		io->Run();
 	}
 	catch (Error &error)
 	{
