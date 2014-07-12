@@ -96,10 +96,13 @@ void AudioOutput::PreFillRingBuffer()
 	// happens first.  (There's a maximum in order to prevent spin-up from
 	// taking massive amounts of time and thus delaying playback.)
 	bool more = true;
-	std::uint64_t c = RingBufferWriteCapacity();
-	while (more && c > 0 && RINGBUF_SIZE - c < SPINUP_SIZE) {
+	bool space_available = true;
+	bool below_spinup_cap = true;
+
+	while (more && space_available && below_spinup_cap) {
 		more = Update();
-		c = RingBufferWriteCapacity();
+		space_available = 0 < RingBufferWriteCapacity();
+		below_spinup_cap = RingBufferReadCapacity() < SPINUP_SIZE;
 	}
 }
 
@@ -211,6 +214,11 @@ void AudioOutput::AdvanceFrameIterator(std::uint64_t sample_count)
 std::uint64_t AudioOutput::RingBufferWriteCapacity()
 {
 	return this->ring_buf->WriteCapacity();
+}
+
+std::uint64_t AudioOutput::RingBufferReadCapacity()
+{
+	return this->ring_buf->ReadCapacity();
 }
 
 std::uint64_t AudioOutput::RingBufferTransferCount()

@@ -170,10 +170,6 @@ private:
 	/// @see RINGBUF_SIZE
 	static const size_t RINGBUF_POWER = 16;
 
-	/// The capacity of the AudioOutput ring buffer.
-	/// @see RINGBUF_POWER
-	static const size_t RINGBUF_SIZE = (1 << 16);
-
 	// Type for the ring buffer.
 	using RingBuf = RingBuffer<char, std::uint64_t>;
 
@@ -271,6 +267,12 @@ private:
 	 * @return The write capacity, in samples.
 	 */
 	std::uint64_t RingBufferWriteCapacity();
+
+	/**
+	 * The current read capacity of the ring buffer.
+	 * @return The read capacity, in samples.
+	 */
+	std::uint64_t RingBufferReadCapacity();
 
 	/**
 	 * The number of samples that may currently be placed in the ringbuffer.
