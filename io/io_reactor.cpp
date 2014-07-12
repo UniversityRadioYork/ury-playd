@@ -21,6 +21,8 @@
 #include <boost/asio.hpp>                       // boost::asio::*
 #include <boost/asio/high_resolution_timer.hpp> // boost::asio::high_resolution_timer
 
+const std::chrono::nanoseconds IoReactor::PLAYER_UPDATE_PERIOD(1000);
+
 IoReactor::IoReactor(Player &player, CommandHandler &handler)
     : player(player), handler(handler), io_service(), signals(io_service)
 {
@@ -31,7 +33,7 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler)
 void IoReactor::Run()
 {
 	Respond(Response::OHAI, MSG_OHAI);
-	MainLoop();
+	io_service.run();
 	Respond(Response::TTFN, MSG_TTFN);
 }
 
@@ -44,8 +46,6 @@ void IoReactor::HandleCommand(const std::string &line)
 		Respond(Response::WHAT, MSG_CMD_INVALID);
 	}
 }
-
-void IoReactor::MainLoop() { io_service.run(); }
 
 void IoReactor::InitSignals()
 {
@@ -61,11 +61,8 @@ void IoReactor::InitSignals()
 
 void IoReactor::DoUpdateTimer()
 {
-	boost::asio::high_resolution_timer t(
-	                this->io_service,
-	                std::chrono::duration_cast<
-	                                std::chrono::high_resolution_clock::
-	                                                duration>(LOOP_PERIOD));
+	auto tick = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration> (PLAYER_UPDATE_PERIOD);
+	boost::asio::high_resolution_timer t(this->io_service, tick);
 	t.async_wait([this](boost::system::error_code) {
 		this->player.Update();
 		DoUpdateTimer();

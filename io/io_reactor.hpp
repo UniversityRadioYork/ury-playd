@@ -14,6 +14,7 @@
 #ifndef PS_IO_REACTOR_HPP
 #define PS_IO_REACTOR_HPP
 
+#include <chrono>
 #include <boost/asio.hpp>
 #include "io_responder.hpp"
 
@@ -63,14 +64,11 @@ protected:
 	                std::function<void(std::ostream &)> f) override = 0;
 
 private:
-	/**
-	 * The reactor's main loop.
-	 * It will block until a quit command is received.
-	 * @return The exit code of the main loop.
-	 */
-	void MainLoop();
 	void DoUpdateTimer();
 	void InitSignals();
+
+	/// The period between player updates.
+	static const std::chrono::nanoseconds PLAYER_UPDATE_PERIOD;
 
 	/// The signal set used to shut the server down on terminations.
 	boost::asio::signal_set signals;

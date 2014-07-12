@@ -25,9 +25,6 @@ extern "C" {
 /// The period between position announcements from the Player object.
 const std::chrono::microseconds POSITION_PERIOD(500000);
 
-/// The period between main loop cycles.
-const std::chrono::nanoseconds LOOP_PERIOD(1000);
-
 /// The size of the internal decoding buffer.
 const size_t BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 
