@@ -280,19 +280,15 @@ void AudioDecoder::InitialisePacket()
 
 void AudioDecoder::InitialiseResampler()
 {
-	std::function<Resampler *(const SampleByteConverter &,
-	                          AVCodecContext *)> rs;
+	Resampler *rs;
+	AVCodecContext *codec = this->stream->codec;
+
 	if (UsingPlanarSampleFormat()) {
-		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
-			return new PlanarResampler(s, c);
-		};
+		rs = new PlanarResampler(codec);
 	} else {
-		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
-			return new PackedResampler(s, c);
-		};
+		rs = new PackedResampler(codec);
 	}
-	this->resampler = std::unique_ptr<Resampler>(
-	                rs(*this, this->stream->codec));
+	this->resampler = std::unique_ptr<Resampler>(rs);
 }
 
 bool AudioDecoder::UsingPlanarSampleFormat()
