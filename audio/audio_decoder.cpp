@@ -29,7 +29,6 @@ extern "C" {
 }
 
 #include "../errors.hpp"
-#include "../constants.h"
 #include "../messages.h"
 #include "../sample_formats.hpp"
 

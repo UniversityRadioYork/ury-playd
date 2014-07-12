@@ -25,7 +25,6 @@ extern "C" {
 
 #include "portaudiocpp/PortAudioCpp.hxx"
 
-#include "../constants.h"
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
 #include "../messages.h"

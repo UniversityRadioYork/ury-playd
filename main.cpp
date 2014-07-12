@@ -10,7 +10,6 @@
 #include <chrono>
 #include <iostream>
 
-#include "constants.h" // POSITION_PERIOD
 #include "cmd.hpp"
 #include "io/io_responder.hpp"
 #include "io/io_reactor.hpp"

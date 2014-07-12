@@ -22,7 +22,6 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-#include "../constants.h"
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
 

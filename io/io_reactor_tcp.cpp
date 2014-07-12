@@ -29,7 +29,6 @@
 #define BOOST_ASIO_HAS_STD_CHRONO
 #endif
 
-#include "../constants.h" // LOOP_PERIOD
 #include "../cmd.hpp"
 #include "../errors.hpp"
 #include "../messages.h"
