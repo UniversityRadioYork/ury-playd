@@ -13,6 +13,8 @@ extern "C" {
 #include "../contrib/pa_ringbuffer.h"
 }
 
+#include "../messages.h"
+
 /**
  * A ring buffer.
  *
