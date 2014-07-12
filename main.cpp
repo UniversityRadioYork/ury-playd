@@ -142,13 +142,12 @@ void Playslave::RegisterCommands(Player *p)
 	using std::bind;
 	using std::placeholders::_1;
 
-	this->handler.AddNullary("play", bind(&Player::Play, p));
-	this->handler.AddNullary("stop", bind(&Player::Stop, p));
-	this->handler.AddNullary("ejct", bind(&Player::Eject, p));
-	this->handler.AddNullary("quit", bind(&Player::Quit, p));
-
-	this->handler.AddUnary("load", bind(&Player::Load, p, _1));
-	this->handler.AddUnary("seek", bind(&Player::Seek, p, _1));
+	this->handler.AddNullary("play", bind(&Player::Play, p))
+	             .AddNullary("stop", bind(&Player::Stop, p))
+	             .AddNullary("ejct", bind(&Player::Eject, p))
+	             .AddNullary("quit", bind(&Player::Quit, p))
+	             .AddUnary("load", bind(&Player::Load, p, _1))
+	             .AddUnary("seek", bind(&Player::Seek, p, _1));
 }
 
 int Playslave::Run()
