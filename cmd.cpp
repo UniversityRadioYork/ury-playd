@@ -17,14 +17,14 @@
 #include "io/io_responder.hpp"
 #include "messages.h"
 
-CommandHandler *CommandHandler::AddNullary(const std::string &word,
+CommandHandler &CommandHandler::AddNullary(const std::string &word,
                                            std::function<bool()> f)
 {
 	this->commands.emplace(word, [f](const WordList &) { return f(); });
-	return this;
+	return *this;
 }
 
-CommandHandler *CommandHandler::AddUnary(
+CommandHandler &CommandHandler::AddUnary(
                 const std::string &word,
                 std::function<bool(const std::string &)> f)
 {
@@ -35,7 +35,7 @@ CommandHandler *CommandHandler::AddUnary(
 		}
 		return valid;
 	});
-	return this;
+	return *this;
 }
 
 bool CommandHandler::Run(const CommandHandler::WordList &words)
