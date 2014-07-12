@@ -33,27 +33,14 @@ extern "C" {
 #include "audio_output.hpp"
 #include "audio_decoder.hpp"
 
-// Use the PortAudio ringbuffer by default.  This is because of unsettled bugs
-// with the Boost ringbuffer—if the latter can be fixed, it should be used
-// instead.
-#ifdef USE_BOOST_RINGBUF
-
-#include "../ringbuffer/ringbuffer_boost.hpp"
-/// Type of the concrete ring buffer used by the AudioOutput.
-/// In this instance, it is a BoostRingBuffer.
-using ConcreteRingBuffer = BoostRingBuffer<char, std::uint64_t, RINGBUF_POWER>;
-
-#else
-
 #include "../ringbuffer/ringbuffer_pa.hpp"
-/// Type of the concrete ring buffer used by the AudioOutput.
-/// In this instance, it is a PaRingBuffer.
-using ConcreteRingBuffer = PaRingBuffer<char, std::uint64_t, RINGBUF_POWER>;
 
-#endif
+const size_t AudioOutput::SPINUP_SIZE = 2 * BUFFER_SIZE;
 
 AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
 {
+	using ConcreteRingBuffer = PaRingBuffer<char, std::uint64_t, RINGBUF_POWER>;
+
 	this->av = decltype(this->av)(new AudioDecoder(path));
 	this->out_strm = decltype(this->out_strm)(
 	                c.Configure(*this, *(this->av)));

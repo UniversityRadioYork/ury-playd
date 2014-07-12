@@ -160,6 +160,21 @@ public:
 	void PreFillRingBuffer();
 
 private:
+	/// The number of bytes to pre-load into the buffer before playing.
+	static const size_t SPINUP_SIZE;
+
+	// These have to be declared in the header, because otherwise they aren't
+	// 'constant expressions'.
+
+	/// n, where 2^n is the capacity of the AudioOutput ring buffer.
+	/// @see RINGBUF_SIZE
+	static const size_t RINGBUF_POWER = 16;
+
+	/// The capacity of the AudioOutput ring buffer.
+	/// @see RINGBUF_POWER
+	static const size_t RINGBUF_SIZE = (1 << 16);
+
+
 	bool file_ended; ///< Whether the current file has stopped decoding.
 
 	/// The audio decoder providing the actual audio data.
