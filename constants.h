@@ -22,9 +22,6 @@ extern "C" {
 
 #include <chrono>
 
-/// The period between position announcements from the Player object.
-const std::chrono::microseconds POSITION_PERIOD(500000);
-
 /// The size of the internal decoding buffer.
 const size_t BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 

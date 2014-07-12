@@ -46,6 +46,12 @@ int main(int argc, char *argv[])
 	return ps.Run();
 }
 
+//
+// Playslave
+//
+
+const std::chrono::microseconds Playslave::POSITION_PERIOD(500000);
+
 void Playslave::ListOutputDevices()
 {
 	this->audio.OnDevices([](const AudioSystem::Device &device) {
