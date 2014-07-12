@@ -36,24 +36,14 @@ AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
 	ClearFrame();
 }
 
-AudioOutput::~AudioOutput()
-{
-	this->out_strm = nullptr;
-	Debug("closed output stream");
-}
-
 void AudioOutput::Start()
 {
 	this->out_strm->start();
-	Debug("audio started");
 }
 
 void AudioOutput::Stop()
 {
 	this->out_strm->abort();
-	Debug("audio stopped");
-
-	// TODO: Possibly recover from dropping frames due to abort.
 }
 
 bool AudioOutput::IsStopped() { return !this->out_strm->isActive(); }
