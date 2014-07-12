@@ -160,18 +160,15 @@ public:
 	void PreFillRingBuffer();
 
 private:
-	/// The number of bytes to pre-load into the buffer before playing.
-	static const size_t SPINUP_SIZE;
-
-	// These have to be declared in the header, because otherwise they aren't
-	// 'constant expressions'.
+	// Type for the ring buffer.
+	using RingBuf = RingBuffer<char, std::uint64_t>;
 
 	/// n, where 2^n is the capacity of the AudioOutput ring buffer.
 	/// @see RINGBUF_SIZE
-	static const size_t RINGBUF_POWER = 16;
+	static const size_t RINGBUF_POWER;
 
-	// Type for the ring buffer.
-	using RingBuf = RingBuffer<char, std::uint64_t>;
+	/// The number of bytes to pre-load into the buffer before playing.
+	static const size_t SPINUP_SIZE;
 
 	bool file_ended; ///< Whether the current file has stopped decoding.
 

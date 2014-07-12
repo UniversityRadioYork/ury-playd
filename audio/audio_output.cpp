@@ -35,6 +35,7 @@ extern "C" {
 
 #include "../ringbuffer/ringbuffer.hpp"
 
+const size_t AudioOutput::RINGBUF_POWER = 16;
 const size_t AudioOutput::SPINUP_SIZE = 2 * BUFFER_SIZE;
 
 AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
