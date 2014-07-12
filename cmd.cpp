@@ -17,20 +17,10 @@
 #include "io/io_responder.hpp"
 #include "messages.h"
 
-/**
- * Constructs a CommandHandler.
- * @param commands The map of commands to their handlers to use for this
- *   CommandHandler: this map will be copied.
- */
-CommandHandler::CommandHandler(const CommandHandler::CommandSet &commands)
-{
-	this->commands = std::unique_ptr<CommandSet>(new CommandSet(commands));
-}
-
 CommandHandler *CommandHandler::AddNullary(const std::string &word,
                                            std::function<bool()> f)
 {
-	this->commands->emplace(word, [f](const WordList &) { return f(); });
+	this->commands.emplace(word, [f](const WordList &) { return f(); });
 	return this;
 }
 
@@ -38,7 +28,7 @@ CommandHandler *CommandHandler::AddUnary(
                 const std::string &word,
                 std::function<bool(const std::string &)> f)
 {
-	this->commands->emplace(word, [f](const WordList &words) {
+	this->commands.emplace(word, [f](const WordList &words) {
 		bool valid = false;
 		if (words.size() == 2 && !words[1].empty()) {
 			valid = f(words[1]);
@@ -59,8 +49,8 @@ bool CommandHandler::Run(const CommandHandler::WordList &words)
 	bool valid = false;
 
 	if (!words.empty()) {
-		auto commandIter = this->commands->find(words[0]);
-		if (commandIter != this->commands->end()) {
+		auto commandIter = this->commands.find(words[0]);
+		if (commandIter != this->commands.end()) {
 			valid = commandIter->second(words);
 		}
 	}

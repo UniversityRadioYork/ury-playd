@@ -41,17 +41,6 @@ public:
 	                std::function<bool(const std::string &)>;
 
 	/**
-	 * Constructs a CommandHandler with no arguments.
-	 */
-	CommandHandler() : CommandHandler(CommandSet{}) {};
-
-	/**
-	 * Constructs a CommandHandler with an existing command set.
-	 * @param commands The command set, which will be copied.
-	 */
-	CommandHandler(const CommandSet &commands);
-
-	/**
 	 * Handles a command line.
 	 * @param line A reference to the line to handle as a command.
 	 * @return Whether the command succeeded.
@@ -79,7 +68,7 @@ public:
 	                         std::function<bool(const std::string &)> f);
 
 private:
-	std::unique_ptr<CommandSet> commands;
+	CommandSet commands;
 
 	WordList LineToWords(const std::string &line);
 
