@@ -23,7 +23,7 @@ extern "C" {
 #include <chrono>
 
 /// The size of the internal decoding buffer.
-const size_t BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
+
 
 
 #endif // PS_CONSTANTS_H

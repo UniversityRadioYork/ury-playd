@@ -153,12 +153,6 @@ public:
 	 */
 	void SeekToPositionMicroseconds(std::chrono::microseconds microseconds);
 
-	/**
-	 * Tries to place enough audio into the audio buffer to prevent a
-	 * buffer underrun during a player start.
-	 */
-	void PreFillRingBuffer();
-
 private:
 	// Type for the ring buffer.
 	using RingBuf = RingBuffer<char, std::uint64_t>;

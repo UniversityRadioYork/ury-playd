@@ -36,6 +36,8 @@ extern "C" {
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
 
+const size_t AudioDecoder::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
+
 AudioDecoder::AudioDecoder(const std::string &path)
 	: decode_state(DecodeState::WAITING_FOR_FRAME),
 	buffer(BUFFER_SIZE)

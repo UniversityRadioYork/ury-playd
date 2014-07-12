@@ -36,7 +36,6 @@ extern "C" {
 #include "../ringbuffer/ringbuffer.hpp"
 
 const size_t AudioOutput::RINGBUF_POWER = 16;
-const size_t AudioOutput::SPINUP_SIZE = 2 * BUFFER_SIZE;
 
 AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
 {
@@ -59,8 +58,6 @@ AudioOutput::~AudioOutput()
 
 void AudioOutput::Start()
 {
-	PreFillRingBuffer();
-
 	this->out_strm->start();
 	Debug("audio started");
 }
@@ -89,22 +86,6 @@ std::uint64_t AudioOutput::ByteCountForSampleCount(std::uint64_t samples) const
 std::uint64_t AudioOutput::SampleCountForByteCount(std::uint64_t bytes) const
 {
 	return this->av->SampleCountForByteCount(bytes);
-}
-
-void AudioOutput::PreFillRingBuffer()
-{
-	// Either fill the ringbuf or hit the maximum spin-up size, whichever
-	// happens first.  (There's a maximum in order to prevent spin-up from
-	// taking massive amounts of time and thus delaying playback.)
-	bool more = true;
-	bool space_available = true;
-	bool below_spinup_cap = true;
-
-	while (more && space_available && below_spinup_cap) {
-		more = Update();
-		space_available = 0 < RingBufferWriteCapacity();
-		below_spinup_cap = RingBufferReadCapacity() < SPINUP_SIZE;
-	}
 }
 
 void AudioOutput::SeekToPositionMicroseconds(

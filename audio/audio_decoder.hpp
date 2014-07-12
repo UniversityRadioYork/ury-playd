@@ -130,6 +130,9 @@ public:
 	                std::uint64_t samples) const override;
 
 private:
+	/// The size of the internal decoding buffer, in bytes.
+	static const size_t BUFFER_SIZE;
+
 	DecodeState decode_state; ///< Current state of decoding.
 
 	AVStream *stream; ///< The FFmpeg stream being decoded.
