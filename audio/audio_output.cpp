@@ -26,14 +26,12 @@
 const size_t AudioOutput::RINGBUF_POWER = 16;
 
 AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
+    : av(path),
+	ring_buf(RINGBUF_POWER, av.ByteCountForSampleCount(1L)),
+	position_sample_count(0)
 {
-	this->av = decltype(this->av)(new AudioDecoder(path));
 	this->out_strm = decltype(this->out_strm)(
-	                c.Configure(*this, *(this->av)));
-	this->ring_buf = decltype(this->ring_buf)(
-	                new RingBuf(RINGBUF_POWER, ByteCountForSampleCount(1L)));
-
-	this->position_sample_count = 0;
+	                c.Configure(*this, this->av));
 
 	ClearFrame();
 }
@@ -62,30 +60,30 @@ bool AudioOutput::IsStopped() { return !this->out_strm->isActive(); }
 
 std::chrono::microseconds AudioOutput::CurrentPositionMicroseconds()
 {
-	return this->av->PositionMicrosecondsForSampleCount(
+	return this->av.PositionMicrosecondsForSampleCount(
 	                this->position_sample_count);
 }
 
 std::uint64_t AudioOutput::ByteCountForSampleCount(std::uint64_t samples) const
 {
-	return this->av->ByteCountForSampleCount(samples);
+	return this->av.ByteCountForSampleCount(samples);
 }
 
 std::uint64_t AudioOutput::SampleCountForByteCount(std::uint64_t bytes) const
 {
-	return this->av->SampleCountForByteCount(bytes);
+	return this->av.SampleCountForByteCount(bytes);
 }
 
 void AudioOutput::SeekToPositionMicroseconds(
                 std::chrono::microseconds microseconds)
 {
-	this->av->SeekToPositionMicroseconds(microseconds);
+	this->av.SeekToPositionMicroseconds(microseconds);
 	this->position_sample_count =
-	                this->av->SampleCountForPositionMicroseconds(
+	                this->av.SampleCountForPositionMicroseconds(
 	                                microseconds);
 
 	ClearFrame();
-	this->ring_buf->Flush();
+	this->ring_buf.Flush();
 }
 
 void AudioOutput::ClearFrame()
@@ -117,7 +115,7 @@ bool AudioOutput::DecodeIfFrameEmpty()
 	bool more_frames_available = true;
 
 	if (FrameFinished()) {
-		AudioDecoder::DecodeResult result = this->av->Decode();
+		AudioDecoder::DecodeResult result = this->av.Decode();
 
 		this->frame = result.second;
 		this->frame_iterator = this->frame.begin();
@@ -144,7 +142,7 @@ void AudioOutput::WriteToRingBuffer(std::uint64_t sample_count)
 	// This should have been established by WriteAllAvailableToRingBuffer.
 	assert(0 < sample_count);
 
-	std::uint64_t written_count = this->ring_buf->Write(
+	std::uint64_t written_count = this->ring_buf.Write(
 	                &(*this->frame_iterator), sample_count);
 	if (written_count != sample_count) {
 		throw InternalError(MSG_OUTPUT_RINGWRITE);
@@ -183,12 +181,12 @@ void AudioOutput::AdvanceFrameIterator(std::uint64_t sample_count)
 
 std::uint64_t AudioOutput::RingBufferWriteCapacity()
 {
-	return this->ring_buf->WriteCapacity();
+	return this->ring_buf.WriteCapacity();
 }
 
 std::uint64_t AudioOutput::RingBufferReadCapacity()
 {
-	return this->ring_buf->ReadCapacity();
+	return this->ring_buf.ReadCapacity();
 }
 
 std::uint64_t AudioOutput::RingBufferTransferCount()
@@ -223,7 +221,7 @@ PlayCallbackStepResult AudioOutput::PlayCallbackStep(
                 char *out, unsigned long frames_per_buf,
                 PlayCallbackStepResult in)
 {
-	unsigned long avail = this->ring_buf->ReadCapacity();
+	unsigned long avail = this->ring_buf.ReadCapacity();
 
 	auto fn = (avail == 0) ? &AudioOutput::PlayCallbackFailure
 	                       : &AudioOutput::PlayCallbackSuccess;
@@ -265,7 +263,7 @@ unsigned long AudioOutput::ReadSamplesToOutput(char *&output,
 	                std::min({output_capacity, buffered_count,
 	                          static_cast<unsigned long>(LONG_MAX)}));
 
-	output += this->ring_buf->Read(output, transfer_sample_count);
+	output += this->ring_buf.Read(output, transfer_sample_count);
 
 	this->position_sample_count += transfer_sample_count;
 	return transfer_sample_count;

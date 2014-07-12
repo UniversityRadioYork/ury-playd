@@ -23,11 +23,9 @@ namespace portaudio {
 class Stream;
 }
 
-template <typename RepT, typename SampleCountT>
-class RingBuffer;
-
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
+#include "../ringbuffer/ringbuffer.hpp"
 
 /// Type of results emitted during the play callback step.
 using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
@@ -156,9 +154,6 @@ public:
 	void SeekToPositionMicroseconds(std::chrono::microseconds microseconds);
 
 private:
-	// Type for the ring buffer.
-	using RingBuf = RingBuffer<char, std::uint64_t>;
-
 	/// n, where 2^n is the capacity of the AudioOutput ring buffer.
 	/// @see RINGBUF_SIZE
 	static const size_t RINGBUF_POWER;
@@ -166,7 +161,7 @@ private:
 	bool file_ended; ///< Whether the current file has stopped decoding.
 
 	/// The audio decoder providing the actual audio data.
-	std::unique_ptr<AudioDecoder> av;
+	AudioDecoder av;
 
 	/// The current decoded frame.
 	std::vector<char> frame;
@@ -175,7 +170,7 @@ private:
 	std::vector<char>::iterator frame_iterator;
 
 	/// The ring buffer used to transfer samples to the playing callback.
-	std::unique_ptr<RingBuf> ring_buf;
+	RingBuffer<char, std::uint64_t> ring_buf;
 
 	/// The PortAudio stream to which this AudioOutput outputs.
 	std::unique_ptr<portaudio::Stream> out_strm;
