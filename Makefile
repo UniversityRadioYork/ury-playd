@@ -1,7 +1,7 @@
 OBJDIR=objs
 
-CC=clang
-CXX=clang++
+CC=gcc
+CXX=g++
 CFLAGS+=-c -Wall -Wextra -Werror -pedantic -g -std=c99
 CXXFLAGS+=-c -Wall -Wextra -Werror -pedantic -g -std=c++11
 LDFLAGS+=-lavcodec -lavformat -lavutil -lswresample -lportaudiocpp -lportaudio -lasound -lm -lpthread -lboost_system

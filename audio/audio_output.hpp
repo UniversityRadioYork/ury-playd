@@ -155,6 +155,10 @@ private:
 	/// @see RINGBUF_SIZE
 	static const size_t RINGBUF_POWER;
 
+	/// Whether the current run of the audio playback stream has not yet
+	/// successfully read its first set of samples from the buffer.
+	bool just_started;
+
 	bool file_ended; ///< Whether the current file has stopped decoding.
 
 	/// The audio decoder providing the actual audio data.

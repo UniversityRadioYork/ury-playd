@@ -35,11 +35,21 @@ AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
 	ClearFrame();
 }
 
-void AudioOutput::Start() { this->out_strm->start(); }
+void AudioOutput::Start()
+{
+	this->just_started = true;
+	this->out_strm->start();
+}
 
-void AudioOutput::Stop() { this->out_strm->abort(); }
+void AudioOutput::Stop()
+{
+	this->out_strm->abort();
+}
 
-bool AudioOutput::IsStopped() { return !this->out_strm->isActive(); }
+bool AudioOutput::IsStopped()
+{
+	return !this->out_strm->isActive();
+}
 
 std::chrono::microseconds AudioOutput::CurrentPositionMicroseconds()
 {
@@ -110,7 +120,10 @@ bool AudioOutput::DecodeIfFrameEmpty()
 	return more_frames_available;
 }
 
-bool AudioOutput::FileEnded() { return this->file_ended; }
+bool AudioOutput::FileEnded()
+{
+	return this->file_ended;
+}
 
 void AudioOutput::WriteAllAvailableToRingBuffer()
 {
@@ -205,9 +218,16 @@ PlayCallbackStepResult AudioOutput::PlayCallbackStep(
                 PlayCallbackStepResult in)
 {
 	unsigned long avail = this->ring_buf.ReadCapacity();
+	bool empty = avail == 0;
 
-	auto fn = (avail == 0) ? &AudioOutput::PlayCallbackFailure
-	                       : &AudioOutput::PlayCallbackSuccess;
+	/* If we've just started this stream, we don't want to hand PortAudio
+	   an incomplete frame—we'd rather wait until we have enough in the
+	   ring buffer before starting to play out. */
+	bool wait = this->just_started && (avail < frames_per_buf);
+
+	bool failed = wait || empty;
+	auto fn = failed ? &AudioOutput::PlayCallbackFailure
+	                 : &AudioOutput::PlayCallbackSuccess;
 	return (this->*fn)(out, avail, frames_per_buf, in);
 }
 
@@ -215,6 +235,8 @@ PlayCallbackStepResult AudioOutput::PlayCallbackSuccess(
                 char *out, unsigned long avail, unsigned long frames_per_buf,
                 PlayCallbackStepResult in)
 {
+	this->just_started = false;
+
 	auto samples_pa_wants = frames_per_buf - in.second;
 	auto samples_read = ReadSamplesToOutput(out, avail, samples_pa_wants);
 
