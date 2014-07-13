@@ -78,4 +78,7 @@ void IoReactor::DoUpdateTimer()
 	});
 }
 
-void IoReactor::End() { this->io_service.stop(); }
+void IoReactor::End()
+{
+	this->io_service.stop();
+}

@@ -53,56 +53,11 @@ extern const std::map<Response, std::string> RESPONSES;
 class Responder {
 public:
 	/**
-	 * Base case for the RespondArgs template, for when there are no
-	 * arguments.
-	 */
-	inline void RespondArgs(std::ostream &) {}
-
-	/**
-	 * Outputs a response body, with a variadic number of arguments.
-	 * This is defined inductively, with RespondArgs() being the base case.
-	 * @tparam Arg1 The type of the leftmost argument.
-	 * @tparam Args Parameter pack of remaining arguments.
-	 * @param stream The stream onto which the response body shall be
-	 *   output.
-	 * @param arg1 The leftmost argument.
-	 * @param args The remaining arguments.
-	 */
-	template <typename Arg1, typename... Args>
-	inline void RespondArgs(std::ostream &stream, const Arg1 &arg1,
-	                        const Args &... args)
-	{
-		stream << " " << arg1;
-		RespondArgs(stream, args...);
-	}
-
-	/**
-	 * Base case for the Respond template, for when there are no arguments.
+	 * Outputs a response.
 	 * @param code The response code to emit.
+	 * @param message The response message.
 	 */
-	inline void Respond(Response code)
-	{
-		ResponseViaOstream([&](std::ostream &stream) {
-			stream << RESPONSES.at(code) << std::endl;
-		});
-	}
-
-	/**
-	 * Outputs a response, with a variadic number of arguments.
-	 * This is defined on RespondArgs.
-	 * @tparam Args Parameter pack of arguments.
-	 * @param code The response code to emit.
-	 * @param args The arguments, if any.
-	 */
-	template <typename... Args>
-	inline void Respond(Response code, Args &... args)
-	{
-		ResponseViaOstream([&](std::ostream &stream) {
-			stream << RESPONSES.at(code);
-			RespondArgs(stream, args...);
-			stream << std::endl;
-		});
-	}
+	void Respond(Response code, const std::string &message);
 
 	/**
 	 * Emits an error as a response.
@@ -112,14 +67,10 @@ public:
 
 protected:
 	/**
-	 * Provides an ostream for building a response.
-	 * The ostream is provided through a lambda, and the response will be
-	 * sent
-	 * either during or after the lambda's lifetime.
-	 * @param f The lambda to invoke with the ostream.
+	 * Outputs a raw response string.
+	 * @param string The response string, of the form "CODE message".
 	 */
-	virtual void ResponseViaOstream(
-	                std::function<void(std::ostream &)> f) = 0;
+	virtual void RespondRaw(const std::string &string) = 0;
 };
 
 #endif // PS_IO_RESPONDER_HPP

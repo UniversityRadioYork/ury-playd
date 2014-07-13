@@ -27,7 +27,7 @@
 /**
  * An IoReactor using POSIX streams.
  *
- * The WinIoReactor allows Playslave to take input from, and send output to,
+ * The PosixIoReactor allows Playslave to take input from, and send output to,
  * standard input/output on a POSIX-compliant OS.
  *
  * @see IoReactor
@@ -52,7 +52,7 @@ public:
 	PosixIoReactor &operator=(const PosixIoReactor &) = delete;
 
 protected:
-	void ResponseViaOstream(std::function<void(std::ostream &)> f) override;
+	void RespondRaw(const std::string &string) override;
 
 private:
 	void SetupWaitForInput();

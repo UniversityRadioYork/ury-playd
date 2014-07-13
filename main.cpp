@@ -78,13 +78,19 @@ void Playslave::RegisterListeners()
 	this->player.SetPositionListenerPeriod(POSITION_PERIOD);
 	this->player.RegisterPositionListener([this](
 	                std::chrono::microseconds position) {
-		std::uint64_t p = position.count();
-		io->Respond(Response::TIME, p);
+		std::ostringstream os;
+		os << position.count();
+		
+		io->Respond(Response::TIME, os.str());
 	});
 	this->player.RegisterStateListener([this](Player::State old_state,
 	                                          Player::State new_state) {
-		io->Respond(Response::STAT, Player::StateString(old_state),
-		            Player::StateString(new_state));
+		std::ostringstream os;
+		os << Player::StateString(old_state);
+		os << " ";
+		os << Player::StateString(new_state);
+		io->Respond(Response::STAT, os.str());
+
 		if (new_state == Player::State::QUITTING) {
 			io->End();
 		}

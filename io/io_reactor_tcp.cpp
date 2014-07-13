@@ -71,12 +71,9 @@ void TcpIoReactor::DoAccept()
 	this->acceptor.async_accept(connection->Socket(), on_accept);
 }
 
-void TcpIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
+void TcpIoReactor::RespondRaw(const std::string &string)
 {
-	std::ostringstream os;
-	f(os);
-
-	this->manager.Send(os.str());
+	this->manager.Send(string);
 }
 
 void TcpIoReactor::End()
@@ -162,12 +159,9 @@ void TcpConnection::DoWrite()
 	                this->strand.wrap(write_cb));
 }
 
-void TcpConnection::ResponseViaOstream(std::function<void(std::ostream &)> f)
+void TcpConnection::RespondRaw(const std::string &string)
 {
-	std::ostringstream os;
-	f(os);
-
-	Send(os.str());
+        Send(string);
 }
 
 //

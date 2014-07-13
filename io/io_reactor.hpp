@@ -60,8 +60,7 @@ protected:
 	 */
 	void HandleCommand(const std::string &line);
 
-	virtual void ResponseViaOstream(
-	                std::function<void(std::ostream &)> f) override = 0;
+	virtual void RespondRaw(const std::string &string) override = 0;
 
 private:
 	void DoUpdateTimer();

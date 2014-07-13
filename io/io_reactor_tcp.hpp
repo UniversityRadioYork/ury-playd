@@ -79,7 +79,7 @@ public:
 	boost::asio::ip::tcp::socket &Socket();
 
 protected:
-	void ResponseViaOstream(std::function<void(std::ostream &)> f) override;
+	void RespondRaw(const std::string &string) override;
 
 private:
 	void DoRead();
@@ -169,7 +169,7 @@ public:
 	void End() override;
 
 protected:
-	void ResponseViaOstream(std::function<void(std::ostream &)> f) override;
+	void RespondRaw(const std::string &string) override;
 
 private:
 	void DoAccept();

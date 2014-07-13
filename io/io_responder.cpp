@@ -7,6 +7,7 @@
  * @see io/io_responder.hpp
  */
 
+#include <sstream>          // std::ostringstream
 #include "io_responder.hpp" // Responder, Response
 #include "../errors.hpp"    // Error
 
@@ -24,6 +25,14 @@ const std::map<Response, std::string> RESPONSES = {{Response::OKAY, "OKAY"},
                                                    {Response::QENT, "QENT"},
                                                    {Response::QMOD, "QMOD"},
                                                    {Response::QNUM, "QNUM"}};
+
+void Responder::Respond(Response code, const std::string &message)
+{
+        std::ostringstream os;
+        os << RESPONSES.at(code) << " " << message << std::endl;
+
+        RespondRaw(os.str());
+}
 
 void Responder::RespondWithError(const Error &error)
 {

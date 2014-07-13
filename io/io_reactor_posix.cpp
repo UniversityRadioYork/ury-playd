@@ -17,8 +17,9 @@
 
 #ifdef BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR
 
-#include <functional>           // std::function
+#include <iostream>             // std::cout
 #include <ostream>              // std::ostream
+#include <string>               // std::string
 #include <unistd.h>             // STDIN_FILENO
 #include "../cmd.hpp"           // CommandHandler
 #include "../player/player.hpp" // Player
@@ -30,10 +31,10 @@ PosixIoReactor::PosixIoReactor(Player &player, CommandHandler &handler)
 	SetupWaitForInput();
 }
 
-void PosixIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
+void PosixIoReactor::RespondRaw(const std::string &string)
 {
 	// There's no need for this to be asynchronous, so we just use iostream.
-	f(std::cout);
+	std::cout << string << std::flush;
 }
 
 void PosixIoReactor::SetupWaitForInput()

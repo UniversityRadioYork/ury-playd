@@ -15,11 +15,13 @@
 
 #ifdef _WIN32
 
-#include "../contrib/stdin_stream.hpp"
-#include "../cmd.hpp"
-#include "../player/player.hpp"
-#include "io_reactor_win.hpp"
-#include <Windows.h>
+#include <iostream>                    // std::cout
+#include <string>                      // std::string
+#include "../contrib/stdin_stream.hpp" // stdin_stream
+#include "../cmd.hpp"                  // CommandHandler
+#include "../player/player.hpp"        // Player
+#include "io_reactor_win.hpp"          // WinIoReactor
+#include <Windows.h>                   // Windows API
 
 WinIoReactor::WinIoReactor(Player &player, CommandHandler &handler)
     : IoReactor(player, handler),
@@ -33,10 +35,10 @@ WinIoReactor::WinIoReactor(Player &player, CommandHandler &handler)
 	SetupWaitForInput();
 }
 
-void WinIoReactor::ResponseViaOstream(std::function<void(std::ostream &)> f)
+void WinIoReactor::RespondRaw(const std::string &string)
 {
 	// There's no need for this to be asynchronous, so we just use iostream.
-	f(std::cout);
+        std::cout << string << std::flush;
 }
 
 void WinIoReactor::SetupWaitForInput()
