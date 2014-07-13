@@ -13,6 +13,8 @@ extern "C" {
 #include "../contrib/pa_ringbuffer.h"
 }
 
+#include "../messages.h"
+
 /**
  * A ring buffer.
  *
@@ -28,7 +30,8 @@ class RingBuffer {
 public:
 	/**
 	 * Constructs a RingBuffer.
-	 * @param power n, where 2^n is the number of elements in the ring buffer.
+	 * @param power n, where 2^n is the number of elements in the ring
+	 *   buffer.
 	 * @param size The size of one element in the ring buffer.
 	 */
 	RingBuffer(int power, int size)
@@ -37,9 +40,9 @@ public:
 		this->buffer = new char[(1 << power) * size];
 
 		int init_result = PaUtil_InitializeRingBuffer(
-			this->rb, size,
-			static_cast<ring_buffer_size_t>(1 << power),
-			this->buffer);
+		                this->rb, size,
+		                static_cast<ring_buffer_size_t>(1 << power),
+		                this->buffer);
 		if (init_result != 0) {
 			throw InternalError(MSG_OUTPUT_RINGINIT);
 		}
@@ -63,7 +66,6 @@ public:
 
 	/**
 	 * The current write capacity.
-	 *
 	 * @return The number of samples this ring buffer has space to store.
 	 */
 	SampleCountT WriteCapacity() const
@@ -73,7 +75,6 @@ public:
 
 	/**
 	 * The current read capacity.
-	 *
 	 * @return The number of samples available in this ring buffer.
 	 */
 	SampleCountT ReadCapacity() const
@@ -91,19 +92,18 @@ public:
 	 * underlying implementation of the ring buffer might not guarantee
 	 * that the array is left untouched.
 	 *
-	 * @param start The start of the array buffer from which we write
-	 *              samples.  Must not be nullptr.
+	 * @param start The start of the array buffer from which we read
+	 *   samples.  Must not be nullptr.
 	 * @param count The number of samples to write.  This must not exceed
-	 *              the minimum of WriteCapacity() and the length of the
-	 *              array.
+	 *   the minimum of WriteCapacity() and the length of the array.
 	 *
 	 * @return The number of samples written, which should not exceed count.
 	 */
 	SampleCountT Write(RepT *start, SampleCountT count)
 	{
 		return CountCast(PaUtil_WriteRingBuffer(
-		this->rb, start,
-		static_cast<ring_buffer_size_t>(count)));
+		                this->rb, start,
+		                static_cast<ring_buffer_size_t>(count)));
 	}
 
 	/**
@@ -113,36 +113,31 @@ public:
 	 * sample variable.
 	 *
 	 * @param start The start of the array buffer to which we write samples.
-	 *              Must not be nullptr.
+	 *   Must not be nullptr.
 	 * @param count The number of samples to read.  This must not exceed the
-	 *              minimum of ReadCapacity() and the length of the array.
+	 *   minimum of ReadCapacity() and the length of the array.
 	 *
 	 * @return The number of samples read, which should not exceed count.
 	 */
 	SampleCountT Read(RepT *start, SampleCountT count)
 	{
 		return CountCast(PaUtil_ReadRingBuffer(
-			this->rb, start,
-			static_cast<ring_buffer_size_t>(count)));
+		                this->rb, start,
+		                static_cast<ring_buffer_size_t>(count)));
 	}
 
-	/**
-	 * Empties the ring buffer.
-	 */
-	void Flush()
-	{
-		PaUtil_FlushRingBuffer(this->rb);
-	}
+	/// Empties the ring buffer.
+	void Flush() { PaUtil_FlushRingBuffer(this->rb); }
 
 private:
 	char *buffer;         ///< The array used by the ringbuffer.
 	PaUtilRingBuffer *rb; ///< The internal PortAudio ringbuffer.
 
 	/**
-	* Converts a ring buffer size into an external size.
-	* @param count  The size/count in PortAudio form.
-	* @return       The size/count after casting to SampleCountT.
-	*/
+	 * Converts a ring buffer size into an external size.
+	 * @param count  The size/count in PortAudio form.
+	 * @return       The size/count after casting to SampleCountT.
+	 */
 	SampleCountT CountCast(ring_buffer_size_t count) const
 	{
 		return static_cast<SampleCountT>(count);

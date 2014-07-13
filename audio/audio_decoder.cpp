@@ -38,8 +38,7 @@ extern "C" {
 const size_t AudioDecoder::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 
 AudioDecoder::AudioDecoder(const std::string &path)
-	: decode_state(DecodeState::WAITING_FOR_FRAME),
-	buffer(BUFFER_SIZE)
+    : decode_state(DecodeState::WAITING_FOR_FRAME), buffer(BUFFER_SIZE)
 {
 	Open(path);
 	InitialiseStream();

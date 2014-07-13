@@ -86,7 +86,7 @@ public:
 	/**
 	 * Constructs a Resampler.
 	 * @param input_context The codec context for the Resampler's input.
-	 * @param output_format The AVSampleFormat this Resampler outputs. 
+	 * @param output_format The AVSampleFormat this Resampler outputs.
 	 */
 	Resampler(AVCodecContext *input_context, AVSampleFormat output_format);
 
