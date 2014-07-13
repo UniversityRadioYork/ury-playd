@@ -10,8 +10,10 @@
 #ifndef PS_MAIN_HPP
 #define PS_MAIN_HPP
 
+#include <chrono>                 // std::chrono
 #include "audio/audio_system.hpp" // AudioSystem
 #include "cmd.hpp"                // CommandHandler
+#include "io/io_reactor.hpp"      // IoReactor
 #include "player/player.hpp"      // Player
 #include "time_parser.hpp"        // TimeParser
 
@@ -40,17 +42,20 @@ public:
 	int Run();
 
 private:
+	/// The period between position announcements from the Player object.
+	static const std::chrono::microseconds POSITION_PERIOD;
+
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.
-
-	std::unique_ptr<Player> player;          ///< The player subsystem.
-	std::unique_ptr<CommandHandler> handler; ///< The command handler.
-	std::unique_ptr<Player::TP> time_parser; ///< The seek time parser.
+	Player player;                      ///< The player subsystem.
+	CommandHandler handler;             ///< The command handler.
+	Player::TP time_parser;             ///< The seek time parser.
+	std::unique_ptr<IoReactor> io;      ///< The I/O handler.
 
 	/**
 	 * Tries to get the output device ID from stdin.
 	 * If there is no stdin, the program lists the available devices and
-	 * dies.
+	 *   dies.
 	 * @param system The audio system.
 	 * @param argc The program argument count (from main()).
 	 * @param argv The program argument vector (from main()).
@@ -60,21 +65,22 @@ private:
 
 	/**
 	 * Lists on stdout all sound devices to which the audio output may
-	 * connect.
+	 *   connect.
 	 * This is mainly for the benefit of the end user.
 	 */
 	void ListOutputDevices();
-
-	/**
-	 * Performs the Playslave's main loop.
-	 */
-	void MainLoop();
 
 	/**
 	 * Registers various listeners with the Player.
 	 * This is so time and state changes can be sent out on stdout.
 	 */
 	void RegisterListeners();
+
+	/**
+	 * Registers the Playslave command set on the given Player.
+	 * @param p The Player on which the commands will act.
+	 */
+	void RegisterCommands(Player *p);
 };
 
 #endif // PS_MAIN_HPP

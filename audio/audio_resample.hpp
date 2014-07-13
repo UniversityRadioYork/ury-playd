@@ -42,8 +42,8 @@ public:
 	 * @return       The corresponding sample count.
 	 * @see          ByteCountForSampleCount
 	 */
-	virtual std::uint64_t SampleCountForByteCount(std::uint64_t bytes)
-	                const = 0;
+	virtual std::uint64_t SampleCountForByteCount(
+	                std::uint64_t bytes) const = 0;
 
 	/**
 	 * Converts from a sample count to a byte count.
@@ -55,8 +55,8 @@ public:
 	 * @see            SampleCountForByteCount
 	 */
 
-	virtual std::uint64_t ByteCountForSampleCount(std::uint64_t samples)
-	                const = 0;
+	virtual std::uint64_t ByteCountForSampleCount(
+	                std::uint64_t samples) const = 0;
 };
 
 /**
@@ -70,19 +70,25 @@ public:
  * interleaved in one byte stream), so we don't need to worry about returning
  * a vector for each channel.  This may change in the future.
  *
- * A resampler uses an external SampleByteConverter to provide conversions
- * between sample counts and byte counts.  Only one is sufficient at the moment
- * because the resampler only converts from planar to packed.  If the Resampler
- * ever does more, separate input and output conversions may be necessary.
+ * As the only resampling that takes place is converting from planar to packed,
+ * we make heavy use of the original input codec context data (channel count,
+ * sample rate, etc).  If the Resampler ever does more than this conversion, a
+ * corresponding refactoring is necessary.
  */
-class Resampler : protected SampleByteConverter {
+class Resampler {
 public:
+	/// Type for output byte vectors from this Resampler.
+	using ResultVector = std::vector<char>;
+
+	/// Type for the count of bytes per sample.
+	using SampleByteCount = int;
+
 	/**
 	 * Constructs a Resampler.
-	 * @param conv  A SampleByteConverter providing conversions between
-	 *              samples and bytes for the output format.
+	 * @param input_context The codec context for the Resampler's input.
+	 * @param output_format The AVSampleFormat this Resampler outputs. 
 	 */
-	Resampler(const SampleByteConverter &conv);
+	Resampler(AVCodecContext *input_context, AVSampleFormat output_format);
 
 	/**
 	 * Virtual destructor for Resampler.
@@ -91,32 +97,29 @@ public:
 
 	/**
 	 * Resamples the contents of an ffmpeg frame.
-	 * @param frame  A pointer to the frame to resample.
-	 * @return       A vector of packed sample data, containing the results
-	 *               of resampling the frame's contents.
+	 * @param frame A pointer to the frame to resample.
+	 * @return A vector of packed sample data, containing the results of
+	 *   resampling the frame's contents.
 	 */
-	virtual std::vector<char> Resample(AVFrame *frame) = 0;
+	virtual ResultVector Resample(AVFrame *frame) = 0;
 
 	/**
-	 * The ffmpeg sample format this Resampler will output.
+	 * The FFmpeg sample format this Resampler will output.
 	 * @return The AVSampleFormat of this Resampler's output.
 	 */
 	virtual AVSampleFormat AVOutputFormat();
 
 protected:
-	std::uint64_t SampleCountForByteCount(std::uint64_t bytes) const;
-	std::uint64_t ByteCountForSampleCount(std::uint64_t samples) const;
-
 	/**
 	 * Makes a frame vector from a sample data array and sample count.
 	 * @param start         A pointer to the start of a sample data array.
 	 * @param sample_count  The number of samples (not bytes) in the array.
 	 * @return              A vector containing a copy of the sample data.
 	 */
-	std::vector<char> MakeFrameVector(char *start, int sample_count);
+	ResultVector MakeFrameVector(char *start, int sample_count);
 
-	AVSampleFormat output_format;   ///< ffmpeg output format.
-	const SampleByteConverter &out; ///< Output sample rate converter.
+	SampleByteCount bytes_per_sample; ///< Bytes in one output sample.
+	AVSampleFormat output_format;     ///< ffmpeg output format.
 };
 
 /**
@@ -130,18 +133,14 @@ class PlanarResampler : public Resampler {
 public:
 	/**
 	 * Constructs a PlanarResampler.
-	 * @param conv   A SampleByteConverter providing conversions between
-	 *               samples and bytes for the output format.
-	 * @param codec  The codec context for the stream being resampled.
+	 * @param codec The codec context for the stream being resampled.
 	 */
-	PlanarResampler(const SampleByteConverter &conv, AVCodecContext *codec);
+	PlanarResampler(AVCodecContext *codec);
 
-	std::vector<char> Resample(AVFrame *frame);
+	ResultVector Resample(AVFrame *frame) override;
 
 private:
-	std::unique_ptr<Swr> swr; ///< The software resampler objct.
-	std::unique_ptr<uint8_t, std::function<void(uint8_t *)>>
-	                resample_buffer; ///< The buffer used for resampling.
+	Swr swr; ///< The software resampler objct.
 };
 
 /**
@@ -155,13 +154,11 @@ class PackedResampler : public Resampler {
 public:
 	/**
 	 * Constructs a PackedResampler.
-	 * @param conv   A SampleByteConverter providing conversions between
-	 *               samples and bytes for the output format.
-	 * @param codec  The codec context for the stream being resampled.
+	 * @param codec The codec context for the stream being resampled.
 	 */
-	PackedResampler(const SampleByteConverter &conv, AVCodecContext *codec);
+	PackedResampler(AVCodecContext *codec);
 
-	std::vector<char> Resample(AVFrame *frame);
+	ResultVector Resample(AVFrame *frame) override;
 };
 
 #endif // PS_AUDIO_RESAMPLE_HPP

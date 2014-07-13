@@ -10,6 +10,7 @@
 #include <functional>
 #include <string>
 #include <memory>
+#include <cassert>
 #include <cstdlib>
 #include <cstdint>
 #include <iostream>
@@ -28,51 +29,42 @@ extern "C" {
 }
 
 #include "../errors.hpp"
-#include "../constants.h"
 #include "../messages.h"
 #include "../sample_formats.hpp"
 
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
 
-AudioDecoder::AudioDecoder(const std::string &path)
-{
-	this->buffer = std::unique_ptr<unsigned char[]>(
-	                new unsigned char[BUFFER_SIZE]);
+const size_t AudioDecoder::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 
+AudioDecoder::AudioDecoder(const std::string &path)
+	: decode_state(DecodeState::WAITING_FOR_FRAME),
+	buffer(BUFFER_SIZE)
+{
 	Open(path);
 	InitialiseStream();
 	InitialisePacket();
 	InitialiseFrame();
 	InitialiseResampler();
-
-	Debug("stream id:", this->stream_id);
-	Debug("codec:", this->stream->codec->codec->long_name);
 }
 
-AudioDecoder::~AudioDecoder()
-{
-}
+AudioDecoder::~AudioDecoder() {}
 
-/* @return The number of channels this decoder outputs. */
 std::uint8_t AudioDecoder::ChannelCount() const
 {
 	return this->stream->codec->channels;
 }
 
-/* @return The size of this decoder's buffer, in samples. */
 size_t AudioDecoder::BufferSampleCapacity() const
 {
 	return SampleCountForByteCount(BUFFER_SIZE);
 }
 
-/* @return The sample rate. */
 double AudioDecoder::SampleRate() const
 {
 	return (double)this->stream->codec->sample_rate;
 }
 
-/* Converts stream position (in microseconds) to estimated sample count. */
 std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
                 std::chrono::microseconds usec) const
 {
@@ -81,7 +73,6 @@ std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
 	                .count();
 }
 
-/* Converts sample count to estimated stream position (in microseconds). */
 std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
                 std::uint64_t samples) const
 {
@@ -90,25 +81,21 @@ std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
 	                position_secs);
 }
 
-/* Converts buffer size (in bytes) to sample count (in samples). */
 std::uint64_t AudioDecoder::SampleCountForByteCount(std::uint64_t bytes) const
 {
-	return ((bytes / this->stream->codec->channels) / BytesPerSample());
+	return (bytes / ChannelCount()) / BytesPerSample();
 }
 
-/* Converts sample count (in samples) to buffer size (in bytes). */
 std::uint64_t AudioDecoder::ByteCountForSampleCount(std::uint64_t samples) const
 {
-	return (samples * this->stream->codec->channels * BytesPerSample());
+	return (samples * ChannelCount()) * BytesPerSample();
 }
 
-/* Returns the current number of bytes per sample. */
 size_t AudioDecoder::BytesPerSample() const
 {
-	return av_get_bytes_per_sample(this->stream->codec->sample_fmt);
+	return av_get_bytes_per_sample(this->resampler->AVOutputFormat());
 }
 
-/* Attempts to seek to the position 'usec' milliseconds into the file. */
 void AudioDecoder::SeekToPositionMicroseconds(
                 std::chrono::microseconds position)
 {
@@ -120,6 +107,9 @@ void AudioDecoder::SeekToPositionMicroseconds(
 	                  AVSEEK_FLAG_ANY) != 0) {
 		throw InternalError(MSG_SEEK_FAIL);
 	}
+
+	this->decode_state = DecodeState::WAITING_FOR_FRAME;
+	InitialisePacket();
 }
 
 std::int64_t AudioDecoder::AvPositionFromMicroseconds(
@@ -134,39 +124,72 @@ std::int64_t AudioDecoder::AvPositionFromMicroseconds(
 	return position_timebase_seconds.count();
 }
 
-/* Tries to decode an entire frame and returns a vector of its contents.
- *
- * If successful, returns a pointer to the resulting vector of decoded data,
- * which is owned by the caller.  If the return value is nullptr, we have run
- * out of frames to decode.
- */
-std::vector<char> AudioDecoder::Decode()
+AudioDecoder::DecodeResult AudioDecoder::Decode()
 {
-	bool complete = false;
-	bool more = true;
-	std::vector<char> vec;
+	Resampler::ResultVector decoded;
 
-	while (!complete && more) {
-		if (av_read_frame(this->context.get(), this->packet.get()) <
-		    0) {
-			more = false;
-		} else if (this->packet->stream_index == this->stream_id) {
-			complete = DecodePacket();
-			if (complete) {
-				vec = Resample();
-			}
-		}
+	switch (this->decode_state) {
+		case DecodeState::WAITING_FOR_FRAME:
+			DoFrame();
+			break;
+		case DecodeState::DECODING:
+			decoded = DoDecode();
+			break;
+		case DecodeState::END_OF_FILE:
+			// Intentionally ignore
+			break;
 	}
 
-	return vec;
+	return std::make_pair(this->decode_state, decoded);
 }
 
-std::vector<char> AudioDecoder::Resample()
+void AudioDecoder::DoFrame()
+{
+	bool read_frame = ReadFrame();
+
+	if (!read_frame) {
+		// We've run out of frames to decode.
+		// (TODO: Start flushing the buffer here?)
+		this->decode_state = DecodeState::END_OF_FILE;
+	} else if (this->packet.stream_index == this->stream_id) {
+		// Only switch to decoding if the frame belongs to the audio
+		// stream.  Else, we ignore it.
+		this->decode_state = DecodeState::DECODING;
+	}
+}
+
+AudioDecoder::DecodeVector AudioDecoder::DoDecode()
+{
+	DecodeVector result;
+
+	bool finished_decoding = DecodePacket();
+	if (finished_decoding) {
+		result = Resample();
+
+		// Get ready to process the next frame.
+		InitialisePacket();
+		this->decode_state = DecodeState::WAITING_FOR_FRAME;
+	} else {
+		// Send through an empty vector, so that the audio output will
+		// safely run its course and make way for the next decode round.
+		result = std::vector<char>();
+	}
+
+	return result;
+}
+
+bool AudioDecoder::ReadFrame()
+{
+	int read_result = av_read_frame(this->context.get(), &this->packet);
+	return 0 == read_result;
+}
+
+Resampler::ResultVector AudioDecoder::Resample()
 {
 	return this->resampler->Resample(this->frame.get());
 }
 
-static std::map<AVSampleFormat, SampleFormat> sf_from_av = {
+static const std::map<AVSampleFormat, SampleFormat> sf_from_av = {
                 {AV_SAMPLE_FMT_U8, SampleFormat::PACKED_UNSIGNED_INT_8},
                 {AV_SAMPLE_FMT_S16, SampleFormat::PACKED_SIGNED_INT_16},
                 {AV_SAMPLE_FMT_S32, SampleFormat::PACKED_SIGNED_INT_32},
@@ -177,14 +200,8 @@ static std::map<AVSampleFormat, SampleFormat> sf_from_av = {
  */
 SampleFormat AudioDecoder::OutputSampleFormat() const
 {
-	try
-	{
-		return sf_from_av.at(this->resampler->AVOutputFormat());
-	}
-	catch (std::out_of_range)
-	{
-		throw FileError(MSG_DECODE_BADRATE);
-	}
+	try { return sf_from_av.at(this->resampler->AVOutputFormat()); }
+	catch (std::out_of_range) { throw FileError(MSG_DECODE_BADRATE); }
 }
 
 void AudioDecoder::Open(const std::string &path)
@@ -254,34 +271,22 @@ void AudioDecoder::InitialiseFrame()
 
 void AudioDecoder::InitialisePacket()
 {
-	auto packet_deleter = [](AVPacket *packet) {
-		av_free_packet(packet);
-		delete packet;
-	};
-	this->packet = std::unique_ptr<AVPacket, decltype(packet_deleter)>(
-	                new AVPacket, packet_deleter);
-
-	AVPacket *pkt = this->packet.get();
-	av_init_packet(pkt);
-	pkt->data = this->buffer.get();
-	pkt->size = BUFFER_SIZE;
+	av_init_packet(&this->packet);
+	this->packet.data = &*this->buffer.begin();
+	this->packet.size = this->buffer.size();
 }
 
 void AudioDecoder::InitialiseResampler()
 {
-	std::function<Resampler *(const SampleByteConverter &,
-	                          AVCodecContext *)> rs;
+	Resampler *rs;
+	AVCodecContext *codec = this->stream->codec;
+
 	if (UsingPlanarSampleFormat()) {
-		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
-			return new PlanarResampler(s, c);
-		};
+		rs = new PlanarResampler(codec);
 	} else {
-		rs = [](const SampleByteConverter &s, AVCodecContext *c) {
-			return new PackedResampler(s, c);
-		};
+		rs = new PackedResampler(codec);
 	}
-	this->resampler = std::unique_ptr<Resampler>(
-	                rs(*this, this->stream->codec));
+	this->resampler = std::unique_ptr<Resampler>(rs);
 }
 
 bool AudioDecoder::UsingPlanarSampleFormat()
@@ -291,11 +296,29 @@ bool AudioDecoder::UsingPlanarSampleFormat()
 
 bool AudioDecoder::DecodePacket()
 {
-	int frame_finished = 0;
+	assert(this->packet.data != nullptr);
+	assert(0 < this->packet.size);
 
-	if (avcodec_decode_audio4(this->stream->codec, this->frame.get(),
-	                          &frame_finished, this->packet.get()) < 0) {
+	auto decode_result = AvCodecDecode();
+
+	int bytes_decoded = decode_result.first;
+	if (bytes_decoded < 0) {
 		throw FileError(MSG_DECODE_FAIL);
 	}
-	return frame_finished;
+	this->packet.data += bytes_decoded;
+	this->packet.size -= bytes_decoded;
+	assert(0 <= this->packet.size);
+
+	bool frame_finished = decode_result.second;
+	return frame_finished || (0 < this->packet.size);
+}
+
+std::pair<int, bool> AudioDecoder::AvCodecDecode()
+{
+	int frame_finished = 0;
+	int bytes_decoded = avcodec_decode_audio4(
+	                this->stream->codec, this->frame.get(), &frame_finished,
+	                &this->packet);
+
+	return std::make_pair(bytes_decoded, frame_finished != 0);
 }

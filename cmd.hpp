@@ -30,9 +30,6 @@ public:
 	/// The type of functions called on receipt of commands.
 	using Payload = std::function<bool(WordList)>;
 
-	/// The type of a set of commands.
-	using CommandSet = std::map<std::string, Payload>;
-
 	/// The type of a command action that takes no command words.
 	using NullAction = std::function<bool()>;
 
@@ -41,48 +38,57 @@ public:
 	                std::function<bool(const std::string &)>;
 
 	/**
-	 * Constructs a CommandHandler with no arguments.
+	 * Handles a command line.
+	 * @param line A reference to the line to handle as a command.
+	 * @return Whether the command succeeded.
 	 */
-	CommandHandler() : CommandHandler(CommandSet{}) {};
-
-	/**
-	 * Constructs a CommandHandler with an existing command set.
-	 * @param commands The command set, which will be copied.
-	 */
-	CommandHandler(const CommandSet &commands);
-
-	/**
-	 * Checks for, and handles, commands waiting on this CommandHandler.
-	 */
-	void Check();
+	bool Handle(const std::string &line);
 
 	/**
 	 * Adds a nullary command.
 	 * @param word The command word to associate with @a f.
-	 * @param f The command, taking no arguments, to execute when the command
-	 *   word @a word is read.
-	 * @return A pointer to this CommandHandler, for method chaining.
+	 * @param f The command, taking no arguments, to execute when the
+	 *   command word @a word is read.
+	 * @return A reference to this CommandHandler, for method chaining.
 	 */
-	CommandHandler *Add(const std::string &word, std::function<bool()> f);
+	CommandHandler &AddNullary(const std::string &word,
+	                           std::function<bool()> f);
 
 	/**
 	 * Adds a unary command.
 	 * @param word The command word to associate with @a f.
-	 * @param f The command, taking one argument, to execute when the command
-	 *   word @a word is read.
-	 * @return A pointer to this CommandHandler, for method chaining.
+	 * @param f The command, taking one argument, to execute when the
+	 *   command word @a word is read.
+	 * @return A reference to this CommandHandler, for method chaining.
 	 */
-	CommandHandler *Add(const std::string &word,
-	                    std::function<bool(const std::string &)> f);
+	CommandHandler &AddUnary(const std::string &word,
+	                         std::function<bool(const std::string &)> f);
 
 private:
-	std::unique_ptr<CommandSet> commands;
+	/// The map of command words to their payload functions.
+	std::map<std::string, Payload> commands;
 
+	/**
+	 * Parses a command line into a list of words.
+	 * @param line The line to split into words.
+	 * @return The list of words in the command line.
+	 */
 	WordList LineToWords(const std::string &line);
 
+	/**
+	 * Runs a command.
+	 * @param words The words that form the command: the first word is taken to be
+	 *   the command name.
+	 * @return true if the command was valid; false otherwise.
+	 */
 	bool Run(const WordList &words);
+
+	/**
+	 * Parses a string as a command line and runs the result.
+	 * @param line The string that represents the command line.
+	 * @return true if the command was valid; false otherwise.
+	 */
 	bool RunLine(const std::string &line);
-	void Handle();
 };
 
 #endif // PS_CMD_HPP

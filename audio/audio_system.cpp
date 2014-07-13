@@ -27,7 +27,7 @@ extern "C" {
 #include "portaudiocpp/System.hxx"
 #include "portaudiocpp/SystemDeviceIterator.hxx"
 namespace portaudio {
-	class CallbackInterface;
+class CallbackInterface;
 }
 
 #include "../errors.hpp"
@@ -46,10 +46,7 @@ AudioSystem::AudioSystem()
 	SetDeviceID("0");
 }
 
-AudioSystem::~AudioSystem()
-{
-	portaudio::System::terminate();
-}
+AudioSystem::~AudioSystem() { portaudio::System::terminate(); }
 
 void AudioSystem::OnDevices(std::function<void(const AudioSystem::Device &)> f)
                 const
@@ -108,7 +105,7 @@ const portaudio::Device &AudioSystem::PaDeviceFrom(const std::string &id_string)
 }
 
 /// Mappings from SampleFormats to their equivalent PaSampleFormats.
-static std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
+static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
                 {SampleFormat::PACKED_UNSIGNED_INT_8, portaudio::UINT8},
                 {SampleFormat::PACKED_SIGNED_INT_16, portaudio::INT16},
                 {SampleFormat::PACKED_SIGNED_INT_32, portaudio::INT32},
@@ -117,12 +114,6 @@ static std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(SampleFormat fmt)
                 const
 {
-	try
-	{
-		return pa_from_sf.at(fmt);
-	}
-	catch (std::out_of_range)
-	{
-		throw FileError(MSG_DECODE_BADRATE);
-	}
+	try { return pa_from_sf.at(fmt); }
+	catch (std::out_of_range) { throw FileError(MSG_DECODE_BADRATE); }
 }

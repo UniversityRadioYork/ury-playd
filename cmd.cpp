@@ -14,52 +14,37 @@
 
 #include "cmd.hpp"
 #include "errors.hpp"
-#include "io.hpp"
+#include "io/io_responder.hpp"
 #include "messages.h"
 
-/**
- * Constructs a CommandHandler.
- * @param commands The map of commands to their handlers to use for this
- *   CommandHandler: this map will be copied.
- */
-CommandHandler::CommandHandler(const CommandHandler::CommandSet &commands)
+CommandHandler &CommandHandler::AddNullary(const std::string &word,
+                                           std::function<bool()> f)
 {
-	this->commands = std::unique_ptr<CommandSet>(new CommandSet(commands));
+	this->commands.emplace(word, [f](const WordList &) { return f(); });
+	return *this;
 }
 
-CommandHandler *CommandHandler::Add(const std::string &word,
-                                    std::function<bool()> f)
+CommandHandler &CommandHandler::AddUnary(
+                const std::string &word,
+                std::function<bool(const std::string &)> f)
 {
-	this->commands->emplace(word, [f](const WordList &) { return f(); });
-	return this;
-}
-
-CommandHandler *CommandHandler::Add(const std::string &word,
-                                    std::function<bool(const std::string &)> f)
-{
-	this->commands->emplace(word, [f](const WordList &words) {
+	this->commands.emplace(word, [f](const WordList &words) {
 		bool valid = false;
 		if (words.size() == 2 && !words[1].empty()) {
 			valid = f(words[1]);
 		}
 		return valid;
 	});
-	return this;
+	return *this;
 }
 
-/**
- * Runs a command.
- * @param words The words that form the command: the first word is taken to be
- *   the command name.
- * @return true if the command was valid; false otherwise.
- */
 bool CommandHandler::Run(const CommandHandler::WordList &words)
 {
 	bool valid = false;
 
 	if (!words.empty()) {
-		auto commandIter = this->commands->find(words[0]);
-		if (commandIter != this->commands->end()) {
+		auto commandIter = this->commands.find(words[0]);
+		if (commandIter != this->commands.end()) {
 			valid = commandIter->second(words);
 		}
 	}
@@ -67,40 +52,14 @@ bool CommandHandler::Run(const CommandHandler::WordList &words)
 	return valid;
 }
 
-/**
- * Parses a string as a command line and runs the result.
- * @param line The string that represents the command line.
- * @return true if the command was valid; false otherwise.
- */
 bool CommandHandler::RunLine(const std::string &line)
 {
 	return Run(LineToWords(line));
 }
 
-/*
- * Checks to see if there is a command waiting on stdin and, if there is,
- * sends it to the command handler.
- *
- * 'usr' is a pointer to any user data that should be passed to executed
- * commands; 'cmds' is a pointer to an END_CMDS-terminated array of command
- * definitions (see cmd.h for details).
- */
-void CommandHandler::Check()
+bool CommandHandler::Handle(const std::string &line)
 {
-	if (input_waiting()) {
-		Handle();
-	}
-}
-/* Processes the command currently waiting on the given stream.
- * If the command is set to be handled by PROPAGATE, it will be sent through
- * prop; it is an error if prop is NULL and PROPAGATE is reached.
- */
-void CommandHandler::Handle()
-{
-	std::string input;
-
-	std::getline(std::cin, input);
-	Debug("got command: ", input);
+	Debug("got command: <", line, ">");
 
 	/* Silently fail if the command is actually end of file */
 	if (std::cin.eof()) {
@@ -108,19 +67,9 @@ void CommandHandler::Handle()
 		throw Error("TODO: Handle this better");
 	}
 
-	bool valid = RunLine(input);
-	if (valid) {
-		Respond(Response::OKAY, input);
-	} else {
-		Respond(Response::WHAT, MSG_CMD_INVALID);
-	}
+	return RunLine(line);
 }
 
-/**
- * Parses a command line into a list of words.
- * @param line The line to split into words.
- * @return The list of words in the command line.
- */
 CommandHandler::WordList CommandHandler::LineToWords(const std::string &line)
 {
 	WordList words;

@@ -33,9 +33,7 @@ public:
 	 * @param unit_map  The map from units to their parsers.
 	 * @see   MkTime
 	 */
-	TimeParser(const UnitMap &unit_map) : unit_map(unit_map)
-	{
-	}
+	TimeParser(const UnitMap &unit_map) : unit_map(unit_map) {}
 
 	/**
 	 * A template for converting an IntType representation of a duration of
@@ -64,7 +62,7 @@ public:
 	 */
 	OutUnit Parse(const std::string &time_str) const
 	{
-                auto seek = Split(time_str);
+		auto seek = Split(time_str);
 		return unit_map.at(seek.first)(seek.second);
 	}
 

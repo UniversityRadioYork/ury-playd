@@ -3,28 +3,13 @@
 
 /**
  * @file
- * Implementation of input/output related code.
- * @see io.hpp
+ * Implementation of the non-virtual aspects of the Responder abstract class.
+ * @see io/io_responder.hpp
  */
 
-#include <iostream>
-#include <map>
-#include <string>
+#include "io_responder.hpp" // Responder, Response
+#include "../errors.hpp"    // Error
 
-#include <cstdarg>
-#include <cstdio>
-#include <ctime>
-
-#ifdef WIN32
-#include <conio.h>
-#else
-#include <unistd.h>
-#include <sys/select.h> /* select */
-#endif
-
-#include "io.hpp"
-
-/* Data for the responses. */
 const std::map<Response, std::string> RESPONSES = {{Response::OKAY, "OKAY"},
                                                    {Response::WHAT, "WHAT"},
                                                    {Response::FAIL, "FAIL"},
@@ -40,22 +25,7 @@ const std::map<Response, std::string> RESPONSES = {{Response::OKAY, "OKAY"},
                                                    {Response::QMOD, "QMOD"},
                                                    {Response::QNUM, "QNUM"}};
 
-/* Returns true if input is waiting on standard in. */
-int input_waiting(void)
+void Responder::RespondWithError(const Error &error)
 {
-#ifdef WIN32
-	return _kbhit();
-#else
-	fd_set rfds;
-	struct timeval tv;
-
-	/* Watch stdin (fd 0) to see when it has input. */
-	FD_ZERO(&rfds);
-	FD_SET(0, &rfds);
-	/* Stop checking immediately. */
-	tv.tv_sec = 0;
-	tv.tv_usec = 0;
-
-	return select(1, &rfds, NULL, NULL, &tv);
-#endif
+	Respond(Response::FAIL, error.Message());
 }

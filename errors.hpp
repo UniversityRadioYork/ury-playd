@@ -10,7 +10,6 @@
 #ifndef PS_ERRORS_HPP
 #define PS_ERRORS_HPP
 
-#include <string>
 #include <iostream>
 
 /**
@@ -26,16 +25,10 @@ public:
 	Error(const std::string &message);
 
 	/**
-	 * Converts the Error to a response, and sends it.
-	 * @todo Support sockets.
-	 */
-	void ToResponse();
-
-	/**
 	 * The human-readable message for this error.
 	 * @return A reference to the string describing this Error.
 	 */
-	const std::string &Message();
+	const std::string &Message() const;
 
 private:
 	std::string message; ///< The human-readable message for this Error.
@@ -88,9 +81,7 @@ public:
 /**
  * Base case for DebugArgs, when there are no arguments.
  */
-inline void DebugArgs()
-{
-}
+inline void DebugArgs() {}
 
 /**
  * Outputs a debug message, with a variadic number of arguments (at least one).

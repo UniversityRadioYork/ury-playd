@@ -10,6 +10,7 @@
 #ifndef PS_AUDIO_DECODER_HPP
 #define PS_AUDIO_DECODER_HPP
 
+#include <array>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -35,26 +36,39 @@ extern "C" {
  */
 class AudioDecoder : public SampleByteConverter {
 public:
+	/// An enumeration of possible states the decoder can be in.
+	enum class DecodeState : std::uint8_t {
+		/// The decoder is currently trying to acquire a frame.
+		WAITING_FOR_FRAME,
+		/// The decoder is currently decoding a frame.
+		DECODING,
+		/// The decoder has run out of things to decode.
+		END_OF_FILE
+	};
+
+	/// Type of decoded sample vectors.
+	using DecodeVector = Resampler::ResultVector;
+
+	/// Type of the result of Decode().
+	using DecodeResult = std::pair<DecodeState, DecodeVector>;
+
 	/**
 	 * Constructs an AudioDecoder.
 	 * @param path The path to the file to load and decode using this
-	 * decoder.
+	 *   decoder.
 	 */
 	AudioDecoder(const std::string &path);
 
-	/**
-	 * Destructs an AudioDecoder.
-	 */
+	/// Destructs an AudioDecoder.
 	~AudioDecoder();
 
 	/**
 	 * Performs a round of decoding.
-	 * The decode may return an empty vector, in which case there is no
-	 * longer
-	 * any data left to decode.
-	 * @return A vector, which may be empty, of decoded sample data.
+	 * @return A pair of the decoder's state upon finishing the decoding
+	 *   round and the vector of bytes decoded.  The vector may be empty,
+	 *   if the decoding round did not finish off a frame.
 	 */
-	std::vector<char> Decode();
+	DecodeResult Decode();
 
 	/**
 	 * Returns the channel count.
@@ -107,24 +121,28 @@ public:
 	std::uint64_t SampleCountForPositionMicroseconds(
 	                std::chrono::microseconds position) const;
 
-	std::uint64_t SampleCountForByteCount(std::uint64_t bytes) const
-	                override;
-	std::uint64_t ByteCountForSampleCount(std::uint64_t samples) const
-	                override;
+	std::uint64_t SampleCountForByteCount(
+	                std::uint64_t bytes) const override;
+	std::uint64_t ByteCountForSampleCount(
+	                std::uint64_t samples) const override;
 
 private:
+	/// The size of the internal decoding buffer, in bytes.
+	static const size_t BUFFER_SIZE;
+
+	DecodeState decode_state; ///< Current state of decoding.
+
 	AVStream *stream; ///< The FFmpeg stream being decoded.
 	int stream_id; ///< The ID of the input file's audio stream to decode.
 
 	std::unique_ptr<AVFormatContext, std::function<void(AVFormatContext *)>>
 	                context; ///< The input codec context.
-	std::unique_ptr<AVPacket, std::function<void(AVPacket *)>>
-	                packet; ///< The last undecoded packet.
+	AVPacket packet;         ///< The last undecoded packet.
 	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
 	                frame;                   ///< The last decoded frame.
-	std::unique_ptr<unsigned char[]> buffer; ///< The decoding buffer.
+	std::vector<uint8_t> buffer;             ///< The decoding buffer.
 	std::unique_ptr<Resampler> resampler;    ///< The object providing
-	                                         ///resampling.
+	/// resampling.
 
 	void Open(const std::string &path);
 
@@ -137,9 +155,14 @@ private:
 	void InitialisePacket();
 	void InitialiseResampler();
 
+	void DoFrame();
+	DecodeVector DoDecode();
+
+	bool ReadFrame();
 	bool DecodePacket();
-	std::vector<char> Resample();
+	Resampler::ResultVector Resample();
 	size_t BytesPerSample() const;
+	std::pair<int, bool> AvCodecDecode();
 
 	bool UsingPlanarSampleFormat();
 	std::int64_t AvPositionFromMicroseconds(

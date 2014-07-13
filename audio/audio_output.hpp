@@ -23,11 +23,9 @@ namespace portaudio {
 class Stream;
 }
 
-template <typename RepT, typename SampleCountT>
-class RingBuffer;
-
 #include "audio_decoder.hpp"
 #include "audio_resample.hpp"
+#include "../ringbuffer/ringbuffer.hpp"
 
 /// Type of results emitted during the play callback step.
 using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
@@ -44,9 +42,9 @@ public:
 	 * @param decoder The decoder whose output will be fed into the stream.
 	 * @return The configured PortAudio stream.
 	 */
-	virtual portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
-	                                     const AudioDecoder &decoder)
-	                const = 0;
+	virtual portaudio::Stream *Configure(
+	                portaudio::CallbackInterface &cb,
+	                const AudioDecoder &decoder) const = 0;
 };
 
 /**
@@ -68,7 +66,6 @@ public:
 	 * @see AudioSystem::Load
 	 */
 	AudioOutput(const std::string &path, const StreamConfigurator &c);
-	~AudioOutput();
 
 	/**
 	 * Starts the audio stream.
@@ -153,17 +150,15 @@ public:
 	 */
 	void SeekToPositionMicroseconds(std::chrono::microseconds microseconds);
 
-	/**
-	 * Tries to place enough audio into the audio buffer to prevent a
-	 * buffer underrun during a player start.
-	 */
-	void PreFillRingBuffer();
-
 private:
+	/// n, where 2^n is the capacity of the AudioOutput ring buffer.
+	/// @see RINGBUF_SIZE
+	static const size_t RINGBUF_POWER;
+
 	bool file_ended; ///< Whether the current file has stopped decoding.
 
 	/// The audio decoder providing the actual audio data.
-	std::unique_ptr<AudioDecoder> av;
+	AudioDecoder av;
 
 	/// The current decoded frame.
 	std::vector<char> frame;
@@ -172,7 +167,7 @@ private:
 	std::vector<char>::iterator frame_iterator;
 
 	/// The ring buffer used to transfer samples to the playing callback.
-	std::unique_ptr<RingBuffer<char, std::uint64_t>> ring_buf;
+	RingBuffer<char, std::uint64_t> ring_buf;
 
 	/// The PortAudio stream to which this AudioOutput outputs.
 	std::unique_ptr<portaudio::Stream> out_strm;
@@ -185,10 +180,10 @@ private:
 	 */
 	void ClearFrame();
 
-	std::uint64_t ByteCountForSampleCount(std::uint64_t sample_count) const
-	                override;
-	std::uint64_t SampleCountForByteCount(std::uint64_t sample_count) const
-	                override;
+	std::uint64_t ByteCountForSampleCount(
+	                std::uint64_t sample_count) const override;
+	std::uint64_t SampleCountForByteCount(
+	                std::uint64_t sample_count) const override;
 
 	/**
 	 * The callback proper.
@@ -254,6 +249,12 @@ private:
 	 * @return The write capacity, in samples.
 	 */
 	std::uint64_t RingBufferWriteCapacity();
+
+	/**
+	 * The current read capacity of the ring buffer.
+	 * @return The read capacity, in samples.
+	 */
+	std::uint64_t RingBufferReadCapacity();
 
 	/**
 	 * The number of samples that may currently be placed in the ringbuffer.

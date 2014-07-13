@@ -4,7 +4,6 @@
 /**
  * @file
  * Constant human-readable messages used within Playslave.
- * @see constants.h
  */
 
 #ifndef PS_MESSAGES_H
