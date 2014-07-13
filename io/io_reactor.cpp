@@ -11,6 +11,13 @@
  * @see io/io_reactor_std.cpp
  */
 
+/* This is forced because we require C++11, which has std::chrono, anyway.
+   Some environments fail Boost's std::chrono detection, and don't set this
+   flag, which causes compilation failures. */
+#ifndef BOOST_ASIO_HAS_STD_CHRONO
+#define BOOST_ASIO_HAS_STD_CHRONO
+#endif
+
 #include <csignal>                              // SIG*
 #include <string>                               // std::string
 #include "../player/player.hpp"                 // Player

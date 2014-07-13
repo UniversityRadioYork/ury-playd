@@ -25,10 +25,6 @@
 
 #include <boost/asio.hpp>
 
-#ifndef BOOST_ASIO_HAS_STD_CHRONO
-#define BOOST_ASIO_HAS_STD_CHRONO
-#endif
-
 #include "../cmd.hpp"
 #include "../errors.hpp"
 #include "../messages.h"
