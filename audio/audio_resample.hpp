@@ -12,6 +12,7 @@
 
 #include <functional>
 #include <memory>
+#include <vector>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -42,8 +43,8 @@ public:
 	 * @return       The corresponding sample count.
 	 * @see          ByteCountForSampleCount
 	 */
-	virtual std::uint64_t SampleCountForByteCount(
-	                std::uint64_t bytes) const = 0;
+	virtual std::uint64_t SampleCountForByteCount(std::uint64_t bytes)
+	                const = 0;
 
 	/**
 	 * Converts from a sample count to a byte count.
@@ -55,8 +56,8 @@ public:
 	 * @see            SampleCountForByteCount
 	 */
 
-	virtual std::uint64_t ByteCountForSampleCount(
-	                std::uint64_t samples) const = 0;
+	virtual std::uint64_t ByteCountForSampleCount(std::uint64_t samples)
+	                const = 0;
 };
 
 /**
@@ -85,10 +86,9 @@ public:
 
 	/**
 	 * Constructs a Resampler.
-	 * @param input_context The codec context for the Resampler's input.
 	 * @param output_format The AVSampleFormat this Resampler outputs.
 	 */
-	Resampler(AVCodecContext *input_context, AVSampleFormat output_format);
+	Resampler(AVSampleFormat output_format);
 
 	/**
 	 * Virtual destructor for Resampler.
@@ -111,12 +111,13 @@ public:
 
 protected:
 	/**
-	 * Makes a frame vector from a sample data array and sample count.
-	 * @param start         A pointer to the start of a sample data array.
-	 * @param sample_count  The number of samples (not bytes) in the array.
-	 * @return              A vector containing a copy of the sample data.
+	 * Makes a frame vector from a sample data array.
+	 * @param start A pointer to the start of a sample data array.
+	 * @param channels The number of channels in the array.
+	 * @param samples The number of samples (not bytes) in the array.
+	 * @return A vector containing a copy of the sample data.
 	 */
-	ResultVector MakeFrameVector(char *start, int sample_count);
+	ResultVector MakeFrameVector(char *start, int channels, int samples);
 
 	SampleByteCount bytes_per_sample; ///< Bytes in one output sample.
 	AVSampleFormat output_format;     ///< ffmpeg output format.
