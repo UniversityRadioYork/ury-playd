@@ -39,7 +39,9 @@ const size_t AudioDecoder::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 
 AudioDecoder::AudioDecoder(const std::string &path)
 	: decode_state(DecodeState::WAITING_FOR_FRAME),
-	buffer(BUFFER_SIZE)
+	buffer(BUFFER_SIZE),
+	context(nullptr),
+	frame(nullptr)
 {
 	Open(path);
 	InitialiseStream();
@@ -48,7 +50,14 @@ AudioDecoder::AudioDecoder(const std::string &path)
 	InitialiseResampler();
 }
 
-AudioDecoder::~AudioDecoder() {}
+AudioDecoder::~AudioDecoder() {
+	if (this->context != nullptr) {
+		avformat_free_context(this->context);
+	}
+	if (this->frame != nullptr) {
+		av_frame_free(&this->frame);
+	}
+}
 
 std::uint8_t AudioDecoder::ChannelCount() const
 {
@@ -103,7 +112,7 @@ void AudioDecoder::SeekToPositionMicroseconds(
 
 	Debug("Seeking to:", ffmpeg_position);
 
-	if (av_seek_frame(this->context.get(), this->stream_id, ffmpeg_position,
+	if (av_seek_frame(this->context, this->stream_id, ffmpeg_position,
 	                  AVSEEK_FLAG_ANY) != 0) {
 		throw InternalError(MSG_SEEK_FAIL);
 	}
@@ -180,13 +189,13 @@ AudioDecoder::DecodeVector AudioDecoder::DoDecode()
 
 bool AudioDecoder::ReadFrame()
 {
-	int read_result = av_read_frame(this->context.get(), &this->packet);
+	int read_result = av_read_frame(this->context, &this->packet);
 	return 0 == read_result;
 }
 
 Resampler::ResultVector AudioDecoder::Resample()
 {
-	return this->resampler->Resample(this->frame.get());
+	return this->resampler->Resample(this->frame);
 }
 
 static const std::map<AVSampleFormat, SampleFormat> sf_from_av = {
@@ -206,20 +215,15 @@ SampleFormat AudioDecoder::OutputSampleFormat() const
 
 void AudioDecoder::Open(const std::string &path)
 {
-	AVFormatContext *ctx = nullptr;
+	this->context = nullptr;
 
-	if (avformat_open_input(&ctx, path.c_str(), NULL, NULL) < 0) {
+	if (avformat_open_input(&this->context, path.c_str(), nullptr, nullptr) < 0) {
 		std::ostringstream os;
 		os << "couldn't open " << path;
 		throw FileError(os.str());
+	} else if (this->context == nullptr) {
+		throw std::bad_alloc();
 	}
-
-	auto free_context = [](AVFormatContext *ctx) {
-		avformat_close_input(&ctx);
-	};
-	this->context = std::unique_ptr<AVFormatContext,
-	                                decltype(free_context)>(ctx,
-	                                                        free_context);
 }
 
 void AudioDecoder::InitialiseStream()
@@ -230,7 +234,7 @@ void AudioDecoder::InitialiseStream()
 
 void AudioDecoder::FindStreamInfo()
 {
-	if (avformat_find_stream_info(this->context.get(), NULL) < 0) {
+	if (avformat_find_stream_info(this->context, nullptr) < 0) {
 		throw FileError(MSG_DECODE_NOAUDIO);
 	}
 }
@@ -238,7 +242,7 @@ void AudioDecoder::FindStreamInfo()
 void AudioDecoder::FindStreamAndInitialiseCodec()
 {
 	AVCodec *codec;
-	int stream = av_find_best_stream(this->context.get(),
+	int stream = av_find_best_stream(this->context,
 	                                 AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
 
 	if (stream < 0) {
@@ -251,7 +255,7 @@ void AudioDecoder::FindStreamAndInitialiseCodec()
 void AudioDecoder::InitialiseCodec(int stream, AVCodec *codec)
 {
 	AVCodecContext *codec_context = this->context->streams[stream]->codec;
-	if (avcodec_open2(codec_context, codec, NULL) < 0) {
+	if (avcodec_open2(codec_context, codec, nullptr) < 0) {
 		throw FileError(MSG_DECODE_NOCODEC);
 	}
 
@@ -261,9 +265,7 @@ void AudioDecoder::InitialiseCodec(int stream, AVCodec *codec)
 
 void AudioDecoder::InitialiseFrame()
 {
-	auto frame_deleter = [](AVFrame *frame) { av_frame_free(&frame); };
-	this->frame = std::unique_ptr<AVFrame, decltype(frame_deleter)>(
-	                av_frame_alloc(), frame_deleter);
+	this->frame = av_frame_alloc();
 	if (this->frame == nullptr) {
 		throw std::bad_alloc();
 	}
@@ -317,7 +319,7 @@ std::pair<int, bool> AudioDecoder::AvCodecDecode()
 {
 	int frame_finished = 0;
 	int bytes_decoded = avcodec_decode_audio4(
-	                this->stream->codec, this->frame.get(), &frame_finished,
+	                this->stream->codec, this->frame, &frame_finished,
 	                &this->packet);
 
 	return std::make_pair(bytes_decoded, frame_finished != 0);

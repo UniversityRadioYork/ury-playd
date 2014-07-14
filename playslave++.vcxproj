@@ -48,13 +48,13 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\Matt\Documents\boost_1_55_0;C:\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Matt\Documents\boost_1_55_0;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\mattbw\Documents\boost_1_55_0\stage\lib;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -74,7 +74,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="audio\audio_cb.cpp" />
     <ClCompile Include="audio\audio_decoder.cpp" />
     <ClCompile Include="audio\audio_output.cpp" />
     <ClCompile Include="audio\audio_resample.cpp" />
@@ -82,38 +81,38 @@
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="contrib\pa_ringbuffer.c" />
     <ClCompile Include="errors.cpp" />
-    <ClCompile Include="io.cpp" />
+    <ClCompile Include="io\io_reactor.cpp" />
+    <ClCompile Include="io\io_reactor_posix.cpp" />
+    <ClCompile Include="io\io_reactor_tcp.cpp" />
+    <ClCompile Include="io\io_reactor_win.cpp" />
+    <ClCompile Include="io\io_responder.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player\player.cpp" />
-    <ClCompile Include="player\player_eject.cpp" />
-    <ClCompile Include="player\player_load.cpp" />
-    <ClCompile Include="player\player_play.cpp" />
     <ClCompile Include="player\player_position.cpp" />
-    <ClCompile Include="player\player_quit.cpp" />
-    <ClCompile Include="player\player_seek.cpp" />
     <ClCompile Include="player\player_state.cpp" />
-    <ClCompile Include="player\player_stop.cpp" />
     <ClCompile Include="swr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="audio\audio_cb.h" />
     <ClInclude Include="audio\audio_decoder.hpp" />
     <ClInclude Include="audio\audio_output.hpp" />
     <ClInclude Include="audio\audio_resample.hpp" />
     <ClInclude Include="audio\audio_system.hpp" />
     <ClInclude Include="cmd.hpp" />
-    <ClInclude Include="constants.h" />
     <ClInclude Include="contrib\pa_memorybarrier.h" />
     <ClInclude Include="contrib\pa_ringbuffer.h" />
+    <ClInclude Include="contrib\stdin_stream.hpp" />
     <ClInclude Include="errors.hpp" />
-    <ClInclude Include="io/io.hpp" />
+    <ClInclude Include="io\io_reactor.hpp" />
+    <ClInclude Include="io\io_reactor_posix.hpp" />
+    <ClInclude Include="io\io_reactor_tcp.hpp" />
+    <ClInclude Include="io\io_reactor_win.hpp" />
+    <ClInclude Include="io\io_responder.hpp" />
+    <ClInclude Include="main.hpp" />
     <ClInclude Include="messages.h" />
     <ClInclude Include="player\player.hpp" />
     <ClInclude Include="player\player_position.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ringbuffer\ringbuffer.hpp" />
-    <ClInclude Include="ringbuffer\ringbuffer_boost.hpp" />
-    <ClInclude Include="ringbuffer\ringbuffer_pa.hpp" />
     <ClInclude Include="sample_formats.hpp" />
     <ClInclude Include="swr.hpp" />
   </ItemGroup>

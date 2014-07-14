@@ -132,16 +132,16 @@ private:
 
 	DecodeState decode_state; ///< Current state of decoding.
 
-	AVStream *stream; ///< The FFmpeg stream being decoded.
+
 	int stream_id; ///< The ID of the input file's audio stream to decode.
 
-	std::unique_ptr<AVFormatContext, std::function<void(AVFormatContext *)>>
-	                context; ///< The input codec context.
-	AVPacket packet;         ///< The last undecoded packet.
-	std::unique_ptr<AVFrame, std::function<void(AVFrame *)>>
-	                frame;                   ///< The last decoded frame.
-	std::vector<uint8_t> buffer;             ///< The decoding buffer.
-	std::unique_ptr<Resampler> resampler;    ///< The object providing
+	AVStream *stream;                     ///< The FFmpeg stream being decoded.
+	AVFormatContext *context;             ///< The input codec context.
+	AVPacket packet;                      ///< The last undecoded packet.
+	AVFrame *frame;                       ///< The last decoded frame.
+
+	std::vector<uint8_t> buffer;          ///< The decoding buffer.
+	std::unique_ptr<Resampler> resampler; ///< The object providing
 	/// resampling.
 
 	void Open(const std::string &path);
