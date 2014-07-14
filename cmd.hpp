@@ -82,13 +82,6 @@ private:
 	 * @return true if the command was valid; false otherwise.
 	 */
 	bool Run(const WordList &words);
-
-	/**
-	 * Parses a string as a command line and runs the result.
-	 * @param line The string that represents the command line.
-	 * @return true if the command was valid; false otherwise.
-	 */
-	bool RunLine(const std::string &line);
 };
 
 #endif // PS_CMD_HPP

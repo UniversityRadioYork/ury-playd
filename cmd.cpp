@@ -52,22 +52,10 @@ bool CommandHandler::Run(const CommandHandler::WordList &words)
 	return valid;
 }
 
-bool CommandHandler::RunLine(const std::string &line)
-{
-	return Run(LineToWords(line));
-}
-
 bool CommandHandler::Handle(const std::string &line)
 {
 	Debug("got command: <", line, ">");
-
-	// Silently fail if the command is actually end of file.
-	if (std::cin.eof()) {
-		Debug("end of file");
-		throw Error("TODO: Handle this better");
-	}
-
-	return RunLine(line);
+	return Run(LineToWords(line));
 }
 
 CommandHandler::WordList CommandHandler::LineToWords(const std::string &line)
