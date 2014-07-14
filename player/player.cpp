@@ -74,6 +74,7 @@ bool Player::Load(const std::string &path)
 		}
 		catch (Error &error)
 		{
+			// Ensure a load failure doesn't leave a corrupted track loaded.
 			Eject();
 			throw error;
 		}

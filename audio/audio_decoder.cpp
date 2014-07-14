@@ -66,7 +66,7 @@ std::uint8_t AudioDecoder::ChannelCount() const
 
 size_t AudioDecoder::BufferSampleCapacity() const
 {
-	return SampleCountForByteCount(BUFFER_SIZE);
+	return SampleCountForByteCount(this->buffer.size());
 }
 
 double AudioDecoder::SampleRate() const
@@ -77,6 +77,10 @@ double AudioDecoder::SampleRate() const
 std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
                 std::chrono::microseconds usec) const
 {
+	// The sample rate is expressed in terms of samples per second, so we
+	// need to convert the position to seconds then multiply by the rate.
+	// We do things in a slightly peculiar order to minimise rounding.
+
 	auto sample_micros = usec * SampleRate();
 	return std::chrono::duration_cast<std::chrono::seconds>(sample_micros)
 	                .count();
@@ -85,6 +89,8 @@ std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
 std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
                 std::uint64_t samples) const
 {
+	// This is basically SampleCountForPositionMicroseconds but backwards.
+
 	auto position_secs = std::chrono::seconds(samples) / SampleRate();
 	return std::chrono::duration_cast<std::chrono::microseconds>(
 	                position_secs);
@@ -108,15 +114,16 @@ size_t AudioDecoder::BytesPerSample() const
 void AudioDecoder::SeekToPositionMicroseconds(
                 std::chrono::microseconds position)
 {
+	// FFmpeg doesn't use microseconds for its seek positions, so we need to
+	// convert into its own units.
 	std::int64_t ffmpeg_position = AvPositionFromMicroseconds(position);
-
-	Debug("Seeking to:", ffmpeg_position);
-
 	if (av_seek_frame(this->context, this->stream_id, ffmpeg_position,
 	                  AVSEEK_FLAG_ANY) != 0) {
 		throw InternalError(MSG_SEEK_FAIL);
 	}
 
+	// Reset the decoder state, because otherwise the decoder will get very
+	// confused.
 	this->decode_state = DecodeState::WAITING_FOR_FRAME;
 	InitialisePacket();
 }
@@ -124,6 +131,14 @@ void AudioDecoder::SeekToPositionMicroseconds(
 std::int64_t AudioDecoder::AvPositionFromMicroseconds(
                 std::chrono::microseconds position)
 {
+	// FFmpeg reports positions in terms of a 'time base', which is
+	// expressed as a fraction (num/dem) of a second.
+	// So, we need to convert the microseconds into time base units,
+	// which is theoretically done by converting into seconds and then
+	// dividing by the time base fraction.  However, as we're working with
+	// integers, we jiggle that calculation around a bit to minimise
+	// rounding.
+
 	auto position_timebase_microseconds =
 	                (position * this->stream->time_base.den) /
 	                this->stream->time_base.num;
@@ -189,6 +204,7 @@ AudioDecoder::DecodeVector AudioDecoder::DoDecode()
 
 bool AudioDecoder::ReadFrame()
 {
+	// av_read_frame uses non-zero returns to signal errors.
 	int read_result = av_read_frame(this->context, &this->packet);
 	return 0 == read_result;
 }
@@ -217,6 +233,7 @@ void AudioDecoder::Open(const std::string &path)
 {
 	this->context = nullptr;
 
+	// FFmpeg reports a file open error using a negative result here.
 	if (avformat_open_input(&this->context, path.c_str(), nullptr, nullptr) < 0) {
 		std::ostringstream os;
 		os << "couldn't open " << path;
@@ -255,6 +272,7 @@ void AudioDecoder::FindStreamAndInitialiseCodec()
 void AudioDecoder::InitialiseCodec(int stream, AVCodec *codec)
 {
 	AVCodecContext *codec_context = this->context->streams[stream]->codec;
+	// A negative result here is FFmpeg's way of reporting an opening error.
 	if (avcodec_open2(codec_context, codec, nullptr) < 0) {
 		throw FileError(MSG_DECODE_NOCODEC);
 	}
@@ -283,6 +301,10 @@ void AudioDecoder::InitialiseResampler()
 	Resampler *rs;
 	AVCodecContext *codec = this->stream->codec;
 
+	// The AudioOutput can only handle packed sample data.
+	// If we're using a sample format that is planar, we need to resample it
+	// into a packed format.  This is done with the PlanarResampler.
+	// Otherwise, we pass it through the (dummy) PackedResampler.
 	if (UsingPlanarSampleFormat()) {
 		rs = new PlanarResampler(codec);
 	} else {
@@ -303,10 +325,14 @@ bool AudioDecoder::DecodePacket()
 
 	auto decode_result = AvCodecDecode();
 
+	// A negative result here is FFmpeg's way of reporting a decode error.
 	int bytes_decoded = decode_result.first;
 	if (bytes_decoded < 0) {
 		throw FileError(MSG_DECODE_FAIL);
 	}
+
+	// Shift the packet forwards so that, if we haven't finished the packet,
+	// we can resume decoding from where we left off this time.
 	this->packet.data += bytes_decoded;
 	this->packet.size -= bytes_decoded;
 	assert(0 <= this->packet.size);

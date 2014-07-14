@@ -135,8 +135,13 @@ void TcpConnection::DoRead()
 
 void TcpConnection::Send(const std::string &string)
 {
+	// This somewhat complex combination of a strand and queue ensure that
+	// only one process actually writes to a TcpConnection at a given time.
+	// Otherwise, writes could interrupt each other.
 	this->strand.post([this, string]() {
 		this->outbox.push_back(string);
+		// If this string is the only one in the queue, then the last chain
+		// of DoWrite()s will have ended and we need to start a new one.
 		if (this->outbox.size() == 1) {
 			DoWrite();
 		}
@@ -146,8 +151,11 @@ void TcpConnection::Send(const std::string &string)
 void TcpConnection::DoWrite()
 {
 	const std::string &string = this->outbox[0];
+	// This is called after the write has finished.
 	auto write_cb = [this](const boost::system::error_code &, std::size_t) {
 		this->outbox.pop_front();
+		// Keep writing until and unless the outbox is emptied.
+		// After that, the next Send will start DoWrite()ing again.
 		if (!this->outbox.empty()) {
 			DoWrite();
 		}

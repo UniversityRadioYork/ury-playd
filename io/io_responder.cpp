@@ -28,10 +28,13 @@ const std::map<Response, std::string> RESPONSES = {{Response::OKAY, "OKAY"},
 
 void Responder::Respond(Response code, const std::string &message)
 {
-        std::ostringstream os;
-        os << RESPONSES.at(code) << " " << message << std::endl;
+	// Responses are formatted as "CODE message\n".
+	std::ostringstream os;
+	os << RESPONSES.at(code) << " " << message << std::endl;
 
-        RespondRaw(os.str());
+	// Delegate the actual sending of the response string to the concrete
+	// implementation.
+	RespondRaw(os.str());
 }
 
 void Responder::RespondWithError(const Error &error)

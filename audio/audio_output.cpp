@@ -161,6 +161,8 @@ bool AudioOutput::FrameFinished()
 
 void AudioOutput::AdvanceFrameIterator(std::uint64_t sample_count)
 {
+	// The iterator operates on bytes, not samples, so we need to get the
+	// number of bytes to advance the iterator by.
 	auto byte_count = ByteCountForSampleCount(sample_count);
 	assert(sample_count <= byte_count);
 	assert(0 < byte_count);
@@ -195,6 +197,7 @@ std::uint64_t AudioOutput::RingBufferTransferCount()
 {
 	assert(!this->frame.empty());
 
+	// How many bytes are left in the current frame?
 	long bytes = std::distance(this->frame_iterator, this->frame.end());
 	assert(0 <= bytes);
 
@@ -256,6 +259,7 @@ PlayCallbackStepResult AudioOutput::PlayCallbackFailure(
 	decltype(in) result;
 
 	if (FileEnded()) {
+		// End of file is ok, it means the stream can finish.
 		result = std::make_pair(paComplete, in.second);
 	} else {
 		// Make up some silence to plug the gap.
@@ -270,12 +274,15 @@ unsigned long AudioOutput::ReadSamplesToOutput(char *&output,
                                                unsigned long output_capacity,
                                                unsigned long buffered_count)
 {
+	// Transfer the maximum that we can offer to PortAudio without overshooting
+	// its sample request limit.
 	long transfer_sample_count = static_cast<long>(
 	                std::min({output_capacity, buffered_count,
 	                          static_cast<unsigned long>(LONG_MAX)}));
-
 	output += this->ring_buf.Read(output, transfer_sample_count);
 
+	// Update the position count so it reflects the last position that was sent
+	// for playback (*not* the last position decoded).
 	this->position_sample_count += transfer_sample_count;
 	return transfer_sample_count;
 }

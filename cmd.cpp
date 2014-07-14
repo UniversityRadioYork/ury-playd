@@ -61,7 +61,7 @@ bool CommandHandler::Handle(const std::string &line)
 {
 	Debug("got command: <", line, ">");
 
-	/* Silently fail if the command is actually end of file */
+	// Silently fail if the command is actually end of file.
 	if (std::cin.eof()) {
 		Debug("end of file");
 		throw Error("TODO: Handle this better");
@@ -72,6 +72,8 @@ bool CommandHandler::Handle(const std::string &line)
 
 CommandHandler::WordList CommandHandler::LineToWords(const std::string &line)
 {
+	// See http://git.io/IxXOSg for a description of what this needs to do.
+
 	WordList words;
 
 	using Separator = boost::escaped_list_separator<char>;
