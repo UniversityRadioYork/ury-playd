@@ -54,7 +54,7 @@ public:
 	WinIoReactor &operator=(const WinIoReactor &) = delete;
 
 protected:
-	void ResponseViaOstream(std::function<void(std::ostream &)> f) override;
+	void RespondRaw(const std::string &string) override;
 
 private:
 	void SetupWaitForInput();
