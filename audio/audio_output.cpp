@@ -128,6 +128,8 @@ bool AudioOutput::FileEnded()
 void AudioOutput::WriteAllAvailableToRingBuffer()
 {
 	std::uint64_t count = RingBufferTransferCount();
+
+	// Don't bother scheduling a write for no samples.
 	if (0 < count) {
 		WriteToRingBuffer(count);
 	}
@@ -140,6 +142,10 @@ void AudioOutput::WriteToRingBuffer(std::uint64_t sample_count)
 
 	std::uint64_t written_count = this->ring_buf.Write(
 	                &(*this->frame_iterator), sample_count);
+
+	// The written count should be the same as the sample count, because
+	// WriteAllAvailableToRingBuffer establishes that the sample count is
+	// never higher than the ring buffer's current capacity.
 	if (written_count != sample_count) {
 		throw InternalError(MSG_OUTPUT_RINGWRITE);
 	}
