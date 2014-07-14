@@ -19,12 +19,7 @@ const std::map<Response, std::string> RESPONSES = {{Response::OKAY, "OKAY"},
                                                    {Response::OHAI, "OHAI"},
                                                    {Response::TTFN, "TTFN"},
                                                    {Response::STAT, "STAT"},
-                                                   {Response::TIME, "TIME"},
-                                                   {Response::DBUG, "DBUG"},
-                                                   {Response::QPOS, "QPOS"},
-                                                   {Response::QENT, "QENT"},
-                                                   {Response::QMOD, "QMOD"},
-                                                   {Response::QNUM, "QNUM"}};
+                                                   {Response::TIME, "TIME"}};
 
 void Responder::Respond(Response code, const std::string &message)
 {

@@ -33,12 +33,6 @@ enum class Response {
 	TTFN, /* Server shutting down */
 	STAT, /* Server changing state */
 	TIME, /* Server sending current song time */
-	DBUG, /* Debug information */
-	/* Queue-specific responses */
-	QENT, /* Requested information about a Queue ENTry */
-	QMOD, /* A command caused a Queue MODification */
-	QPOS, /* The current Queue POSition has changed */
-	QNUM  /* Reminder of current number of queue items */
 };
 
 /**
