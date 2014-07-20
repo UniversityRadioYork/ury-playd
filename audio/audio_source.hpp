@@ -3,12 +3,12 @@
 
 /**
  * @file
- * Declaration of the AudioDecoder class.
- * @see audio/audio_decoder.cpp
+ * Declaration of the AudioSource class.
+ * @see audio/audio_source.cpp
  */
 
-#ifndef PS_AUDIO_DECODER_HPP
-#define PS_AUDIO_DECODER_HPP
+#ifndef PS_AUDIO_SOURCE_HPP
+#define PS_AUDIO_SOURCE_HPP
 
 #include <array>
 #include <chrono>
@@ -30,11 +30,11 @@ extern "C" {
 /**
  * An object responsible for decoding an audio file.
  *
- * The AudioDecoder is an interface to the ffmpeg library, which represents all
+ * The AudioSource is an interface to the ffmpeg library, which represents all
  * the ffmpeg state associated with one file.  It can be polled to decode
  * frames of audio data, which are returned as byte vectors.
  */
-class AudioDecoder {
+class AudioSource {
 public:
 	/// An enumeration of possible states the decoder can be in.
 	enum class DecodeState : std::uint8_t {
@@ -53,14 +53,14 @@ public:
 	using DecodeResult = std::pair<DecodeState, DecodeVector>;
 
 	/**
-	 * Constructs an AudioDecoder.
+	 * Constructs an AudioSource.
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.
 	 */
-	AudioDecoder(const std::string &path);
+	AudioSource(const std::string &path);
 
-	/// Destructs an AudioDecoder.
-	~AudioDecoder();
+	/// Destructs an AudioSource.
+	~AudioSource();
 
 	/**
 	 * Performs a round of decoding.
@@ -72,7 +72,7 @@ public:
 
 	/**
 	 * Returns the channel count.
-	 * @return The number of channels this AudioDecoder is decoding.
+	 * @return The number of channels this AudioSource is decoding.
 	 */
 	std::uint8_t ChannelCount() const;
 
@@ -169,4 +169,4 @@ private:
 	                std::chrono::microseconds position);
 };
 
-#endif // PS_AUDIO_DECODER_HPP
+#endif // PS_AUDIO_SOURCE_HPP

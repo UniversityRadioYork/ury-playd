@@ -35,7 +35,7 @@ class CallbackInterface;
 #include "../sample_formats.hpp"
 
 #include "audio.hpp"
-#include "audio_decoder.hpp"
+#include "audio_source.hpp"
 #include "audio_sink.hpp"
 #include "audio_system.hpp"
 
@@ -67,7 +67,7 @@ void AudioSystem::SetDeviceID(const std::string &id)
 
 Audio *AudioSystem::Load(const std::string &path) const
 {
-	auto source = new AudioDecoder(path);
+	auto source = new AudioSource(path);
 
 	AudioSink::StreamConfigurator config_fn = std::bind(&AudioSystem::Configure,
 		this,

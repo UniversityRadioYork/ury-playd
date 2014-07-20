@@ -23,7 +23,7 @@ namespace portaudio {
 class Stream;
 }
 
-#include "audio_decoder.hpp"
+#include "audio_source.hpp"
 #include "audio_resample.hpp"
 #include "../ringbuffer/ringbuffer.hpp"
 

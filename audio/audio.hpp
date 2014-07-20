@@ -25,7 +25,7 @@ namespace portaudio {
 
 #include "../ringbuffer/ringbuffer.hpp"
 
-class AudioDecoder;
+class AudioSource;
 class AudioSink;
 
 /**
@@ -43,7 +43,7 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	Audio::Audio(AudioDecoder *source, AudioSink *sink);
+	Audio::Audio(AudioSource *source, AudioSink *sink);
 
 	/**
 	 * Starts playback of this audio file.
@@ -62,7 +62,7 @@ public:
 	/**
 	 * Performs an update cycle on this Audio.
 	 * This ensures the ring buffer has output to offer to the sound driver.
-	 * It does this by by asking the AudioDecoder to decode if necessary.
+	 * It does this by by asking the AudioSource to decode if necessary.
 	 * @return True if there is more output to send to the sound card; false
 	 *   otherwise.
 	 */
@@ -130,7 +130,7 @@ public:
 
 private:
 	/// The source of audio data.
-	std::unique_ptr<AudioDecoder> source;
+	std::unique_ptr<AudioSource> source;
 
 	/// The sink to which audio data is sent.
 	std::unique_ptr<AudioSink> sink;

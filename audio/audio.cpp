@@ -18,9 +18,9 @@
 
 #include "audio.hpp"
 #include "audio_sink.hpp"
-#include "audio_decoder.hpp"
+#include "audio_source.hpp"
 
-Audio::Audio(AudioDecoder *source, AudioSink *sink)
+Audio::Audio(AudioSource *source, AudioSink *sink)
 	: source(source),
 	sink(sink),
 	position_sample_count(0)
@@ -107,13 +107,13 @@ bool Audio::DecodeIfFrameEmpty()
 	bool more_frames_available = true;
 
 	if (FrameFinished()) {
-		AudioDecoder::DecodeResult result = this->source->Decode();
+		AudioSource::DecodeResult result = this->source->Decode();
 
 		this->frame = result.second;
 		this->frame_iterator = this->frame.begin();
 
 		more_frames_available = result.first !=
-			AudioDecoder::DecodeState::END_OF_FILE;
+			AudioSource::DecodeState::END_OF_FILE;
 	}
 
 	return more_frames_available;

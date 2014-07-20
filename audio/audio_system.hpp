@@ -23,7 +23,7 @@ class Device;
 
 #include "../sample_formats.hpp"
 
-#include "audio_decoder.hpp"
+#include "audio_source.hpp"
 #include "audio_sink.hpp"
 #include "audio.hpp"
 

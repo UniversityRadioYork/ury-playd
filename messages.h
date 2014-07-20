@@ -14,16 +14,16 @@
 /// Message shown when the CommandHandler receives an invalid command.
 const std::string MSG_CMD_INVALID = "Bad command or file name";
 
-/// Message shown when the AudioDecoder fails to decode a file.
+/// Message shown when the AudioSource fails to decode a file.
 const std::string MSG_DECODE_FAIL = "Decoding failure";
 
-/// Message shown when the AudioDecoder fails to find an audio stream.
+/// Message shown when the AudioSource fails to find an audio stream.
 const std::string MSG_DECODE_NOAUDIO = "This doesn't seem to be an audio file";
 
-/// Message shown when the AudioDecoder fails to initialise a stream.
+/// Message shown when the AudioSource fails to initialise a stream.
 const std::string MSG_DECODE_NOSTREAM = "Couldn't acquire stream";
 
-/// Message shown when the AudioDecoder fails to initialise a codec.
+/// Message shown when the AudioSource fails to initialise a codec.
 const std::string MSG_DECODE_NOCODEC = "Couldn't acquire codec";
 
 /// Message shown when a bad sample rate is found.

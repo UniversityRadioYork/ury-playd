@@ -3,8 +3,8 @@
 
 /**
  * @file
- * Implementation of the AudioDecoder class.
- * @see audio/audio_decoder.hpp
+ * Implementation of the AudioSource class.
+ * @see audio/audio_source.hpp
  */
 
 #include <functional>
@@ -32,12 +32,12 @@ extern "C" {
 #include "../messages.h"
 #include "../sample_formats.hpp"
 
-#include "audio_decoder.hpp"
+#include "audio_source.hpp"
 #include "audio_resample.hpp"
 
-const size_t AudioDecoder::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
+const size_t AudioSource::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 
-AudioDecoder::AudioDecoder(const std::string &path)
+AudioSource::AudioSource(const std::string &path)
 	: decode_state(DecodeState::WAITING_FOR_FRAME),
 	buffer(BUFFER_SIZE),
 	context(nullptr),
@@ -50,7 +50,7 @@ AudioDecoder::AudioDecoder(const std::string &path)
 	InitialiseResampler();
 }
 
-AudioDecoder::~AudioDecoder() {
+AudioSource::~AudioSource() {
 	if (this->context != nullptr) {
 		avformat_free_context(this->context);
 	}
@@ -59,22 +59,22 @@ AudioDecoder::~AudioDecoder() {
 	}
 }
 
-std::uint8_t AudioDecoder::ChannelCount() const
+std::uint8_t AudioSource::ChannelCount() const
 {
 	return this->stream->codec->channels;
 }
 
-size_t AudioDecoder::BufferSampleCapacity() const
+size_t AudioSource::BufferSampleCapacity() const
 {
 	return this->buffer.size() / this->BytesPerSample();
 }
 
-double AudioDecoder::SampleRate() const
+double AudioSource::SampleRate() const
 {
 	return (double)this->stream->codec->sample_rate;
 }
 
-std::uint64_t AudioDecoder::SamplePositionFromMicroseconds(
+std::uint64_t AudioSource::SamplePositionFromMicroseconds(
                 std::chrono::microseconds usec) const
 {
 	// The sample rate is expressed in terms of samples per second, so we
@@ -86,7 +86,7 @@ std::uint64_t AudioDecoder::SamplePositionFromMicroseconds(
 	                .count();
 }
 
-std::chrono::microseconds AudioDecoder::MicrosecondPositionFromSamples(
+std::chrono::microseconds AudioSource::MicrosecondPositionFromSamples(
 	std::uint64_t samples) const
 {
 	// This is basically SamplePositionFromMicroseconds but backwards.
@@ -96,12 +96,12 @@ std::chrono::microseconds AudioDecoder::MicrosecondPositionFromSamples(
 		position_secs);
 }
 
-size_t AudioDecoder::BytesPerSample() const
+size_t AudioSource::BytesPerSample() const
 {
 	return ChannelCount() * av_get_bytes_per_sample(this->resampler->AVOutputFormat());
 }
 
-std::uint64_t AudioDecoder::Seek(std::chrono::microseconds position)
+std::uint64_t AudioSource::Seek(std::chrono::microseconds position)
 {
 	// FFmpeg doesn't use microseconds for its seek positions, so we need to
 	// convert into its own units.
@@ -119,7 +119,7 @@ std::uint64_t AudioDecoder::Seek(std::chrono::microseconds position)
 	return SamplePositionFromMicroseconds(position);
 }
 
-std::int64_t AudioDecoder::AvPositionFromMicroseconds(
+std::int64_t AudioSource::AvPositionFromMicroseconds(
                 std::chrono::microseconds position)
 {
 	// FFmpeg reports positions in terms of a 'time base', which is
@@ -139,7 +139,7 @@ std::int64_t AudioDecoder::AvPositionFromMicroseconds(
 	return position_timebase_seconds.count();
 }
 
-AudioDecoder::DecodeResult AudioDecoder::Decode()
+AudioSource::DecodeResult AudioSource::Decode()
 {
 	Resampler::ResultVector decoded;
 
@@ -158,7 +158,7 @@ AudioDecoder::DecodeResult AudioDecoder::Decode()
 	return std::make_pair(this->decode_state, decoded);
 }
 
-void AudioDecoder::DoFrame()
+void AudioSource::DoFrame()
 {
 	bool read_frame = ReadFrame();
 
@@ -173,7 +173,7 @@ void AudioDecoder::DoFrame()
 	}
 }
 
-AudioDecoder::DecodeVector AudioDecoder::DoDecode()
+AudioSource::DecodeVector AudioSource::DoDecode()
 {
 	DecodeVector result;
 
@@ -193,14 +193,14 @@ AudioDecoder::DecodeVector AudioDecoder::DoDecode()
 	return result;
 }
 
-bool AudioDecoder::ReadFrame()
+bool AudioSource::ReadFrame()
 {
 	// av_read_frame uses non-zero returns to signal errors.
 	int read_result = av_read_frame(this->context, &this->packet);
 	return 0 == read_result;
 }
 
-Resampler::ResultVector AudioDecoder::Resample()
+Resampler::ResultVector AudioSource::Resample()
 {
 	return this->resampler->Resample(this->frame);
 }
@@ -214,13 +214,13 @@ static const std::map<AVSampleFormat, SampleFormat> sf_from_av = {
 /**
  * @return The sample format of the data returned by this decoder.
  */
-SampleFormat AudioDecoder::OutputSampleFormat() const
+SampleFormat AudioSource::OutputSampleFormat() const
 {
 	try { return sf_from_av.at(this->resampler->AVOutputFormat()); }
 	catch (std::out_of_range) { throw FileError(MSG_DECODE_BADRATE); }
 }
 
-void AudioDecoder::Open(const std::string &path)
+void AudioSource::Open(const std::string &path)
 {
 	this->context = nullptr;
 
@@ -234,20 +234,20 @@ void AudioDecoder::Open(const std::string &path)
 	}
 }
 
-void AudioDecoder::InitialiseStream()
+void AudioSource::InitialiseStream()
 {
 	FindStreamInfo();
 	FindStreamAndInitialiseCodec();
 }
 
-void AudioDecoder::FindStreamInfo()
+void AudioSource::FindStreamInfo()
 {
 	if (avformat_find_stream_info(this->context, nullptr) < 0) {
 		throw FileError(MSG_DECODE_NOAUDIO);
 	}
 }
 
-void AudioDecoder::FindStreamAndInitialiseCodec()
+void AudioSource::FindStreamAndInitialiseCodec()
 {
 	AVCodec *codec;
 	int stream = av_find_best_stream(this->context,
@@ -260,7 +260,7 @@ void AudioDecoder::FindStreamAndInitialiseCodec()
 	InitialiseCodec(stream, codec);
 }
 
-void AudioDecoder::InitialiseCodec(int stream, AVCodec *codec)
+void AudioSource::InitialiseCodec(int stream, AVCodec *codec)
 {
 	AVCodecContext *codec_context = this->context->streams[stream]->codec;
 	// A negative result here is FFmpeg's way of reporting an opening error.
@@ -272,7 +272,7 @@ void AudioDecoder::InitialiseCodec(int stream, AVCodec *codec)
 	this->stream_id = stream;
 }
 
-void AudioDecoder::InitialiseFrame()
+void AudioSource::InitialiseFrame()
 {
 	this->frame = av_frame_alloc();
 	if (this->frame == nullptr) {
@@ -280,14 +280,14 @@ void AudioDecoder::InitialiseFrame()
 	}
 }
 
-void AudioDecoder::InitialisePacket()
+void AudioSource::InitialisePacket()
 {
 	av_init_packet(&this->packet);
 	this->packet.data = &*this->buffer.begin();
 	this->packet.size = this->buffer.size();
 }
 
-void AudioDecoder::InitialiseResampler()
+void AudioSource::InitialiseResampler()
 {
 	Resampler *rs;
 	AVCodecContext *codec = this->stream->codec;
@@ -304,14 +304,14 @@ void AudioDecoder::InitialiseResampler()
 	this->resampler = std::unique_ptr<Resampler>(rs);
 }
 
-bool AudioDecoder::UsingPlanarSampleFormat()
+bool AudioSource::UsingPlanarSampleFormat()
 {
 	// The docs for this function explicitly mention a return value of 1 for
 	// planar, 0 for packed.
 	return av_sample_fmt_is_planar(this->stream->codec->sample_fmt) == 1;
 }
 
-bool AudioDecoder::DecodePacket()
+bool AudioSource::DecodePacket()
 {
 	assert(this->packet.data != nullptr);
 	assert(0 < this->packet.size);
@@ -334,7 +334,7 @@ bool AudioDecoder::DecodePacket()
 	return frame_finished || (0 < this->packet.size);
 }
 
-std::pair<int, bool> AudioDecoder::AvCodecDecode()
+std::pair<int, bool> AudioSource::AvCodecDecode()
 {
 	int frame_finished = 0;
 	int bytes_decoded = avcodec_decode_audio4(
