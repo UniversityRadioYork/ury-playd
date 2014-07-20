@@ -3,12 +3,12 @@
 
 /**
  * @file
- * Declaration of the AudioOutput class.
+ * Declaration of the AudioSink class.
  * @see audio/audio.cpp
  */
 
-#ifndef PS_AUDIO_OUTPUT_HPP
-#define PS_AUDIO_OUTPUT_HPP
+#ifndef PS_AUDIO_SINK_HPP
+#define PS_AUDIO_SINK_HPP
 
 #include <chrono>
 #include <cstdint>
@@ -33,14 +33,14 @@ using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
 /**
  * An output stream for an Audio file.
  *
- * An AudioOutput consists of a PortAudio output stream and a buffer that
- * stores decoded samples from the Audio object.  While active, the AudioOutput
+ * An AudioSink consists of a PortAudio output stream and a buffer that
+ * stores decoded samples from the Audio object.  While active, the AudioSink
  * periodically transfers samples from its buffer to PortAudio in a separate
  * thread.
  */
-class AudioOutput : portaudio::CallbackInterface {
+class AudioSink : portaudio::CallbackInterface {
 public:
-	/// A function that configures and returns a stream, given this AudioOutput.
+	/// A function that configures and returns a stream, given this AudioSink.
 	using StreamConfigurator = std::function<portaudio::Stream *(portaudio::CallbackInterface &)>;
 
 	/// Type of results emitted during the play callback step.
@@ -53,11 +53,11 @@ public:
 	using TransferIterator = Resampler::ResultVector::iterator;
 
 	/**
-	 * Constructs an AudioOutput.
+	 * Constructs an AudioSink.
 	 * @param c A function that can configure PortAudio streams.
 	 * @param bytes_per_sample The number of bytes each audio sample occupies.
 	 */
-	AudioOutput(const StreamConfigurator c, Resampler::SampleByteCount bytes_per_sample);
+	AudioSink(const StreamConfigurator c, Resampler::SampleByteCount bytes_per_sample);
 
 	/**
 	 * Starts the audio stream.
@@ -92,7 +92,7 @@ public:
 
 	/**
 	 * Sets the current played position, given a position in samples.
-	 * This flushes out the AudioOutput ready to receive sample data from the
+	 * This flushes out the AudioSink ready to receive sample data from the
 	 * new position.
 	 * @param samples The new position, as a count of elapsed samples.
 	 * @see Position
@@ -100,21 +100,21 @@ public:
 	void SetPosition(SamplePosition samples);
 
 	/**
-	 * Gets whether this AudioOutput is expecting input.
+	 * Gets whether this AudioSink is expecting input.
 	 * @return Whether the input-ready flag has been set.
 	 * @see SetInputReady
 	 */
 	bool InputReady();
 
 	/**
-	 * Set whether this AudioOutput can expect input.
+	 * Set whether this AudioSink can expect input.
 	 * @param ready True if there is input ready; false otherwise.
 	 * @see InputReady
 	 */
-	void AudioOutput::SetInputReady(bool ready);
+	void AudioSink::SetInputReady(bool ready);
 
 	/**
-	 * Transfers a range of sample bytes into the AudioOutput.
+	 * Transfers a range of sample bytes into the AudioSink.
 	 * The range may be empty, but must be valid.
 	 *
 	 * * Precondition: @a start <= @a end, @a start and @a end point to a valid
@@ -144,7 +144,7 @@ private:
 	/// The ring buffer used to transfer samples to the playing callback.
 	RingBuffer<char, unsigned long> ring_buf;
 
-	/// The PortAudio stream to which this AudioOutput outputs.
+	/// The PortAudio stream to which this AudioSink outputs.
 	std::unique_ptr<portaudio::Stream> stream;
 
 	/// The current position, in samples.
@@ -185,4 +185,4 @@ private:
 	                                  unsigned long buffered_count);
 };
 
-#endif // PS_AUDIO_OUTPUT_HPP
+#endif // PS_AUDIO_SINK_HPP

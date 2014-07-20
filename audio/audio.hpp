@@ -26,7 +26,7 @@ namespace portaudio {
 #include "../ringbuffer/ringbuffer.hpp"
 
 class AudioDecoder;
-class AudioOutput;
+class AudioSink;
 
 /**
  * An audio file.
@@ -43,7 +43,7 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	Audio::Audio(AudioDecoder *source, AudioOutput *sink);
+	Audio::Audio(AudioDecoder *source, AudioSink *sink);
 
 	/**
 	 * Starts playback of this audio file.
@@ -133,7 +133,7 @@ private:
 	std::unique_ptr<AudioDecoder> source;
 
 	/// The sink to which audio data is sent.
-	std::unique_ptr<AudioOutput> sink;
+	std::unique_ptr<AudioSink> sink;
 
 	/// Whether the current file has stopped decoding.
 	bool file_ended;

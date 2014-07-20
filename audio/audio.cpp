@@ -17,10 +17,10 @@
 #include "../messages.h"
 
 #include "audio.hpp"
-#include "audio_output.hpp"
+#include "audio_sink.hpp"
 #include "audio_decoder.hpp"
 
-Audio::Audio(AudioDecoder *source, AudioOutput *sink)
+Audio::Audio(AudioDecoder *source, AudioSink *sink)
 	: source(source),
 	sink(sink),
 	position_sample_count(0)

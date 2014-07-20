@@ -36,7 +36,7 @@ class CallbackInterface;
 
 #include "audio.hpp"
 #include "audio_decoder.hpp"
-#include "audio_output.hpp"
+#include "audio_sink.hpp"
 #include "audio_system.hpp"
 
 AudioSystem::AudioSystem()
@@ -69,14 +69,14 @@ Audio *AudioSystem::Load(const std::string &path) const
 {
 	auto source = new AudioDecoder(path);
 
-	AudioOutput::StreamConfigurator config_fn = std::bind(&AudioSystem::Configure,
+	AudioSink::StreamConfigurator config_fn = std::bind(&AudioSystem::Configure,
 		this,
 		source->ChannelCount(),
 		source->OutputSampleFormat(),
 		source->SampleRate(),
 		source->BufferSampleCapacity(),
 		std::placeholders::_1);
-	auto sink = new AudioOutput(config_fn, source->BytesPerSample());
+	auto sink = new AudioSink(config_fn, source->BytesPerSample());
 
 	return new Audio(source, sink);
 }

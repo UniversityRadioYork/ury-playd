@@ -3,8 +3,8 @@
 
 /**
  * @file
- * Implementation of the AudioOutput class.
- * @see audio/audio_output.hpp
+ * Implementation of the AudioSink class.
+ * @see audio/audio_sink.hpp
  */
 
 #include <cassert>
@@ -18,13 +18,13 @@
 #include "../sample_formats.hpp"
 #include "../messages.h"
 
-#include "audio_output.hpp"
+#include "audio_sink.hpp"
 
 #include "../ringbuffer/ringbuffer.hpp"
 
-const size_t AudioOutput::RINGBUF_POWER = 16;
+const size_t AudioSink::RINGBUF_POWER = 16;
 
-AudioOutput::AudioOutput(const StreamConfigurator c, Resampler::SampleByteCount bytes_per_sample)
+AudioSink::AudioSink(const StreamConfigurator c, Resampler::SampleByteCount bytes_per_sample)
 	: ring_buf(RINGBUF_POWER, bytes_per_sample),
 	position_sample_count(0),
 	bytes_per_sample(bytes_per_sample)
@@ -32,45 +32,45 @@ AudioOutput::AudioOutput(const StreamConfigurator c, Resampler::SampleByteCount 
 	this->stream = decltype(this->stream)(c(*this));
 }
 
-void AudioOutput::Start()
+void AudioSink::Start()
 {
 	this->just_started = true;
 	this->stream->start();
 }
 
-void AudioOutput::Stop()
+void AudioSink::Stop()
 {
 	this->stream->abort();
 }
 
-bool AudioOutput::IsStopped()
+bool AudioSink::IsStopped()
 {
 	return !this->stream->isActive();
 }
 
-bool AudioOutput::InputReady()
+bool AudioSink::InputReady()
 {
 	return this->input_ready;
 }
 
-void AudioOutput::SetInputReady(bool ready)
+void AudioSink::SetInputReady(bool ready)
 {
 	this->input_ready = ready;
 }
 
-AudioOutput::SamplePosition AudioOutput::Position()
+AudioSink::SamplePosition AudioSink::Position()
 {
 	return this->position_sample_count;
 }
 
-void AudioOutput::SetPosition(AudioOutput::SamplePosition samples)
+void AudioSink::SetPosition(AudioSink::SamplePosition samples)
 {
 	this->position_sample_count = samples;
 	this->ring_buf.Flush();
 }
 
 
-void AudioOutput::Transfer(AudioOutput::TransferIterator &start, const AudioOutput::TransferIterator &end)
+void AudioSink::Transfer(AudioSink::TransferIterator &start, const AudioSink::TransferIterator &end)
 {
 	// No point transferring 0 bytes.
 	if (start == end) {
@@ -97,7 +97,7 @@ void AudioOutput::Transfer(AudioOutput::TransferIterator &start, const AudioOutp
 	assert(start <= end);
 }
 
-int AudioOutput::paCallbackFun(const void *, void *out,
+int AudioSink::paCallbackFun(const void *, void *out,
                                unsigned long frames_per_buf,
                                const PaStreamCallbackTimeInfo *,
                                PaStreamCallbackFlags)
@@ -113,7 +113,7 @@ int AudioOutput::paCallbackFun(const void *, void *out,
 	return static_cast<int>(result.first);
 }
 
-PlayCallbackStepResult AudioOutput::PlayCallbackStep(
+PlayCallbackStepResult AudioSink::PlayCallbackStep(
                 char *out, unsigned long frames_per_buf,
                 PlayCallbackStepResult in)
 {
@@ -126,12 +126,12 @@ PlayCallbackStepResult AudioOutput::PlayCallbackStep(
 	bool wait = this->just_started && (avail < frames_per_buf);
 
 	bool failed = wait || empty;
-	auto fn = failed ? &AudioOutput::PlayCallbackFailure
-	                 : &AudioOutput::PlayCallbackSuccess;
+	auto fn = failed ? &AudioSink::PlayCallbackFailure
+	                 : &AudioSink::PlayCallbackSuccess;
 	return (this->*fn)(out, avail, frames_per_buf, in);
 }
 
-PlayCallbackStepResult AudioOutput::PlayCallbackSuccess(
+PlayCallbackStepResult AudioSink::PlayCallbackSuccess(
                 char *out, unsigned long avail, unsigned long frames_per_buf,
                 PlayCallbackStepResult in)
 {
@@ -143,7 +143,7 @@ PlayCallbackStepResult AudioOutput::PlayCallbackSuccess(
 	return std::make_pair(paContinue, in.second + samples_read);
 }
 
-PlayCallbackStepResult AudioOutput::PlayCallbackFailure(
+PlayCallbackStepResult AudioSink::PlayCallbackFailure(
                 char *out, unsigned long, unsigned long frames_per_buf,
                 PlayCallbackStepResult in)
 {
@@ -162,7 +162,7 @@ PlayCallbackStepResult AudioOutput::PlayCallbackFailure(
 	return result;
 }
 
-unsigned long AudioOutput::ReadSamplesToOutput(char *&output,
+unsigned long AudioSink::ReadSamplesToOutput(char *&output,
                                                unsigned long output_capacity,
                                                unsigned long buffered_count)
 {
