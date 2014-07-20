@@ -14,7 +14,7 @@
 #include <cassert>
 
 #include "player.hpp"
-#include "../audio/audio_output.hpp"
+#include "../audio/audio.hpp"
 #include "../audio/audio_system.hpp"
 #include "../errors.hpp"
 

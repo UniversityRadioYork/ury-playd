@@ -34,7 +34,7 @@ extern "C" {
  * the ffmpeg state associated with one file.  It can be polled to decode
  * frames of audio data, which are returned as byte vectors.
  */
-class AudioDecoder : public SampleByteConverter {
+class AudioDecoder {
 public:
 	/// An enumeration of possible states the decoder can be in.
 	enum class DecodeState : std::uint8_t {
@@ -96,35 +96,37 @@ public:
 	size_t BufferSampleCapacity() const;
 
 	/**
-	 * Seeks to the given position, in microseconds.
-	 * @param position  The new position in the file, in microseconds.
+	 * Returns the number of bytes for each sample this decoder outputs.
+	 * As the decoder returns packed samples, this includes the channel count
+	 * as a factor.
+	 * @return The number of bytes per sample.
 	 */
-	void SeekToPositionMicroseconds(std::chrono::microseconds position);
-
-	//
-	// Unit conversion
-	//
+	size_t BytesPerSample() const;
 
 	/**
-	 * Converts an elapsed sample count to a position in microseconds.
-	 * @param samples The number of elapsed samples.
-	 * @return The corresponding song position, in microseconds.
+	 * Seeks to the given position, in microseconds.
+	 * For convenience, the new position (in terms of samples) is returned.
+	 * @param position  The new position in the file, in microseconds.
+	 * @return The new position in the file, in samples.
 	 */
-	std::chrono::microseconds PositionMicrosecondsForSampleCount(
-	                std::uint64_t samples) const;
+	std::uint64_t Seek(std::chrono::microseconds position);
+
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
 	 * @param position The song position, in microseconds.
 	 * @return The corresponding number of elapsed samples.
 	 */
-	std::uint64_t SampleCountForPositionMicroseconds(
-	                std::chrono::microseconds position) const;
+	std::uint64_t SamplePositionFromMicroseconds(
+		std::chrono::microseconds position) const;
 
-	std::uint64_t SampleCountForByteCount(
-	                std::uint64_t bytes) const override;
-	std::uint64_t ByteCountForSampleCount(
-	                std::uint64_t samples) const override;
+	/**
+	 * Converts an elapsed sample count to a position in microseconds.
+	 * @param samples The number of elapsed samples.
+	 * @return The corresponding song position, in microseconds.
+	 */
+	std::chrono::microseconds MicrosecondPositionFromSamples(
+		std::uint64_t samples) const;
 
 private:
 	/// The size of the internal decoding buffer, in bytes.
@@ -141,8 +143,7 @@ private:
 	AVFrame *frame;                       ///< The last decoded frame.
 
 	std::vector<uint8_t> buffer;          ///< The decoding buffer.
-	std::unique_ptr<Resampler> resampler; ///< The object providing
-	/// resampling.
+	std::unique_ptr<Resampler> resampler; ///< The resampler.
 
 	void Open(const std::string &path);
 
@@ -161,7 +162,6 @@ private:
 	bool ReadFrame();
 	bool DecodePacket();
 	Resampler::ResultVector Resample();
-	size_t BytesPerSample() const;
 	std::pair<int, bool> AvCodecDecode();
 
 	bool UsingPlanarSampleFormat();

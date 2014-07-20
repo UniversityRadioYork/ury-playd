@@ -25,11 +25,12 @@ class Device;
 
 #include "audio_decoder.hpp"
 #include "audio_output.hpp"
+#include "audio.hpp"
 
 /**
  * An AudioSystem represents the entire audio stack used by Playslave++.
  *
- * The AudioSystem is responsible for creating AudioOutput instances,
+ * The AudioSystem is responsible for creating Audio instances,
  * enumerating and resolving device IDs, and initialising and terminating the
  * audio libraries.
  *
@@ -37,7 +38,7 @@ class Device;
  * construction and unloads them on termination.  As such, it's probably not
  * wise to construct multiple AudioSystem instances.
  */
-class AudioSystem : public StreamConfigurator {
+class AudioSystem {
 public:
 	/// Type for device entries.
 	using Device = std::pair<std::string, std::string>;
@@ -55,15 +56,15 @@ public:
 	~AudioSystem();
 
 	/**
-	 * Loads a file, creating an AudioOutput for it.
+	 * Loads a file, creating an Audio for it.
 	 * @param path  The path to a file.
-	 * @return      The AudioOutput for that file.
+	 * @return      The Audio for that file.
 	 */
-	AudioOutput *Load(const std::string &path) const;
+	Audio *Load(const std::string &path) const;
 
 	/**
 	 * Sets the current device ID.
-	 * @param id  The device ID to use for subsequent AudioOutputs.
+	 * @param id  The device ID to use for subsequent Audios.
 	 */
 	void SetDeviceID(const std::string &id);
 
@@ -73,8 +74,20 @@ public:
 	 */
 	void OnDevices(std::function<void(const Device &)> f) const;
 
-	portaudio::Stream *Configure(portaudio::CallbackInterface &cb,
-	                             const AudioDecoder &av) const override;
+	/**
+	 * Configures and returns a PortAudio stream.
+	 * @param channel_count The number of channels of the stream will receive.
+	 * @param sample_format The format of the samples the stream will receive.
+	 * @param sample_rate The rate of the samples the stream will receive.
+	 * @param buffer_size The size of the buffer the stream should allocate.
+	 * @param cb The object that PortAudio will call to receive audio.
+	 * @return The configured PortAudio stream.
+	 */
+	portaudio::Stream *Configure(std::uint8_t channel_count,
+		SampleFormat sample_format,
+		double sample_rate,
+		size_t buffer_size,
+		portaudio::CallbackInterface &cb) const;
 
 private:
 	std::string device_id; ///< The current device ID.

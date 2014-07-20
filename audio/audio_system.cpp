@@ -34,6 +34,7 @@ class CallbackInterface;
 #include "../messages.h"
 #include "../sample_formats.hpp"
 
+#include "audio.hpp"
 #include "audio_decoder.hpp"
 #include "audio_output.hpp"
 #include "audio_system.hpp"
@@ -64,24 +65,38 @@ void AudioSystem::SetDeviceID(const std::string &id)
 	this->device_id = std::string(id);
 }
 
-AudioOutput *AudioSystem::Load(const std::string &path) const
+Audio *AudioSystem::Load(const std::string &path) const
 {
-	return new AudioOutput(path, *this);
+	auto source = new AudioDecoder(path);
+
+	AudioOutput::StreamConfigurator config_fn = std::bind(&AudioSystem::Configure,
+		this,
+		source->ChannelCount(),
+		source->OutputSampleFormat(),
+		source->SampleRate(),
+		source->BufferSampleCapacity(),
+		std::placeholders::_1);
+	auto sink = new AudioOutput(config_fn, source->BytesPerSample());
+
+	return new Audio(source, sink);
 }
 
-portaudio::Stream *AudioSystem::Configure(portaudio::CallbackInterface &cb,
-                                          const AudioDecoder &av) const
+portaudio::Stream *AudioSystem::Configure(std::uint8_t channel_count,
+										  SampleFormat sample_format,
+										  double sample_rate,
+										  size_t buffer_size,
+										  portaudio::CallbackInterface &cb) const
 {
 	const portaudio::Device &device = PaDeviceFrom(this->device_id);
 
 	portaudio::DirectionSpecificStreamParameters out_pars(
-	                device, av.ChannelCount(),
-	                PaSampleFormatFrom(av.OutputSampleFormat()), true,
+	                device, channel_count,
+	                PaSampleFormatFrom(sample_format), true,
 	                device.defaultLowOutputLatency(), nullptr);
 
 	portaudio::StreamParameters pars(
 	                portaudio::DirectionSpecificStreamParameters::null(),
-	                out_pars, av.SampleRate(), av.BufferSampleCapacity(),
+	                out_pars, sample_rate, buffer_size,
 	                paClipOff);
 
 	return new portaudio::InterfaceCallbackStream(pars, cb);

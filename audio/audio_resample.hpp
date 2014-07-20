@@ -21,46 +21,6 @@ extern "C" {
 #include "../swr.hpp"
 
 /**
- * Abstract class for things that convert between sample counts and byte counts.
- *
- * This class defines an interface only.  It exists mainly for the Resampler's
- * benefit as it needs access to something that can do this conversion for it
- * but doesn't need to know exactly what.
- *
- * The conversions depend on whatever bytes-per-sample ratio this
- * SampleByteConverter holds.  For instance, for an AudioDecoder, the ratio
- * is that of whatever the AudioDecoder is outputting.  Note that we can't
- * plug an AudioDecoder directly into a Resampler, due to cyclic dependencies.
- */
-class SampleByteConverter {
-public:
-	/**
-	 * Converts from a byte count to a sample count.
-	 *
-	 * This involves dividing by the bytes-per-sample ratio. and is the
-	 * inverse of SampleCountForByteCount up to rounding and overflowing.
-	 * @param bytes  The byte count to convert to a sample count.
-	 * @return       The corresponding sample count.
-	 * @see          ByteCountForSampleCount
-	 */
-	virtual std::uint64_t SampleCountForByteCount(std::uint64_t bytes)
-	                const = 0;
-
-	/**
-	 * Converts from a sample count to a byte count.
-	 *
-	 * This involves multiplying by the bytes-per-sample ratio, and is the
-	 * inverse of SampleCountForByteCount up to rounding and overflowing.
-	 * @param samples  The sample count to convert to a byte count.
-	 * @return         The corresponding byte count.
-	 * @see            SampleCountForByteCount
-	 */
-
-	virtual std::uint64_t ByteCountForSampleCount(std::uint64_t samples)
-	                const = 0;
-};
-
-/**
  * A class for performing resampling.
  *
  * A resampler takes a ffmpeg frame from the decoder and returns a vector of raw

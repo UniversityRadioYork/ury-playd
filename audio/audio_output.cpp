@@ -19,191 +19,82 @@
 #include "../messages.h"
 
 #include "audio_output.hpp"
-#include "audio_decoder.hpp"
 
 #include "../ringbuffer/ringbuffer.hpp"
 
 const size_t AudioOutput::RINGBUF_POWER = 16;
 
-AudioOutput::AudioOutput(const std::string &path, const StreamConfigurator &c)
-    : av(path),
-      ring_buf(RINGBUF_POWER, av.ByteCountForSampleCount(1L)),
-      position_sample_count(0)
+AudioOutput::AudioOutput(const StreamConfigurator c, Resampler::SampleByteCount bytes_per_sample)
+	: ring_buf(RINGBUF_POWER, bytes_per_sample),
+	position_sample_count(0),
+	bytes_per_sample(bytes_per_sample)
 {
-	this->out_strm = decltype(this->out_strm)(c.Configure(*this, this->av));
-
-	ClearFrame();
+	this->stream = decltype(this->stream)(c(*this));
 }
 
 void AudioOutput::Start()
 {
 	this->just_started = true;
-	this->out_strm->start();
+	this->stream->start();
 }
 
 void AudioOutput::Stop()
 {
-	this->out_strm->abort();
+	this->stream->abort();
 }
 
 bool AudioOutput::IsStopped()
 {
-	return !this->out_strm->isActive();
+	return !this->stream->isActive();
 }
 
-std::chrono::microseconds AudioOutput::CurrentPositionMicroseconds()
+bool AudioOutput::InputReady()
 {
-	return this->av.PositionMicrosecondsForSampleCount(
-	                this->position_sample_count);
+	return this->input_ready;
 }
 
-std::uint64_t AudioOutput::ByteCountForSampleCount(std::uint64_t samples) const
+void AudioOutput::SetInputReady(bool ready)
 {
-	return this->av.ByteCountForSampleCount(samples);
+	this->input_ready = ready;
 }
 
-std::uint64_t AudioOutput::SampleCountForByteCount(std::uint64_t bytes) const
+AudioOutput::SamplePosition AudioOutput::Position()
 {
-	return this->av.SampleCountForByteCount(bytes);
+	return this->position_sample_count;
 }
 
-void AudioOutput::SeekToPositionMicroseconds(
-                std::chrono::microseconds microseconds)
+void AudioOutput::SetPosition(AudioOutput::SamplePosition samples)
 {
-	this->av.SeekToPositionMicroseconds(microseconds);
-	this->position_sample_count =
-	                this->av.SampleCountForPositionMicroseconds(
-	                                microseconds);
-
-	ClearFrame();
+	this->position_sample_count = samples;
 	this->ring_buf.Flush();
 }
 
-void AudioOutput::ClearFrame()
-{
-	this->frame.clear();
-	this->frame_iterator = this->frame.end();
-	this->file_ended = false;
-}
 
-bool AudioOutput::Update()
+void AudioOutput::Transfer(AudioOutput::TransferIterator &start, const AudioOutput::TransferIterator &end)
 {
-	bool more_frames_available = DecodeIfFrameEmpty();
-
-	if (!FrameFinished()) {
-		WriteAllAvailableToRingBuffer();
+	// No point transferring 0 bytes.
+	if (start == end) {
+		return;
 	}
+	assert(start < end);
 
-	this->file_ended = !more_frames_available;
-	return more_frames_available;
-}
+	unsigned long bytes = std::distance(start, end);
+	// There should be a whole number of samples being transferred.
+	assert(bytes % bytes_per_sample == 0);
+	assert(0 < bytes);
 
-bool AudioOutput::DecodeIfFrameEmpty()
-{
-	// Either the current frame is in progress, or has been emptied.
-	// AdvanceFrameIterator() establishes this assertion by emptying a
-	// frame as soon as it finishes.
-	assert(this->frame.empty() || !FrameFinished());
+	auto samples = bytes / this->bytes_per_sample;
 
-	bool more_frames_available = true;
+	// Only transfer as many samples as the ring buffer can take.
+	auto count = std::min(samples, this->ring_buf.WriteCapacity());
 
-	if (FrameFinished()) {
-		AudioDecoder::DecodeResult result = this->av.Decode();
+	unsigned long written_count = this->ring_buf.Write(&*start, count);
+	// Since we never write more than the ring buffer can take, the written
+	// count should equal the requested written count.
+	assert(written_count == count);
 
-		this->frame = result.second;
-		this->frame_iterator = this->frame.begin();
-
-		more_frames_available = result.first !=
-		                        AudioDecoder::DecodeState::END_OF_FILE;
-	}
-
-	return more_frames_available;
-}
-
-bool AudioOutput::FileEnded()
-{
-	return this->file_ended;
-}
-
-void AudioOutput::WriteAllAvailableToRingBuffer()
-{
-	std::uint64_t count = RingBufferTransferCount();
-
-	// Don't bother scheduling a write for no samples.
-	if (0 < count) {
-		WriteToRingBuffer(count);
-	}
-}
-
-void AudioOutput::WriteToRingBuffer(std::uint64_t sample_count)
-{
-	// This should have been established by WriteAllAvailableToRingBuffer.
-	assert(0 < sample_count);
-
-	std::uint64_t written_count = this->ring_buf.Write(
-	                &(*this->frame_iterator), sample_count);
-
-	// The written count should be the same as the sample count, because
-	// WriteAllAvailableToRingBuffer establishes that the sample count is
-	// never higher than the ring buffer's current capacity.
-	if (written_count != sample_count) {
-		throw InternalError(MSG_OUTPUT_RINGWRITE);
-	}
-	assert(0 < written_count);
-
-	AdvanceFrameIterator(written_count);
-}
-
-bool AudioOutput::FrameFinished()
-{
-	return this->frame.end() <= this->frame_iterator;
-}
-
-void AudioOutput::AdvanceFrameIterator(std::uint64_t sample_count)
-{
-	// The iterator operates on bytes, not samples, so we need to get the
-	// number of bytes to advance the iterator by.
-	auto byte_count = ByteCountForSampleCount(sample_count);
-	assert(sample_count <= byte_count);
-	assert(0 < byte_count);
-
-	std::advance(this->frame_iterator, byte_count);
-
-	// We empty the frame once we're done with it.  This
-	// maintains FrameFinished(), as an empty frame is a finished one.
-	if (FrameFinished()) {
-		ClearFrame();
-		assert(FrameFinished());
-	}
-
-	// The frame iterator should be somewhere between the beginning and
-	// end of the frame, unless the frame was emptied.
-	assert(this->frame.empty() ||
-	       (this->frame.begin() < this->frame_iterator &&
-	        this->frame_iterator < this->frame.end()));
-}
-
-std::uint64_t AudioOutput::RingBufferWriteCapacity()
-{
-	return this->ring_buf.WriteCapacity();
-}
-
-std::uint64_t AudioOutput::RingBufferReadCapacity()
-{
-	return this->ring_buf.ReadCapacity();
-}
-
-std::uint64_t AudioOutput::RingBufferTransferCount()
-{
-	assert(!this->frame.empty());
-
-	// How many bytes are left in the current frame?
-	long bytes = std::distance(this->frame_iterator, this->frame.end());
-	assert(0 <= bytes);
-
-	std::uint64_t samples = SampleCountForByteCount(
-	                static_cast<std::uint64_t>(bytes));
-	return std::min(samples, RingBufferWriteCapacity());
+	start += (written_count * this->bytes_per_sample);
+	assert(start <= end);
 }
 
 int AudioOutput::paCallbackFun(const void *, void *out,
@@ -258,13 +149,14 @@ PlayCallbackStepResult AudioOutput::PlayCallbackFailure(
 {
 	decltype(in) result;
 
-	if (FileEnded()) {
-		// End of file is ok, it means the stream can finish.
-		result = std::make_pair(paComplete, in.second);
-	} else {
+	if (InputReady()) {
+		// There's been some sort of genuine issue.
 		// Make up some silence to plug the gap.
-		memset(out, 0, ByteCountForSampleCount(frames_per_buf));
+		memset(out, 0, this->bytes_per_sample * frames_per_buf);
 		result = std::make_pair(paContinue, frames_per_buf);
+	} else {
+		// End of input is ok, it means the stream can finish.
+		result = std::make_pair(paComplete, in.second);
 	}
 
 	return result;

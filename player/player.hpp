@@ -22,7 +22,7 @@
 #include <string>
 #include <utility>
 
-#include "../audio/audio_output.hpp"
+#include "../audio/audio.hpp"
 #include "../time_parser.hpp"
 
 #include "player_position.hpp"
@@ -67,7 +67,7 @@ private:
 	const AudioSystem &audio_system;
 	const TP &time_parser;
 
-	std::unique_ptr<AudioOutput> audio;
+	std::unique_ptr<Audio> audio;
 
 	PlayerPosition position;
 

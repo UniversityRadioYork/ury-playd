@@ -66,7 +66,7 @@ std::uint8_t AudioDecoder::ChannelCount() const
 
 size_t AudioDecoder::BufferSampleCapacity() const
 {
-	return SampleCountForByteCount(this->buffer.size());
+	return this->buffer.size() / this->BytesPerSample();
 }
 
 double AudioDecoder::SampleRate() const
@@ -74,7 +74,7 @@ double AudioDecoder::SampleRate() const
 	return (double)this->stream->codec->sample_rate;
 }
 
-std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
+std::uint64_t AudioDecoder::SamplePositionFromMicroseconds(
                 std::chrono::microseconds usec) const
 {
 	// The sample rate is expressed in terms of samples per second, so we
@@ -86,33 +86,22 @@ std::uint64_t AudioDecoder::SampleCountForPositionMicroseconds(
 	                .count();
 }
 
-std::chrono::microseconds AudioDecoder::PositionMicrosecondsForSampleCount(
-                std::uint64_t samples) const
+std::chrono::microseconds AudioDecoder::MicrosecondPositionFromSamples(
+	std::uint64_t samples) const
 {
-	// This is basically SampleCountForPositionMicroseconds but backwards.
+	// This is basically SamplePositionFromMicroseconds but backwards.
 
 	auto position_secs = std::chrono::seconds(samples) / SampleRate();
 	return std::chrono::duration_cast<std::chrono::microseconds>(
-	                position_secs);
-}
-
-std::uint64_t AudioDecoder::SampleCountForByteCount(std::uint64_t bytes) const
-{
-	return (bytes / ChannelCount()) / BytesPerSample();
-}
-
-std::uint64_t AudioDecoder::ByteCountForSampleCount(std::uint64_t samples) const
-{
-	return (samples * ChannelCount()) * BytesPerSample();
+		position_secs);
 }
 
 size_t AudioDecoder::BytesPerSample() const
 {
-	return av_get_bytes_per_sample(this->resampler->AVOutputFormat());
+	return ChannelCount() * av_get_bytes_per_sample(this->resampler->AVOutputFormat());
 }
 
-void AudioDecoder::SeekToPositionMicroseconds(
-                std::chrono::microseconds position)
+std::uint64_t AudioDecoder::Seek(std::chrono::microseconds position)
 {
 	// FFmpeg doesn't use microseconds for its seek positions, so we need to
 	// convert into its own units.
@@ -126,6 +115,8 @@ void AudioDecoder::SeekToPositionMicroseconds(
 	// confused.
 	this->decode_state = DecodeState::WAITING_FOR_FRAME;
 	InitialisePacket();
+
+	return SamplePositionFromMicroseconds(position);
 }
 
 std::int64_t AudioDecoder::AvPositionFromMicroseconds(
@@ -301,7 +292,7 @@ void AudioDecoder::InitialiseResampler()
 	Resampler *rs;
 	AVCodecContext *codec = this->stream->codec;
 
-	// The AudioOutput can only handle packed sample data.
+	// The Audio can only handle packed sample data.
 	// If we're using a sample format that is planar, we need to resample it
 	// into a packed format.  This is done with the PlanarResampler.
 	// Otherwise, we pass it through the (dummy) PackedResampler.
@@ -315,7 +306,9 @@ void AudioDecoder::InitialiseResampler()
 
 bool AudioDecoder::UsingPlanarSampleFormat()
 {
-	return av_sample_fmt_is_planar(this->stream->codec->sample_fmt);
+	// The docs for this function explicitly mention a return value of 1 for
+	// planar, 0 for packed.
+	return av_sample_fmt_is_planar(this->stream->codec->sample_fmt) == 1;
 }
 
 bool AudioDecoder::DecodePacket()
