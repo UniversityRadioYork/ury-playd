@@ -79,7 +79,6 @@ protected:
 	 */
 	ResultVector MakeFrameVector(char *start, int channels, int samples);
 
-	SampleByteCount bytes_per_sample; ///< Bytes in one output sample.
 	AVSampleFormat output_format;     ///< ffmpeg output format.
 };
 
