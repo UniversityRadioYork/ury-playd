@@ -33,7 +33,7 @@ const std::chrono::nanoseconds IoReactor::PLAYER_UPDATE_PERIOD(1000);
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler,
 	const std::string &address, const std::string &port)
-	: player(player), handler(handler), io_service(), signals(io_service), acceptor(io_service), manager(), reactor_running(true), new_connection()
+	: player(player), handler(handler), io_service(), acceptor(io_service), signals(io_service), manager(), reactor_running(true), new_connection()
 {
 	InitSignals();
 	InitAcceptor(address, port);

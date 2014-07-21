@@ -43,7 +43,7 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	Audio::Audio(AudioSource *source, AudioSink *sink);
+	Audio(AudioSource *source, AudioSink *sink);
 
 	/**
 	 * Starts playback of this audio file.
@@ -150,10 +150,10 @@ private:
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
 
-	bool Audio::DecodeIfFrameEmpty();
+	bool DecodeIfFrameEmpty();
 
 	/// Transfers as much of the current frame as possible to the sink.
-	void Audio::TransferFrame();
+	void TransferFrame();
 };
 
 #endif // PS_AUDIO_HPP

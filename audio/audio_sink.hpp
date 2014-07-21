@@ -19,9 +19,7 @@
 
 #include "portaudio.h"
 #include "portaudiocpp/CallbackInterface.hxx"
-namespace portaudio {
-class Stream;
-}
+#include "portaudiocpp/Stream.hxx"
 
 #include "audio_source.hpp"
 #include "audio_resample.hpp"
@@ -111,7 +109,7 @@ public:
 	 * @param ready True if there is input ready; false otherwise.
 	 * @see InputReady
 	 */
-	void AudioSink::SetInputReady(bool ready);
+	void SetInputReady(bool ready);
 
 	/**
 	 * Transfers a range of sample bytes into the AudioSink.

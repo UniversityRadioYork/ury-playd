@@ -13,6 +13,7 @@ extern "C" {
 #include "../contrib/pa_ringbuffer.h"
 }
 
+#include "../errors.hpp"
 #include "../messages.h"
 
 /**
@@ -44,7 +45,7 @@ public:
 		                static_cast<ring_buffer_size_t>(1 << power),
 		                this->buffer);
 		if (init_result != 0) {
-			throw InternalError(MSG_OUTPUT_RINGINIT);
+			throw new InternalError(MSG_OUTPUT_RINGINIT);
 		}
 	}
 

@@ -137,12 +137,13 @@ private:
 
 	int stream_id; ///< The ID of the input file's audio stream to decode.
 
+	std::vector<uint8_t> buffer;          ///< The decoding buffer.
+
 	AVStream *stream;                     ///< The FFmpeg stream being decoded.
 	AVFormatContext *context;             ///< The input codec context.
 	AVPacket packet;                      ///< The last undecoded packet.
 	AVFrame *frame;                       ///< The last decoded frame.
 
-	std::vector<uint8_t> buffer;          ///< The decoding buffer.
 	std::unique_ptr<Resampler> resampler; ///< The resampler.
 
 	void Open(const std::string &path);

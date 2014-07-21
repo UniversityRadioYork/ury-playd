@@ -189,18 +189,18 @@ private:
 	 */
 	void HandleCommand(const std::string &line);
 
-	/// The object responsible for managing live connections.
-	TcpConnectionManager manager;
-
 	Player &player;                     ///< The player.
 	CommandHandler &handler;            ///< The command handler.
 	boost::asio::io_service io_service; ///< The ASIO IO service.
 
+	/// The acceptor used to listen for incoming connections.
+	boost::asio::ip::tcp::acceptor acceptor;
+
 	/// The signal set used to shut the server down on terminations.
 	boost::asio::signal_set signals;
 
-	/// The acceptor used to listen for incoming connections.
-	boost::asio::ip::tcp::acceptor acceptor;
+	/// The object responsible for managing live connections.
+	TcpConnectionManager manager;
 
 	/// True when the reactor is running.
 	bool reactor_running;
