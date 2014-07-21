@@ -22,20 +22,11 @@ class Responder;
  */
 class PlayerPosition {
 public:
-	/**
-	 * Unit used for positions.
-	 */
+	/// Unit used for positions.
 	using Unit = std::chrono::microseconds;
-
-	/**
-	 * Type for position listeners.
-	 * @see RegisterListener
-	 */
-	using Listener = std::function<void(Unit)>;
-
 private:
 	/// The vector of callbacks to fire when the position updates.
-	std::vector<Listener> listeners;
+	std::vector<std::reference_wrapper<Responder>> listeners;
 
 	/// The period between each firing of the listeners.
 	Unit period;
@@ -56,14 +47,14 @@ public:
 	PlayerPosition();
 
 	/**
-	 * Registers a position listener.
-	 * This listener is sent the current song position, in microseconds,
-	 * every time the PlayerPosition reaches its internal listener firing
-	 * period.
+	 * Registers a Responder as a position listener.
+	 * This listener is sent a TIME response containing the current song
+	 * position, in microseconds, every time the PlayerPosition reaches its
+	 * internal listener firing period.
 	 * @param listener The listener callback.
 	 * @see SetListenerPeriod
 	 */
-	void RegisterListener(PlayerPosition::Listener listener);
+	void RegisterListener(Responder &listener);
 
 	/**
 	 * Sets the period between position signals.

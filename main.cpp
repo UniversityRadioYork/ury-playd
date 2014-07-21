@@ -60,13 +60,7 @@ std::string Playslave::DeviceID()
 void Playslave::RegisterListeners()
 {
 	this->player.SetPositionListenerPeriod(POSITION_PERIOD);
-	this->player.RegisterPositionListener([this](
-	                std::chrono::microseconds position) {
-		std::ostringstream os;
-		os << position.count();
-
-		this->io->Respond(Response::TIME, os.str());
-	});
+	this->player.RegisterPositionListener(*this->io);
 	this->player.RegisterStateListener([this](Player::State old_state,
 	                                          Player::State new_state) {
 		std::ostringstream os;

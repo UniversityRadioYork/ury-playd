@@ -163,7 +163,7 @@ public:
 	 * roughly every @a period microseconds.
 	 * @param listener The listener callback.
 	 */
-	void RegisterPositionListener(PlayerPosition::Listener listener);
+	void RegisterPositionListener(Responder &listener);
 
 	/**
 	 * Sets the period between position signals.
