@@ -78,9 +78,7 @@ void IoReactor::DoUpdateTimer()
 	boost::asio::high_resolution_timer t(this->io_service, tick);
 	t.async_wait([this](boost::system::error_code) {
 		this->player.Update();
-		if (this->reactor_running) {
-			DoUpdateTimer();
-		}
+		DoUpdateTimer();
 	});
 }
 
@@ -119,9 +117,9 @@ void IoReactor::RespondRaw(const std::string &string)
 
 void IoReactor::End()
 {
-	this->reactor_running = false;
 	this->acceptor.close();
 	this->manager.StopAll();
+	this->io_service.stop();
 }
 
 //
@@ -158,11 +156,13 @@ boost::asio::ip::tcp::socket &TcpConnection::Socket() { return socket; }
 
 void TcpConnection::DoRead()
 {
+	// This is needed to keep the TcpConnection alive while it performs the
+	// read.  Otherwise, it'd be destructed as soon as it goes out of the
+	// connection manager's list and cause illegal memory accesses.
 	auto self(shared_from_this());
 
 	boost::asio::async_read_until(socket, data, "\n",
-		[this](const boost::system::error_code &
-		ec,
+		[this, self](const boost::system::error_code &ec,
 		std::size_t) {
 		if (!ec) {
 			std::istream is(&data);
@@ -178,9 +178,6 @@ void TcpConnection::DoRead()
 			this->cmd(s);
 
 			DoRead();
-		}
-		else if (ec == boost::asio::error::bad_descriptor) {
-			this->manager.Unregister(shared_from_this());
 		}
 		else if (ec != boost::asio::error::operation_aborted) {
 			this->manager.Stop(shared_from_this());
@@ -209,9 +206,14 @@ void TcpConnection::Send(const std::string &string)
 
 void TcpConnection::DoWrite()
 {
+	// This is needed to keep the TcpConnection alive while it performs the
+	// write.  Otherwise, it'd be destructed as soon as it goes out of the
+	// connection manager's list and cause illegal memory accesses.
+	auto self(shared_from_this());
+
 	const std::string &string = this->outbox[0];
 	// This is called after the write has finished.
-	auto write_cb = [this](const boost::system::error_code &ec, std::size_t) {
+	auto write_cb = [this, self](const boost::system::error_code &ec, std::size_t) {
 		if (!ec) {
 			this->outbox.pop_front();
 			// Keep writing until and unless the outbox is emptied.
@@ -220,7 +222,7 @@ void TcpConnection::DoWrite()
 				DoWrite();
 			}
 		}
-		else if (ec != boost::asio::error::operation_aborted && !this->closing) {
+		else if (ec != boost::asio::error::operation_aborted) {
 			this->manager.Stop(shared_from_this());
 		}
 	};
@@ -251,6 +253,7 @@ void TcpConnectionManager::Start(TcpConnection::Pointer c)
 void TcpConnectionManager::Stop(TcpConnection::Pointer c)
 {
 	c->Stop();
+	this->connections.erase(c);
 }
 
 void TcpConnectionManager::StopAll()
@@ -258,8 +261,7 @@ void TcpConnectionManager::StopAll()
 	for (auto c : this->connections) {
 		c->Stop();
 	}
-	// Don't clear out the connections here; wait for them to be
-	// destructed when the IoReactor finishes.
+	this->connections.clear();
 }
 
 void TcpConnectionManager::Send(const std::string &string)
@@ -268,8 +270,4 @@ void TcpConnectionManager::Send(const std::string &string)
 	for (auto c : this->connections) {
 		c->Send(string);
 	}
-}
-void TcpConnectionManager::Unregister(TcpConnection::Pointer c)
-{
-	this->connections.erase(c);
 }

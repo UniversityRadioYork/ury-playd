@@ -126,12 +126,6 @@ public:
 	void StopAll();
 
 	/**
-	 * Unregisters a TcpConnection with this manager.
-	 * @param c A shared pointer to the TcpConnection.
-	 */
-	void Unregister(TcpConnection::Pointer c);
-
-	/**
 	* Sends a message to all connections.
 	* @param string The message to send.
 	*/
