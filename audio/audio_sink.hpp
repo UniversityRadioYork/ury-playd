@@ -133,12 +133,6 @@ private:
 
 	Resampler::SampleByteCount bytes_per_sample; ///< Number of bytes in one sample.
 
-	/// Whether the current run of the audio playback stream has not yet
-	/// successfully read its first set of samples from the buffer.
-	bool just_started;
-
-	bool input_ready; ///< Whether there is input ready for this sink.
-
 	/// The ring buffer used to transfer samples to the playing callback.
 	RingBuffer<char, unsigned long> ring_buf;
 
@@ -147,6 +141,13 @@ private:
 
 	/// The current position, in samples.
 	std::uint64_t position_sample_count;
+
+	/// Whether the current run of the audio playback stream has not yet
+	/// successfully read its first set of samples from the buffer.
+	bool just_started;
+
+	/// Whether there is input ready for this sink.
+	bool input_ready;
 
 	/**
 	 * The callback proper.

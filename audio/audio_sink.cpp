@@ -27,7 +27,9 @@ const size_t AudioSink::RINGBUF_POWER = 16;
 AudioSink::AudioSink(const StreamConfigurator c, Resampler::SampleByteCount bytes_per_sample)
 	: bytes_per_sample(bytes_per_sample),
 	ring_buf(RINGBUF_POWER, bytes_per_sample),
-	position_sample_count(0)
+	position_sample_count(0),
+	just_started(false),
+	input_ready(false)
 {
 	this->stream = decltype(this->stream)(c(*this));
 }

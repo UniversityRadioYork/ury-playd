@@ -98,7 +98,8 @@ std::chrono::microseconds AudioSource::MicrosecondPositionFromSamples(
 
 size_t AudioSource::BytesPerSample() const
 {
-	return ChannelCount() * av_get_bytes_per_sample(this->resampler->AVOutputFormat());
+	size_t bps = av_get_bytes_per_sample(this->resampler->AVOutputFormat());
+	return ChannelCount() * bps;
 }
 
 std::uint64_t AudioSource::Seek(std::chrono::microseconds position)
