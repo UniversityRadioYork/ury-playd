@@ -13,26 +13,10 @@
 #include "cmd.hpp"
 #include "io/io_responder.hpp"
 #include "io/io_reactor.hpp"
-#include "io/io_reactor_tcp.hpp"
 #include "messages.h"
 #include "player/player.hpp"
 #include "audio/audio_system.hpp"
 #include "main.hpp"
-
-#include <boost/asio.hpp>
-#if defined(_WIN32)
-
-#define HAVE_STD_IO_REACTOR
-#include "io/io_reactor_win.hpp"
-using StdIoReactor = WinIoReactor;
-
-#elif defined(BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR)
-
-#include "io/io_reactor_posix.hpp"
-#define HAVE_STD_IO_REACTOR
-using StdIoReactor = PosixIoReactor;
-
-#endif
 
 /**
  * The main entry point.
@@ -81,7 +65,7 @@ void Playslave::RegisterListeners()
 		std::ostringstream os;
 		os << position.count();
 		
-		io->Respond(Response::TIME, os.str());
+		this->io->Respond(Response::TIME, os.str());
 	});
 	this->player.RegisterStateListener([this](Player::State old_state,
 	                                          Player::State new_state) {
@@ -89,10 +73,10 @@ void Playslave::RegisterListeners()
 		os << Player::StateString(old_state);
 		os << " ";
 		os << Player::StateString(new_state);
-		io->Respond(Response::STAT, os.str());
+		this->io->Respond(Response::STAT, os.str());
 
 		if (new_state == Player::State::QUITTING) {
-			io->End();
+			this->io->End();
 		}
 	});
 }
@@ -125,20 +109,11 @@ Playslave::Playslave(int argc, char *argv[])
 
 	RegisterCommands(&this->player);
 
-	IoReactor *io = nullptr;
-	if (this->arguments.size() == 4) {
-		io = new TcpIoReactor(this->player, this->handler,
-		                      this->arguments.at(2),
-		                      this->arguments.at(3));
-	} else {
-#ifdef HAVE_STD_IO_REACTOR
-		io = new StdIoReactor(this->player, this->handler);
-#else
-		throw Error("Cannot use standard IO, not supported on this "
-		            "platform.");
-#endif // HAVE_STD_IO_REACTOR
-	}
-	this->io = decltype(this->io)(io);
+	auto size = this->arguments.size();
+
+	this->io = decltype(this->io)(new IoReactor(this->player, this->handler,
+		2 < size ? this->arguments.at(2) : "0.0.0.0",
+		3 < size ? this->arguments.at(3) : "1350"));
 }
 
 void Playslave::RegisterCommands(Player *p)

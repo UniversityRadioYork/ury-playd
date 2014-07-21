@@ -3,12 +3,8 @@
 
 /**
  * @file
- * Declaration of the IoReactor abstract class.
+ * Declaration of the IoReactor class.
  * @see io/io_reactor.cpp
- * @see io/io_reactor_asio.hpp
- * @see io/io_reactor_asio.cpp
- * @see io/io_reactor_std.hpp
- * @see io/io_reactor_std.cpp
  */
 
 #ifndef PS_IO_REACTOR_HPP
@@ -17,9 +13,133 @@
 #include <chrono>
 #include <boost/asio.hpp>
 #include "io_responder.hpp"
+#include <deque>          // std::deque
+#include <functional>     // std::function
+#include <ostream>        // std::ostream
+#include <set>            // std::set
+#include "io_reactor.hpp" // IoReactor
 
 class Player;
 class CommandHandler;
+
+#include <boost/asio.hpp>
+#include <boost/enable_shared_from_this.hpp>
+
+class Player;
+class CommandHandler;
+
+class TcpConnectionManager;
+
+/**
+* A connection using the TCP server.
+*/
+class TcpConnection : public std::enable_shared_from_this<TcpConnection>,
+	public Responder {
+public:
+	/// A shared pointer to a TcpConnection.
+	using Pointer = std::shared_ptr<TcpConnection>;
+
+	/**
+	* Creates a new TcpConnection.
+	* @param cmd A function that sends a command line to be handled.
+	* @param manager The manager that is handling this connection.
+	* @param io_service The IO service to be used for this connection.
+	* @return A TcpConnection.
+	*/
+	explicit TcpConnection(std::function<void(const std::string &)> cmd,
+		TcpConnectionManager &manager,
+		boost::asio::io_service &io_service);
+
+	/// Deleted copy constructor.
+	TcpConnection(const TcpConnection &) = delete;
+
+	/// Deleted copy-assignment.
+	TcpConnection &operator=(const TcpConnection &) = delete;
+
+	/**
+	* Starts this TcpConnection.
+	*/
+	void Start();
+
+	/**
+	* Stops this TcpConnection.
+	*/
+	void Stop();
+
+	/**
+	* Sends a message to this connection.
+	* @param string The message to send.
+	*/
+	void Send(const std::string &string);
+
+	/**
+	* Gets the socket to which this connection is attached.
+	* @return A reference to the TCP socket.
+	*/
+	boost::asio::ip::tcp::socket &Socket();
+
+protected:
+	void RespondRaw(const std::string &string) override;
+
+private:
+	void DoRead();
+	void DoWrite();
+
+	boost::asio::ip::tcp::socket socket;
+	boost::asio::streambuf data;
+	boost::asio::io_service::strand strand;
+	std::deque<std::string> outbox;
+	std::function<void(const std::string &)> cmd;
+	TcpConnectionManager &manager;
+
+	bool closing;
+};
+
+/**
+* A manager for TcpConnection objects.
+*/
+class TcpConnectionManager {
+public:
+	/// Deleted copy constructor.
+	TcpConnectionManager(const TcpConnectionManager &) = delete;
+
+	/// Deleted copy-assignment.
+	TcpConnectionManager &operator=(const TcpConnectionManager &) = delete;
+
+	explicit TcpConnectionManager();
+
+	/**
+	* Starts a TcpConnection, registering it with this manager.
+	* @param c A shared pointer to the TcpConnection.
+	*/
+	void Start(TcpConnection::Pointer c);
+
+	/**
+	* Stops a TcpConnection, unregistering it with this manager.
+	* @param c A shared pointer to the TcpConnection.
+	*/
+	void Stop(TcpConnection::Pointer c);
+
+	/**
+	* Stops and unregisters all connections.
+	*/
+	void StopAll();
+
+	/**
+	 * Unregisters a TcpConnection with this manager.
+	 * @param c A shared pointer to the TcpConnection.
+	 */
+	void Unregister(TcpConnection::Pointer c);
+
+	/**
+	* Sends a message to all connections.
+	* @param string The message to send.
+	*/
+	void Send(const std::string &string);
+
+private:
+	std::set<TcpConnection::Pointer> connections;
+};
 
 /**
  * The IO reactor, which services input, routes responses, and executes the
@@ -32,8 +152,18 @@ public:
 	 * @param player The player to which periodic update requests shall be
 	 *   sent.
 	 * @param handler The handler to which command inputs shall be sent.
+	 * @param address The address to which IoReactor will bind.
+	 * @param port The port on which IoReactor will listen for clients.
 	 */
-	IoReactor(Player &player, CommandHandler &handler);
+	explicit IoReactor(Player &player, CommandHandler &handler,
+		const std::string &address,
+		const std::string &port);
+
+	/// Deleted copy constructor.
+	IoReactor(const IoReactor &) = delete;
+
+	/// Deleted copy-assignment.
+	IoReactor &operator=(const IoReactor &) = delete;
 
 	/**
 	 * Runs the reactor.
@@ -46,12 +176,17 @@ public:
 	 * This should be called by the parent object when the player is
 	 * quitting.
 	 */
-	virtual void End();
+	void End();
 
-protected:
-	Player &player;                     ///< The player.
-	CommandHandler &handler;            ///< The command handler.
-	boost::asio::io_service io_service; ///< The ASIO IO service.
+private:
+	void RespondRaw(const std::string &string) override;
+	void DoAccept();
+	void InitAcceptor(const std::string &address, const std::string &port);
+	void DoUpdateTimer();
+	void InitSignals();
+
+	/// The period between player updates.
+	static const std::chrono::nanoseconds PLAYER_UPDATE_PERIOD;
 
 	/**
 	 * Sends a command to the command handler.
@@ -60,17 +195,23 @@ protected:
 	 */
 	void HandleCommand(const std::string &line);
 
-	virtual void RespondRaw(const std::string &string) override = 0;
+	/// The object responsible for managing live connections.
+	TcpConnectionManager manager;
 
-private:
-	void DoUpdateTimer();
-	void InitSignals();
-
-	/// The period between player updates.
-	static const std::chrono::nanoseconds PLAYER_UPDATE_PERIOD;
+	Player &player;                     ///< The player.
+	CommandHandler &handler;            ///< The command handler.
+	boost::asio::io_service io_service; ///< The ASIO IO service.
 
 	/// The signal set used to shut the server down on terminations.
 	boost::asio::signal_set signals;
+
+	/// The acceptor used to listen for incoming connections.
+	boost::asio::ip::tcp::acceptor acceptor;
+
+	/// True when the reactor is running.
+	bool reactor_running;
+
+	TcpConnection::Pointer new_connection;
 };
 
 #endif // PS_IO_REACTOR_HPP
