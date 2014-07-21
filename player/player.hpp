@@ -28,6 +28,7 @@
 #include "player_position.hpp"
 
 class AudioSystem;
+class Responder;
 
 /**
  * A player contains a loaded audio file and the state of its playback.
@@ -177,6 +178,13 @@ public:
 	 * @param listener The listener callback.
 	 */
 	void RegisterStateListener(StateListener listener);
+
+	/**
+	 * Sends welcome/current status information to a new client.
+	 * @param client An IO Responder to which messages to the client
+	 *   should be sent.
+	 */
+	void WelcomeClient(Responder &client);
 
 	/**
 	 * The human-readable name of the given player state.

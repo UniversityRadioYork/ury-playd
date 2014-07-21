@@ -8,7 +8,9 @@
  */
 
 #include <chrono>
+#include <sstream>
 #include "player.hpp"
+#include "../io/io_responder.hpp"
 
 // Player
 
@@ -57,6 +59,14 @@ void PlayerPosition::Reset()
 {
 	this->current = decltype(this->current)(0);
 	this->last = boost::none;
+}
+
+void PlayerPosition::Emit(Responder &target)
+{
+	std::ostringstream os;
+	os << this->current.count();
+
+	target.Respond(Response::TIME, os.str());
 }
 
 void PlayerPosition::Send()

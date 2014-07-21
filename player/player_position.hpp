@@ -15,6 +15,8 @@
 #include <set>
 #include <boost/optional.hpp>
 
+class Responder;
+
 /**
  * Tracker and broadcaster for the Player's current position in a song.
  */
@@ -87,6 +89,11 @@ public:
 	 */
 	void Reset();
 
+	/**
+	 * Emits the current position to a responder.
+	 * @param target The responder to which a TIME response shall be sent.
+	 */
+	void Emit(Responder &target);
 private:
 	/**
 	 * Figures out whether it's time to send a position signal.

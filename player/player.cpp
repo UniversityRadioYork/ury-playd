@@ -10,6 +10,7 @@
  */
 
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <cassert>
 
@@ -17,6 +18,8 @@
 #include "../audio/audio.hpp"
 #include "../audio/audio_system.hpp"
 #include "../errors.hpp"
+#include "../io/io_responder.hpp"
+#include "../messages.h"
 
 /// List of states in which some audio is loaded.
 const Player::StateList Player::AUDIO_LOADED_STATES = {State::PLAYING,
@@ -46,6 +49,17 @@ void Player::Update()
 void Player::OpenFile(const std::string &path)
 {
 	this->audio = decltype(this->audio)(this->audio_system.Load(path));
+}
+
+void Player::WelcomeClient(Responder &client)
+{
+        client.Respond(Response::OHAI, MSG_OHAI);
+
+        std::ostringstream os;
+        os << "None " << StateString(this->current_state);
+        client.Respond(Response::STAT, os.str());
+
+        this->position.Emit(client);
 }
 
 //

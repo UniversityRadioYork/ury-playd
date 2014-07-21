@@ -46,6 +46,9 @@ extern const std::map<Response, std::string> RESPONSES;
  */
 class Responder {
 public:
+	/// A type for callbacks taking a Responder.
+	using Callback = std::function<void(Responder &)>;
+
 	/**
 	 * Outputs a response.
 	 * @param code The response code to emit.

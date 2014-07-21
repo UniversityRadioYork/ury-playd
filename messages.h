@@ -45,7 +45,7 @@ const std::string MSG_OUTPUT_RINGWRITE = "Ring buffer write error";
 const std::string MSG_OUTPUT_RINGINIT = "Ring buffer init error";
 
 /// Message shown when a client connects to Playslave.
-const std::string MSG_OHAI = "URY playslave at your service";
+const std::string MSG_OHAI = "Playslave++";
 
 /// Message shown when a client disconnects from Playslave.
 const std::string MSG_TTFN = "Sleep now";

@@ -32,7 +32,8 @@
 const std::chrono::nanoseconds IoReactor::PLAYER_UPDATE_PERIOD(1000);
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler,
-                     const std::string &address, const std::string &port)
+                     const std::string &address, const std::string &port,
+                     Responder::Callback cb)
     : player(player),
       handler(handler),
       io_service(),
@@ -40,7 +41,8 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
       signals(io_service),
       manager(),
       reactor_running(true),
-      new_connection()
+      new_connection(),
+      new_client_callback(cb)
 {
 	InitSignals();
 	InitAcceptor(address, port);
@@ -50,9 +52,7 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
 
 void IoReactor::Run()
 {
-	Respond(Response::OHAI, MSG_OHAI);
 	io_service.run();
-	Respond(Response::TTFN, MSG_TTFN);
 }
 
 void IoReactor::HandleCommand(const std::string &line)
@@ -106,7 +106,8 @@ void IoReactor::DoAccept()
 {
 	auto cmd = [this](const std::string &line) { HandleCommand(line); };
 	this->new_connection.reset(new TcpConnection(cmd, this->manager,
-	                                             this->io_service));
+	                                             this->io_service,
+						     this->new_client_callback));
 	auto on_accept = [this](boost::system::error_code ec) {
 		if (!ec) {
 			this->manager.Start(this->new_connection);
@@ -136,19 +137,21 @@ void IoReactor::End()
 
 TcpConnection::TcpConnection(std::function<void(const std::string &)> cmd,
                              TcpConnectionManager &manager,
-                             boost::asio::io_service &io_service)
+                             boost::asio::io_service &io_service,
+                             Responder::Callback cb)
     : socket(io_service),
       strand(io_service),
       outbox(),
       cmd(cmd),
       manager(manager),
+      new_client_callback(cb),
       closing(false)
 {
 }
 
 void TcpConnection::Start()
 {
-	Respond(Response::OHAI, MSG_OHAI);
+	new_client_callback(*this);
 	DoRead();
 }
 

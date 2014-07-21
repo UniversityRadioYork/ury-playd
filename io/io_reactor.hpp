@@ -44,11 +44,13 @@ public:
 	 * @param cmd A function that sends a command line to be handled.
 	 * @param manager The manager that is handling this connection.
 	 * @param io_service The IO service to be used for this connection.
+	 * @param cb A callback to fire when the connection starts.
 	 * @return A TcpConnection.
 	 */
 	explicit TcpConnection(std::function<void(const std::string &)> cmd,
 	                       TcpConnectionManager &manager,
-	                       boost::asio::io_service &io_service);
+	                       boost::asio::io_service &io_service,
+		               Responder::Callback cb);
 
 	/// Deleted copy constructor.
 	TcpConnection(const TcpConnection &) = delete;
@@ -91,6 +93,7 @@ private:
 	std::deque<std::string> outbox;
 	std::function<void(const std::string &)> cmd;
 	TcpConnectionManager &manager;
+	Responder::Callback new_client_callback;
 
 	bool closing;
 };
@@ -148,9 +151,11 @@ public:
 	 * @param handler The handler to which command inputs shall be sent.
 	 * @param address The address to which IoReactor will bind.
 	 * @param port The port on which IoReactor will listen for clients.
+	 * @param cb The callback to fire when clients connect.
 	 */
 	explicit IoReactor(Player &player, CommandHandler &handler,
-	                   const std::string &address, const std::string &port);
+	                   const std::string &address, const std::string &port,
+	                   Responder::Callback cb);
 
 	/// Deleted copy constructor.
 	IoReactor(const IoReactor &) = delete;
@@ -205,6 +210,8 @@ private:
 	bool reactor_running;
 
 	TcpConnection::Pointer new_connection;
+
+	Responder::Callback new_client_callback;
 };
 
 #endif // PS_IO_REACTOR_HPP
