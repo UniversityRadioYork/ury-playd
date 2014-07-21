@@ -97,8 +97,8 @@ public:
 
 	/**
 	 * Returns the number of bytes for each sample this decoder outputs.
-	 * As the decoder returns packed samples, this includes the channel count
-	 * as a factor.
+	 * As the decoder returns packed samples, this includes the channel
+	 *   count as a factor.
 	 * @return The number of bytes per sample.
 	 */
 	size_t BytesPerSample() const;
@@ -111,14 +111,13 @@ public:
 	 */
 	std::uint64_t Seek(std::chrono::microseconds position);
 
-
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
 	 * @param position The song position, in microseconds.
 	 * @return The corresponding number of elapsed samples.
 	 */
 	std::uint64_t SamplePositionFromMicroseconds(
-		std::chrono::microseconds position) const;
+	                std::chrono::microseconds position) const;
 
 	/**
 	 * Converts an elapsed sample count to a position in microseconds.
@@ -126,7 +125,7 @@ public:
 	 * @return The corresponding song position, in microseconds.
 	 */
 	std::chrono::microseconds MicrosecondPositionFromSamples(
-		std::uint64_t samples) const;
+	                std::uint64_t samples) const;
 
 private:
 	/// The size of the internal decoding buffer, in bytes.
@@ -134,15 +133,14 @@ private:
 
 	DecodeState decode_state; ///< Current state of decoding.
 
-
 	int stream_id; ///< The ID of the input file's audio stream to decode.
 
-	std::vector<uint8_t> buffer;          ///< The decoding buffer.
+	std::vector<uint8_t> buffer; ///< The decoding buffer.
 
-	AVStream *stream;                     ///< The FFmpeg stream being decoded.
-	AVFormatContext *context;             ///< The input codec context.
-	AVPacket packet;                      ///< The last undecoded packet.
-	AVFrame *frame;                       ///< The last decoded frame.
+	AVStream *stream;         ///< The FFmpeg stream being decoded.
+	AVFormatContext *context; ///< The input codec context.
+	AVPacket packet;          ///< The last undecoded packet.
+	AVFrame *frame;           ///< The last decoded frame.
 
 	std::unique_ptr<Resampler> resampler; ///< The resampler.
 

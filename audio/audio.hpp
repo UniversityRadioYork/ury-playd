@@ -2,10 +2,10 @@
 // Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
 /**
-* @file
-* Declaration of the Audio class.
-* @see audio/audio.cpp
-*/
+ * @file
+ * Declaration of the Audio class.
+ * @see audio/audio.cpp
+ */
 
 #ifndef PS_AUDIO_HPP
 #define PS_AUDIO_HPP
@@ -20,7 +20,7 @@
 #include "portaudio.h"
 #include "portaudiocpp/CallbackInterface.hxx"
 namespace portaudio {
-	class Stream;
+class Stream;
 }
 
 #include "../ringbuffer/ringbuffer.hpp"
@@ -80,7 +80,7 @@ public:
 	 * Returns whether the current frame has been finished.
 	 * If this is true, then either the frame is empty, or all of the
 	 * samples in the frame have been fed to the ringbuffer.
-	 * @return  True if the frame is finished; false otherwise.
+	 * @return True if the frame is finished; false otherwise.
 	 */
 	bool FrameFinished();
 
@@ -88,7 +88,7 @@ public:
 	 * Returns whether the audio file has ended.
 	 * This does NOT mean that playback has ended; the ring buffer may still
 	 * have samples waiting to send to the audio library.
-	 * @return  True if there is no audio left to decode; false otherwise.
+	 * @return True if there is no audio left to decode; false otherwise.
 	 */
 	bool FileEnded();
 
@@ -100,7 +100,7 @@ public:
 	R CurrentPosition()
 	{
 		return std::chrono::duration_cast<R>(
-			CurrentPositionMicroseconds());
+		                CurrentPositionMicroseconds());
 	}
 
 	/**
@@ -119,7 +119,7 @@ public:
 	void SeekToPosition(R position)
 	{
 		SeekToPositionMicroseconds(std::chrono::duration_cast<
-			std::chrono::microseconds>(position));
+		                std::chrono::microseconds>(position));
 	}
 
 	/**

@@ -31,24 +31,24 @@ class CommandHandler;
 class TcpConnectionManager;
 
 /**
-* A connection using the TCP server.
-*/
+ * A connection using the TCP server.
+ */
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>,
-	public Responder {
+                      public Responder {
 public:
 	/// A shared pointer to a TcpConnection.
 	using Pointer = std::shared_ptr<TcpConnection>;
 
 	/**
-	* Creates a new TcpConnection.
-	* @param cmd A function that sends a command line to be handled.
-	* @param manager The manager that is handling this connection.
-	* @param io_service The IO service to be used for this connection.
-	* @return A TcpConnection.
-	*/
+	 * Creates a new TcpConnection.
+	 * @param cmd A function that sends a command line to be handled.
+	 * @param manager The manager that is handling this connection.
+	 * @param io_service The IO service to be used for this connection.
+	 * @return A TcpConnection.
+	 */
 	explicit TcpConnection(std::function<void(const std::string &)> cmd,
-		TcpConnectionManager &manager,
-		boost::asio::io_service &io_service);
+	                       TcpConnectionManager &manager,
+	                       boost::asio::io_service &io_service);
 
 	/// Deleted copy constructor.
 	TcpConnection(const TcpConnection &) = delete;
@@ -57,25 +57,25 @@ public:
 	TcpConnection &operator=(const TcpConnection &) = delete;
 
 	/**
-	* Starts this TcpConnection.
-	*/
+	 * Starts this TcpConnection.
+	 */
 	void Start();
 
 	/**
-	* Stops this TcpConnection.
-	*/
+	 * Stops this TcpConnection.
+	 */
 	void Stop();
 
 	/**
-	* Sends a message to this connection.
-	* @param string The message to send.
-	*/
+	 * Sends a message to this connection.
+	 * @param string The message to send.
+	 */
 	void Send(const std::string &string);
 
 	/**
-	* Gets the socket to which this connection is attached.
-	* @return A reference to the TCP socket.
-	*/
+	 * Gets the socket to which this connection is attached.
+	 * @return A reference to the TCP socket.
+	 */
 	boost::asio::ip::tcp::socket &Socket();
 
 protected:
@@ -96,8 +96,8 @@ private:
 };
 
 /**
-* A manager for TcpConnection objects.
-*/
+ * A manager for TcpConnection objects.
+ */
 class TcpConnectionManager {
 public:
 	/// Deleted copy constructor.
@@ -109,26 +109,26 @@ public:
 	explicit TcpConnectionManager();
 
 	/**
-	* Starts a TcpConnection, registering it with this manager.
-	* @param c A shared pointer to the TcpConnection.
-	*/
+	 * Starts a TcpConnection, registering it with this manager.
+	 * @param c A shared pointer to the TcpConnection.
+	 */
 	void Start(TcpConnection::Pointer c);
 
 	/**
-	* Stops a TcpConnection, unregistering it with this manager.
-	* @param c A shared pointer to the TcpConnection.
-	*/
+	 * Stops a TcpConnection, unregistering it with this manager.
+	 * @param c A shared pointer to the TcpConnection.
+	 */
 	void Stop(TcpConnection::Pointer c);
 
 	/**
-	* Stops and unregisters all connections.
-	*/
+	 * Stops and unregisters all connections.
+	 */
 	void StopAll();
 
 	/**
-	* Sends a message to all connections.
-	* @param string The message to send.
-	*/
+	 * Sends a message to all connections.
+	 * @param string The message to send.
+	 */
 	void Send(const std::string &string);
 
 private:
@@ -144,14 +144,13 @@ public:
 	/**
 	 * Constructs an IoReactor.
 	 * @param player The player to which periodic update requests shall be
-	 *   sent.
+	 * sent.
 	 * @param handler The handler to which command inputs shall be sent.
 	 * @param address The address to which IoReactor will bind.
 	 * @param port The port on which IoReactor will listen for clients.
 	 */
 	explicit IoReactor(Player &player, CommandHandler &handler,
-		const std::string &address,
-		const std::string &port);
+	                   const std::string &address, const std::string &port);
 
 	/// Deleted copy constructor.
 	IoReactor(const IoReactor &) = delete;

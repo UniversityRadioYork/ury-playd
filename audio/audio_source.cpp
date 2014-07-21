@@ -38,10 +38,10 @@ extern "C" {
 const size_t AudioSource::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 
 AudioSource::AudioSource(const std::string &path)
-	: decode_state(DecodeState::WAITING_FOR_FRAME),
-	buffer(BUFFER_SIZE),
-	context(nullptr),
-	frame(nullptr)
+    : decode_state(DecodeState::WAITING_FOR_FRAME),
+      buffer(BUFFER_SIZE),
+      context(nullptr),
+      frame(nullptr)
 {
 	Open(path);
 	InitialiseStream();
@@ -50,7 +50,8 @@ AudioSource::AudioSource(const std::string &path)
 	InitialiseResampler();
 }
 
-AudioSource::~AudioSource() {
+AudioSource::~AudioSource()
+{
 	if (this->context != nullptr) {
 		avformat_free_context(this->context);
 	}
@@ -87,13 +88,13 @@ std::uint64_t AudioSource::SamplePositionFromMicroseconds(
 }
 
 std::chrono::microseconds AudioSource::MicrosecondPositionFromSamples(
-	std::uint64_t samples) const
+                std::uint64_t samples) const
 {
 	// This is basically SamplePositionFromMicroseconds but backwards.
 
 	auto position_secs = std::chrono::seconds(samples) / SampleRate();
 	return std::chrono::duration_cast<std::chrono::microseconds>(
-		position_secs);
+	                position_secs);
 }
 
 size_t AudioSource::BytesPerSample() const
@@ -217,8 +218,14 @@ static const std::map<AVSampleFormat, SampleFormat> sf_from_av = {
  */
 SampleFormat AudioSource::OutputSampleFormat() const
 {
-	try { return sf_from_av.at(this->resampler->AVOutputFormat()); }
-	catch (std::out_of_range) { throw FileError(MSG_DECODE_BADRATE); }
+	try
+	{
+		return sf_from_av.at(this->resampler->AVOutputFormat());
+	}
+	catch (std::out_of_range)
+	{
+		throw FileError(MSG_DECODE_BADRATE);
+	}
 }
 
 void AudioSource::Open(const std::string &path)
@@ -226,7 +233,8 @@ void AudioSource::Open(const std::string &path)
 	this->context = nullptr;
 
 	// FFmpeg reports a file open error using a negative result here.
-	if (avformat_open_input(&this->context, path.c_str(), nullptr, nullptr) < 0) {
+	if (avformat_open_input(&this->context, path.c_str(), nullptr,
+	                        nullptr) < 0) {
 		std::ostringstream os;
 		os << "couldn't open " << path;
 		throw FileError(os.str());
@@ -251,8 +259,8 @@ void AudioSource::FindStreamInfo()
 void AudioSource::FindStreamAndInitialiseCodec()
 {
 	AVCodec *codec;
-	int stream = av_find_best_stream(this->context,
-	                                 AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
+	int stream = av_find_best_stream(this->context, AVMEDIA_TYPE_AUDIO, -1,
+	                                 -1, &codec, 0);
 
 	if (stream < 0) {
 		throw FileError(MSG_DECODE_NOSTREAM);
@@ -338,9 +346,9 @@ bool AudioSource::DecodePacket()
 std::pair<int, bool> AudioSource::AvCodecDecode()
 {
 	int frame_finished = 0;
-	int bytes_decoded = avcodec_decode_audio4(
-	                this->stream->codec, this->frame, &frame_finished,
-	                &this->packet);
+	int bytes_decoded =
+	                avcodec_decode_audio4(this->stream->codec, this->frame,
+	                                      &frame_finished, &this->packet);
 
 	return std::make_pair(bytes_decoded, frame_finished != 0);
 }

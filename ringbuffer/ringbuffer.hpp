@@ -18,10 +18,8 @@ extern "C" {
 
 /**
  * A ring buffer.
- *
  * This ring buffer is based on the PortAudio ring buffer, provided in the
  * contrib/ directory.
- *
  * This is stable and performs well, but, as it is C code, necessitates some
  * hoop jumping to integrate and could do with being replaced with a native
  * solution.
@@ -85,19 +83,15 @@ public:
 
 	/**
 	 * Writes samples from an array into the ring buffer.
-	 *
 	 * To write one sample, pass a count of 1 and take a pointer to the
 	 * sample variable.
-	 *
 	 * Note that start pointer is not constant.  This is because the
 	 * underlying implementation of the ring buffer might not guarantee
 	 * that the array is left untouched.
-	 *
 	 * @param start The start of the array buffer from which we read
 	 *   samples.  Must not be nullptr.
 	 * @param count The number of samples to write.  This must not exceed
 	 *   the minimum of WriteCapacity() and the length of the array.
-	 *
 	 * @return The number of samples written, which should not exceed count.
 	 */
 	SampleCountT Write(RepT *start, SampleCountT count)
@@ -109,15 +103,12 @@ public:
 
 	/**
 	 * Reads samples from the ring buffer into an array.
-	 *
 	 * To read one sample, pass a count of 1 and take a pointer to the
 	 * sample variable.
-	 *
 	 * @param start The start of the array buffer to which we write samples.
 	 *   Must not be nullptr.
 	 * @param count The number of samples to read.  This must not exceed the
 	 *   minimum of ReadCapacity() and the length of the array.
-	 *
 	 * @return The number of samples read, which should not exceed count.
 	 */
 	SampleCountT Read(RepT *start, SampleCountT count)
@@ -128,7 +119,10 @@ public:
 	}
 
 	/// Empties the ring buffer.
-	void Flush() { PaUtil_FlushRingBuffer(this->rb); }
+	void Flush()
+	{
+		PaUtil_FlushRingBuffer(this->rb);
+	}
 
 private:
 	char *buffer;         ///< The array used by the ringbuffer.
@@ -136,8 +130,8 @@ private:
 
 	/**
 	 * Converts a ring buffer size into an external size.
-	 * @param count  The size/count in PortAudio form.
-	 * @return       The size/count after casting to SampleCountT.
+	 * @param count The size/count in PortAudio form.
+	 * @return The size/count after casting to SampleCountT.
 	 */
 	SampleCountT CountCast(ring_buffer_size_t count) const
 	{

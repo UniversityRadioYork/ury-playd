@@ -64,7 +64,7 @@ void Playslave::RegisterListeners()
 	                std::chrono::microseconds position) {
 		std::ostringstream os;
 		os << position.count();
-		
+
 		this->io->Respond(Response::TIME, os.str());
 	});
 	this->player.RegisterStateListener([this](Player::State old_state,
@@ -111,9 +111,10 @@ Playslave::Playslave(int argc, char *argv[])
 
 	auto size = this->arguments.size();
 
-	this->io = decltype(this->io)(new IoReactor(this->player, this->handler,
-		2 < size ? this->arguments.at(2) : "0.0.0.0",
-		3 < size ? this->arguments.at(3) : "1350"));
+	this->io = decltype(this->io)(new IoReactor(
+	                this->player, this->handler,
+	                2 < size ? this->arguments.at(2) : "0.0.0.0",
+	                3 < size ? this->arguments.at(3) : "1350"));
 }
 
 void Playslave::RegisterCommands(Player *p)

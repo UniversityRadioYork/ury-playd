@@ -38,11 +38,14 @@ using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
  */
 class AudioSink : portaudio::CallbackInterface {
 public:
-	/// A function that configures and returns a stream, given this AudioSink.
-	using StreamConfigurator = std::function<portaudio::Stream *(portaudio::CallbackInterface &)>;
+	/// A function that configures and returns a stream, given this
+	/// AudioSink.
+	using StreamConfigurator = std::function<
+	                portaudio::Stream *(portaudio::CallbackInterface &)>;
 
 	/// Type of results emitted during the play callback step.
-	using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
+	using PlayCallbackStepResult =
+	                std::pair<PaStreamCallbackResult, unsigned long>;
 
 	/// Type of positions measured in samples.
 	using SamplePosition = std::uint64_t;
@@ -53,9 +56,11 @@ public:
 	/**
 	 * Constructs an AudioSink.
 	 * @param c A function that can configure PortAudio streams.
-	 * @param bytes_per_sample The number of bytes each audio sample occupies.
+	 * @param bytes_per_sample The number of bytes each audio sample
+	 * occupies.
 	 */
-	AudioSink(const StreamConfigurator c, Resampler::SampleByteCount bytes_per_sample);
+	AudioSink(const StreamConfigurator c,
+	          Resampler::SampleByteCount bytes_per_sample);
 
 	/**
 	 * Starts the audio stream.
@@ -115,13 +120,14 @@ public:
 	 * Transfers a range of sample bytes into the AudioSink.
 	 * The range may be empty, but must be valid.
 	 *
-	 * * Precondition: @a start <= @a end, @a start and @a end point to a valid
-	 *     contiguous block of sample bytes.
-	 * * Postcondition: @a start <= @a end, @a old(start) <= @a start, @a start
-	 *     and @a end point to a valid contiguous block of sample bytes.
+	 * * Precondition: @a start <= @a end, @a start and @a end point to a
+	 *     valid contiguous block of sample bytes.
+	 * * Postcondition: @a start <= @a end, @a old(start) <= @a start,
+	 *     @a *start and @a end point to a valid contiguous block of sample
+	 *     bytes.
 	 *
-	 * @param start An iterator denoting the start of the range.  This iterator
-	 *   will be advanced by the number of bytes accepted.
+	 * @param start An iterator denoting the start of the range.  This
+	 *   iterator will be advanced by the number of bytes accepted.
 	 * @param end An iterator denoting the end of the range.
 	 */
 	void Transfer(TransferIterator &start, const TransferIterator &end);
@@ -131,7 +137,8 @@ private:
 	/// @see RINGBUF_SIZE
 	static const size_t RINGBUF_POWER;
 
-	Resampler::SampleByteCount bytes_per_sample; ///< Number of bytes in one sample.
+	/// Number of bytes in one sample.
+	Resampler::SampleByteCount bytes_per_sample;
 
 	/// The ring buffer used to transfer samples to the playing callback.
 	RingBuffer<char, unsigned long> ring_buf;

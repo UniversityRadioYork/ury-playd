@@ -2,10 +2,10 @@
 // Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
 /**
-* @file
-* Implementation of the Audio class.
-* @see audio/audio.hpp
-*/
+ * @file
+ * Implementation of the Audio class.
+ * @see audio/audio.hpp
+ */
 
 #include <cassert>
 #include <climits>
@@ -21,9 +21,7 @@
 #include "audio_source.hpp"
 
 Audio::Audio(AudioSource *source, AudioSink *sink)
-	: source(source),
-	sink(sink),
-	position_sample_count(0)
+    : source(source), sink(sink), position_sample_count(0)
 {
 	ClearFrame();
 }
@@ -46,11 +44,10 @@ bool Audio::IsStopped()
 std::chrono::microseconds Audio::CurrentPositionMicroseconds()
 {
 	return this->source->MicrosecondPositionFromSamples(
-		this->sink->Position());
+	                this->sink->Position());
 }
 
-void Audio::SeekToPositionMicroseconds(
-	std::chrono::microseconds microseconds)
+void Audio::SeekToPositionMicroseconds(std::chrono::microseconds microseconds)
 {
 	auto samples = this->source->Seek(microseconds);
 	this->sink->SetPosition(samples);
@@ -93,8 +90,8 @@ void Audio::TransferFrame()
 	// The frame iterator should be somewhere between the beginning and
 	// end of the frame, unless the frame was emptied.
 	assert(this->frame.empty() ||
-		(this->frame.begin() <= this->frame_iterator &&
-		this->frame_iterator < this->frame.end()));
+	       (this->frame.begin() <= this->frame_iterator &&
+	        this->frame_iterator < this->frame.end()));
 }
 
 bool Audio::DecodeIfFrameEmpty()
@@ -113,7 +110,7 @@ bool Audio::DecodeIfFrameEmpty()
 		this->frame_iterator = this->frame.begin();
 
 		more_frames_available = result.first !=
-			AudioSource::DecodeState::END_OF_FILE;
+		                        AudioSource::DecodeState::END_OF_FILE;
 	}
 
 	return more_frames_available;

@@ -24,12 +24,13 @@
 
 const size_t AudioSink::RINGBUF_POWER = 16;
 
-AudioSink::AudioSink(const StreamConfigurator c, Resampler::SampleByteCount bytes_per_sample)
-	: bytes_per_sample(bytes_per_sample),
-	ring_buf(RINGBUF_POWER, bytes_per_sample),
-	position_sample_count(0),
-	just_started(false),
-	input_ready(false)
+AudioSink::AudioSink(const StreamConfigurator c,
+                     Resampler::SampleByteCount bytes_per_sample)
+    : bytes_per_sample(bytes_per_sample),
+      ring_buf(RINGBUF_POWER, bytes_per_sample),
+      position_sample_count(0),
+      just_started(false),
+      input_ready(false)
 {
 	this->stream = decltype(this->stream)(c(*this));
 }
@@ -71,8 +72,8 @@ void AudioSink::SetPosition(AudioSink::SamplePosition samples)
 	this->ring_buf.Flush();
 }
 
-
-void AudioSink::Transfer(AudioSink::TransferIterator &start, const AudioSink::TransferIterator &end)
+void AudioSink::Transfer(AudioSink::TransferIterator &start,
+                         const AudioSink::TransferIterator &end)
 {
 	// No point transferring 0 bytes.
 	if (start == end) {
@@ -100,9 +101,9 @@ void AudioSink::Transfer(AudioSink::TransferIterator &start, const AudioSink::Tr
 }
 
 int AudioSink::paCallbackFun(const void *, void *out,
-                               unsigned long frames_per_buf,
-                               const PaStreamCallbackTimeInfo *,
-                               PaStreamCallbackFlags)
+                             unsigned long frames_per_buf,
+                             const PaStreamCallbackTimeInfo *,
+                             PaStreamCallbackFlags)
 {
 	char *cout = static_cast<char *>(out);
 
@@ -115,9 +116,9 @@ int AudioSink::paCallbackFun(const void *, void *out,
 	return static_cast<int>(result.first);
 }
 
-PlayCallbackStepResult AudioSink::PlayCallbackStep(
-                char *out, unsigned long frames_per_buf,
-                PlayCallbackStepResult in)
+PlayCallbackStepResult AudioSink::PlayCallbackStep(char *out,
+                                                   unsigned long frames_per_buf,
+                                                   PlayCallbackStepResult in)
 {
 	unsigned long avail = this->ring_buf.ReadCapacity();
 	bool empty = avail == 0;
@@ -165,17 +166,19 @@ PlayCallbackStepResult AudioSink::PlayCallbackFailure(
 }
 
 unsigned long AudioSink::ReadSamplesToOutput(char *&output,
-                                               unsigned long output_capacity,
-                                               unsigned long buffered_count)
+                                             unsigned long output_capacity,
+                                             unsigned long buffered_count)
 {
-	// Transfer the maximum that we can offer to PortAudio without overshooting
+	// Transfer the maximum that we can offer to PortAudio without
+	// overshooting
 	// its sample request limit.
 	long transfer_sample_count = static_cast<long>(
 	                std::min({output_capacity, buffered_count,
 	                          static_cast<unsigned long>(LONG_MAX)}));
 	output += this->ring_buf.Read(output, transfer_sample_count);
 
-	// Update the position count so it reflects the last position that was sent
+	// Update the position count so it reflects the last position that was
+	// sent
 	// for playback (*not* the last position decoded).
 	this->position_sample_count += transfer_sample_count;
 	return transfer_sample_count;

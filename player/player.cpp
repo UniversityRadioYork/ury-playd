@@ -74,7 +74,8 @@ bool Player::Load(const std::string &path)
 		}
 		catch (Error &error)
 		{
-			// Ensure a load failure doesn't leave a corrupted track loaded.
+			// Ensure a load failure doesn't leave a corrupted track
+			// loaded.
 			Eject();
 			throw error;
 		}
@@ -106,8 +107,14 @@ bool Player::Seek(const std::string &time_str)
 		bool success = true;
 		std::chrono::microseconds position(0);
 
-		try { position = this->time_parser.Parse(time_str); }
-		catch (std::out_of_range) { success = false; }
+		try
+		{
+			position = this->time_parser.Parse(time_str);
+		}
+		catch (std::out_of_range)
+		{
+			success = false;
+		}
 
 		if (success) {
 			this->audio->SeekToPosition(position);

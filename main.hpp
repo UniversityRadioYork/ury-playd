@@ -30,8 +30,8 @@ class Playslave {
 public:
 	/**
 	 * Constructs a Playslave, initialising its libraries.
-	 * @param argc  The argument count from the main function.
-	 * @param argv  The argument vector from the main function.
+	 * @param argc The argument count from the main function.
+	 * @param argv The argument vector from the main function.
 	 */
 	Playslave(int argc, char *argv[]);
 
@@ -55,7 +55,7 @@ private:
 	/**
 	 * Tries to get the output device ID from stdin.
 	 * If there is no stdin, the program lists the available devices and
-	 *   dies.
+	 * dies.
 	 * @param system The audio system.
 	 * @param argc The program argument count (from main()).
 	 * @param argv The program argument vector (from main()).
@@ -65,7 +65,7 @@ private:
 
 	/**
 	 * Lists on stdout all sound devices to which the audio output may
-	 *   connect.
+	 * connect.
 	 * This is mainly for the benefit of the end user.
 	 */
 	void ListOutputDevices();

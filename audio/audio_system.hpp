@@ -57,37 +57,38 @@ public:
 
 	/**
 	 * Loads a file, creating an Audio for it.
-	 * @param path  The path to a file.
-	 * @return      The Audio for that file.
+	 * @param path The path to a file.
+	 * @return The Audio for that file.
 	 */
 	Audio *Load(const std::string &path) const;
 
 	/**
 	 * Sets the current device ID.
-	 * @param id  The device ID to use for subsequent Audios.
+	 * @param id The device ID to use for subsequent Audios.
 	 */
 	void SetDeviceID(const std::string &id);
 
 	/**
 	 * Performs a function on each device entry in the AudioSystem.
-	 * @param f  The function to call on each device.
+	 * @param f The function to call on each device.
 	 */
 	void OnDevices(std::function<void(const Device &)> f) const;
 
 	/**
 	 * Configures and returns a PortAudio stream.
-	 * @param channel_count The number of channels of the stream will receive.
-	 * @param sample_format The format of the samples the stream will receive.
+	 * @param channel_count The number of channels of the stream will
+	 *   receive.
+	 * @param sample_format The format of the samples the stream will
+	 *   receive.
 	 * @param sample_rate The rate of the samples the stream will receive.
 	 * @param buffer_size The size of the buffer the stream should allocate.
 	 * @param cb The object that PortAudio will call to receive audio.
 	 * @return The configured PortAudio stream.
 	 */
 	portaudio::Stream *Configure(std::uint8_t channel_count,
-		SampleFormat sample_format,
-		double sample_rate,
-		size_t buffer_size,
-		portaudio::CallbackInterface &cb) const;
+	                             SampleFormat sample_format,
+	                             double sample_rate, size_t buffer_size,
+	                             portaudio::CallbackInterface &cb) const;
 
 private:
 	std::string device_id; ///< The current device ID.
@@ -97,8 +98,8 @@ private:
 	 * @param id_string The device ID, as a string.
 	 * @return The device.
 	 */
-	const portaudio::Device &PaDeviceFrom(
-	                const std::string &id_string) const;
+	const portaudio::Device &PaDeviceFrom(const std::string &id_string)
+	                const;
 
 	/**
 	 * Converts a sample format identifier from playslave++ to PortAudio.

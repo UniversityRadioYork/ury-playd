@@ -47,7 +47,10 @@ AudioSystem::AudioSystem()
 	SetDeviceID("0");
 }
 
-AudioSystem::~AudioSystem() { portaudio::System::terminate(); }
+AudioSystem::~AudioSystem()
+{
+	portaudio::System::terminate();
+}
 
 void AudioSystem::OnDevices(std::function<void(const AudioSystem::Device &)> f)
                 const
@@ -69,23 +72,19 @@ Audio *AudioSystem::Load(const std::string &path) const
 {
 	auto source = new AudioSource(path);
 
-	AudioSink::StreamConfigurator config_fn = std::bind(&AudioSystem::Configure,
-		this,
-		source->ChannelCount(),
-		source->OutputSampleFormat(),
-		source->SampleRate(),
-		source->BufferSampleCapacity(),
-		std::placeholders::_1);
+	AudioSink::StreamConfigurator config_fn = std::bind(
+	                &AudioSystem::Configure, this, source->ChannelCount(),
+	                source->OutputSampleFormat(), source->SampleRate(),
+	                source->BufferSampleCapacity(), std::placeholders::_1);
 	auto sink = new AudioSink(config_fn, source->BytesPerSample());
 
 	return new Audio(source, sink);
 }
 
-portaudio::Stream *AudioSystem::Configure(std::uint8_t channel_count,
-										  SampleFormat sample_format,
-										  double sample_rate,
-										  size_t buffer_size,
-										  portaudio::CallbackInterface &cb) const
+portaudio::Stream *AudioSystem::Configure(
+                std::uint8_t channel_count, SampleFormat sample_format,
+                double sample_rate, size_t buffer_size,
+                portaudio::CallbackInterface &cb) const
 {
 	const portaudio::Device &device = PaDeviceFrom(this->device_id);
 
@@ -96,8 +95,7 @@ portaudio::Stream *AudioSystem::Configure(std::uint8_t channel_count,
 
 	portaudio::StreamParameters pars(
 	                portaudio::DirectionSpecificStreamParameters::null(),
-	                out_pars, sample_rate, buffer_size,
-	                paClipOff);
+	                out_pars, sample_rate, buffer_size, paClipOff);
 
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
@@ -129,6 +127,12 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(SampleFormat fmt)
                 const
 {
-	try { return pa_from_sf.at(fmt); }
-	catch (std::out_of_range) { throw FileError(MSG_DECODE_BADRATE); }
+	try
+	{
+		return pa_from_sf.at(fmt);
+	}
+	catch (std::out_of_range)
+	{
+		throw FileError(MSG_DECODE_BADRATE);
+	}
 }
