@@ -96,6 +96,7 @@
     <ClInclude Include="audio\audio_sink.hpp" />
     <ClInclude Include="audio\audio_resample.hpp" />
     <ClInclude Include="audio\audio_system.hpp" />
+    <ClInclude Include="audio\ringbuffer.hpp" />
     <ClInclude Include="cmd.hpp" />
     <ClInclude Include="contrib\pa_memorybarrier.h" />
     <ClInclude Include="contrib\pa_ringbuffer.h" />
@@ -107,7 +108,6 @@
     <ClInclude Include="player\player.hpp" />
     <ClInclude Include="player\player_position.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="ringbuffer\ringbuffer.hpp" />
     <ClInclude Include="sample_formats.hpp" />
     <ClInclude Include="swr.hpp" />
   </ItemGroup>

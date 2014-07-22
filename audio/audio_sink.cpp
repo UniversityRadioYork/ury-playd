@@ -20,7 +20,7 @@
 
 #include "audio_sink.hpp"
 
-#include "../ringbuffer/ringbuffer.hpp"
+#include "ringbuffer.hpp"
 
 const size_t AudioSink::RINGBUF_POWER = 16;
 

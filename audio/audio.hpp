@@ -23,8 +23,6 @@ namespace portaudio {
 class Stream;
 }
 
-#include "../ringbuffer/ringbuffer.hpp"
-
 class AudioSource;
 class AudioSink;
 

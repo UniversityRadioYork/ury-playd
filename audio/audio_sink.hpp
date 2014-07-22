@@ -23,7 +23,7 @@
 
 #include "audio_source.hpp"
 #include "audio_resample.hpp"
-#include "../ringbuffer/ringbuffer.hpp"
+#include "ringbuffer.hpp"
 
 /// Type of results emitted during the play callback step.
 using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
