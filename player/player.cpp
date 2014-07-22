@@ -54,11 +54,7 @@ void Player::OpenFile(const std::string &path)
 void Player::WelcomeClient(Responder &client)
 {
         client.Respond(Response::OHAI, MSG_OHAI);
-
-        std::ostringstream os;
-        os << "None " << StateString(this->current_state);
-        client.Respond(Response::STAT, os.str());
-
+        client.Respond(Response::STAT, StateString(this->current_state));
         this->position.Emit(client);
 }
 

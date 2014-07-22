@@ -63,11 +63,7 @@ void Playslave::RegisterListeners()
 	this->player.RegisterPositionListener(*this->io);
 	this->player.RegisterStateListener([this](Player::State old_state,
 	                                          Player::State new_state) {
-		std::ostringstream os;
-		os << Player::StateString(old_state);
-		os << " ";
-		os << Player::StateString(new_state);
-		this->io->Respond(Response::STAT, os.str());
+		this->io->Respond(Response::STAT, Player::StateString(new_state));
 
 		if (new_state == Player::State::QUITTING) {
 			this->io->End();
