@@ -86,6 +86,12 @@ bool Player::Load(const std::string &path)
 			Debug("Loaded ", path);
 			SetState(State::STOPPED);
 		}
+		catch (FileError &)
+		{
+			// File errors aren't fatal, so catch them here.
+			Eject();
+			valid = false;
+		}
 		catch (Error &error)
 		{
 			// Ensure a load failure doesn't leave a corrupted track
