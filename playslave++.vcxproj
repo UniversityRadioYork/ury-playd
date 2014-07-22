@@ -79,6 +79,7 @@
     <ClCompile Include="audio\audio_sink.cpp" />
     <ClCompile Include="audio\audio_resample.cpp" />
     <ClCompile Include="audio\audio_system.cpp" />
+    <ClCompile Include="audio\swr.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="contrib\pa_ringbuffer.c" />
     <ClCompile Include="errors.cpp" />
@@ -88,7 +89,6 @@
     <ClCompile Include="player\player.cpp" />
     <ClCompile Include="player\player_position.cpp" />
     <ClCompile Include="player\player_state.cpp" />
-    <ClCompile Include="swr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="audio\audio.hpp" />
@@ -97,6 +97,7 @@
     <ClInclude Include="audio\audio_resample.hpp" />
     <ClInclude Include="audio\audio_system.hpp" />
     <ClInclude Include="audio\ringbuffer.hpp" />
+    <ClInclude Include="audio\swr.hpp" />
     <ClInclude Include="cmd.hpp" />
     <ClInclude Include="contrib\pa_memorybarrier.h" />
     <ClInclude Include="contrib\pa_ringbuffer.h" />
@@ -109,7 +110,6 @@
     <ClInclude Include="player\player_position.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="sample_formats.hpp" />
-    <ClInclude Include="swr.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -18,7 +18,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-#include "../swr.hpp"
+#include "swr.hpp"
 
 /**
  * A class for performing resampling.

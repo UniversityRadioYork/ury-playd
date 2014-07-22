@@ -17,9 +17,8 @@ extern "C" {
 }
 
 #include "../errors.hpp"
-#include "../swr.hpp"
-
 #include "audio_resample.hpp"
+#include "swr.hpp"
 
 Resampler::Resampler(AVSampleFormat output_format)
     : output_format(output_format)
