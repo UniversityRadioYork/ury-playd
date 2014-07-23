@@ -40,7 +40,6 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
       acceptor(io_service),
       signals(io_service),
       manager(),
-      reactor_running(true),
       new_connection(),
       new_client_callback(cb)
 {

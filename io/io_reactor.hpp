@@ -206,9 +206,6 @@ private:
 	/// The object responsible for managing live connections.
 	TcpConnectionManager manager;
 
-	/// True when the reactor is running.
-	bool reactor_running;
-
 	TcpConnection::Pointer new_connection;
 
 	Responder::Callback new_client_callback;

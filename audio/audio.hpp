@@ -142,9 +142,6 @@ private:
 	/// The current position in the current decoded frame.
 	std::vector<char>::iterator frame_iterator;
 
-	/// The current position, in samples.
-	uint64_t position_sample_count;
-
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
 

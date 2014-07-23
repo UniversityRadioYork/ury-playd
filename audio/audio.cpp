@@ -21,7 +21,7 @@
 #include "audio_source.hpp"
 
 Audio::Audio(AudioSource *source, AudioSink *sink)
-    : source(source), sink(sink), position_sample_count(0)
+    : source(source), sink(sink)
 {
 	ClearFrame();
 }

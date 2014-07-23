@@ -66,12 +66,10 @@ const std::string& Player::CurrentStateString() const
 
 void Player::SetState(State state)
 {
-	State last_state = this->current_state;
-
 	this->current_state = state;
 
 	if (this->state_listener != nullptr) {
-		this->state_listener(last_state, state);
+		this->state_listener(state);
 	}
 }
 
