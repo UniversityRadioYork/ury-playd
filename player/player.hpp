@@ -54,7 +54,7 @@ public:
 	 * Type for state listeners.
 	 * @see RegisterStateListener
 	 */
-	using StateListener = std::function<void(State, State)>;
+	using StateListener = std::function<void(State)>;
 
 	/**
 	 * A list of states.
