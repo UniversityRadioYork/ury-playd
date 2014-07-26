@@ -44,7 +44,7 @@ PlayerState::PlayerState() : current(State::EJECTED) {};
 
 const void PlayerState::Emit(Responder &responder) const
 {
-	responder.Respond(Response::STAT,
+	responder.Respond(ResponseCode::STAT,
 	                  PlayerState::STRINGS.at(this->current));
 }
 

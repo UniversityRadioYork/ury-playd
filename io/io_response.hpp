@@ -24,7 +24,7 @@
  * @note If you're adding new responses here, update RESPONSES.
  * @see RESPONSES
  */
-enum class Response {
+enum class ResponseCode {
 	// 'Pull' responses (initiated by client command)
 	OKAY, ///< Request was valid and produced an answer.
 	WHAT, ///< Request was invalid/user error.
@@ -39,10 +39,10 @@ enum class Response {
 };
 
 /**
- * A map from Response codes to their string equivalents.
- * @see Response
+ * A map from ResponseCode codes to their string equivalents.
+ * @see ResponseCode
  */
-extern const std::map<Response, std::string> RESPONSES;
+extern const std::map<ResponseCode, std::string> RESPONSES;
 
 /**
  * Abstract class for anything that can be sent a response.
@@ -57,7 +57,7 @@ public:
 	 * @param code The response code to emit.
 	 * @param message The response message.
 	 */
-	void Respond(Response code, const std::string &message);
+	void Respond(ResponseCode code, const std::string &message);
 
 	/**
 	 * Emits an error as a response.
@@ -94,7 +94,7 @@ public:
 
 	/**
 	 * Registers a Responder with this ResponseSource.
-	 * The ResponseSource will periodically send a Response to the given
+	 * The ResponseSource will periodically send a ResponseCode to the given
 	 * Responder.
 	 * @param responder The responder to register.
 	 */

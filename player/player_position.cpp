@@ -15,9 +15,9 @@
 
 // Player
 
-void Player::SetPositionResponsePeriod(PlayerPosition::Unit period)
+void Player::SetPositionResponseCodePeriod(PlayerPosition::Unit period)
 {
-	this->position.SetResponsePeriod(period);
+	this->position.SetResponseCodePeriod(period);
 }
 
 void Player::UpdatePosition()
@@ -61,7 +61,7 @@ const void PlayerPosition::Emit(Responder &target) const
 	std::ostringstream os;
 	os << this->current.count();
 
-	target.Respond(Response::TIME, os.str());
+	target.Respond(ResponseCode::TIME, os.str());
 }
 
 bool PlayerPosition::IsReadyToSend()
@@ -69,7 +69,7 @@ bool PlayerPosition::IsReadyToSend()
 	return (!this->last) || ((*this->last) + this->period <= this->current);
 }
 
-void PlayerPosition::SetResponsePeriod(PlayerPosition::Unit period)
+void PlayerPosition::SetResponseCodePeriod(PlayerPosition::Unit period)
 {
 	this->period = period;
 }

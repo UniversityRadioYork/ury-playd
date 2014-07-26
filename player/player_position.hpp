@@ -49,7 +49,7 @@ public:
 	 * @param period The period to wait between responses.
 	 * @see SetResponder
 	 */
-	void SetResponsePeriod(Unit period);
+	void SetResponseCodePeriod(Unit period);
 
 	/**
 	 * Updates the position tracker with the new position.

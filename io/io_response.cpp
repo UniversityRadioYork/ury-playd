@@ -8,22 +8,22 @@
  */
 
 #include <sstream>         // std::ostringstream
-#include "io_response.hpp" // Responder, Response
+#include "io_response.hpp" // Responder, ResponseCode
 #include "../errors.hpp"   // Error
 
-const std::map<Response, std::string> RESPONSES = {{Response::OKAY, "OKAY"},
-                                                   {Response::WHAT, "WHAT"},
-                                                   {Response::FAIL, "FAIL"},
-                                                   {Response::OOPS, "OOPS"},
-                                                   {Response::NOPE, "NOPE"},
-                                                   {Response::OHAI, "OHAI"},
-                                                   {Response::TTFN, "TTFN"},
-                                                   {Response::STAT, "STAT"},
-                                                   {Response::TIME, "TIME"}};
+const std::map<ResponseCode, std::string> RESPONSES = {{ResponseCode::OKAY, "OKAY"},
+                                                   {ResponseCode::WHAT, "WHAT"},
+                                                   {ResponseCode::FAIL, "FAIL"},
+                                                   {ResponseCode::OOPS, "OOPS"},
+                                                   {ResponseCode::NOPE, "NOPE"},
+                                                   {ResponseCode::OHAI, "OHAI"},
+                                                   {ResponseCode::TTFN, "TTFN"},
+                                                   {ResponseCode::STAT, "STAT"},
+                                                   {ResponseCode::TIME, "TIME"}};
 
-void Responder::Respond(Response code, const std::string &message)
+void Responder::Respond(ResponseCode code, const std::string &message)
 {
-	// Responses are formatted as "CODE message\n".
+	// ResponseCodes are formatted as "CODE message\n".
 	std::ostringstream os;
 	os << RESPONSES.at(code) << " " << message << std::endl;
 
@@ -34,7 +34,7 @@ void Responder::Respond(Response code, const std::string &message)
 
 void Responder::RespondWithError(const Error &error)
 {
-	Respond(Response::FAIL, error.Message());
+	Respond(ResponseCode::FAIL, error.Message());
 }
 
 //

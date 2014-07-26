@@ -138,7 +138,7 @@ public:
 	 * Sets the period between position responses.
 	 * @param period The period to wait between responses.
 	 */
-	void SetPositionResponsePeriod(PlayerPosition::Unit period);
+	void SetPositionResponseCodePeriod(PlayerPosition::Unit period);
 
 	/**
 	 * Sends welcome/current status information to a new client.

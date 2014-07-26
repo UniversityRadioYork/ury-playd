@@ -53,7 +53,7 @@ void Player::OpenFile(const std::string &path)
 
 void Player::WelcomeClient(Responder &client)
 {
-        client.Respond(Response::OHAI, MSG_OHAI);
+        client.Respond(ResponseCode::OHAI, MSG_OHAI);
         this->state.Emit(client);
         this->position.Emit(client);
 }

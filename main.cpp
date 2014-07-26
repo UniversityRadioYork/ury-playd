@@ -118,7 +118,7 @@ int Playslave::Run()
 	{
 		// Don't roll this into the constructor: it'll go out of scope!
 		this->audio.SetDeviceID(DeviceID());
-		this->player.SetPositionResponsePeriod(POSITION_PERIOD);
+		this->player.SetPositionResponseCodePeriod(POSITION_PERIOD);
 		this->player.SetResponder(*this->io);
 		this->io->Run();
 	}

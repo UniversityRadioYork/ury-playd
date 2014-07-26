@@ -25,7 +25,7 @@
 #include "../errors.hpp"
 #include "../messages.h"                        // MSG_*
 #include "io_reactor.hpp"                       // IoReactor
-#include "io_response.hpp"                     // Response
+#include "io_response.hpp"                     // ResponseCode
 #include <boost/asio.hpp>                       // boost::asio::*
 #include <boost/asio/high_resolution_timer.hpp> // boost::asio::high_resolution_timer
 
@@ -59,9 +59,9 @@ void IoReactor::HandleCommand(const std::string &line)
 {
 	bool valid = this->handler.Handle(line);
 	if (valid) {
-		Respond(Response::OKAY, line);
+		Respond(ResponseCode::OKAY, line);
 	} else {
-		Respond(Response::WHAT, MSG_CMD_INVALID);
+		Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
 	}
 }
 
