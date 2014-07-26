@@ -45,7 +45,7 @@ void PlayerPosition::Update(const PlayerPosition::Unit position)
 	this->current = position;
 
 	if (IsReadyToSend()) {
-		EmitToRegisteredSink();
+		Push();
 		this->last = this->current;
 	}
 }

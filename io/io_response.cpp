@@ -46,7 +46,7 @@ void ResponseSource::SetResponseSink(ResponseSink &responder)
 	this->push_sink = std::ref(responder);
 }
 
-const void ResponseSource::EmitToRegisteredSink() const
+const void ResponseSource::Push() const
 {
 	if (this->push_sink.is_initialized()) {
 		Emit(this->push_sink.get().get());

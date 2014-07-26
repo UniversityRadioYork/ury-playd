@@ -106,7 +106,7 @@ protected:
 	 * @param code The code for this response.
 	 * @param message The message for this response.
 	 */
-	const void EmitToRegisteredSink() const;
+	const void Push() const;
 
 private:
 	/// A ResponseSink to which 'push' responses are emitted.

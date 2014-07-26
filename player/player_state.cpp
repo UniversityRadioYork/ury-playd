@@ -83,5 +83,5 @@ const bool PlayerState::In(PlayerState::List states) const
 void PlayerState::Set(PlayerState::State state)
 {
 	this->current = state;
-	EmitToRegisteredSink();
+	Push();
 }
