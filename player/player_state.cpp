@@ -42,7 +42,7 @@ const PlayerState::List PlayerState::AUDIO_LOADED_STATES = {PlayerState::State::
 
 PlayerState::PlayerState() : current(State::EJECTED) {};
 
-const void PlayerState::Emit(Responder &responder) const
+const void PlayerState::Emit(ResponseSink &responder) const
 {
 	responder.Respond(ResponseCode::STAT,
 	                  PlayerState::STRINGS.at(this->current));

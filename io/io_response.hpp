@@ -47,10 +47,10 @@ extern const std::map<ResponseCode, std::string> RESPONSES;
 /**
  * Abstract class for anything that can be sent a response.
  */
-class Responder {
+class ResponseSink {
 public:
-	/// A type for callbacks taking a Responder.
-	using Callback = std::function<void(Responder &)>;
+	/// A type for callbacks taking a ResponseSink.
+	using Callback = std::function<void(ResponseSink &)>;
 
 	/**
 	 * Outputs a response.
@@ -76,9 +76,9 @@ protected:
 /**
  * Abstract helper class for sources of responses.
  *
- * A ResponseSource can both 'push' responses to a registered Responder and
+ * A ResponseSource can both 'push' responses to a registered ResponseSink and
  * be 'polled' from outside to dump its current response to an external
- * Responder.  For example, PlayerPosition 'pushes' its position every few
+ * ResponseSink.  For example, PlayerPosition 'pushes' its position every few
  * milliseconds to the outside world, to keep the client aware of the time,
  * but is also 'polled' on a new client connection so that the client
  * immediately gets the current position on connect.
@@ -86,32 +86,32 @@ protected:
 class ResponseSource {
 public:
 	/**
-	 * Emits a response to a given Responder.
-	 * @param responder The Responder to which this ResponseSource's
+	 * Emits a response to a given ResponseSink.
+	 * @param responder The ResponseSink to which this ResponseSource's
 	 *   current response should be emitted.
 	 */
-	virtual const void Emit(Responder &responder) const = 0;
+	virtual const void Emit(ResponseSink &responder) const = 0;
 
 	/**
-	 * Registers a Responder with this ResponseSource.
+	 * Registers a ResponseSink with this ResponseSource.
 	 * The ResponseSource will periodically send a ResponseCode to the given
-	 * Responder.
+	 * ResponseSink.
 	 * @param responder The responder to register.
 	 */
-	void SetResponder(Responder &responder);
+	void SetResponseSink(ResponseSink &responder);
 protected:
 	/**
-	 * Calls an Emit on the registered Responder.
-	 * If there is no registered Responder, the response is dropped.
+	 * Calls an Emit on the registered ResponseSink.
+	 * If there is no registered ResponseSink, the response is dropped.
 	 * @param code The code for this response.
 	 * @param message The message for this response.
 	 */
 	const void EmitToRegisteredSink() const;
 
 private:
-	/// A Responder to which 'push' responses are emitted.
-	/// If the Responder is not present, responses are not emitted.
-	boost::optional<std::reference_wrapper<Responder>> push_sink;
+	/// A ResponseSink to which 'push' responses are emitted.
+	/// If the ResponseSink is not present, responses are not emitted.
+	boost::optional<std::reference_wrapper<ResponseSink>> push_sink;
 };
 
 #endif // PS_IO_RESPONSE_HPP

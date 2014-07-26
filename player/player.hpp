@@ -130,22 +130,22 @@ public:
 	 * Registers a responder with the position and state subsystems.
 	 * This responder is sent information on position and state changes
 	 * periodically.
-	 * @param responder The Responder to register with the Player.
+	 * @param responder The ResponseSink to register with the Player.
 	 */
-	void SetResponder(Responder &listener);
+	void SetResponseSink(ResponseSink &listener);
 
 	/**
 	 * Sets the period between position responses.
 	 * @param period The period to wait between responses.
 	 */
-	void SetPositionResponseCodePeriod(PlayerPosition::Unit period);
+	void SetPositionResponsePeriod(PlayerPosition::Unit period);
 
 	/**
 	 * Sends welcome/current status information to a new client.
-	 * @param client An IO Responder to which messages to the client
+	 * @param client An IO ResponseSink to which messages to the client
 	 *   should be sent.
 	 */
-	void WelcomeClient(Responder &client);
+	void WelcomeClient(ResponseSink &client);
 
 private:
 	/**

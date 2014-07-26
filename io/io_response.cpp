@@ -8,7 +8,7 @@
  */
 
 #include <sstream>         // std::ostringstream
-#include "io_response.hpp" // Responder, ResponseCode
+#include "io_response.hpp" // ResponseSink, ResponseCode
 #include "../errors.hpp"   // Error
 
 const std::map<ResponseCode, std::string> RESPONSES = {{ResponseCode::OKAY, "OKAY"},
@@ -21,7 +21,7 @@ const std::map<ResponseCode, std::string> RESPONSES = {{ResponseCode::OKAY, "OKA
                                                    {ResponseCode::STAT, "STAT"},
                                                    {ResponseCode::TIME, "TIME"}};
 
-void Responder::Respond(ResponseCode code, const std::string &message)
+void ResponseSink::Respond(ResponseCode code, const std::string &message)
 {
 	// ResponseCodes are formatted as "CODE message\n".
 	std::ostringstream os;
@@ -32,7 +32,7 @@ void Responder::Respond(ResponseCode code, const std::string &message)
 	RespondRaw(os.str());
 }
 
-void Responder::RespondWithError(const Error &error)
+void ResponseSink::RespondWithError(const Error &error)
 {
 	Respond(ResponseCode::FAIL, error.Message());
 }
@@ -41,7 +41,7 @@ void Responder::RespondWithError(const Error &error)
 // ResponseSource
 //
 
-void ResponseSource::SetResponder(Responder &responder)
+void ResponseSource::SetResponseSink(ResponseSink &responder)
 {
 	this->push_sink = std::ref(responder);
 }

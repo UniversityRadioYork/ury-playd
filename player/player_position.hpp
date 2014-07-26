@@ -47,9 +47,9 @@ public:
 	 * Sets the period between position signals.
 	 * This is shared across all listeners.
 	 * @param period The period to wait between responses.
-	 * @see SetResponder
+	 * @see SetResponseSink
 	 */
-	void SetResponseCodePeriod(Unit period);
+	void SetResponsePeriod(Unit period);
 
 	/**
 	 * Updates the position tracker with the new position.
@@ -71,7 +71,7 @@ public:
 	 * Emits the current position to a responder.
 	 * @param target The responder to which a TIME response shall be sent.
 	 */
-	const void Emit(Responder &target) const override;
+	const void Emit(ResponseSink &target) const override;
 private:
 	/**
 	 * Figures out whether it's time to send a position signal.

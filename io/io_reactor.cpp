@@ -33,7 +33,7 @@ const std::chrono::nanoseconds IoReactor::PLAYER_UPDATE_PERIOD(1000);
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler,
                      const std::string &address, const std::string &port,
-                     Responder::Callback cb)
+                     ResponseSink::Callback cb)
     : player(player),
       handler(handler),
       io_service(),
@@ -142,7 +142,7 @@ void IoReactor::End()
 TcpConnection::TcpConnection(std::function<void(const std::string &)> cmd,
                              TcpConnectionManager &manager,
                              boost::asio::io_service &io_service,
-                             Responder::Callback cb)
+                             ResponseSink::Callback cb)
     : socket(io_service),
       strand(io_service),
       outbox(),

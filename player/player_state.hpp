@@ -58,11 +58,11 @@ public:
 	PlayerState();
 
 	/**
-	 * Announces the current state to a Responder.
+	 * Announces the current state to a ResponseSink.
 	 * @param responder The responder to which the current state shall be
 	 *   emitted.
 	 */
-	const void Emit(Responder &target) const override;
+	const void Emit(ResponseSink &target) const override;
 
 	/**
 	 * Executes a closure iff the current state is one of the given states.
@@ -83,7 +83,7 @@ public:
 	/**
 	 * Sets the player's current state.
 	 * This will automatically emit the new state to any responder that has
-	 * been registered with this PlayerState using SetResponder.
+	 * been registered with this PlayerState using SetResponseSink.
 	 * @param state The new state.
 	 */
 	void Set(State state);

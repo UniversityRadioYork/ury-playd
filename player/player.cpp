@@ -51,7 +51,7 @@ void Player::OpenFile(const std::string &path)
 	this->audio = decltype(this->audio)(this->audio_system.Load(path));
 }
 
-void Player::WelcomeClient(Responder &client)
+void Player::WelcomeClient(ResponseSink &client)
 {
         client.Respond(ResponseCode::OHAI, MSG_OHAI);
         this->state.Emit(client);
@@ -142,10 +142,10 @@ bool Player::Seek(const std::string &time_str)
 	});
 }
 
-void Player::SetResponder(Responder &responder)
+void Player::SetResponseSink(ResponseSink &responder)
 {
-	this->position.SetResponder(responder);
-	this->state.SetResponder(responder);
+	this->position.SetResponseSink(responder);
+	this->state.SetResponseSink(responder);
 }
 
 bool Player::Stop()

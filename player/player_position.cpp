@@ -15,9 +15,9 @@
 
 // Player
 
-void Player::SetPositionResponseCodePeriod(PlayerPosition::Unit period)
+void Player::SetPositionResponsePeriod(PlayerPosition::Unit period)
 {
-	this->position.SetResponseCodePeriod(period);
+	this->position.SetResponsePeriod(period);
 }
 
 void Player::UpdatePosition()
@@ -56,7 +56,7 @@ void PlayerPosition::Reset()
 	this->last = boost::none;
 }
 
-const void PlayerPosition::Emit(Responder &target) const
+const void PlayerPosition::Emit(ResponseSink &target) const
 {
 	std::ostringstream os;
 	os << this->current.count();
@@ -69,7 +69,7 @@ bool PlayerPosition::IsReadyToSend()
 	return (!this->last) || ((*this->last) + this->period <= this->current);
 }
 
-void PlayerPosition::SetResponseCodePeriod(PlayerPosition::Unit period)
+void PlayerPosition::SetResponsePeriod(PlayerPosition::Unit period)
 {
 	this->period = period;
 }
