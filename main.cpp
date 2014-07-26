@@ -61,13 +61,7 @@ void Playslave::RegisterListeners()
 {
 	this->player.SetPositionListenerPeriod(POSITION_PERIOD);
 	this->player.RegisterPositionListener(*this->io);
-	this->player.RegisterStateListener([this](Player::State new_state) {
-		this->io->Respond(Response::STAT, Player::StateString(new_state));
-
-		if (new_state == Player::State::QUITTING) {
-			this->io->End();
-		}
-	});
+	this->player.RegisterStateListener(*this->io);
 }
 
 const Player::TP::UnitMap UNITS = {

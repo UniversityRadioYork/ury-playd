@@ -11,6 +11,7 @@
  */
 
 #include "player.hpp"
+#include "../io/io_responder.hpp"
 
 // Basic state queries
 
@@ -68,14 +69,14 @@ void Player::SetState(State state)
 {
 	this->current_state = state;
 
-	if (this->state_listener != nullptr) {
-		this->state_listener(state);
+	if (this->state_listener.is_initialized()) {
+		this->state_listener.get().get().Respond(Response::STAT, CurrentStateString());
 	}
 }
 
 // Listening for state changes
 
-void Player::RegisterStateListener(StateListener listener)
+void Player::RegisterStateListener(Responder &listener)
 {
-	this->state_listener = listener;
+	this->state_listener = std::ref(listener);
 }

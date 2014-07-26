@@ -84,8 +84,12 @@ void IoReactor::DoUpdateTimer()
 	                PLAYER_UPDATE_PERIOD);
 	boost::asio::high_resolution_timer t(this->io_service, tick);
 	t.async_wait([this](boost::system::error_code) {
-		this->player.Update();
-		DoUpdateTimer();
+		bool running = this->player.Update();
+		if (running) {
+			DoUpdateTimer();
+		} else {
+			End();
+		}
 	});
 }
 

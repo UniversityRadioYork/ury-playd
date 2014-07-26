@@ -22,13 +22,15 @@
 #include <string>
 #include <utility>
 
+#include <boost/optional.hpp>
+
 #include "../audio/audio.hpp"
 #include "../time_parser.hpp"
+#include "../io/io_responder.hpp"
 
 #include "player_position.hpp"
 
 class AudioSystem;
-class Responder;
 
 /**
  * A player contains a loaded audio file and the state of its playback.
@@ -50,15 +52,7 @@ public:
 		QUITTING  ///< The player is about to terminate.
 	};
 
-	/**
-	 * Type for state listeners.
-	 * @see RegisterStateListener
-	 */
-	using StateListener = std::function<void(State)>;
-
-	/**
-	 * A list of states.
-	 */
+	/// A list of states.
 	using StateList = std::initializer_list<State>;
 
 	/// The type of TimeParser the Player expects.
@@ -72,7 +66,7 @@ private:
 
 	PlayerPosition position;
 
-	StateListener state_listener;
+	boost::optional<std::reference_wrapper<Responder>> state_listener;
 	State current_state;
 
 public:
@@ -154,8 +148,9 @@ public:
 	/**
 	 * Instructs the Player to perform a cycle of work.
 	 * This includes decoding the next frame and responding to commands.
+	 * @return Whether the player has more cycles of work to do.
 	 */
-	void Update();
+	bool Update();
 
 	/**
 	 * Registers a position listener.
@@ -177,7 +172,7 @@ public:
 	 * This listener is notified on state changes.
 	 * @param listener The listener callback.
 	 */
-	void RegisterStateListener(StateListener listener);
+	void RegisterStateListener(Responder &listener);
 
 	/**
 	 * Sends welcome/current status information to a new client.

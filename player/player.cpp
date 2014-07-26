@@ -32,7 +32,7 @@ Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
 	this->audio = nullptr;
 }
 
-void Player::Update()
+bool Player::Update()
 {
 	if (this->current_state == State::PLAYING) {
 		if (this->audio->IsStopped()) {
@@ -44,6 +44,8 @@ void Player::Update()
 	if (CurrentStateIn(AUDIO_LOADED_STATES)) {
 		this->audio->Update();
 	}
+
+	return IsRunning();
 }
 
 void Player::OpenFile(const std::string &path)
