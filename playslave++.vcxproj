@@ -108,6 +108,7 @@
     <ClInclude Include="messages.h" />
     <ClInclude Include="player\player.hpp" />
     <ClInclude Include="player\player_position.hpp" />
+    <ClInclude Include="player\player_state.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="sample_formats.hpp" />
   </ItemGroup>

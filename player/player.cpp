@@ -21,7 +21,8 @@
 #include "../io/io_responder.hpp"
 #include "../messages.h"
 
-/// List of states in which some audio is loaded.
+const Player::StateList Player::AUDIO_PLAYING_STATES = {State::PLAYING};
+
 const Player::StateList Player::AUDIO_LOADED_STATES = {State::PLAYING,
                                                        State::STOPPED};
 
@@ -34,18 +35,20 @@ Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
 
 bool Player::Update()
 {
-	if (this->current_state == State::PLAYING) {
-		if (this->audio->IsStopped()) {
-			Eject();
-		} else {
-			UpdatePosition();
-		}
-	}
-	if (CurrentStateIn(AUDIO_LOADED_STATES)) {
-		this->audio->Update();
-	}
-
+	IfCurrentStateIn(AUDIO_PLAYING_STATES, std::bind(&Player::PlaybackUpdate, this));
+	IfCurrentStateIn(AUDIO_LOADED_STATES, std::bind(&Audio::Update, this->audio.get()));
 	return IsRunning();
+}
+
+bool Player::PlaybackUpdate()
+{
+	if (this->audio->IsStopped()) {
+		Eject();
+	}
+	else {
+		UpdatePosition();
+	}
+	return true;
 }
 
 void Player::OpenFile(const std::string &path)

@@ -192,7 +192,10 @@ private:
 	/// A mapping between states and their human-readable names.
 	const static std::map<State, std::string> STATE_STRINGS;
 
-	/// Shorthand for {State::PLAYING, State::STOPPED}.
+	/// List of states in which the player is playing something.
+	const static StateList AUDIO_PLAYING_STATES;
+
+	/// List of states in which some audio is loaded.
 	const static StateList AUDIO_LOADED_STATES;
 
 	/**
@@ -240,6 +243,13 @@ private:
 	 * @see UpdatePosition
 	 */
 	void ResetPosition();
+
+	/**
+	 * Performs player updates necessary while the player is playing.
+	 * @return True (so that the function can be used in an IfPlayerStateIn
+	 *   call).
+	 */
+	bool PlaybackUpdate();
 
 	/**
 	 * Opens a file, setting this->audio to the resulting file.
