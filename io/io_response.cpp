@@ -3,13 +3,13 @@
 
 /**
  * @file
- * Implementation of the non-virtual aspects of the Responder abstract class.
- * @see io/io_responder.hpp
+ * Implementation of client response classes.
+ * @see io/io_response.hpp
  */
 
-#include <sstream>          // std::ostringstream
-#include "io_responder.hpp" // Responder, Response
-#include "../errors.hpp"    // Error
+#include <sstream>         // std::ostringstream
+#include "io_response.hpp" // Responder, Response
+#include "../errors.hpp"   // Error
 
 const std::map<Response, std::string> RESPONSES = {{Response::OKAY, "OKAY"},
                                                    {Response::WHAT, "WHAT"},

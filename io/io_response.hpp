@@ -3,12 +3,12 @@
 
 /**
  * @file
- * Declaration of the Responder abstract class.
- * @see io/io_responder.cpp
+ * Declaration of classes pertaining to responses to the client.
+ * @see io/io_response.cpp
  */
 
-#ifndef PS_IO_RESPONDER_HPP
-#define PS_IO_RESPONDER_HPP
+#ifndef PS_IO_RESPONSE_HPP
+#define PS_IO_RESPONSE_HPP
 
 #include <functional>    // std::function
 #include <map>           // std::map
@@ -114,4 +114,4 @@ private:
 	boost::optional<std::reference_wrapper<Responder>> push_sink;
 };
 
-#endif // PS_IO_RESPONDER_HPP
+#endif // PS_IO_RESPONSE_HPP

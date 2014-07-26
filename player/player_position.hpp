@@ -15,7 +15,7 @@
 #include <set>
 #include <boost/optional.hpp>
 
-#include "../io/io_responder.hpp"
+#include "../io/io_response.hpp"
 
 /**
  * Tracker and broadcaster for the Player's current position in a song.

@@ -19,7 +19,7 @@
 #include "../audio/audio.hpp"
 #include "../audio/audio_system.hpp"
 #include "../errors.hpp"
-#include "../io/io_responder.hpp"
+#include "../io/io_response.hpp"
 #include "../messages.h"
 
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)

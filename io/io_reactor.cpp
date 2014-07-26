@@ -25,7 +25,7 @@
 #include "../errors.hpp"
 #include "../messages.h"                        // MSG_*
 #include "io_reactor.hpp"                       // IoReactor
-#include "io_responder.hpp"                     // Response
+#include "io_response.hpp"                     // Response
 #include <boost/asio.hpp>                       // boost::asio::*
 #include <boost/asio/high_resolution_timer.hpp> // boost::asio::high_resolution_timer
 

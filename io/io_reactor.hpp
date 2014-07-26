@@ -12,7 +12,7 @@
 
 #include <chrono>
 #include <boost/asio.hpp>
-#include "io_responder.hpp"
+#include "io_response.hpp"
 #include <deque>          // std::deque
 #include <functional>     // std::function
 #include <ostream>        // std::ostream

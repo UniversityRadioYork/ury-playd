@@ -19,7 +19,7 @@
 #include <functional>
 #include <boost/optional.hpp>
 
-#include "../io/io_responder.hpp"
+#include "../io/io_response.hpp"
 
 /**
  * An object holding and representing the current state of a Player.
