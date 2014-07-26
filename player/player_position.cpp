@@ -3,8 +3,9 @@
 
 /**
  * @file
- * Implementation of the PlayerPosition class.
+ * Implementation of the PlayerPosition class, and related Player methods.
  * @see player/player_position.hpp
+ * @see player/player.hpp
  */
 
 #include <chrono>

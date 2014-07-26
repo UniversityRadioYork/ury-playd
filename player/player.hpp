@@ -22,13 +22,12 @@
 #include <string>
 #include <utility>
 
-#include <boost/optional.hpp>
-
 #include "../audio/audio.hpp"
 #include "../time_parser.hpp"
 #include "../io/io_responder.hpp"
 
 #include "player_position.hpp"
+#include "player_state.hpp"
 
 class AudioSystem;
 
@@ -38,23 +37,6 @@ class AudioSystem;
  */
 class Player {
 public:
-	/**
-	 * Enumeration of states that the player can be in.
-	 * The player is effectively a finite-state machine whose behaviour
-	 *   at any given time is dictated by the current state, which is
-	 *   represented by an instance of State.
-	 */
-	enum class State : std::uint8_t {
-		STARTING, ///< The player has just initialised.
-		EJECTED,  ///< The player has no song loaded.
-		STOPPED,  ///< The player has a song loaded and not playing.
-		PLAYING,  ///< The player has a song loaded and playing.
-		QUITTING  ///< The player is about to terminate.
-	};
-
-	/// A list of states.
-	using StateList = std::initializer_list<State>;
-
 	/// The type of TimeParser the Player expects.
 	using TP = TimeParser<std::chrono::microseconds>;
 
@@ -65,9 +47,7 @@ private:
 	std::unique_ptr<Audio> audio;
 
 	PlayerPosition position;
-
-	boost::optional<std::reference_wrapper<Responder>> state_listener;
-	State current_state;
+	PlayerState state;
 
 public:
 	/**
@@ -140,12 +120,6 @@ public:
 	const std::string &CurrentStateString() const;
 
 	/**
-	 * The current state of the Player.
-	 * @return The current state.
-	 */
-	State CurrentState() const;
-
-	/**
 	 * Instructs the Player to perform a cycle of work.
 	 * This includes decoding the next frame and responding to commands.
 	 * @return Whether the player has more cycles of work to do.
@@ -181,23 +155,7 @@ public:
 	 */
 	void WelcomeClient(Responder &client);
 
-	/**
-	 * The human-readable name of the given player state.
-	 * @param state The state whose name is to be returned.
-	 * @return The human-readable name of @a state.
-	 */
-	static const std::string &StateString(State state);
-
 private:
-	/// A mapping between states and their human-readable names.
-	const static std::map<State, std::string> STATE_STRINGS;
-
-	/// List of states in which the player is playing something.
-	const static StateList AUDIO_PLAYING_STATES;
-
-	/// List of states in which some audio is loaded.
-	const static StateList AUDIO_LOADED_STATES;
-
 	/**
 	 * Executes a closure iff the current state is one of the given states.
 	 * @param states The initialiser list of states.
@@ -205,7 +163,8 @@ private:
 	 * @return False if the state was not valid, or the result of the
 	 *   closure otherwise.
 	 */
-	bool IfCurrentStateIn(StateList states, std::function<bool()> f);
+	bool IfCurrentStateIn(PlayerState::List states,
+		              PlayerState::StateRestrictedFunction f);
 
 	/**
 	 * Checks to see if the current state is one of the given states.
@@ -213,13 +172,13 @@ private:
 	 * @return Whether the current state is not in the states given by the
 	 *   initializer_list.
 	 */
-	bool CurrentStateIn(StateList states) const;
+	bool CurrentStateIn(PlayerState::List states) const;
 
 	/**
 	 * Sets the current player state.
 	 * @param state The new state.
 	 */
-	void SetState(State state);
+	void SetState(PlayerState::State state);
 
 	/**
 	 * Parses a time string into a pair of unit prefix and timestamp.
