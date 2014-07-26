@@ -83,13 +83,5 @@ const bool PlayerState::In(PlayerState::List states) const
 void PlayerState::Set(PlayerState::State state)
 {
 	this->current = state;
-
-	if (this->auto_responder.is_initialized()) {
-		Emit(this->auto_responder.get().get());
-	}
-}
-
-void PlayerState::SetResponder(Responder &responder)
-{
-	this->auto_responder = std::ref(responder);
+	EmitToRegisteredSink();
 }

@@ -34,8 +34,6 @@ void Player::ResetPosition()
 // PlayerPosition
 PlayerPosition::PlayerPosition()
 {
-	this->listeners = decltype(this->listeners)();
-
 	// Default to broadcasting the position every time it is changed.
 	this->period = decltype(this->period)(0);
 
@@ -47,7 +45,8 @@ void PlayerPosition::Update(const PlayerPosition::Unit position)
 	this->current = position;
 
 	if (IsReadyToSend()) {
-		Send();
+		EmitToRegisteredSink();
+		this->last = this->current;
 	}
 }
 
@@ -57,7 +56,7 @@ void PlayerPosition::Reset()
 	this->last = boost::none;
 }
 
-void PlayerPosition::Emit(Responder &target)
+const void PlayerPosition::Emit(Responder &target) const
 {
 	std::ostringstream os;
 	os << this->current.count();
@@ -65,22 +64,9 @@ void PlayerPosition::Emit(Responder &target)
 	target.Respond(Response::TIME, os.str());
 }
 
-void PlayerPosition::Send()
-{
-	for (auto listener : this->listeners) {
-		Emit(listener);
-	}
-	this->last = this->current;
-}
-
 bool PlayerPosition::IsReadyToSend()
 {
 	return (!this->last) || ((*this->last) + this->period <= this->current);
-}
-
-void PlayerPosition::SetResponder(Responder &listener)
-{
-	this->listeners.push_back(listener);
 }
 
 void PlayerPosition::SetResponsePeriod(PlayerPosition::Unit period)

@@ -15,19 +15,16 @@
 #include <set>
 #include <boost/optional.hpp>
 
-class Responder;
+#include "../io/io_responder.hpp"
 
 /**
  * Tracker and broadcaster for the Player's current position in a song.
  */
-class PlayerPosition {
+class PlayerPosition : public ResponseSource {
 public:
 	/// Unit used for positions.
 	using Unit = std::chrono::microseconds;
 private:
-	/// The vector of callbacks to fire when the position updates.
-	std::vector<std::reference_wrapper<Responder>> listeners;
-
 	/// The period between each firing of the listeners.
 	Unit period;
 
@@ -45,16 +42,6 @@ public:
 	 * Constructs a PlayerPosition.
 	 */
 	PlayerPosition();
-
-	/**
-	 * Registers a Responder as a position listener.
-	 * This listener is sent a TIME response containing the current song
-	 * position, in microseconds, every time the PlayerPosition reaches its
-	 * internal listener firing period.
-	 * @param responder The responder.
-	 * @see SetResponsePeriod
-	 */
-	void SetResponder(Responder &responder);
 
 	/**
 	 * Sets the period between position signals.
@@ -84,7 +71,7 @@ public:
 	 * Emits the current position to a responder.
 	 * @param target The responder to which a TIME response shall be sent.
 	 */
-	void Emit(Responder &target);
+	const void Emit(Responder &target) const override;
 private:
 	/**
 	 * Figures out whether it's time to send a position signal.

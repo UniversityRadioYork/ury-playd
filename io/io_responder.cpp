@@ -36,3 +36,19 @@ void Responder::RespondWithError(const Error &error)
 {
 	Respond(Response::FAIL, error.Message());
 }
+
+//
+// ResponseSource
+//
+
+void ResponseSource::SetResponder(Responder &responder)
+{
+	this->push_sink = std::ref(responder);
+}
+
+const void ResponseSource::EmitToRegisteredSink() const
+{
+	if (this->push_sink.is_initialized()) {
+		Emit(this->push_sink.get().get());
+	}
+}

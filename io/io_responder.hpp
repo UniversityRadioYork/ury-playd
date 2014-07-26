@@ -14,6 +14,9 @@
 #include <map>           // std::map
 #include <string>        // std::string
 #include <ostream>       // std::ostream etc.
+
+#include <boost/optional.hpp>
+
 #include "../errors.hpp" // Error
 
 /**
@@ -68,6 +71,47 @@ protected:
 	 * @param string The response string, of the form "CODE message".
 	 */
 	virtual void RespondRaw(const std::string &string) = 0;
+};
+
+/**
+ * Abstract helper class for sources of responses.
+ *
+ * A ResponseSource can both 'push' responses to a registered Responder and
+ * be 'polled' from outside to dump its current response to an external
+ * Responder.  For example, PlayerPosition 'pushes' its position every few
+ * milliseconds to the outside world, to keep the client aware of the time,
+ * but is also 'polled' on a new client connection so that the client
+ * immediately gets the current position on connect.
+ */
+class ResponseSource {
+public:
+	/**
+	 * Emits a response to a given Responder.
+	 * @param responder The Responder to which this ResponseSource's
+	 *   current response should be emitted.
+	 */
+	virtual const void Emit(Responder &responder) const = 0;
+
+	/**
+	 * Registers a Responder with this ResponseSource.
+	 * The ResponseSource will periodically send a Response to the given
+	 * Responder.
+	 * @param responder The responder to register.
+	 */
+	void SetResponder(Responder &responder);
+protected:
+	/**
+	 * Calls an Emit on the registered Responder.
+	 * If there is no registered Responder, the response is dropped.
+	 * @param code The code for this response.
+	 * @param message The message for this response.
+	 */
+	const void EmitToRegisteredSink() const;
+
+private:
+	/// A Responder to which 'push' responses are emitted.
+	/// If the Responder is not present, responses are not emitted.
+	boost::optional<std::reference_wrapper<Responder>> push_sink;
 };
 
 #endif // PS_IO_RESPONDER_HPP

@@ -25,7 +25,7 @@
  * An object holding and representing the current state of a Player.
  * @see Player
  */
-class PlayerState {
+class PlayerState : public ResponseSource {
 public:
 	/**
 	 * Enumeration of states that the player can be in.
@@ -62,7 +62,7 @@ public:
 	 * @param responder The responder to which the current state shall be
 	 *   emitted.
 	 */
-	const void Emit(Responder &responder) const;
+	const void Emit(Responder &target) const override;
 
 	/**
 	 * Executes a closure iff the current state is one of the given states.
@@ -88,21 +88,12 @@ public:
 	 */
 	void Set(State state);
 
-	/**
-	 * Sets the responder to which state updates are sent.
-	 * @param responder The new auto-update responder.
-	 */
-	void SetResponder(Responder &responder);
 private:
 	/// A mapping between states and their human-readable names.
 	const static std::map<State, std::string> STRINGS;
 
 	/// The current state.
 	State current;
-
-	/// A Responder to which state changes are emitted.
-	/// If the Responder is not present, state changes are not emitted.
-	boost::optional<std::reference_wrapper<Responder>> auto_responder;
 
 	const bool In(List states) const;
 };
