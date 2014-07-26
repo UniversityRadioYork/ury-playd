@@ -27,11 +27,6 @@ bool Player::IsRunning() const
 	return this->state.IsRunning();
 }
 
-void Player::RegisterStateListener(Responder &listener)
-{
-	this->state.SetResponder(listener);
-}
-
 void Player::SetState(PlayerState::State state)
 {
 	this->state.Set(state);

@@ -51,18 +51,18 @@ public:
 	 * This listener is sent a TIME response containing the current song
 	 * position, in microseconds, every time the PlayerPosition reaches its
 	 * internal listener firing period.
-	 * @param listener The listener callback.
-	 * @see SetListenerPeriod
+	 * @param responder The responder.
+	 * @see SetResponsePeriod
 	 */
-	void RegisterListener(Responder &listener);
+	void SetResponder(Responder &responder);
 
 	/**
 	 * Sets the period between position signals.
 	 * This is shared across all listeners.
-	 * @param period The period to wait between listener callbacks.
-	 * @see RegisterListener
+	 * @param period The period to wait between responses.
+	 * @see SetResponder
 	 */
-	void SetListenerPeriod(Unit period);
+	void SetResponsePeriod(Unit period);
 
 	/**
 	 * Updates the position tracker with the new position.

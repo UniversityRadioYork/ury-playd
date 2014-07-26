@@ -15,14 +15,9 @@
 
 // Player
 
-void Player::RegisterPositionListener(Responder &listener)
+void Player::SetPositionResponsePeriod(PlayerPosition::Unit period)
 {
-	this->position.RegisterListener(listener);
-}
-
-void Player::SetPositionListenerPeriod(PlayerPosition::Unit period)
-{
-	this->position.SetListenerPeriod(period);
+	this->position.SetResponsePeriod(period);
 }
 
 void Player::UpdatePosition()
@@ -83,12 +78,12 @@ bool PlayerPosition::IsReadyToSend()
 	return (!this->last) || ((*this->last) + this->period <= this->current);
 }
 
-void PlayerPosition::RegisterListener(Responder &listener)
+void PlayerPosition::SetResponder(Responder &listener)
 {
 	this->listeners.push_back(listener);
 }
 
-void PlayerPosition::SetListenerPeriod(PlayerPosition::Unit period)
+void PlayerPosition::SetResponsePeriod(PlayerPosition::Unit period)
 {
 	this->period = period;
 }

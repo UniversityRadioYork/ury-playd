@@ -71,12 +71,6 @@ private:
 	void ListOutputDevices();
 
 	/**
-	 * Registers various listeners with the Player.
-	 * This is so time and state changes can be sent out on stdout.
-	 */
-	void RegisterListeners();
-
-	/**
 	 * Registers the Playslave command set on the given Player.
 	 * @param p The Player on which the commands will act.
 	 */

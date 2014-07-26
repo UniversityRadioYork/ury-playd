@@ -142,6 +142,12 @@ bool Player::Seek(const std::string &time_str)
 	});
 }
 
+void Player::SetResponder(Responder &responder)
+{
+	this->position.SetResponder(responder);
+	this->state.SetResponder(responder);
+}
+
 bool Player::Stop()
 {
 	return IfCurrentStateIn({PlayerState::State::PLAYING }, [this] {

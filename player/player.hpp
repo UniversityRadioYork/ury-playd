@@ -127,26 +127,18 @@ public:
 	bool Update();
 
 	/**
-	 * Registers a position listener.
-	 * This listener is sent the current song position, in microseconds,
-	 * roughly every @a period microseconds.
-	 * @param listener The listener callback.
+	 * Registers a responder with the position and state subsystems.
+	 * This responder is sent information on position and state changes
+	 * periodically.
+	 * @param responder The Responder to register with the Player.
 	 */
-	void RegisterPositionListener(Responder &listener);
+	void SetResponder(Responder &listener);
 
 	/**
-	 * Sets the period between position signals.
-	 * This is shared across all listeners.
-	 * @param period The period to wait between listener callbacks.
+	 * Sets the period between position responses.
+	 * @param period The period to wait between responses.
 	 */
-	void SetPositionListenerPeriod(PlayerPosition::Unit period);
-
-	/**
-	 * Registers a position listener.
-	 * This listener is notified on state changes.
-	 * @param listener The listener callback.
-	 */
-	void RegisterStateListener(Responder &listener);
+	void SetPositionResponsePeriod(PlayerPosition::Unit period);
 
 	/**
 	 * Sends welcome/current status information to a new client.
