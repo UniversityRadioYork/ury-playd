@@ -29,6 +29,8 @@
 #ifndef PS_RINGBUFFER_HPP
 #define PS_RINGBUFFER_HPP
 
+#include <cassert>
+
 extern "C" {
 #include "../contrib/pa_ringbuffer.h"
 }
@@ -49,12 +51,19 @@ class RingBuffer {
 public:
 	/**
 	 * Constructs a RingBuffer.
+	 *
+	 * * Precondition: 0 < power, 0 < size.
+	 * * Postcondition: The RingBuffer is fully initialised.
+	 *
 	 * @param power n, where 2^n is the number of elements in the ring
 	 *   buffer.
 	 * @param size The size of one element in the ring buffer.
 	 */
 	RingBuffer(int power, int size)
 	{
+		assert(0 < power);
+		assert(0 < size);
+
 		this->rb = new PaUtilRingBuffer;
 		this->buffer = new char[(1 << power) * size];
 
@@ -65,6 +74,9 @@ public:
 		if (init_result != 0) {
 			throw new InternalError(MSG_OUTPUT_RINGINIT);
 		}
+
+		assert(this->rb != nullptr);
+		assert(this->buffer != nullptr);
 	}
 
 	/// Destructs a PaRingBuffer.
@@ -86,6 +98,7 @@ public:
 	/**
 	 * The current write capacity.
 	 * @return The number of samples this ring buffer has space to store.
+	 * @see Write
 	 */
 	SampleCountT WriteCapacity() const
 	{
@@ -95,6 +108,7 @@ public:
 	/**
 	 * The current read capacity.
 	 * @return The number of samples available in this ring buffer.
+	 * @see Read
 	 */
 	SampleCountT ReadCapacity() const
 	{
@@ -108,14 +122,26 @@ public:
 	 * Note that start pointer is not constant.  This is because the
 	 * underlying implementation of the ring buffer might not guarantee
 	 * that the array is left untouched.
+	 *
+	 * * Precondition: start points to a valid array, 0 < count <= the size
+	 *     of the block of memory pointed to by start, count <=
+	 *     WriteCapacity().
+	 * * Postcondition: The ringbuffer has been written to with the contents
+	 *     of the memory pointed to by start and bounded by count and
+	 *     WriteCapacity().
+	 *
 	 * @param start The start of the array buffer from which we read
 	 *   samples.  Must not be nullptr.
 	 * @param count The number of samples to write.  This must not exceed
 	 *   the minimum of WriteCapacity() and the length of the array.
 	 * @return The number of samples written, which should not exceed count.
+	 * @see WriteCapacity
 	 */
 	SampleCountT Write(RepT *start, SampleCountT count)
 	{
+		assert(0 < count);
+		assert(count <= WriteCapacity());
+
 		return CountCast(PaUtil_WriteRingBuffer(
 		                this->rb, start,
 		                static_cast<ring_buffer_size_t>(count)));
@@ -125,14 +151,26 @@ public:
 	 * Reads samples from the ring buffer into an array.
 	 * To read one sample, pass a count of 1 and take a pointer to the
 	 * sample variable.
+	 *
+	 * * Precondition: start points to a valid array, 0 < count <= the size
+	 *     of the block of memory pointed to by start, count <=
+	 *     ReadCapacity().
+	 * * Postcondition: The block of memory pointed to by start and bounded
+	 *     by count and ReadCapacity() has been filled with the appropriate
+	 *     number of samples from the front of the ring buffer.
+	 *
 	 * @param start The start of the array buffer to which we write samples.
 	 *   Must not be nullptr.
 	 * @param count The number of samples to read.  This must not exceed the
 	 *   minimum of ReadCapacity() and the length of the array.
 	 * @return The number of samples read, which should not exceed count.
+	 * @see ReadCapacity
 	 */
 	SampleCountT Read(RepT *start, SampleCountT count)
 	{
+		assert(0 < count);
+		assert(count <= ReadCapacity());
+
 		return CountCast(PaUtil_ReadRingBuffer(
 		                this->rb, start,
 		                static_cast<ring_buffer_size_t>(count)));
