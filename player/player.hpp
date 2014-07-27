@@ -149,20 +149,9 @@ public:
 
 private:
 	/**
-	 * Executes a closure iff the current state is one of the given states.
+	 * Checks whether the current player state is one of the given states.
 	 * @param states The initialiser list of states.
-	 * @param f The closure to execute if in the correct state.
-	 * @return False if the state was not valid, or the result of the
-	 *   closure otherwise.
-	 */
-	bool IfCurrentStateIn(PlayerState::List states,
-	                      PlayerState::StateRestrictedFunction f);
-
-	/**
-	 * Checks to see if the current state is one of the given states.
-	 * @param states The initialiser list of states.
-	 * @return Whether the current state is not in the states given by the
-	 *   initializer_list.
+	 * @return True if the state is in the given list; false otherwise.
 	 */
 	bool CurrentStateIn(PlayerState::List states) const;
 
@@ -195,12 +184,8 @@ private:
 	 */
 	void ResetPosition();
 
-	/**
-	 * Performs player updates necessary while the player is playing.
-	 * @return True (so that the function can be used in an IfPlayerStateIn
-	 *   call).
-	 */
-	bool PlaybackUpdate();
+	/// Performs player updates necessary while the player is playing.
+	void PlaybackUpdate();
 
 	/**
 	 * Opens a file, setting this->audio to the resulting file.

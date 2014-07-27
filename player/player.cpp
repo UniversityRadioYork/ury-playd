@@ -33,21 +33,22 @@ Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
 
 bool Player::Update()
 {
-	IfCurrentStateIn(PlayerState::AUDIO_PLAYING_STATES,
-	                 std::bind(&Player::PlaybackUpdate, this));
-	IfCurrentStateIn(PlayerState::AUDIO_LOADED_STATES,
-	                 std::bind(&Audio::Update, this->audio.get()));
+	if (CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES)) {
+		PlaybackUpdate();
+	}
+	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
+		this->audio->Update();
+	}
 	return IsRunning();
 }
 
-bool Player::PlaybackUpdate()
+void Player::PlaybackUpdate()
 {
 	if (this->audio->IsStopped()) {
 		Eject();
 	} else {
 		UpdatePosition();
 	}
-	return true;
 }
 
 void Player::OpenFile(const std::string &path)
@@ -68,11 +69,12 @@ void Player::WelcomeClient(ResponseSink &client)
 
 bool Player::Eject()
 {
-	return IfCurrentStateIn(PlayerState::AUDIO_LOADED_STATES, [this] {
+	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
 		this->audio = nullptr;
 		SetState(PlayerState::State::EJECTED);
 		return true;
-	});
+	}
+	return false;
 }
 
 bool Player::Load(const std::string &path)
@@ -105,12 +107,13 @@ bool Player::Load(const std::string &path)
 
 bool Player::Play()
 {
-	return IfCurrentStateIn({PlayerState::State::STOPPED}, [this] {
+	if (CurrentStateIn({PlayerState::State::STOPPED})) {
 		assert(this->audio != nullptr);
 		this->audio->Start();
 		SetState(PlayerState::State::PLAYING);
 		return true;
-	});
+	}
+	return false;
 }
 
 bool Player::Quit()
@@ -123,8 +126,7 @@ bool Player::Quit()
 
 bool Player::Seek(const std::string &time_str)
 {
-	return IfCurrentStateIn(PlayerState::AUDIO_LOADED_STATES,
-	                        [this, &time_str] {
+	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
 		bool success = true;
 		std::chrono::microseconds position(0);
 
@@ -142,9 +144,9 @@ bool Player::Seek(const std::string &time_str)
 			this->ResetPosition();
 			this->UpdatePosition();
 		}
-
 		return success;
-	});
+	}
+	return false;
 }
 
 void Player::SetResponseSink(ResponseSink &responder)
@@ -155,9 +157,10 @@ void Player::SetResponseSink(ResponseSink &responder)
 
 bool Player::Stop()
 {
-	return IfCurrentStateIn({PlayerState::State::PLAYING}, [this] {
+	if (CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES)) {
 		this->audio->Stop();
 		SetState(PlayerState::State::STOPPED);
 		return true;
-	});
+	}
+	return false;
 }

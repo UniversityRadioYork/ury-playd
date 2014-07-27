@@ -16,10 +16,9 @@
 // Player
 //
 
-bool Player::IfCurrentStateIn(PlayerState::List states,
-                              PlayerState::StateRestrictedFunction f)
+bool Player::CurrentStateIn(PlayerState::List states) const
 {
-	return this->state.IfIn(states, f);
+	return this->state.In(states);
 }
 
 bool Player::IsRunning() const
@@ -50,16 +49,10 @@ void PlayerState::Emit(ResponseSink &responder) const
 	                  PlayerState::STRINGS.at(this->current));
 }
 
-bool PlayerState::IfIn(PlayerState::List states,
-                       PlayerState::StateRestrictedFunction f) const
+bool PlayerState::In(PlayerState::List states) const
 {
-	bool result = false;
-
-	if (In(states)) {
-		result = f();
-	}
-
-	return result;
+	return std::find(states.begin(), states.end(), this->current) !=
+	       states.end();
 }
 
 bool PlayerState::IsRunning() const
@@ -75,12 +68,6 @@ const std::map<PlayerState::State, std::string> PlayerState::STRINGS = {
                 {State::STOPPED, "Stopped"},
                 {State::PLAYING, "Playing"},
                 {State::QUITTING, "Quitting"}};
-
-bool PlayerState::In(PlayerState::List states) const
-{
-	return std::find(states.begin(), states.end(), this->current) !=
-	       states.end();
-}
 
 void PlayerState::Set(PlayerState::State state)
 {

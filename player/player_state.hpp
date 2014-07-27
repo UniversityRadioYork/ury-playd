@@ -44,10 +44,6 @@ public:
 	/// A list of states, used for IfIn.
 	using List = std::initializer_list<State>;
 
-	/// A function that is executed by IfIn if the current state is in
-	/// the given List.
-	using StateRestrictedFunction = std::function<bool()>;
-
 	/// List of states in which the player is playing something.
 	const static List AUDIO_PLAYING_STATES;
 
@@ -65,13 +61,11 @@ public:
 	void Emit(ResponseSink &target) const override;
 
 	/**
-	 * Executes a closure iff the current state is one of the given states.
+	 * Checks whether the current state is in a given list of states.
 	 * @param states The initialiser list of states.
-	 * @param f The closure to execute if in the correct state.
-	 * @return False if the state was not valid, or the result of the
-	 *   closure otherwise.
+	 * @return True if the state is in the List; false otherwise.
 	 */
-	bool IfIn(List states, StateRestrictedFunction f) const;
+	bool In(List states) const;
 
 	/**
 	 * Returns whether the player is still running.
@@ -95,7 +89,6 @@ private:
 	/// The current state.
 	State current;
 
-	bool In(List states) const;
 };
 
 #endif // PS_PLAYER_STATE_HPP
