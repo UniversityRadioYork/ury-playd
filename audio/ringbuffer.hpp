@@ -32,7 +32,7 @@
 #include <cassert>
 
 extern "C" {
-#include "../contrib/pa_ringbuffer.h"
+#include "../contrib/pa_ringbuffer/pa_ringbuffer.h"
 }
 
 #include "../errors.hpp"

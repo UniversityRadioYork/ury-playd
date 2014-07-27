@@ -1,10 +1,11 @@
 playslave++
 Debug/
 Release/
+*.o
 *.obj
 *.dll
 *.TMP
-objs/
+build/
 doc/
 
 *.opensdf

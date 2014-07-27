@@ -41,7 +41,7 @@ const PlayerState::List PlayerState::AUDIO_PLAYING_STATES = {
 const PlayerState::List PlayerState::AUDIO_LOADED_STATES = {
                 PlayerState::State::PLAYING, PlayerState::State::STOPPED};
 
-PlayerState::PlayerState() : current(State::EJECTED) {};
+PlayerState::PlayerState() : current(State::EJECTED) {}
 
 void PlayerState::Emit(ResponseSink &responder) const
 {
