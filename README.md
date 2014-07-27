@@ -10,28 +10,20 @@ primarily by CaptainHayashi and LordAro.  It is licenced under the MIT licence
 
 ## Usage
 
-`playslave++ DEVICE-ID`
+`playslave++ DEVICE-ID [ADDRESS] [PORT]`
 
 * Invoking `playslave++` with no arguments lists the various device IDs
   available to it.
 * Full protocol information is available on the GitHub wiki.
+* On POSIX systems, see the enclosed man page.
 
 ## Features
 
 * Theoretically plays anything ffmpeg can play
 * Seek (microseconds, seconds, minutes etc)
-* Announces the current position via stdout
-* Unix-style stdin/stdout interface with text protocol
+* Frequently announces the current position
+* TCP/IO interface with text protocol
 * Deliberately not much else
-
-### Planned
-
-Anything not on this list is likely not going to be a playslave++ feature.
-
-* Duration report on song load
-* Configurable/optional time announcements
-* Possible move to sockets
-* Possible better support of more esoteric sample formats
 
 ## Philosophy
 
@@ -40,6 +32,34 @@ Anything not on this list is likely not going to be a playslave++ feature.
 * Favour simplicity over performance
 * Favour simplicity over features
 * Let other programs handle the shinies
+
+## Requirements
+
+* [PortAudio](http://www.portaudio.com/) V19
+* [FFmpeg](https://www.ffmpeg.org/) (latest version)
+* [Boost](http://boost.org/) 1.55.0 or newer
+
+playslave++ probably doesn't work with libav, due to its dependency on
+libswresample.
+
+To use the Makefile, you'll need GNU Make and pkg-config (or equivalent), and
+pkg-config packages for PortAudio and FFmpeg.  We've tested building playslave++
+on Gentoo and FreeBSD 10, but other POSIX-style operating systems should work.
+
+playslave++ **can** be built with Visual Studio (tested with 2013 Premium), but
+you will need to source and configure the dependencies manually.
+
+If you have the PortAudio C++ bindings available, those may be used in place
+of the bundled bindings.  This will happen automatically when using the
+Makefile, if the C++ bindings are installed as a pkg-config package.
+
+## Installation on POSIX-style operating systems
+
+* Ensure you have the dependencies above;
+* Read the `Makefile`, to see if any variables need to be overridden for your
+  environment;
+* Run `make`, and, optionally, `sudo make install`.  The latter will install
+  a man page for playslave++, in addition to playslave++ itself.
 
 ## Q/A
 
