@@ -6,26 +6,6 @@
  * The RingBuffer class template.
  */
 
-// Here is some documentation for pa_ringbuffer that is missing from the contrib
-// source code:
-
-/**
- * @typedef ring_buffer_size_t
- * The type for ring buffer sizes.
- */
-
-/**
- * @typedef PaUtilRingBuffer
- * A PortAudio ring buffer.
- */
-
-/**
- * @struct PaUtilRingBuffer
- * A PortAudio ring buffer.
- */
-
-// End pa_ringbuffer documentation.
-
 #ifndef PS_RINGBUFFER_HPP
 #define PS_RINGBUFFER_HPP
 
