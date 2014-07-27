@@ -11,15 +11,16 @@
 #include "io_response.hpp" // ResponseSink, ResponseCode
 #include "../errors.hpp"   // Error
 
-const std::map<ResponseCode, std::string> RESPONSES = {{ResponseCode::OKAY, "OKAY"},
-                                                   {ResponseCode::WHAT, "WHAT"},
-                                                   {ResponseCode::FAIL, "FAIL"},
-                                                   {ResponseCode::OOPS, "OOPS"},
-                                                   {ResponseCode::NOPE, "NOPE"},
-                                                   {ResponseCode::OHAI, "OHAI"},
-                                                   {ResponseCode::TTFN, "TTFN"},
-                                                   {ResponseCode::STAT, "STAT"},
-                                                   {ResponseCode::TIME, "TIME"}};
+const std::map<ResponseCode, std::string> RESPONSES = {
+                {ResponseCode::OKAY, "OKAY"},
+                {ResponseCode::WHAT, "WHAT"},
+                {ResponseCode::FAIL, "FAIL"},
+                {ResponseCode::OOPS, "OOPS"},
+                {ResponseCode::NOPE, "NOPE"},
+                {ResponseCode::OHAI, "OHAI"},
+                {ResponseCode::TTFN, "TTFN"},
+                {ResponseCode::STAT, "STAT"},
+                {ResponseCode::TIME, "TIME"}};
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message)
 {

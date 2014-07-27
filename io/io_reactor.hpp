@@ -50,7 +50,7 @@ public:
 	explicit TcpConnection(std::function<void(const std::string &)> cmd,
 	                       TcpConnectionManager &manager,
 	                       boost::asio::io_service &io_service,
-		               ResponseSink::Callback cb);
+	                       ResponseSink::Callback cb);
 
 	/// Deleted copy constructor.
 	TcpConnection(const TcpConnection &) = delete;

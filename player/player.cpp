@@ -23,7 +23,11 @@
 #include "../messages.h"
 
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
-	: audio_system(audio_system), time_parser(time_parser), audio(nullptr), position(), state()
+    : audio_system(audio_system),
+      time_parser(time_parser),
+      audio(nullptr),
+      position(),
+      state()
 {
 }
 
@@ -53,9 +57,9 @@ void Player::OpenFile(const std::string &path)
 
 void Player::WelcomeClient(ResponseSink &client)
 {
-        client.Respond(ResponseCode::OHAI, MSG_OHAI);
-        this->state.Emit(client);
-        this->position.Emit(client);
+	client.Respond(ResponseCode::OHAI, MSG_OHAI);
+	this->state.Emit(client);
+	this->position.Emit(client);
 }
 
 //
@@ -119,7 +123,8 @@ bool Player::Quit()
 
 bool Player::Seek(const std::string &time_str)
 {
-	return IfCurrentStateIn(PlayerState::AUDIO_LOADED_STATES, [this, &time_str] {
+	return IfCurrentStateIn(PlayerState::AUDIO_LOADED_STATES,
+	                        [this, &time_str] {
 		bool success = true;
 		std::chrono::microseconds position(0);
 
@@ -150,7 +155,7 @@ void Player::SetResponseSink(ResponseSink &responder)
 
 bool Player::Stop()
 {
-	return IfCurrentStateIn({PlayerState::State::PLAYING }, [this] {
+	return IfCurrentStateIn({PlayerState::State::PLAYING}, [this] {
 		this->audio->Stop();
 		SetState(PlayerState::State::STOPPED);
 		return true;

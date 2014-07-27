@@ -24,6 +24,7 @@ class PlayerPosition : public ResponseSource {
 public:
 	/// Unit used for positions.
 	using Unit = std::chrono::microseconds;
+
 private:
 	/// The period between each firing of the listeners.
 	Unit period;
@@ -72,6 +73,7 @@ public:
 	 * @param target The responder to which a TIME response shall be sent.
 	 */
 	void Emit(ResponseSink &target) const override;
+
 private:
 	/**
 	 * Figures out whether it's time to send a position signal.

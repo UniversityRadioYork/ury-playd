@@ -36,9 +36,11 @@ void Player::SetState(PlayerState::State state)
 // PlayerState
 //
 
-const PlayerState::List PlayerState::AUDIO_PLAYING_STATES = {PlayerState::State::PLAYING};
+const PlayerState::List PlayerState::AUDIO_PLAYING_STATES = {
+                PlayerState::State::PLAYING};
 
-const PlayerState::List PlayerState::AUDIO_LOADED_STATES = {PlayerState::State::PLAYING, PlayerState::State::STOPPED};
+const PlayerState::List PlayerState::AUDIO_LOADED_STATES = {
+                PlayerState::State::PLAYING, PlayerState::State::STOPPED};
 
 PlayerState::PlayerState() : current(State::EJECTED) {};
 
@@ -49,7 +51,7 @@ void PlayerState::Emit(ResponseSink &responder) const
 }
 
 bool PlayerState::IfIn(PlayerState::List states,
-	                   PlayerState::StateRestrictedFunction f) const
+                       PlayerState::StateRestrictedFunction f) const
 {
 	bool result = false;
 
@@ -68,11 +70,11 @@ bool PlayerState::IsRunning() const
 // Private
 
 const std::map<PlayerState::State, std::string> PlayerState::STRINGS = {
-		{ State::STARTING, "Starting" },
-		{ State::EJECTED, "Ejected" },
-		{ State::STOPPED, "Stopped" },
-		{ State::PLAYING, "Playing" },
-		{ State::QUITTING, "Quitting" } };
+                {State::STARTING, "Starting"},
+                {State::EJECTED, "Ejected"},
+                {State::STOPPED, "Stopped"},
+                {State::PLAYING, "Playing"},
+                {State::QUITTING, "Quitting"}};
 
 bool PlayerState::In(PlayerState::List states) const
 {

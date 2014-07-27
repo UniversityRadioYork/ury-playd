@@ -94,7 +94,7 @@ Playslave::Playslave(int argc, char *argv[])
 	                this->player, this->handler,
 	                2 < size ? this->arguments.at(2) : "0.0.0.0",
 	                3 < size ? this->arguments.at(3) : "1350",
-			bind(&Player::WelcomeClient, &this->player, _1)));
+	                bind(&Player::WelcomeClient, &this->player, _1)));
 }
 
 void Playslave::RegisterCommands(Player *p)

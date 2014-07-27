@@ -10,6 +10,7 @@
 #include <cassert>
 #include <climits>
 #include <algorithm>
+#include <algorithm>
 #include <string>
 
 #include "../errors.hpp"
@@ -20,8 +21,7 @@
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
 
-Audio::Audio(AudioSource *source, AudioSink *sink)
-    : source(source), sink(sink)
+Audio::Audio(AudioSource *source, AudioSink *sink) : source(source), sink(sink)
 {
 	ClearFrame();
 }

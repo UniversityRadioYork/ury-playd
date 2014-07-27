@@ -25,7 +25,7 @@
 #include "../errors.hpp"
 #include "../messages.h"                        // MSG_*
 #include "io_reactor.hpp"                       // IoReactor
-#include "io_response.hpp"                     // ResponseCode
+#include "io_response.hpp"                      // ResponseCode
 #include <boost/asio.hpp>                       // boost::asio::*
 #include <boost/asio/high_resolution_timer.hpp> // boost::asio::high_resolution_timer
 
@@ -108,9 +108,9 @@ void IoReactor::InitAcceptor(const std::string &address,
 void IoReactor::DoAccept()
 {
 	auto cmd = [this](const std::string &line) { HandleCommand(line); };
-	this->new_connection.reset(new TcpConnection(cmd, this->manager,
-	                                             this->io_service,
-						     this->new_client_callback));
+	this->new_connection.reset(
+	                new TcpConnection(cmd, this->manager, this->io_service,
+	                                  this->new_client_callback));
 	auto on_accept = [this](boost::system::error_code ec) {
 		if (!ec) {
 			this->manager.Start(this->new_connection);

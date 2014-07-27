@@ -156,7 +156,7 @@ private:
 	 *   closure otherwise.
 	 */
 	bool IfCurrentStateIn(PlayerState::List states,
-		              PlayerState::StateRestrictedFunction f);
+	                      PlayerState::StateRestrictedFunction f);
 
 	/**
 	 * Checks to see if the current state is one of the given states.
