@@ -4,7 +4,7 @@
 builddir ?= build
 
 # Where the source resides.
-srcdir ?= .
+srcdir ?= src
 
 # The warning flags to use when building playslav e++.
 WARNS ?= -Wall -Wextra -Werror -pedantic
