@@ -84,7 +84,7 @@
     <ClCompile Include="contrib\pa_ringbuffer.c" />
     <ClCompile Include="errors.cpp" />
     <ClCompile Include="io\io_reactor.cpp" />
-    <ClCompile Include="io\io_responder.cpp" />
+    <ClCompile Include="io\io_response.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player\player.cpp" />
     <ClCompile Include="player\player_position.cpp" />
@@ -103,11 +103,12 @@
     <ClInclude Include="contrib\pa_ringbuffer.h" />
     <ClInclude Include="errors.hpp" />
     <ClInclude Include="io\io_reactor.hpp" />
-    <ClInclude Include="io\io_responder.hpp" />
+    <ClInclude Include="io\io_response.hpp" />
     <ClInclude Include="main.hpp" />
     <ClInclude Include="messages.h" />
     <ClInclude Include="player\player.hpp" />
     <ClInclude Include="player\player_position.hpp" />
+    <ClInclude Include="player\player_state.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="sample_formats.hpp" />
   </ItemGroup>

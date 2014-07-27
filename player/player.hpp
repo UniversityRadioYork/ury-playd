@@ -24,11 +24,12 @@
 
 #include "../audio/audio.hpp"
 #include "../time_parser.hpp"
+#include "../io/io_response.hpp"
 
 #include "player_position.hpp"
+#include "player_state.hpp"
 
 class AudioSystem;
-class Responder;
 
 /**
  * A player contains a loaded audio file and the state of its playback.
@@ -36,31 +37,6 @@ class Responder;
  */
 class Player {
 public:
-	/**
-	 * Enumeration of states that the player can be in.
-	 * The player is effectively a finite-state machine whose behaviour
-	 *   at any given time is dictated by the current state, which is
-	 *   represented by an instance of State.
-	 */
-	enum class State : std::uint8_t {
-		STARTING, ///< The player has just initialised.
-		EJECTED,  ///< The player has no song loaded.
-		STOPPED,  ///< The player has a song loaded and not playing.
-		PLAYING,  ///< The player has a song loaded and playing.
-		QUITTING  ///< The player is about to terminate.
-	};
-
-	/**
-	 * Type for state listeners.
-	 * @see RegisterStateListener
-	 */
-	using StateListener = std::function<void(State)>;
-
-	/**
-	 * A list of states.
-	 */
-	using StateList = std::initializer_list<State>;
-
 	/// The type of TimeParser the Player expects.
 	using TP = TimeParser<std::chrono::microseconds>;
 
@@ -71,9 +47,7 @@ private:
 	std::unique_ptr<Audio> audio;
 
 	PlayerPosition position;
-
-	StateListener state_listener;
-	State current_state;
+	PlayerState state;
 
 public:
 	/**
@@ -146,60 +120,34 @@ public:
 	const std::string &CurrentStateString() const;
 
 	/**
-	 * The current state of the Player.
-	 * @return The current state.
-	 */
-	State CurrentState() const;
-
-	/**
 	 * Instructs the Player to perform a cycle of work.
 	 * This includes decoding the next frame and responding to commands.
+	 * @return Whether the player has more cycles of work to do.
 	 */
-	void Update();
+	bool Update();
 
 	/**
-	 * Registers a position listener.
-	 * This listener is sent the current song position, in microseconds,
-	 * roughly every @a period microseconds.
-	 * @param listener The listener callback.
+	 * Registers a responder with the position and state subsystems.
+	 * This responder is sent information on position and state changes
+	 * periodically.
+	 * @param responder The ResponseSink to register with the Player.
 	 */
-	void RegisterPositionListener(Responder &listener);
+	void SetResponseSink(ResponseSink &listener);
 
 	/**
-	 * Sets the period between position signals.
-	 * This is shared across all listeners.
-	 * @param period The period to wait between listener callbacks.
+	 * Sets the period between position responses.
+	 * @param period The period to wait between responses.
 	 */
-	void SetPositionListenerPeriod(PlayerPosition::Unit period);
-
-	/**
-	 * Registers a position listener.
-	 * This listener is notified on state changes.
-	 * @param listener The listener callback.
-	 */
-	void RegisterStateListener(StateListener listener);
+	void SetPositionResponsePeriod(PlayerPosition::Unit period);
 
 	/**
 	 * Sends welcome/current status information to a new client.
-	 * @param client An IO Responder to which messages to the client
+	 * @param client An IO ResponseSink to which messages to the client
 	 *   should be sent.
 	 */
-	void WelcomeClient(Responder &client);
-
-	/**
-	 * The human-readable name of the given player state.
-	 * @param state The state whose name is to be returned.
-	 * @return The human-readable name of @a state.
-	 */
-	static const std::string &StateString(State state);
+	void WelcomeClient(ResponseSink &client);
 
 private:
-	/// A mapping between states and their human-readable names.
-	const static std::map<State, std::string> STATE_STRINGS;
-
-	/// Shorthand for {State::PLAYING, State::STOPPED}.
-	const static StateList AUDIO_LOADED_STATES;
-
 	/**
 	 * Executes a closure iff the current state is one of the given states.
 	 * @param states The initialiser list of states.
@@ -207,7 +155,8 @@ private:
 	 * @return False if the state was not valid, or the result of the
 	 *   closure otherwise.
 	 */
-	bool IfCurrentStateIn(StateList states, std::function<bool()> f);
+	bool IfCurrentStateIn(PlayerState::List states,
+		              PlayerState::StateRestrictedFunction f);
 
 	/**
 	 * Checks to see if the current state is one of the given states.
@@ -215,13 +164,13 @@ private:
 	 * @return Whether the current state is not in the states given by the
 	 *   initializer_list.
 	 */
-	bool CurrentStateIn(StateList states) const;
+	bool CurrentStateIn(PlayerState::List states) const;
 
 	/**
 	 * Sets the current player state.
 	 * @param state The new state.
 	 */
-	void SetState(State state);
+	void SetState(PlayerState::State state);
 
 	/**
 	 * Parses a time string into a pair of unit prefix and timestamp.
@@ -245,6 +194,13 @@ private:
 	 * @see UpdatePosition
 	 */
 	void ResetPosition();
+
+	/**
+	 * Performs player updates necessary while the player is playing.
+	 * @return True (so that the function can be used in an IfPlayerStateIn
+	 *   call).
+	 */
+	bool PlaybackUpdate();
 
 	/**
 	 * Opens a file, setting this->audio to the resulting file.

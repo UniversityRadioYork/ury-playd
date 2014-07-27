@@ -2,80 +2,86 @@
 // Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
 /**
- * @file
- * Implementation of aspects of the Player class pertaining to its state.
- * @see player/player.hpp
- * @see player/player.cpp
- * @see player/player_position.hpp
- * @see player/player_position.cpp
- */
+* @file
+* Implementation of the PlayerState class, and related Player methods.
+* @see player/player_position.hpp
+* @see player/player.hpp
+*/
 
 #include "player.hpp"
+#include "player_state.hpp"
+#include "../io/io_response.hpp"
 
-// Basic state queries
+//
+// Player
+//
 
-Player::State Player::CurrentState() const
+bool Player::IfCurrentStateIn(PlayerState::List states,
+                              PlayerState::StateRestrictedFunction f)
 {
-	return this->current_state;
+	return this->state.IfIn(states, f);
 }
 
 bool Player::IsRunning() const
 {
-	return CurrentState() != State::QUITTING;
+	return this->state.IsRunning();
 }
 
-// State conditionals
-
-bool Player::CurrentStateIn(Player::StateList states) const
+void Player::SetState(PlayerState::State state)
 {
-	return std::find(states.begin(), states.end(), this->current_state) !=
-	       states.end();
+	this->state.Set(state);
 }
 
-bool Player::IfCurrentStateIn(Player::StateList states, std::function<bool()> f)
+//
+// PlayerState
+//
+
+const PlayerState::List PlayerState::AUDIO_PLAYING_STATES = {PlayerState::State::PLAYING};
+
+const PlayerState::List PlayerState::AUDIO_LOADED_STATES = {PlayerState::State::PLAYING, PlayerState::State::STOPPED};
+
+PlayerState::PlayerState() : current(State::EJECTED) {};
+
+const void PlayerState::Emit(ResponseSink &responder) const
+{
+	responder.Respond(ResponseCode::STAT,
+	                  PlayerState::STRINGS.at(this->current));
+}
+
+const bool PlayerState::IfIn(PlayerState::List states,
+	                     PlayerState::StateRestrictedFunction f) const
 {
 	bool result = false;
 
-	if (CurrentStateIn(states)) {
+	if (In(states)) {
 		result = f();
 	}
 
 	return result;
 }
 
-// State strings
-
-const std::map<Player::State, std::string> Player::STATE_STRINGS = {
-                {State::STARTING, "Starting"},
-                {State::EJECTED, "Ejected"},
-                {State::STOPPED, "Stopped"},
-                {State::PLAYING, "Playing"},
-                {State::QUITTING, "Quitting"}};
-
-const std::string& Player::StateString(State state)
+const bool PlayerState::IsRunning() const
 {
-	return Player::STATE_STRINGS.at(state);
+	return this->current != State::QUITTING;
 }
 
-const std::string& Player::CurrentStateString() const
+// Private
+
+const std::map<PlayerState::State, std::string> PlayerState::STRINGS = {
+		{ State::STARTING, "Starting" },
+		{ State::EJECTED, "Ejected" },
+		{ State::STOPPED, "Stopped" },
+		{ State::PLAYING, "Playing" },
+		{ State::QUITTING, "Quitting" } };
+
+const bool PlayerState::In(PlayerState::List states) const
 {
-	return Player::StateString(CurrentState());
+	return std::find(states.begin(), states.end(), this->current) !=
+	       states.end();
 }
 
-// Changing state
-
-void Player::SetState(State state)
+void PlayerState::Set(PlayerState::State state)
 {
-	this->current_state = state;
-
-	if (this->state_listener != nullptr) {
-		this->state_listener(state);
-	}
-}
-
-// Listening for state changes
-
-void Player::RegisterStateListener(StateListener listener)
-{
-	this->state_listener = listener;
+	this->current = state;
+	Push();
 }

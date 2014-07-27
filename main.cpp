@@ -11,7 +11,7 @@
 #include <iostream>
 
 #include "cmd.hpp"
-#include "io/io_responder.hpp"
+#include "io/io_response.hpp"
 #include "io/io_reactor.hpp"
 #include "messages.h"
 #include "player/player.hpp"
@@ -55,19 +55,6 @@ std::string Playslave::DeviceID()
 	}
 
 	return device;
-}
-
-void Playslave::RegisterListeners()
-{
-	this->player.SetPositionListenerPeriod(POSITION_PERIOD);
-	this->player.RegisterPositionListener(*this->io);
-	this->player.RegisterStateListener([this](Player::State new_state) {
-		this->io->Respond(Response::STAT, Player::StateString(new_state));
-
-		if (new_state == Player::State::QUITTING) {
-			this->io->End();
-		}
-	});
 }
 
 const Player::TP::UnitMap UNITS = {
@@ -131,8 +118,9 @@ int Playslave::Run()
 	{
 		// Don't roll this into the constructor: it'll go out of scope!
 		this->audio.SetDeviceID(DeviceID());
-		RegisterListeners();
-		io->Run();
+		this->player.SetPositionResponsePeriod(POSITION_PERIOD);
+		this->player.SetResponseSink(*this->io);
+		this->io->Run();
 	}
 	catch (Error &error)
 	{

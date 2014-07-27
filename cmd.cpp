@@ -14,7 +14,7 @@
 
 #include "cmd.hpp"
 #include "errors.hpp"
-#include "io/io_responder.hpp"
+#include "io/io_response.hpp"
 #include "messages.h"
 
 CommandHandler &CommandHandler::AddNullary(const std::string &word,

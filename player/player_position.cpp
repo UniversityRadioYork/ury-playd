@@ -3,25 +3,21 @@
 
 /**
  * @file
- * Implementation of the PlayerPosition class.
+ * Implementation of the PlayerPosition class, and related Player methods.
  * @see player/player_position.hpp
+ * @see player/player.hpp
  */
 
 #include <chrono>
 #include <sstream>
 #include "player.hpp"
-#include "../io/io_responder.hpp"
+#include "../io/io_response.hpp"
 
 // Player
 
-void Player::RegisterPositionListener(Responder &listener)
+void Player::SetPositionResponsePeriod(PlayerPosition::Unit period)
 {
-	this->position.RegisterListener(listener);
-}
-
-void Player::SetPositionListenerPeriod(PlayerPosition::Unit period)
-{
-	this->position.SetListenerPeriod(period);
+	this->position.SetResponsePeriod(period);
 }
 
 void Player::UpdatePosition()
@@ -38,8 +34,6 @@ void Player::ResetPosition()
 // PlayerPosition
 PlayerPosition::PlayerPosition()
 {
-	this->listeners = decltype(this->listeners)();
-
 	// Default to broadcasting the position every time it is changed.
 	this->period = decltype(this->period)(0);
 
@@ -51,7 +45,8 @@ void PlayerPosition::Update(const PlayerPosition::Unit position)
 	this->current = position;
 
 	if (IsReadyToSend()) {
-		Send();
+		Push();
+		this->last = this->current;
 	}
 }
 
@@ -61,20 +56,12 @@ void PlayerPosition::Reset()
 	this->last = boost::none;
 }
 
-void PlayerPosition::Emit(Responder &target)
+const void PlayerPosition::Emit(ResponseSink &target) const
 {
 	std::ostringstream os;
 	os << this->current.count();
 
-	target.Respond(Response::TIME, os.str());
-}
-
-void PlayerPosition::Send()
-{
-	for (auto listener : this->listeners) {
-		Emit(listener);
-	}
-	this->last = this->current;
+	target.Respond(ResponseCode::TIME, os.str());
 }
 
 bool PlayerPosition::IsReadyToSend()
@@ -82,12 +69,7 @@ bool PlayerPosition::IsReadyToSend()
 	return (!this->last) || ((*this->last) + this->period <= this->current);
 }
 
-void PlayerPosition::RegisterListener(Responder &listener)
-{
-	this->listeners.push_back(listener);
-}
-
-void PlayerPosition::SetListenerPeriod(PlayerPosition::Unit period)
+void PlayerPosition::SetResponsePeriod(PlayerPosition::Unit period)
 {
 	this->period = period;
 }

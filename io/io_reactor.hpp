@@ -12,7 +12,7 @@
 
 #include <chrono>
 #include <boost/asio.hpp>
-#include "io_responder.hpp"
+#include "io_response.hpp"
 #include <deque>          // std::deque
 #include <functional>     // std::function
 #include <ostream>        // std::ostream
@@ -34,7 +34,7 @@ class TcpConnectionManager;
  * A connection using the TCP server.
  */
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>,
-                      public Responder {
+                      public ResponseSink {
 public:
 	/// A shared pointer to a TcpConnection.
 	using Pointer = std::shared_ptr<TcpConnection>;
@@ -50,7 +50,7 @@ public:
 	explicit TcpConnection(std::function<void(const std::string &)> cmd,
 	                       TcpConnectionManager &manager,
 	                       boost::asio::io_service &io_service,
-		               Responder::Callback cb);
+		               ResponseSink::Callback cb);
 
 	/// Deleted copy constructor.
 	TcpConnection(const TcpConnection &) = delete;
@@ -93,7 +93,7 @@ private:
 	std::deque<std::string> outbox;
 	std::function<void(const std::string &)> cmd;
 	TcpConnectionManager &manager;
-	Responder::Callback new_client_callback;
+	ResponseSink::Callback new_client_callback;
 
 	bool closing;
 };
@@ -142,7 +142,7 @@ private:
  * The IO reactor, which services input, routes responses, and executes the
  * Player update routine periodically.
  */
-class IoReactor : public Responder {
+class IoReactor : public ResponseSink {
 public:
 	/**
 	 * Constructs an IoReactor.
@@ -155,7 +155,7 @@ public:
 	 */
 	explicit IoReactor(Player &player, CommandHandler &handler,
 	                   const std::string &address, const std::string &port,
-	                   Responder::Callback cb);
+	                   ResponseSink::Callback cb);
 
 	/// Deleted copy constructor.
 	IoReactor(const IoReactor &) = delete;
@@ -208,7 +208,7 @@ private:
 
 	TcpConnection::Pointer new_connection;
 
-	Responder::Callback new_client_callback;
+	ResponseSink::Callback new_client_callback;
 };
 
 #endif // PS_IO_REACTOR_HPP

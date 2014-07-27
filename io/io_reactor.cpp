@@ -25,7 +25,7 @@
 #include "../errors.hpp"
 #include "../messages.h"                        // MSG_*
 #include "io_reactor.hpp"                       // IoReactor
-#include "io_responder.hpp"                     // Response
+#include "io_response.hpp"                     // ResponseCode
 #include <boost/asio.hpp>                       // boost::asio::*
 #include <boost/asio/high_resolution_timer.hpp> // boost::asio::high_resolution_timer
 
@@ -33,7 +33,7 @@ const std::chrono::nanoseconds IoReactor::PLAYER_UPDATE_PERIOD(1000);
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler,
                      const std::string &address, const std::string &port,
-                     Responder::Callback cb)
+                     ResponseSink::Callback cb)
     : player(player),
       handler(handler),
       io_service(),
@@ -58,9 +58,9 @@ void IoReactor::HandleCommand(const std::string &line)
 {
 	bool valid = this->handler.Handle(line);
 	if (valid) {
-		Respond(Response::OKAY, line);
+		Respond(ResponseCode::OKAY, line);
 	} else {
-		Respond(Response::WHAT, MSG_CMD_INVALID);
+		Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
 	}
 }
 
@@ -83,8 +83,12 @@ void IoReactor::DoUpdateTimer()
 	                PLAYER_UPDATE_PERIOD);
 	boost::asio::high_resolution_timer t(this->io_service, tick);
 	t.async_wait([this](boost::system::error_code) {
-		this->player.Update();
-		DoUpdateTimer();
+		bool running = this->player.Update();
+		if (running) {
+			DoUpdateTimer();
+		} else {
+			End();
+		}
 	});
 }
 
@@ -137,7 +141,7 @@ void IoReactor::End()
 TcpConnection::TcpConnection(std::function<void(const std::string &)> cmd,
                              TcpConnectionManager &manager,
                              boost::asio::io_service &io_service,
-                             Responder::Callback cb)
+                             ResponseSink::Callback cb)
     : socket(io_service),
       strand(io_service),
       outbox(),
