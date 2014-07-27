@@ -23,7 +23,7 @@
 #include "../messages.h"
 
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
-	: audio_system(audio_system), time_parser(time_parser), position(), state(), audio(nullptr)
+	: audio_system(audio_system), time_parser(time_parser), audio(nullptr), position(), state()
 {
 }
 

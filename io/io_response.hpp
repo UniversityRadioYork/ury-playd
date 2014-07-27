@@ -90,7 +90,7 @@ public:
 	 * @param responder The ResponseSink to which this ResponseSource's
 	 *   current response should be emitted.
 	 */
-	virtual const void Emit(ResponseSink &responder) const = 0;
+	virtual void Emit(ResponseSink &responder) const = 0;
 
 	/**
 	 * Registers a ResponseSink with this ResponseSource.
@@ -106,7 +106,7 @@ protected:
 	 * @param code The code for this response.
 	 * @param message The message for this response.
 	 */
-	const void Push() const;
+	void Push() const;
 
 private:
 	/// A ResponseSink to which 'push' responses are emitted.

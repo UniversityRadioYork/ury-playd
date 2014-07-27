@@ -56,7 +56,7 @@ void PlayerPosition::Reset()
 	this->last = boost::none;
 }
 
-const void PlayerPosition::Emit(ResponseSink &target) const
+void PlayerPosition::Emit(ResponseSink &target) const
 {
 	std::ostringstream os;
 	os << this->current.count();

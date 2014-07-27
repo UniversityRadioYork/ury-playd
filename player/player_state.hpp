@@ -62,7 +62,7 @@ public:
 	 * @param responder The responder to which the current state shall be
 	 *   emitted.
 	 */
-	const void Emit(ResponseSink &target) const override;
+	void Emit(ResponseSink &target) const override;
 
 	/**
 	 * Executes a closure iff the current state is one of the given states.
@@ -71,14 +71,14 @@ public:
 	 * @return False if the state was not valid, or the result of the
 	 *   closure otherwise.
 	 */
-	const bool IfIn(List states, StateRestrictedFunction f) const;
+	bool IfIn(List states, StateRestrictedFunction f) const;
 
 	/**
 	 * Returns whether the player is still running.
 	 * @return True if the player is not in the QUITTING state; false
 	 *   otherwise.
 	 */
-	const bool PlayerState::IsRunning() const;
+	bool IsRunning() const;
 
 	/**
 	 * Sets the player's current state.
@@ -95,7 +95,7 @@ private:
 	/// The current state.
 	State current;
 
-	const bool In(List states) const;
+	bool In(List states) const;
 };
 
 #endif // PS_PLAYER_STATE_HPP

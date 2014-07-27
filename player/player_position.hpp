@@ -71,7 +71,7 @@ public:
 	 * Emits the current position to a responder.
 	 * @param target The responder to which a TIME response shall be sent.
 	 */
-	const void Emit(ResponseSink &target) const override;
+	void Emit(ResponseSink &target) const override;
 private:
 	/**
 	 * Figures out whether it's time to send a position signal.
