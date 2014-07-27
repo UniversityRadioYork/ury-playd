@@ -1,6 +1,6 @@
 .Dd July 26, 2014
 .Dt PLAYSLAVE++ 1
-.Os 
+.Os
 .Sh NAME
 .Nm playslave++
 .Nd basic TCP/IP-driven audio player
@@ -69,27 +69,21 @@ The command
 
 will produce a listing similar to the following:
 .Bd -literal -offset indent
-0: Microsoft Sound Mapper - Input
-1: Microphone (Plantronics GameCom
-2: SPDIF Interface (Plantronics Ga
-3: Line (Plantronics GameCom 780)
-4: Microsoft Sound Mapper - Output
-5: Speakers (Plantronics GameCom 7
-6: Digital Audio (S/PDIF) (2- High
-7: Digital Audio (S/PDIF) (2- High
-8: Digital Audio (S/PDIF) (2- High Definition Audio Device)
-9: Speakers (Plantronics GameCom 780)
-10: Digital Audio (S/PDIF) (2- High Definition Audio Device)
-11: Microphone (Plantronics GameCom 780)
-12: SPDIF Interface (Plantronics GameCom 780)
-13: Line (Plantronics GameCom 780)
+0: HDA ATI SB: ALC892 Analog (hw:0,0)
+1: HDA ATI SB: ALC892 Digital (hw:0,1)
+2: HDA ATI SB: ALC892 Alt Analog (hw:0,2)
+3: HDA NVidia: ID 42 Digital (hw:1,3)
+4: Plantronics GameCom 780: USB Audio (hw:2,0)
+5: sysdefault
+6: front
+7: surround40
+8: default
+9: dmix
 .Ed
 
 Suppose we want
 .Nm
-to output on the Microsoft Sound Mapper. (Naturally, if you're reading this man
-page, chances are this isn't an option; please excuse the use of Windows-based
-examples!)  The command
+to output on the GameCom.  The command
 
 .Dl % playslave++ 4
 
