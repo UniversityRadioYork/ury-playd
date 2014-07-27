@@ -4,7 +4,7 @@
 /**
 * @file
 * Implementation of the PlayerState class, and related Player methods.
-* @see player/player_position.hpp
+* @see player/player_state.hpp
 * @see player/player.hpp
 */
 

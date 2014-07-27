@@ -149,10 +149,10 @@ bool Player::Seek(const std::string &time_str)
 	return false;
 }
 
-void Player::SetResponseSink(ResponseSink &responder)
+void Player::SetResponseSink(ResponseSink &sink)
 {
-	this->position.SetResponseSink(responder);
-	this->state.SetResponseSink(responder);
+	this->position.SetResponseSink(sink);
+	this->state.SetResponseSink(sink);
 }
 
 bool Player::Stop()

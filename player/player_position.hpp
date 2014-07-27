@@ -19,6 +19,8 @@
 
 /**
  * Tracker and broadcaster for the Player's current position in a song.
+ * @see Player
+ * @see PlayerState
  */
 class PlayerPosition : public ResponseSource {
 public:
@@ -26,7 +28,7 @@ public:
 	using Unit = std::chrono::microseconds;
 
 private:
-	/// The period between each firing of the listeners.
+	/// The period between each push of the position to the response sink.
 	Unit period;
 
 	/// The current position of the player.
@@ -39,9 +41,7 @@ private:
 	boost::optional<Unit> last;
 
 public:
-	/**
-	 * Constructs a PlayerPosition.
-	 */
+	/// Constructs a PlayerPosition.
 	PlayerPosition();
 
 	/**
@@ -54,7 +54,8 @@ public:
 
 	/**
 	 * Updates the position tracker with the new position.
-	 * This fires the position listeners if necessary.
+	 * This pushes the position to the registered response sink, if
+	 * necessary.
 	 * @param position The new position, in @a PositionUnit units.
 	 * @see Reset
 	 */
@@ -62,17 +63,18 @@ public:
 
 	/**
 	 * Resets the position tracker's position data.
-	 * This does not deregister the listeners.
+	 * This does not remove any registered push response sink.
 	 * Call this whenever the song changes, or before a skip.
 	 * @see Update
 	 */
 	void Reset();
 
 	/**
-	 * Emits the current position to a responder.
-	 * @param target The responder to which a TIME response shall be sent.
+	 * Emits the current position to a ResponseSink.
+	 * @param sink The ResponseSink to which a TIME response shall be
+	 *   sent.
 	 */
-	void Emit(ResponseSink &target) const override;
+	void Emit(ResponseSink &sink) const override;
 
 private:
 	/**

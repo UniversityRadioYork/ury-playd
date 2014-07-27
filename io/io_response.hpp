@@ -10,10 +10,10 @@
 #ifndef PS_IO_RESPONSE_HPP
 #define PS_IO_RESPONSE_HPP
 
-#include <functional>    // std::function
-#include <map>           // std::map
-#include <string>        // std::string
-#include <ostream>       // std::ostream etc.
+#include <functional> // std::function
+#include <map>        // std::map
+#include <string>     // std::string
+#include <ostream>    // std::ostream etc.
 
 #include <boost/optional.hpp>
 
@@ -46,6 +46,9 @@ extern const std::map<ResponseCode, std::string> RESPONSES;
 
 /**
  * Abstract class for anything that can be sent a response.
+ * Usually the responses come from a ResponseSource, but anything may send a
+ * ResponseSink a response.
+ * @see ResponseSource
  */
 class ResponseSink {
 public:
@@ -82,35 +85,38 @@ protected:
  * milliseconds to the outside world, to keep the client aware of the time,
  * but is also 'polled' on a new client connection so that the client
  * immediately gets the current position on connect.
+ *
+ * @see ResponseSink
  */
 class ResponseSource {
 public:
 	/**
 	 * Emits a response to a given ResponseSink.
-	 * @param responder The ResponseSink to which this ResponseSource's
-	 *   current response should be emitted.
+	 * @param sink The ResponseSink to which this ResponseSource's current
+	 * response should be emitted.
 	 */
-	virtual void Emit(ResponseSink &responder) const = 0;
+	virtual void Emit(ResponseSink &sink) const = 0;
 
 	/**
 	 * Registers a ResponseSink with this ResponseSource.
-	 * The ResponseSource will periodically send a ResponseCode to the given
+	 * The ResponseSource will periodically send a response to the given
 	 * ResponseSink.
-	 * @param responder The responder to register.
+	 * @param sink The ResponseSink to register.
 	 */
-	void SetResponseSink(ResponseSink &responder);
+	void SetResponseSink(ResponseSink &sink);
+
 protected:
 	/**
 	 * Calls an Emit on the registered ResponseSink.
 	 * If there is no registered ResponseSink, the response is dropped.
-	 * @param code The code for this response.
-	 * @param message The message for this response.
 	 */
 	void Push() const;
 
 private:
-	/// A ResponseSink to which 'push' responses are emitted.
-	/// If the ResponseSink is not present, responses are not emitted.
+	/**
+	 * A ResponseSink to which 'push' responses are emitted.
+	 * If the ResponseSink is not present, responses are not emitted.
+	 */
 	boost::optional<std::reference_wrapper<ResponseSink>> push_sink;
 };
 

@@ -32,8 +32,9 @@
 class AudioSystem;
 
 /**
- * A player contains a loaded audio file and the state of its playback.
- * Player connects to the audio system via PortAudio, given a device handle.
+ * A Player contains a loaded audio file and the state of its playback.
+ * @see PlayerPosition
+ * @see PlayerState
  */
 class Player {
 public:
@@ -127,12 +128,12 @@ public:
 	bool Update();
 
 	/**
-	 * Registers a responder with the position and state subsystems.
-	 * This responder is sent information on position and state changes
+	 * Registers a response sink with the position and state subsystems.
+	 * The sink is sent information on position and state changes
 	 * periodically.
-	 * @param responder The ResponseSink to register with the Player.
+	 * @param sink The ResponseSink to register with the Player.
 	 */
-	void SetResponseSink(ResponseSink &listener);
+	void SetResponseSink(ResponseSink &sink);
 
 	/**
 	 * Sets the period between position responses.
@@ -191,6 +192,7 @@ private:
 	 * Opens a file, setting this->audio to the resulting file.
 	 * Generally, you should use Load instead.
 	 * @param path The absolute path to a track to load.
+	 * @see Load
 	 */
 	void OpenFile(const std::string &path);
 };

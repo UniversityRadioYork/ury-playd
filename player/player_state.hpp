@@ -5,10 +5,6 @@
 * @file
 * Declaration of the PlayerState class, and associated types.
 * @see player/player_state.cpp
-* @see player/player.hpp
-* @see player/player.cpp
-* @see player/player_position.hpp
-* @see player/player_position.cpp
 */
 
 #ifndef PS_PLAYER_STATE_HPP
@@ -24,6 +20,7 @@
 /**
  * An object holding and representing the current state of a Player.
  * @see Player
+ * @see PlayerPosition
  */
 class PlayerState : public ResponseSource {
 public:
@@ -55,10 +52,10 @@ public:
 
 	/**
 	 * Announces the current state to a ResponseSink.
-	 * @param responder The responder to which the current state shall be
+	 * @param sink The ResponseSink to which the current state shall be
 	 *   emitted.
 	 */
-	void Emit(ResponseSink &target) const override;
+	void Emit(ResponseSink &sink) const override;
 
 	/**
 	 * Checks whether the current state is in a given list of states.
