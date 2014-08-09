@@ -21,7 +21,8 @@ const std::map<ResponseCode, std::string> RESPONSES = {
                 {ResponseCode::TTFN, "TTFN"},
                 {ResponseCode::STAT, "STATE"},
                 {ResponseCode::TIME, "TIME"},
-                {ResponseCode::FILE, "FILE"}};
+                {ResponseCode::FILE, "FILE"},
+                {ResponseCode::FEATURES, "FEATURES"}};
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message)
 {

@@ -53,6 +53,7 @@ void Player::PlaybackUpdate()
 void Player::WelcomeClient(ResponseSink &client)
 {
 	client.Respond(ResponseCode::OHAI, MSG_OHAI);
+        client.Respond(ResponseCode::FEATURES, MSG_FEATURES);
         this->file.Emit(client);
 	this->position.Emit(client);
 	this->state.Emit(client);

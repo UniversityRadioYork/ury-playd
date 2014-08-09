@@ -50,4 +50,7 @@ const std::string MSG_OHAI = "Playslave++";
 /// Message shown when a client disconnects from Playslave.
 const std::string MSG_TTFN = "Sleep now";
 
+/// The string providing a space-delimited set of features Playslave implements.
+const std::string MSG_FEATURES = "FileLoad Seek StopStart Time";
+
 #endif // PS_MESSAGES_H

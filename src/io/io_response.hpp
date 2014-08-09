@@ -34,7 +34,8 @@ enum class ResponseCode {
 	TTFN, ///< Server shutting down.
 	STAT, ///< Server changing state.
 	TIME, ///< Server sending current song time,
-	FILE  ///< The loaded file just changed.
+	FILE, ///< The loaded file just changed.
+	FEATURES ///< Server sending feature list.
 };
 
 /**
