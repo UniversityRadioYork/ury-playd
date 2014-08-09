@@ -328,7 +328,7 @@ bool AudioSource::UsingPlanarSampleFormat()
 bool AudioSource::DecodePacket()
 {
 	assert(this->packet.data != nullptr);
-	assert(0 < this->packet.size);
+	assert(0 <= this->packet.size);
 
 	auto decode_result = AvCodecDecode();
 
