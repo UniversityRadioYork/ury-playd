@@ -30,7 +30,7 @@ enum class ResponseCode {
 	FAIL,     ///< Error, pointing blame at environment.
 	OHAI,     ///< Server starting up.
 	TTFN,     ///< Server shutting down.
-	STAT,     ///< Server changing state.
+	STATE,    ///< Server changing state.
 	TIME,     ///< Server sending current song time,
 	FILE,     ///< The loaded file just changed.
 	FEATURES, ///< Server sending feature list.
