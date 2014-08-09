@@ -54,7 +54,7 @@ void Player::PlaybackUpdate()
 	}
 }
 
-void Player::WelcomeClient(ResponseSink &client)
+void Player::WelcomeClient(ResponseSink &client) const
 {
 	client.Respond(ResponseCode::OHAI, MSG_OHAI);
         client.Respond(ResponseCode::FEATURES, MSG_FEATURES);

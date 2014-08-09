@@ -32,16 +32,14 @@
 const std::chrono::nanoseconds IoReactor::PLAYER_UPDATE_PERIOD(1000);
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler,
-                     const std::string &address, const std::string &port,
-                     ResponseSink::Callback cb)
+                     const std::string &address, const std::string &port)
     : player(player),
       handler(handler),
       io_service(),
       acceptor(io_service),
       signals(io_service),
       manager(),
-      new_connection(),
-      new_client_callback(cb)
+      new_connection()
 {
 	InitSignals();
 	InitAcceptor(address, port);
@@ -110,7 +108,7 @@ void IoReactor::DoAccept()
 	auto cmd = [this](const std::string &line) { HandleCommand(line); };
 	this->new_connection.reset(
 	                new TcpConnection(cmd, this->manager, this->io_service,
-	                                  this->new_client_callback));
+	                                  this->player));
 	auto on_accept = [this](boost::system::error_code ec) {
 		if (!ec) {
 			this->manager.Start(this->new_connection);
@@ -141,20 +139,20 @@ void IoReactor::End()
 TcpConnection::TcpConnection(std::function<void(const std::string &)> cmd,
                              TcpConnectionManager &manager,
                              boost::asio::io_service &io_service,
-                             ResponseSink::Callback cb)
+                             const Player &player)
     : socket(io_service),
       strand(io_service),
       outbox(),
       cmd(cmd),
       manager(manager),
-      new_client_callback(cb),
+      player(player),
       closing(false)
 {
 }
 
 void TcpConnection::Start()
 {
-	new_client_callback(*this);
+	this->player.WelcomeClient(*this);
 	DoRead();
 }
 

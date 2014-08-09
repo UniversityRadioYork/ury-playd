@@ -115,14 +115,10 @@ Playslave::Playslave(int argc, char *argv[])
 
 	auto size = this->arguments.size();
 
-	using std::bind;
-	using std::placeholders::_1;
-
 	this->io = decltype(this->io)(new IoReactor(
 	                this->player, this->handler,
 	                2 < size ? this->arguments.at(2) : "0.0.0.0",
-	                3 < size ? this->arguments.at(3) : "1350",
-	                bind(&Player::WelcomeClient, &this->player, _1)));
+	                3 < size ? this->arguments.at(3) : "1350"));
 }
 
 int Playslave::Run()

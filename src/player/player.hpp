@@ -143,7 +143,7 @@ public:
 	 * @param client An IO ResponseSink to which messages to the client
 	 *   should be sent.
 	 */
-	void WelcomeClient(ResponseSink &client);
+	void WelcomeClient(ResponseSink &client) const;
 
 private:
 	/**

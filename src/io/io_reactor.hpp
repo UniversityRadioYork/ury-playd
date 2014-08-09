@@ -18,6 +18,7 @@
 #include <ostream>        // std::ostream
 #include <set>            // std::set
 #include "io_reactor.hpp" // IoReactor
+#include "../player/player.hpp"
 
 class Player;
 class CommandHandler;
@@ -25,7 +26,6 @@ class CommandHandler;
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-class Player;
 class CommandHandler;
 
 class TcpConnectionManager;
@@ -44,13 +44,13 @@ public:
 	 * @param cmd A function that sends a command line to be handled.
 	 * @param manager The manager that is handling this connection.
 	 * @param io_service The IO service to be used for this connection.
-	 * @param cb A callback to fire when the connection starts.
+	 * @param player A const reference to the player.
 	 * @return A TcpConnection.
 	 */
 	explicit TcpConnection(std::function<void(const std::string &)> cmd,
 	                       TcpConnectionManager &manager,
 	                       boost::asio::io_service &io_service,
-	                       ResponseSink::Callback cb);
+	                       const Player &player);
 
 	/// Deleted copy constructor.
 	TcpConnection(const TcpConnection &) = delete;
@@ -93,6 +93,7 @@ private:
 	std::deque<std::string> outbox;
 	std::function<void(const std::string &)> cmd;
 	TcpConnectionManager &manager;
+        const Player &player;
 	ResponseSink::Callback new_client_callback;
 
 	bool closing;
@@ -151,11 +152,9 @@ public:
 	 * @param handler The handler to which command inputs shall be sent.
 	 * @param address The address to which IoReactor will bind.
 	 * @param port The port on which IoReactor will listen for clients.
-	 * @param cb The callback to fire when clients connect.
 	 */
 	explicit IoReactor(Player &player, CommandHandler &handler,
-	                   const std::string &address, const std::string &port,
-	                   ResponseSink::Callback cb);
+	                   const std::string &address, const std::string &port);
 
 	/// Deleted copy constructor.
 	IoReactor(const IoReactor &) = delete;
