@@ -19,7 +19,7 @@ const std::map<ResponseCode, std::string> RESPONSES = {
                 {ResponseCode::NOPE, "NOPE"},
                 {ResponseCode::OHAI, "OHAI"},
                 {ResponseCode::TTFN, "TTFN"},
-                {ResponseCode::STAT, "STAT"},
+                {ResponseCode::STAT, "STATE"},
                 {ResponseCode::TIME, "TIME"},
                 {ResponseCode::FILE, "FILE"}};
 

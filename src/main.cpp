@@ -134,7 +134,7 @@ void Playslave::RegisterCommands(Player *p)
 
 	this->handler.AddNullary("play", bind(&Player::Play, p))
 	                .AddNullary("stop", bind(&Player::Stop, p))
-	                .AddNullary("ejct", bind(&Player::Eject, p))
+	                .AddNullary("eject", bind(&Player::Eject, p))
 	                .AddNullary("quit", bind(&Player::Quit, p))
 	                .AddUnary("load", bind(&Player::Load, p, _1))
 	                .AddUnary("seek", bind(&Player::Seek, p, _1));
