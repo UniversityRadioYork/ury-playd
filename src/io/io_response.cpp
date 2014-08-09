@@ -11,23 +11,22 @@
 #include "io_response.hpp" // ResponseSink, ResponseCode
 #include "../errors.hpp"   // Error
 
-const std::map<ResponseCode, std::string> RESPONSES = {
-                {ResponseCode::OKAY,     "OKAY"},
-                {ResponseCode::WHAT,     "WHAT"},
-                {ResponseCode::FAIL,     "FAIL"},
-                {ResponseCode::OHAI,     "OHAI"},
-                {ResponseCode::TTFN,     "TTFN"},
-                {ResponseCode::STATE,    "STATE"},
-                {ResponseCode::TIME,     "TIME"},
-                {ResponseCode::FILE,     "FILE"},
-                {ResponseCode::FEATURES, "FEATURES"},
-                {ResponseCode::END,      "END"}};
+const std::string RESPONSES[] = {
+                /* ResponseCode::OKAY     */ "OKAY",
+                /* ResponseCode::WHAT     */ "WHAT",
+                /* ResponseCode::FAIL     */ "FAIL",
+                /* ResponseCode::OHAI     */ "OHAI",
+                /* ResponseCode::STATE    */ "STATE",
+                /* ResponseCode::TIME     */ "TIME",
+                /* ResponseCode::FILE     */ "FILE",
+                /* ResponseCode::FEATURES */ "FEATURES",
+                /* ResponseCode::END      */ "END"};
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message)
 {
 	// ResponseCodes are formatted as "CODE message\n".
 	std::ostringstream os;
-	os << RESPONSES.at(code) << " " << message << std::endl;
+	os << RESPONSES[static_cast<int>(code)] << " " << message << std::endl;
 
 	// Delegate the actual sending of the response string to the concrete
 	// implementation.

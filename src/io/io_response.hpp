@@ -29,7 +29,6 @@ enum class ResponseCode {
 	WHAT,     ///< Request was invalid/user error.
 	FAIL,     ///< Error, pointing blame at environment.
 	OHAI,     ///< Server starting up.
-	TTFN,     ///< Server shutting down.
 	STATE,    ///< Server changing state.
 	TIME,     ///< Server sending current song time,
 	FILE,     ///< The loaded file just changed.
@@ -41,7 +40,7 @@ enum class ResponseCode {
  * A map from ResponseCode codes to their string equivalents.
  * @see ResponseCode
  */
-extern const std::map<ResponseCode, std::string> RESPONSES;
+extern const std::string RESPONSES[];
 
 /**
  * Abstract class for anything that can be sent a response.
