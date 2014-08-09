@@ -25,17 +25,16 @@
  * @see RESPONSES
  */
 enum class ResponseCode {
-	OKAY, ///< Request was valid and produced an answer.
-	WHAT, ///< Request was invalid/user error.
-	FAIL, ///< Error, pointing blame at environment.
-	OOPS, ///< Error, pointing blame at programmer.
-	NOPE, ///< Request was probably valid, but forbidden.
-	OHAI, ///< Server starting up.
-	TTFN, ///< Server shutting down.
-	STAT, ///< Server changing state.
-	TIME, ///< Server sending current song time,
-	FILE, ///< The loaded file just changed.
-	FEATURES ///< Server sending feature list.
+	OKAY,     ///< Request was valid and produced an answer.
+	WHAT,     ///< Request was invalid/user error.
+	FAIL,     ///< Error, pointing blame at environment.
+	OHAI,     ///< Server starting up.
+	TTFN,     ///< Server shutting down.
+	STAT,     ///< Server changing state.
+	TIME,     ///< Server sending current song time,
+	FILE,     ///< The loaded file just changed.
+	FEATURES, ///< Server sending feature list.
+	END       ///< The loaded file just ended on its own.
 };
 
 /**
@@ -75,6 +74,9 @@ protected:
 	 */
 	virtual void RespondRaw(const std::string &string) = 0;
 };
+
+/// Type for slots that accept ResponseSinks.  Yeeeah.
+using ResponseSinkSlot = boost::optional<std::reference_wrapper<ResponseSink>>;
 
 /**
  * Abstract helper class for sources of responses.
@@ -117,7 +119,7 @@ private:
 	 * A ResponseSink to which 'push' responses are emitted.
 	 * If the ResponseSink is not present, responses are not emitted.
 	 */
-	boost::optional<std::reference_wrapper<ResponseSink>> push_sink;
+	ResponseSinkSlot push_sink;
 };
 
 #endif // PS_IO_RESPONSE_HPP

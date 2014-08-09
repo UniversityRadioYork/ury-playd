@@ -45,6 +45,7 @@ private:
 	PlayerPosition position;
 	PlayerState state;
 	const TP &time_parser;
+	ResponseSinkSlot end_sink;
 
 public:
 	/**
@@ -124,9 +125,9 @@ public:
 	bool Update();
 
 	/**
-	 * Registers a response sink with the position and state subsystems.
-	 * The sink is sent information on position and state changes
-	 * periodically.
+	 * Registers a response sink with the Player.
+	 * The sink is sent information on position, file and state changes
+	 * periodically, as well as being notified when a file ends.
 	 * @param sink The ResponseSink to register with the Player.
 	 */
 	void SetResponseSink(ResponseSink &sink);
@@ -183,14 +184,6 @@ private:
 
 	/// Performs player updates necessary while the player is playing.
 	void PlaybackUpdate();
-
-	/**
-	 * Opens a file, setting this->audio to the resulting file.
-	 * Generally, you should use Load instead.
-	 * @param path The absolute path to a track to load.
-	 * @see Load
-	 */
-	void OpenFile(const std::string &path);
 };
 
 #endif // PS_PLAYER_HPP

@@ -44,6 +44,10 @@ bool Player::Update()
 void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
+                if (this->end_sink.is_initialized()) {
+                        this->end_sink.get().get().Respond(ResponseCode::END,
+                                                           "");
+                }
 		Eject();
 	} else {
 		UpdatePosition();
@@ -64,6 +68,7 @@ void Player::SetResponseSink(ResponseSink &sink)
         this->file.SetResponseSink(sink);
 	this->position.SetResponseSink(sink);
 	this->state.SetResponseSink(sink);
+        this->end_sink = std::ref(sink);
 }
 
 //
