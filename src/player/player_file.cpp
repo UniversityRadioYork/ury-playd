@@ -60,3 +60,4 @@ void PlayerFile::Update()
 	assert(this->audio != nullptr);
 	this->audio->Update();
 }
+

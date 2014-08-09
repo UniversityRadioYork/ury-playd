@@ -48,7 +48,8 @@ void Player::PlaybackUpdate()
                         this->end_sink.get().get().Respond(ResponseCode::END,
                                                            "");
                 }
-		Eject();
+		Stop();
+		Seek("0");
 	} else {
 		UpdatePosition();
 	}
