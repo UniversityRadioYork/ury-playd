@@ -107,13 +107,11 @@ const Player::TP::UnitMap UNITS = {
                 {"", Player::TP::MkTime<std::chrono::microseconds>}};
 
 Playslave::Playslave(int argc, char *argv[])
-    : audio(), player(audio, time_parser), handler(), time_parser(UNITS)
+    : audio(), player(audio, time_parser), handler(player), time_parser(UNITS)
 {
 	for (int i = 0; i < argc; i++) {
 		this->arguments.push_back(std::string(argv[i]));
 	}
-
-	RegisterCommands(&this->player);
 
 	auto size = this->arguments.size();
 
@@ -125,19 +123,6 @@ Playslave::Playslave(int argc, char *argv[])
 	                2 < size ? this->arguments.at(2) : "0.0.0.0",
 	                3 < size ? this->arguments.at(3) : "1350",
 	                bind(&Player::WelcomeClient, &this->player, _1)));
-}
-
-void Playslave::RegisterCommands(Player *p)
-{
-	using std::bind;
-	using std::placeholders::_1;
-
-	this->handler.AddNullary("play", bind(&Player::Play, p))
-	                .AddNullary("stop", bind(&Player::Stop, p))
-	                .AddNullary("eject", bind(&Player::Eject, p))
-	                .AddNullary("quit", bind(&Player::Quit, p))
-	                .AddUnary("load", bind(&Player::Load, p, _1))
-	                .AddUnary("seek", bind(&Player::Seek, p, _1));
 }
 
 int Playslave::Run()

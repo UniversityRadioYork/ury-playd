@@ -15,6 +15,8 @@
 #include <map>
 #include <vector>
 
+#include "player/player.hpp"
+
 #ifdef IGNORE
 #undef IGNORE
 #endif
@@ -27,15 +29,12 @@ public:
 	/// The type of lists of command words.
 	using WordList = std::vector<std::string>;
 
-	/// The type of functions called on receipt of commands.
-	using Payload = std::function<bool(WordList)>;
-
-	/// The type of a command action that takes no command words.
-	using NullAction = std::function<bool()>;
-
-	/// The type of a command action that takes exactly one command word.
-	using SingleRequiredWordAction =
-	                std::function<bool(const std::string &)>;
+	/**
+	 * Constructs a CommandHandler.
+	 * @param player A reference to the Player on which the Playslave
+	 *   commands will run.
+	 */
+	CommandHandler(Player &player);
 
 	/**
 	 * Handles a command line.
@@ -44,29 +43,9 @@ public:
 	 */
 	bool Handle(const std::string &line);
 
-	/**
-	 * Adds a nullary command.
-	 * @param word The command word to associate with @a f.
-	 * @param f The command, taking no arguments, to execute when the
-	 *   command word @a word is read.
-	 * @return A reference to this CommandHandler, for method chaining.
-	 */
-	CommandHandler &AddNullary(const std::string &word,
-	                           std::function<bool()> f);
-
-	/**
-	 * Adds a unary command.
-	 * @param word The command word to associate with @a f.
-	 * @param f The command, taking one argument, to execute when the
-	 *   command word @a word is read.
-	 * @return A reference to this CommandHandler, for method chaining.
-	 */
-	CommandHandler &AddUnary(const std::string &word,
-	                         std::function<bool(const std::string &)> f);
-
 private:
-	/// The map of command words to their payload functions.
-	std::map<std::string, Payload> commands;
+	/// Reference to the Player on which commands run.
+	Player &player;
 
 	/**
 	 * Parses a command line into a list of words.
@@ -82,6 +61,9 @@ private:
 	 * @return true if the command was valid; false otherwise.
 	 */
 	bool Run(const WordList &words);
+
+	bool RunNullary(const std::string &cmd);
+	bool RunUnary(const std::string &cmd, const std::string &arg);
 };
 
 #endif // PS_CMD_HPP
