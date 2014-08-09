@@ -25,17 +25,16 @@
  * @see RESPONSES
  */
 enum class ResponseCode {
-	// 'Pull' responses (initiated by client command)
 	OKAY, ///< Request was valid and produced an answer.
 	WHAT, ///< Request was invalid/user error.
 	FAIL, ///< Error, pointing blame at environment.
 	OOPS, ///< Error, pointing blame at programmer.
 	NOPE, ///< Request was probably valid, but forbidden.
-	// 'Push' responses (initiated by server)
 	OHAI, ///< Server starting up.
 	TTFN, ///< Server shutting down.
 	STAT, ///< Server changing state.
-	TIME, ///< Server sending current song time.
+	TIME, ///< Server sending current song time,
+	FILE  ///< The loaded file just changed.
 };
 
 /**

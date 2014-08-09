@@ -44,6 +44,12 @@ public:
 	Audio(AudioSource *source, AudioSink *sink);
 
 	/**
+	 * Gets the file-path of this audio file.
+	 * @return The audio file's path.
+	 */
+	std::string Path() const;
+
+	/**
 	 * Starts playback of this audio file.
 	 * @see Stop
 	 * @see IsStopped

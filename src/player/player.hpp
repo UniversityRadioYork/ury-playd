@@ -26,10 +26,9 @@
 #include "../time_parser.hpp"
 #include "../io/io_response.hpp"
 
+#include "player_file.hpp"
 #include "player_position.hpp"
 #include "player_state.hpp"
-
-class AudioSystem;
 
 /**
  * A Player contains a loaded audio file and the state of its playback.
@@ -42,13 +41,10 @@ public:
 	using TP = TimeParser<std::chrono::microseconds>;
 
 private:
-	const AudioSystem &audio_system;
-	const TP &time_parser;
-
-	std::unique_ptr<Audio> audio;
-
+	PlayerFile file;
 	PlayerPosition position;
 	PlayerState state;
+	const TP &time_parser;
 
 public:
 	/**

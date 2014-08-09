@@ -22,7 +22,7 @@ void Player::SetPositionResponsePeriod(PlayerPosition::Unit period)
 
 void Player::UpdatePosition()
 {
-	auto pos = this->audio->CurrentPosition<PlayerPosition::Unit>();
+	auto pos = this->file.CurrentPosition<PlayerPosition::Unit>();
 	this->position.Update(pos);
 }
 

@@ -26,6 +26,12 @@ Audio::Audio(AudioSource *source, AudioSink *sink) : source(source), sink(sink)
 	ClearFrame();
 }
 
+std::string Audio::Path() const
+{
+	assert(this->source != nullptr);
+	return this->source->Path();
+}
+
 void Audio::Start()
 {
 	this->sink->Start();

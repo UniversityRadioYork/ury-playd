@@ -41,7 +41,8 @@ AudioSource::AudioSource(const std::string &path)
     : decode_state(DecodeState::WAITING_FOR_FRAME),
       buffer(BUFFER_SIZE),
       context(nullptr),
-      frame(nullptr)
+      frame(nullptr),
+      path(path)
 {
 	Open(path);
 	InitialiseStream();
@@ -58,6 +59,10 @@ AudioSource::~AudioSource()
 	if (this->frame != nullptr) {
 		av_frame_free(&this->frame);
 	}
+}
+
+std::string AudioSource::Path() const {
+        return this->path;
 }
 
 std::uint8_t AudioSource::ChannelCount() const

@@ -23,11 +23,10 @@
 #include "../messages.h"
 
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
-    : audio_system(audio_system),
-      time_parser(time_parser),
-      audio(nullptr),
+    : file(audio_system),
       position(),
-      state()
+      state(),
+      time_parser(time_parser)
 {
 }
 
@@ -37,30 +36,33 @@ bool Player::Update()
 		PlaybackUpdate();
 	}
 	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
-		this->audio->Update();
+		this->file.Update();
 	}
 	return IsRunning();
 }
 
 void Player::PlaybackUpdate()
 {
-	if (this->audio->IsStopped()) {
+	if (this->file.IsStopped()) {
 		Eject();
 	} else {
 		UpdatePosition();
 	}
 }
 
-void Player::OpenFile(const std::string &path)
-{
-	this->audio = decltype(this->audio)(this->audio_system.Load(path));
-}
-
 void Player::WelcomeClient(ResponseSink &client)
 {
 	client.Respond(ResponseCode::OHAI, MSG_OHAI);
-	this->state.Emit(client);
+        this->file.Emit(client);
 	this->position.Emit(client);
+	this->state.Emit(client);
+}
+
+void Player::SetResponseSink(ResponseSink &sink)
+{
+        this->file.SetResponseSink(sink);
+	this->position.SetResponseSink(sink);
+	this->state.SetResponseSink(sink);
 }
 
 //
@@ -70,7 +72,7 @@ void Player::WelcomeClient(ResponseSink &client)
 bool Player::Eject()
 {
 	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
-		this->audio = nullptr;
+                this->file.Eject();
 		SetState(PlayerState::State::EJECTED);
 		return true;
 	}
@@ -83,7 +85,7 @@ bool Player::Load(const std::string &path)
 	if (valid) {
 		try
 		{
-			OpenFile(path);
+			this->file.Load(path);
 			ResetPosition();
 			Debug("Loaded ", path);
 			SetState(PlayerState::State::STOPPED);
@@ -108,8 +110,7 @@ bool Player::Load(const std::string &path)
 bool Player::Play()
 {
 	if (CurrentStateIn({PlayerState::State::STOPPED})) {
-		assert(this->audio != nullptr);
-		this->audio->Start();
+                this->file.Start();
 		SetState(PlayerState::State::PLAYING);
 		return true;
 	}
@@ -140,7 +141,7 @@ bool Player::Seek(const std::string &time_str)
 		}
 
 		if (success) {
-			this->audio->SeekToPosition(position);
+			this->file.SeekToPosition(position);
 			this->ResetPosition();
 			this->UpdatePosition();
 		}
@@ -149,16 +150,10 @@ bool Player::Seek(const std::string &time_str)
 	return false;
 }
 
-void Player::SetResponseSink(ResponseSink &sink)
-{
-	this->position.SetResponseSink(sink);
-	this->state.SetResponseSink(sink);
-}
-
 bool Player::Stop()
 {
 	if (CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES)) {
-		this->audio->Stop();
+		this->file.Stop();
 		SetState(PlayerState::State::STOPPED);
 		return true;
 	}

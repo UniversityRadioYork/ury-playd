@@ -19,6 +19,7 @@
 
 extern "C" {
 #include <libavformat/avformat.h>
+#include <libavutil/frame.h>
 #include <libswresample/swresample.h>
 }
 
@@ -61,6 +62,12 @@ public:
 
 	/// Destructs an AudioSource.
 	~AudioSource();
+
+	/**
+	 * Gets the file-path of this audio source's audio file.
+	 * @return The audio file's path.
+	 */
+	std::string Path() const;
 
 	/**
 	 * Performs a round of decoding.
@@ -143,6 +150,8 @@ private:
 	AVFrame *frame;           ///< The last decoded frame.
 
 	std::unique_ptr<Resampler> resampler; ///< The resampler.
+
+	std::string path; ///< The path of the file loaded in this source.
 
 	void Open(const std::string &path);
 
