@@ -17,12 +17,22 @@ primarily by CaptainHayashi and LordAro.  It is licenced under the MIT licence
 * Full protocol information is available on the GitHub wiki.
 * On POSIX systems, see the enclosed man page.
 
+`playslave++` understands the following commands via its TCP/IP interface:
+
+* `load "/full/path/to/file"` — Loads /full/path/to/file for playback;
+* `eject` — Unloads the current file;
+* `play` — Starts playback;
+* `stop` — Stops (pauses) playback;
+* `seek 1m` — Seeks one minute into the current file.  Units supported include
+  `h`, `m`, `s`, `ms`, `us` (micros), with `us` assumed if no unit is given.
+* `quit` — Closes `playslave++`.
+
 ## Features
 
 * Theoretically plays anything ffmpeg can play
 * Seek (microseconds, seconds, minutes etc)
 * Frequently announces the current position
-* TCP/IO interface with text protocol
+* TCP/IP interface with text protocol
 * Deliberately not much else
 
 ## Philosophy
