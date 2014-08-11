@@ -105,7 +105,7 @@ bool Player::Load(const std::string &path)
 			// Ensure a load failure doesn't leave a corrupted track
 			// loaded.
 			Eject();
-			throw error;
+			throw;
 		}
 	}
 	return valid;
