@@ -136,7 +136,7 @@ int Playslave::Run()
 	catch (Error &error)
 	{
 		io->RespondWithError(error);
-		Debug("Unhandled exception caught, going away now.");
+		Debug() << "Unhandled exception caught, going away now." << std::endl;
 		exit_code = EXIT_FAILURE;
 	}
 

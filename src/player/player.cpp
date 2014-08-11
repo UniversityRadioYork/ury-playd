@@ -94,7 +94,7 @@ bool Player::Load(const std::string &path)
 		{
 			this->file.Load(path);
 			ResetPosition();
-			Debug("Loaded ", path);
+			Debug() << "Loaded " << path << std::endl;
 			SetState(PlayerState::State::STOPPED);
 		}
 		catch (FileError &)

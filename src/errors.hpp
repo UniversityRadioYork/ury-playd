@@ -11,6 +11,7 @@
 #define PS_ERRORS_HPP
 
 #include <iostream>
+#include <sstream>
 
 /**
  * A Playslave exception.
@@ -74,44 +75,48 @@ public:
 	FileError(const std::string &message) : Error(message) {};
 };
 
-//
-// Debugging
-//
+/** Class for telling the human what playslave is doing. */
+class Debug {
+public:
+	/** Constructor. */
+	inline Debug()
+	{
+		oss << "DEBUG:";
+	}
 
-/**
- * Base case for DebugArgs, when there are no arguments.
- */
-inline void DebugArgs()
-{
-}
+	/** Destructor. Actually shoves things to the screen. */
+	inline ~Debug()
+	{
+		std::cerr << oss.str();
+	}
 
-/**
- * Outputs a debug message, with a variadic number of arguments (at least one).
- * This is defined inductively, with DebugArgs() being the base case.
- * @tparam Arg1 The type of the leftmost argument.
- * @tparam Args Parameter pack of remaining arguments.
- * @param arg1 The leftmost argument.
- * @param args The remaining arguments.
- */
-template <typename Arg1, typename... Args>
-inline void DebugArgs(Arg1 &arg1, Args &... args)
-{
-	std::cerr << " " << arg1;
-	DebugArgs(args...);
-}
+	/**
+	 * Stream operator for shoving objects onto a screen somewhere.
+	 * @tparam T Type of parameter.
+	 * @param x Object to write to the stream.
+	 * @return Chainable reference.
+	 */
+	template <typename T>
+	inline Debug &operator<<(const T &x)
+	{
+		oss << " ";
+		oss << x;
+		return *this;
+	}
 
-/**
- * Outputs a debug message, with a variadic number of arguments.
- * @tparam Args Parameter pack of arguments.
- * @param args The arguments.
- * @see DebugArgs
- */
-template <typename... Args>
-inline void Debug(Args &... args)
-{
-	std::cerr << "DEBUG:";
-	DebugArgs(args...);
-	std::cerr << std::endl;
-}
+	/**
+	 * Specialisation for std::endl, which is actually a function pointer.
+	 * @param pf Function pointer.
+	 * @return Chainable reference.
+	 */
+	inline Debug &operator<<(std::ostream&(*pf)(std::ostream&))
+	{
+		oss << pf;
+		return *this;
+	}
+
+private:
+	std::ostringstream oss; ///< Stream buffer (avoids theoretical threading issues).
+};
 
 #endif // PS_ERRORS_HPP

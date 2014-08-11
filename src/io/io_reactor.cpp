@@ -229,7 +229,7 @@ void TcpConnection::DoWrite()
 	// connection manager's list and cause illegal memory accesses.
 	auto self(shared_from_this());
 
-	const std::string &string = this->outbox[0];
+	std::string string = this->outbox[0];
 	// This is called after the write has finished.
 	auto write_cb = [this, self](const boost::system::error_code &ec,
 	                             std::size_t) {
@@ -246,6 +246,10 @@ void TcpConnection::DoWrite()
 		}
 	};
 
+	// Only add the newline character at the final opportunity.
+	// Makes for easier debug lines.
+	assert(string.back() != '\n');
+	string += '\n';
 	boost::asio::async_write(
 	                this->socket,
 	                boost::asio::buffer(string.c_str(), string.size()),
@@ -287,7 +291,7 @@ void TcpConnectionManager::StopAll()
 
 void TcpConnectionManager::Send(const std::string &string)
 {
-	Debug("Send to all:", string);
+	Debug() << "Send to all:" << string << std::endl;
 	for (auto c : this->connections) {
 		c->Send(string);
 	}
