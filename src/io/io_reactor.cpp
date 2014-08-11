@@ -95,7 +95,7 @@ void IoReactor::InitAcceptor(const std::string &address,
 {
 	boost::asio::ip::tcp::resolver resolver(io_service);
 	boost::asio::ip::tcp::endpoint endpoint =
-	                *resolver.resolve({address, port});
+	                *resolver.resolve({ address, port });
 	this->acceptor.open(endpoint.protocol());
 	this->acceptor.set_option(
 	                boost::asio::ip::tcp::acceptor::reuse_address(true));
@@ -106,9 +106,8 @@ void IoReactor::InitAcceptor(const std::string &address,
 void IoReactor::DoAccept()
 {
 	auto cmd = [this](const std::string &line) { HandleCommand(line); };
-	this->new_connection.reset(
-	                new TcpConnection(cmd, this->manager, this->io_service,
-	                                  this->player));
+	this->new_connection.reset(new TcpConnection(
+	                cmd, this->manager, this->io_service, this->player));
 	auto on_accept = [this](boost::system::error_code ec) {
 		if (!ec) {
 			this->manager.Start(this->new_connection);

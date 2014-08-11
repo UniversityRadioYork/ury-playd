@@ -109,14 +109,15 @@ public:
 	 * @param pf Function pointer.
 	 * @return Chainable reference.
 	 */
-	inline Debug &operator<<(std::ostream&(*pf)(std::ostream&))
+	inline Debug &operator<<(std::ostream &(*pf)(std::ostream &))
 	{
 		oss << pf;
 		return *this;
 	}
 
 private:
-	std::ostringstream oss; ///< Stream buffer (avoids theoretical threading issues).
+	std::ostringstream oss; ///< Stream buffer (avoids theoretical threading
+	                        /// issues).
 };
 
 #endif // PS_ERRORS_HPP

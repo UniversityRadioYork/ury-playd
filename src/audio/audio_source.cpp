@@ -61,8 +61,9 @@ AudioSource::~AudioSource()
 	}
 }
 
-std::string AudioSource::Path() const {
-        return this->path;
+std::string AudioSource::Path() const
+{
+	return this->path;
 }
 
 std::uint8_t AudioSource::ChannelCount() const
@@ -213,10 +214,11 @@ Resampler::ResultVector AudioSource::Resample()
 }
 
 static const std::map<AVSampleFormat, SampleFormat> sf_from_av = {
-                {AV_SAMPLE_FMT_U8, SampleFormat::PACKED_UNSIGNED_INT_8},
-                {AV_SAMPLE_FMT_S16, SampleFormat::PACKED_SIGNED_INT_16},
-                {AV_SAMPLE_FMT_S32, SampleFormat::PACKED_SIGNED_INT_32},
-                {AV_SAMPLE_FMT_FLT, SampleFormat::PACKED_FLOAT_32}};
+	{ AV_SAMPLE_FMT_U8, SampleFormat::PACKED_UNSIGNED_INT_8 },
+	{ AV_SAMPLE_FMT_S16, SampleFormat::PACKED_SIGNED_INT_16 },
+	{ AV_SAMPLE_FMT_S32, SampleFormat::PACKED_SIGNED_INT_32 },
+	{ AV_SAMPLE_FMT_FLT, SampleFormat::PACKED_FLOAT_32 }
+};
 
 /**
  * @return The sample format of the data returned by this decoder.

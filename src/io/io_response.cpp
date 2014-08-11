@@ -11,15 +11,16 @@
 #include "../errors.hpp"   // Error
 
 const std::string RESPONSES[] = {
-                /* ResponseCode::OKAY     */ "OKAY",
-                /* ResponseCode::WHAT     */ "WHAT",
-                /* ResponseCode::FAIL     */ "FAIL",
-                /* ResponseCode::OHAI     */ "OHAI",
-                /* ResponseCode::STATE    */ "STATE",
-                /* ResponseCode::TIME     */ "TIME",
-                /* ResponseCode::FILE     */ "FILE",
-                /* ResponseCode::FEATURES */ "FEATURES",
-                /* ResponseCode::END      */ "END"};
+	/* ResponseCode::OKAY     */ "OKAY",
+	/* ResponseCode::WHAT     */ "WHAT",
+	/* ResponseCode::FAIL     */ "FAIL",
+	/* ResponseCode::OHAI     */ "OHAI",
+	/* ResponseCode::STATE    */ "STATE",
+	/* ResponseCode::TIME     */ "TIME",
+	/* ResponseCode::FILE     */ "FILE",
+	/* ResponseCode::FEATURES */ "FEATURES",
+	/* ResponseCode::END      */ "END"
+};
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message)
 {

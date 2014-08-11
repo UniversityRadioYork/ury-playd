@@ -85,7 +85,6 @@ private:
 
 	/// The current state.
 	State current;
-
 };
 
 #endif // PS_PLAYER_STATE_HPP

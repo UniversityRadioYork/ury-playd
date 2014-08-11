@@ -36,12 +36,16 @@ void Player::SetState(PlayerState::State state)
 //
 
 const PlayerState::List PlayerState::AUDIO_PLAYING_STATES = {
-                PlayerState::State::PLAYING};
+	PlayerState::State::PLAYING
+};
 
 const PlayerState::List PlayerState::AUDIO_LOADED_STATES = {
-                PlayerState::State::PLAYING, PlayerState::State::STOPPED};
+	PlayerState::State::PLAYING, PlayerState::State::STOPPED
+};
 
-PlayerState::PlayerState() : current(State::EJECTED) {}
+PlayerState::PlayerState() : current(State::EJECTED)
+{
+}
 
 void PlayerState::Emit(ResponseSink &responder) const
 {
@@ -63,11 +67,12 @@ bool PlayerState::IsRunning() const
 // Private
 
 const std::map<PlayerState::State, std::string> PlayerState::STRINGS = {
-                {State::STARTING, "Starting"},
-                {State::EJECTED, "Ejected"},
-                {State::STOPPED, "Stopped"},
-                {State::PLAYING, "Playing"},
-                {State::QUITTING, "Quitting"}};
+	{ State::STARTING, "Starting" },
+	{ State::EJECTED, "Ejected" },
+	{ State::STOPPED, "Stopped" },
+	{ State::PLAYING, "Playing" },
+	{ State::QUITTING, "Quitting" }
+};
 
 void PlayerState::Set(PlayerState::State state)
 {
