@@ -45,7 +45,7 @@ PKGS = portaudio-2.0 libavcodec libavformat libavutil libswresample
 # PortAudio's C++ bindings aren't always available, so we bundle them.
 # However, if there is a PortAudioCPP package available, we can make use of it
 # instead.
-HAS_PORTAUDIOCPP ?= $(shell $(PKG_CONFIG) --list | grep 'portaudiocpp')
+HAS_PORTAUDIOCPP ?= $(shell $(PKG_CONFIG) --list-all | grep 'portaudiocpp')
 ifeq "$(HAS_PORTAUDIOCPP)" ""
   PORTAUDIOCPP_DIR  = contrib/portaudiocpp
   CXXFLAGS         += -I"$(srcdir)/$(PORTAUDIOCPP_DIR)"
