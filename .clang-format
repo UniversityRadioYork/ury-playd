@@ -8,3 +8,4 @@ TabWidth:        8
 UseTab:          ForIndentation
 BreakBeforeBraces: Stroustrup
 ContinuationIndentWidth: 16
+Cpp11BracedListStyle: false

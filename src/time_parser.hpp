@@ -33,7 +33,9 @@ public:
 	 * @param unit_map  The map from units to their parsers.
 	 * @see   MkTime
 	 */
-	TimeParser(const UnitMap &unit_map) : unit_map(unit_map) {}
+	TimeParser(const UnitMap &unit_map) : unit_map(unit_map)
+	{
+	}
 
 	/**
 	 * A template for converting an IntType representation of a duration of

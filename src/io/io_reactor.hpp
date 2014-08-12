@@ -93,7 +93,7 @@ private:
 	std::deque<std::string> outbox;
 	std::function<void(const std::string &)> cmd;
 	TcpConnectionManager &manager;
-        const Player &player;
+	const Player &player;
 	ResponseSink::Callback new_client_callback;
 
 	bool closing;

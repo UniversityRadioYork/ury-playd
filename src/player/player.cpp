@@ -23,10 +23,7 @@
 #include "../messages.h"
 
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
-    : file(audio_system),
-      position(),
-      state(),
-      time_parser(time_parser)
+    : file(audio_system), position(), state(), time_parser(time_parser)
 {
 }
 
@@ -44,10 +41,10 @@ bool Player::Update()
 void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
-                if (this->end_sink.is_initialized()) {
-                        this->end_sink.get().get().Respond(ResponseCode::END,
-                                                           "");
-                }
+		if (this->end_sink.is_initialized()) {
+			this->end_sink.get().get().Respond(ResponseCode::END,
+			                                   "");
+		}
 		Stop();
 		Seek("0");
 	} else {
@@ -58,18 +55,18 @@ void Player::PlaybackUpdate()
 void Player::WelcomeClient(ResponseSink &client) const
 {
 	client.Respond(ResponseCode::OHAI, MSG_OHAI);
-        client.Respond(ResponseCode::FEATURES, MSG_FEATURES);
-        this->file.Emit(client);
+	client.Respond(ResponseCode::FEATURES, MSG_FEATURES);
+	this->file.Emit(client);
 	this->position.Emit(client);
 	this->state.Emit(client);
 }
 
 void Player::SetResponseSink(ResponseSink &sink)
 {
-        this->file.SetResponseSink(sink);
+	this->file.SetResponseSink(sink);
 	this->position.SetResponseSink(sink);
 	this->state.SetResponseSink(sink);
-        this->end_sink = std::ref(sink);
+	this->end_sink = std::ref(sink);
 }
 
 //
@@ -79,7 +76,7 @@ void Player::SetResponseSink(ResponseSink &sink)
 bool Player::Eject()
 {
 	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
-                this->file.Eject();
+		this->file.Eject();
 		SetState(PlayerState::State::EJECTED);
 		return true;
 	}
@@ -94,7 +91,7 @@ bool Player::Load(const std::string &path)
 		{
 			this->file.Load(path);
 			ResetPosition();
-			Debug("Loaded ", path);
+			Debug() << "Loaded " << path << std::endl;
 			SetState(PlayerState::State::STOPPED);
 		}
 		catch (FileError &)
@@ -108,7 +105,7 @@ bool Player::Load(const std::string &path)
 			// Ensure a load failure doesn't leave a corrupted track
 			// loaded.
 			Eject();
-			throw error;
+			throw;
 		}
 	}
 	return valid;
@@ -116,8 +113,8 @@ bool Player::Load(const std::string &path)
 
 bool Player::Play()
 {
-	if (CurrentStateIn({PlayerState::State::STOPPED})) {
-                this->file.Start();
+	if (CurrentStateIn({ PlayerState::State::STOPPED })) {
+		this->file.Start();
 		SetState(PlayerState::State::PLAYING);
 		return true;
 	}

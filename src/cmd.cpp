@@ -49,7 +49,7 @@ bool CommandHandler::RunUnary(const std::string &cmd, const std::string &arg)
 
 bool CommandHandler::Handle(const std::string &line)
 {
-	Debug("got command: <", line, ">");
+	Debug() << "got command: <" << line << ">" << std::endl;
 	return Run(LineToWords(line));
 }
 

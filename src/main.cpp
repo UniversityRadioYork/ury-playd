@@ -73,38 +73,39 @@ std::string Playslave::DeviceID()
  * @see Player::TP::MkTime
  */
 const Player::TP::UnitMap UNITS = {
-                /// 1us = 1 microsecond.
-                {"us", Player::TP::MkTime<std::chrono::microseconds>},
-                /// 1usec = 1 microsecond.
-                {"usec", Player::TP::MkTime<std::chrono::microseconds>},
-                /// 2usecs = 2 microseconds.
-                {"usecs", Player::TP::MkTime<std::chrono::microseconds>},
-                /// 1ms = 1 millisecond.
-                {"ms", Player::TP::MkTime<std::chrono::milliseconds>},
-                /// 1msec = 1 millisecond.
-                {"msec", Player::TP::MkTime<std::chrono::milliseconds>},
-                /// 2msecs = 2 milliseconds.
-                {"msecs", Player::TP::MkTime<std::chrono::milliseconds>},
-                /// 1s = 1 second.
-                {"s", Player::TP::MkTime<std::chrono::seconds>},
-                /// 1sec = 1 second.
-                {"sec", Player::TP::MkTime<std::chrono::seconds>},
-                /// 2secs = 2 seconds.
-                {"secs", Player::TP::MkTime<std::chrono::seconds>},
-                /// 1m = 1 minute.
-                {"m", Player::TP::MkTime<std::chrono::minutes>},
-                /// 1min = 1 minute.
-                {"min", Player::TP::MkTime<std::chrono::minutes>},
-                /// 2mins = 2 minutes.
-                {"mins", Player::TP::MkTime<std::chrono::minutes>},
-                /// 1h = 1 hour.
-                {"h", Player::TP::MkTime<std::chrono::hours>},
-                /// 1hour = 1 hour.
-                {"hour", Player::TP::MkTime<std::chrono::hours>},
-                /// 2hours = 2 hours.
-                {"hours", Player::TP::MkTime<std::chrono::hours>},
-                /// When no unit is provided, we assume microseconds.
-                {"", Player::TP::MkTime<std::chrono::microseconds>}};
+	/// 1us = 1 microsecond.
+	{ "us", Player::TP::MkTime<std::chrono::microseconds> },
+	/// 1usec = 1 microsecond.
+	{ "usec", Player::TP::MkTime<std::chrono::microseconds> },
+	/// 2usecs = 2 microseconds.
+	{ "usecs", Player::TP::MkTime<std::chrono::microseconds> },
+	/// 1ms = 1 millisecond.
+	{ "ms", Player::TP::MkTime<std::chrono::milliseconds> },
+	/// 1msec = 1 millisecond.
+	{ "msec", Player::TP::MkTime<std::chrono::milliseconds> },
+	/// 2msecs = 2 milliseconds.
+	{ "msecs", Player::TP::MkTime<std::chrono::milliseconds> },
+	/// 1s = 1 second.
+	{ "s", Player::TP::MkTime<std::chrono::seconds> },
+	/// 1sec = 1 second.
+	{ "sec", Player::TP::MkTime<std::chrono::seconds> },
+	/// 2secs = 2 seconds.
+	{ "secs", Player::TP::MkTime<std::chrono::seconds> },
+	/// 1m = 1 minute.
+	{ "m", Player::TP::MkTime<std::chrono::minutes> },
+	/// 1min = 1 minute.
+	{ "min", Player::TP::MkTime<std::chrono::minutes> },
+	/// 2mins = 2 minutes.
+	{ "mins", Player::TP::MkTime<std::chrono::minutes> },
+	/// 1h = 1 hour.
+	{ "h", Player::TP::MkTime<std::chrono::hours> },
+	/// 1hour = 1 hour.
+	{ "hour", Player::TP::MkTime<std::chrono::hours> },
+	/// 2hours = 2 hours.
+	{ "hours", Player::TP::MkTime<std::chrono::hours> },
+	/// When no unit is provided, we assume microseconds.
+	{ "", Player::TP::MkTime<std::chrono::microseconds> }
+};
 
 Playslave::Playslave(int argc, char *argv[])
     : audio(), player(audio, time_parser), handler(player), time_parser(UNITS)
@@ -136,7 +137,8 @@ int Playslave::Run()
 	catch (Error &error)
 	{
 		io->RespondWithError(error);
-		Debug("Unhandled exception caught, going away now.");
+		Debug() << "Unhandled exception caught, going away now."
+		        << std::endl;
 		exit_code = EXIT_FAILURE;
 	}
 

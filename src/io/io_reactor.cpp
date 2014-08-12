@@ -95,7 +95,7 @@ void IoReactor::InitAcceptor(const std::string &address,
 {
 	boost::asio::ip::tcp::resolver resolver(io_service);
 	boost::asio::ip::tcp::endpoint endpoint =
-	                *resolver.resolve({address, port});
+	                *resolver.resolve({ address, port });
 	this->acceptor.open(endpoint.protocol());
 	this->acceptor.set_option(
 	                boost::asio::ip::tcp::acceptor::reuse_address(true));
@@ -106,9 +106,8 @@ void IoReactor::InitAcceptor(const std::string &address,
 void IoReactor::DoAccept()
 {
 	auto cmd = [this](const std::string &line) { HandleCommand(line); };
-	this->new_connection.reset(
-	                new TcpConnection(cmd, this->manager, this->io_service,
-	                                  this->player));
+	this->new_connection.reset(new TcpConnection(
+	                cmd, this->manager, this->io_service, this->player));
 	auto on_accept = [this](boost::system::error_code ec) {
 		if (!ec) {
 			this->manager.Start(this->new_connection);
@@ -229,7 +228,7 @@ void TcpConnection::DoWrite()
 	// connection manager's list and cause illegal memory accesses.
 	auto self(shared_from_this());
 
-	const std::string &string = this->outbox[0];
+	std::string string = this->outbox[0];
 	// This is called after the write has finished.
 	auto write_cb = [this, self](const boost::system::error_code &ec,
 	                             std::size_t) {
@@ -246,6 +245,10 @@ void TcpConnection::DoWrite()
 		}
 	};
 
+	// Only add the newline character at the final opportunity.
+	// Makes for easier debug lines.
+	assert(string.back() != '\n');
+	string += '\n';
 	boost::asio::async_write(
 	                this->socket,
 	                boost::asio::buffer(string.c_str(), string.size()),
@@ -287,7 +290,7 @@ void TcpConnectionManager::StopAll()
 
 void TcpConnectionManager::Send(const std::string &string)
 {
-	Debug("Send to all:", string);
+	Debug() << "Send to all:" << string << std::endl;
 	for (auto c : this->connections) {
 		c->Send(string);
 	}
