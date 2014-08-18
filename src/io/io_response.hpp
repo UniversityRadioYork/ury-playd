@@ -15,8 +15,6 @@
 #include <string>     // std::string
 #include <ostream>    // std::ostream etc.
 
-#include <boost/optional.hpp>
-
 #include "../errors.hpp" // Error
 
 /**
@@ -74,9 +72,6 @@ protected:
 	virtual void RespondRaw(const std::string &string) const = 0;
 };
 
-/// Type for slots that accept ResponseSinks.  Yeeeah.
-using ResponseSinkSlot = boost::optional<std::reference_wrapper<ResponseSink>>;
-
 /**
  * Abstract helper class for sources of responses.
  *
@@ -118,7 +113,7 @@ private:
 	 * A ResponseSink to which 'push' responses are emitted.
 	 * If the ResponseSink is not present, responses are not emitted.
 	 */
-	ResponseSinkSlot push_sink;
+	ResponseSink *push_sink;
 };
 
 #endif // PS_IO_RESPONSE_HPP

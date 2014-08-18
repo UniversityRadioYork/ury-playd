@@ -23,7 +23,7 @@
 #include "../messages.h"
 
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
-    : file(audio_system), position(), state(), time_parser(time_parser)
+	: file(audio_system), position(), state(), time_parser(time_parser), end_sink(nullptr)
 {
 }
 
@@ -41,9 +41,8 @@ bool Player::Update()
 void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
-		if (this->end_sink.is_initialized()) {
-			this->end_sink.get().get().Respond(ResponseCode::END,
-			                                   "");
+		if (this->end_sink != nullptr) {
+			this->end_sink->Respond(ResponseCode::END, "");
 		}
 		Stop();
 		Seek("0");
@@ -66,7 +65,7 @@ void Player::SetResponseSink(ResponseSink &sink)
 	this->file.SetResponseSink(sink);
 	this->position.SetResponseSink(sink);
 	this->state.SetResponseSink(sink);
-	this->end_sink = std::ref(sink);
+	this->end_sink = &sink;
 }
 
 //

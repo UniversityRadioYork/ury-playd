@@ -41,12 +41,12 @@ void ResponseSink::RespondWithError(const Error &error) const
 
 void ResponseSource::SetResponseSink(ResponseSink &responder)
 {
-	this->push_sink = std::ref(responder);
+	this->push_sink = &responder;
 }
 
 void ResponseSource::Push() const
 {
-	if (this->push_sink.is_initialized()) {
-		Emit(this->push_sink.get().get());
+	if (this->push_sink != nullptr) {
+		Emit(*this->push_sink);
 	}
 }

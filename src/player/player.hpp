@@ -45,7 +45,7 @@ private:
 	PlayerPosition position;
 	PlayerState state;
 	const TP &time_parser;
-	ResponseSinkSlot end_sink;
+	ResponseSink *end_sink;
 
 public:
 	/**
