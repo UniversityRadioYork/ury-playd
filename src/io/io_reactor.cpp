@@ -21,7 +21,6 @@ extern "C" {
 #include "../messages.h"                        // MSG_*
 #include "io_reactor.hpp"                       // IoReactor
 #include "io_response.hpp"                      // ResponseCode
-#include <boost/lexical_cast.hpp>
 
 const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 10; // ms
 
@@ -106,7 +105,7 @@ void IoReactor::DoUpdateTimer()
 void IoReactor::InitAcceptor(const std::string &address,
                              const std::string &port)
 {
-	std::uint16_t uport = boost::lexical_cast<std::uint16_t>(port);
+	int uport = std::stoi(port);
 
 	uv_tcp_init(uv_default_loop(), &this->server);
 	this->server.data = static_cast<void *>(this);
