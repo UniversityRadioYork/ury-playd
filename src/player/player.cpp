@@ -99,7 +99,7 @@ bool Player::Load(const std::string &path)
 			Eject();
 			valid = false;
 		}
-		catch (Error &error)
+		catch (Error &)
 		{
 			// Ensure a load failure doesn't leave a corrupted track
 			// loaded.
