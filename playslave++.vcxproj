@@ -92,13 +92,13 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\mattbw\Documents\GitHub\libuv\include;C:\Users\Matt\Documents\boost_1_55_0;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\mattbw\Documents\GitHub\libuv\include;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Users\mattbw\Documents\GitHub\libuv\Debug\lib;C:\Users\mattbw\Documents\boost_1_55_0\stage\lib;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\mattbw\Documents\GitHub\libuv\Debug\lib;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;psapi.lib;ws2_32.lib;iphlpapi.lib;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd</IgnoreSpecificDefaultLibraries>
     </Link>
