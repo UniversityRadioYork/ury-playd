@@ -42,9 +42,16 @@ void AllocBuffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
 	*buf = uv_buf_init((char *)malloc(suggested_size), suggested_size);
 }
 
-void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+void ReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
+	IoReactor *reactor = static_cast<IoReactor *>(stream->data);
+	reactor->Read(stream, nread, buf);
+}
 
+void IoReactor::Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+{
+	this->connections.erase((uv_tcp_t *)stream);
+	uv_close((uv_handle_t *)stream, nullptr);
 }
 
 void OnNewConnection(uv_stream_t *server, int status)
@@ -60,8 +67,11 @@ void IoReactor::NewConnection(uv_stream_t *server)
 {
 	uv_tcp_t *client = (uv_tcp_t *)malloc(sizeof(uv_tcp_t));
 	uv_tcp_init(uv_default_loop(), client);
+	client->data = static_cast<void *>(this);
+
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
-		uv_read_start((uv_stream_t *)client, AllocBuffer, Read);
+		this->connections.insert(client);
+		uv_read_start((uv_stream_t *)client, AllocBuffer, ReadCallback);
 	} else {
 		uv_close((uv_handle_t *)client, nullptr);
 	}
@@ -119,10 +129,30 @@ void IoReactor::InitAcceptor(const std::string &address,
 	int r = uv_listen((uv_stream_t *)&this->server, 128, OnNewConnection);
 }
 
+struct WriteReq {
+	uv_write_t req;
+	uv_buf_t buf;
+};
+
+void RespondCallback(uv_write_t *req, int status)
+{
+	WriteReq *wr = (WriteReq *)req;
+	delete[] wr->buf.base;
+	delete wr;
+}
+
 void IoReactor::RespondRaw(const std::string &string)
 {
-	// todo
-	//this->manager.Send(string);
+	unsigned int l = string.length();
+	const char *s = string.c_str();
+
+	for (uv_tcp_t *tcp : this->connections) {
+		WriteReq *req = new WriteReq;
+		req->buf = uv_buf_init(new char[l], l);
+		memcpy(req->buf.base, s, l);
+
+		uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1, RespondCallback);
+	}
 }
 
 void IoReactor::End()

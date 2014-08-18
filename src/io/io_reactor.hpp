@@ -64,10 +64,13 @@ public:
 	void End();
 
 	void NewConnection(uv_stream_t *server);
+	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
 private:
 	void RespondRaw(const std::string &string) override;
 	void InitAcceptor(const std::string &address, const std::string &port);
 	void DoUpdateTimer();
+
+	std::set<uv_tcp_t *> connections;
 
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
