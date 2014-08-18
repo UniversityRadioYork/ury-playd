@@ -55,6 +55,7 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
 
 void IoReactor::Run()
 {
+	uv_run(loop, UV_RUN_DEFAULT);
 	io_service.run();
 }
 
