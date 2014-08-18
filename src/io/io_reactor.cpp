@@ -131,7 +131,7 @@ void RespondCallback(uv_write_t *req, int status)
 
 void IoReactor::RespondRaw(const std::string &string) const
 {
-	for (const std::shared_ptr<TcpResponseSink> &conn : this->connections) {
+	for (const auto &conn : this->connections) {
 		conn->RespondRaw(string);
 	}
 }
