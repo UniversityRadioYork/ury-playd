@@ -23,7 +23,7 @@ extern "C" {
 #include "io_response.hpp"                      // ResponseCode
 #include <boost/lexical_cast.hpp>
 
-const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 20; // ms
+const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 10; // ms
 
 void AllocBuffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
 {
@@ -97,7 +97,7 @@ void IoReactor::DoUpdateTimer()
 {
 	uv_timer_init(uv_default_loop(), &this->updater);
 	this->updater.data = static_cast<void *>(&this->player);
-	uv_timer_start(&this->updater, UpdateTimerCallback, 0, 20);
+	uv_timer_start(&this->updater, UpdateTimerCallback, 0, PLAYER_UPDATE_PERIOD);
 }
 
 void IoReactor::InitAcceptor(const std::string &address,
