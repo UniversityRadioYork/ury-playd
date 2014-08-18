@@ -58,20 +58,20 @@ public:
 	 * @param code The response code to emit.
 	 * @param message The response message.
 	 */
-	void Respond(ResponseCode code, const std::string &message);
+	void Respond(ResponseCode code, const std::string &message) const;
 
 	/**
 	 * Emits an error as a response.
 	 * @param error The error to convert to a response.
 	 */
-	void RespondWithError(const Error &error);
+	void RespondWithError(const Error &error) const;
 
 protected:
 	/**
 	 * Outputs a raw response string.
 	 * @param string The response string, of the form "CODE message".
 	 */
-	virtual void RespondRaw(const std::string &string) = 0;
+	virtual void RespondRaw(const std::string &string) const = 0;
 };
 
 /// Type for slots that accept ResponseSinks.  Yeeeah.

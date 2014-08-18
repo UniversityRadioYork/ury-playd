@@ -32,14 +32,8 @@ void AllocBuffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
 
 void ReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
-	IoReactor *reactor = static_cast<IoReactor *>(stream->data);
-	reactor->Read(stream, nread, buf);
-}
-
-void IoReactor::Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
-{
-	this->connections.erase((uv_tcp_t *)stream);
-	uv_close((uv_handle_t *)stream, nullptr);
+	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(stream->data);
+	tcp->Read(stream, nread, buf);
 }
 
 void OnNewConnection(uv_stream_t *server, int status)
@@ -55,17 +49,22 @@ void IoReactor::NewConnection(uv_stream_t *server)
 {
 	uv_tcp_t *client = (uv_tcp_t *)malloc(sizeof(uv_tcp_t));
 	uv_tcp_init(uv_default_loop(), client);
-	client->data = static_cast<void *>(this);
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
-		TcpResponseSink r(client);
-		this->player.WelcomeClient(r);
+		auto tcp = std::make_shared<TcpResponseSink>(*this, client, this->handler);
+		this->player.WelcomeClient(*tcp);
+		this->connections.insert(tcp);
+		client->data = static_cast<void *>(tcp.get());
 
-		this->connections.insert(client);
 		uv_read_start((uv_stream_t *)client, AllocBuffer, ReadCallback);
 	} else {
 		uv_close((uv_handle_t *)client, nullptr);
 	}
+}
+
+void IoReactor::RemoveConnection(TcpResponseSink &conn)
+{
+	this->connections.erase(std::make_shared<TcpResponseSink>(conn));
 }
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler,
@@ -82,20 +81,16 @@ void IoReactor::Run()
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
-void IoReactor::HandleCommand(const std::string &line)
-{
-	bool valid = this->handler.Handle(line);
-	if (valid) {
-		Respond(ResponseCode::OKAY, line);
-	} else {
-		Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
-	}
-}
-
 void UpdateTimerCallback(uv_timer_t *handle)
 {
 	Player *player = static_cast<Player *>(handle->data);
 	player->Update();
+}
+
+void CloseCallback(uv_handle_t *handle)
+{
+	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(handle->data);
+	tcp->Close();
 }
 
 void IoReactor::DoUpdateTimer()
@@ -132,12 +127,10 @@ void RespondCallback(uv_write_t *req, int status)
 	delete wr;
 }
 
-void IoReactor::RespondRaw(const std::string &string)
+void IoReactor::RespondRaw(const std::string &string) const
 {
-
-	for (uv_tcp_t *tcp : this->connections) {
-		TcpResponseSink t(tcp);
-		t.RespondRaw(string);
+	for (const std::shared_ptr<TcpResponseSink> &conn : this->connections) {
+		conn->RespondRaw(string);
 	}
 }
 
@@ -146,9 +139,18 @@ void IoReactor::End()
 	uv_stop(uv_default_loop());
 }
 
-TcpResponseSink::TcpResponseSink(uv_tcp_t *tcp) : tcp(tcp) {}
+//
+// TcpResponseSink
+//
 
-void TcpResponseSink::RespondRaw(const std::string &string)
+TcpResponseSink::TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp, CommandHandler &handler)
+	: parent(parent),
+	  tcp(tcp),
+	  tokeniser(handler, *this)
+{
+}
+
+void TcpResponseSink::RespondRaw(const std::string &string) const
 {
 	unsigned int l = string.length();
 	const char *s = string.c_str();
@@ -159,4 +161,23 @@ void TcpResponseSink::RespondRaw(const std::string &string)
 	req->buf.base[l] = '\n';
 
 	uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1, RespondCallback);
+}
+
+void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+{
+	if (nread < 0) {
+		if (nread == UV_EOF) {
+			uv_close((uv_handle_t *)stream, CloseCallback);
+		}
+
+		return;
+	}
+
+	this->tokeniser.Feed(buf->base, (buf->base) + nread);
+}
+
+void TcpResponseSink::Close()
+{
+	Debug() << "Closing client connection" << std::endl;
+	this->parent.RemoveConnection(*this);
 }

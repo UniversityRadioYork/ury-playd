@@ -16,6 +16,7 @@
 #include <ostream>        // std::ostream
 #include <set>            // std::set
 #include "io_reactor.hpp" // IoReactor
+#include "tokeniser.hpp"
 #include "../player/player.hpp"
 
 class Player;
@@ -26,6 +27,8 @@ extern "C" {
 }
 
 class CommandHandler;
+class TcpResponseSink;
+
 
 /**
  * The IO reactor, which services input, routes responses, and executes the
@@ -65,22 +68,16 @@ public:
 
 	void NewConnection(uv_stream_t *server);
 	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
+	void RemoveConnection(TcpResponseSink &sink);
 private:
-	void RespondRaw(const std::string &string) override;
+	void RespondRaw(const std::string &string) const override;
 	void InitAcceptor(const std::string &address, const std::string &port);
 	void DoUpdateTimer();
 
-	std::set<uv_tcp_t *> connections;
+	std::set<std::shared_ptr<TcpResponseSink>> connections;
 
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
-
-	/**
-	 * Sends a command to the command handler.
-	 * The result of the command is responded on as per the playslave API.
-	 * @param line The command line received by the IO reactor.
-	 */
-	void HandleCommand(const std::string &line);
 
 	uv_tcp_t server;
 	uv_timer_t updater;
@@ -89,12 +86,19 @@ private:
 	CommandHandler &handler;            ///< The command handler.
 };
 
+/**
+ * A TCP connection from a client.
+ */
 class TcpResponseSink : public ResponseSink {
 public:
-	TcpResponseSink(uv_tcp_t *tcp);
-	void RespondRaw(const std::string &response);
+	TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp, CommandHandler &handler);
+	void RespondRaw(const std::string &response) const override;
+	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
+	void Close();
 private:
+	IoReactor &parent;
 	uv_tcp_t *tcp;
+	Tokeniser tokeniser;
 };
 
 #endif // PS_IO_REACTOR_HPP

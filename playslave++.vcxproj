@@ -22,6 +22,7 @@
     <ClCompile Include="src\errors.cpp" />
     <ClCompile Include="src\io\io_reactor.cpp" />
     <ClCompile Include="src\io\io_response.cpp" />
+    <ClCompile Include="src\io\tokeniser.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\player\player.cpp" />
     <ClCompile Include="src\player\player_file.cpp" />
@@ -42,6 +43,7 @@
     <ClInclude Include="src\errors.hpp" />
     <ClInclude Include="src\io\io_reactor.hpp" />
     <ClInclude Include="src\io\io_response.hpp" />
+    <ClInclude Include="src\io\tokeniser.hpp" />
     <ClInclude Include="src\main.hpp" />
     <ClInclude Include="src\messages.h" />
     <ClInclude Include="src\player\player.hpp" />

@@ -10,8 +10,6 @@
 #include <iostream>
 #include <string>
 
-#include <boost/tokenizer.hpp>
-
 #include "cmd.hpp"
 #include "errors.hpp"
 #include "io/io_response.hpp"
@@ -21,7 +19,7 @@ CommandHandler::CommandHandler(Player &player) : player(player)
 {
 }
 
-bool CommandHandler::Run(const CommandHandler::WordList &words)
+bool CommandHandler::Handle(const CommandHandler::WordList &words)
 {
 	if (words.size() == 1) {
 		return RunNullary(words[0]);
@@ -45,26 +43,4 @@ bool CommandHandler::RunUnary(const std::string &cmd, const std::string &arg)
 	if ("load" == cmd) return this->player.Load(arg);
 	if ("seek" == cmd) return this->player.Seek(arg);
 	return false;
-}
-
-bool CommandHandler::Handle(const std::string &line)
-{
-	Debug() << "got command: <" << line << ">" << std::endl;
-	return Run(LineToWords(line));
-}
-
-CommandHandler::WordList CommandHandler::LineToWords(const std::string &line)
-{
-	// See http://git.io/IxXOSg for a description of what this needs to do.
-
-	WordList words;
-
-	using Separator = boost::escaped_list_separator<char>;
-	using Tokeniser = boost::tokenizer<Separator>;
-	Separator separator('\\', ' ', '\"');
-	Tokeniser tok(line, separator);
-
-	words.assign(tok.begin(), tok.end());
-
-	return words;
 }

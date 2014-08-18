@@ -22,7 +22,7 @@ const std::string RESPONSES[] = {
 	/* ResponseCode::END      */ "END"
 };
 
-void ResponseSink::Respond(ResponseCode code, const std::string &message)
+void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 {
 	// ResponseCodes are formatted as "CODE message\n".
 	// Delegate the actual sending of the response string to the concrete
@@ -30,7 +30,7 @@ void ResponseSink::Respond(ResponseCode code, const std::string &message)
 	RespondRaw(RESPONSES[static_cast<int>(code)] + " " + message);
 }
 
-void ResponseSink::RespondWithError(const Error &error)
+void ResponseSink::RespondWithError(const Error &error) const
 {
 	Respond(ResponseCode::FAIL, error.Message());
 }
