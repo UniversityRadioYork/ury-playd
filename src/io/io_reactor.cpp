@@ -84,7 +84,10 @@ void IoReactor::Run()
 void UpdateTimerCallback(uv_timer_t *handle)
 {
 	Player *player = static_cast<Player *>(handle->data);
-	player->Update();
+	bool running = player->Update();
+	if (!running) {
+		uv_stop(uv_default_loop());
+	}
 }
 
 void CloseCallback(uv_handle_t *handle)
