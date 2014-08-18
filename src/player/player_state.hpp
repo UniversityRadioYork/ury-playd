@@ -13,7 +13,6 @@
 #include <cstdint>
 #include <initializer_list>
 #include <functional>
-#include <boost/optional.hpp>
 
 #include "../io/io_response.hpp"
 
