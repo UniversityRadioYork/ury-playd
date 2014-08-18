@@ -70,6 +70,9 @@ void IoReactor::NewConnection(uv_stream_t *server)
 	client->data = static_cast<void *>(this);
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
+		TcpResponseSink r(client);
+		this->player.WelcomeClient(r);
+
 		this->connections.insert(client);
 		uv_read_start((uv_stream_t *)client, AllocBuffer, ReadCallback);
 	} else {
@@ -143,19 +146,29 @@ void RespondCallback(uv_write_t *req, int status)
 
 void IoReactor::RespondRaw(const std::string &string)
 {
-	unsigned int l = string.length();
-	const char *s = string.c_str();
 
 	for (uv_tcp_t *tcp : this->connections) {
-		WriteReq *req = new WriteReq;
-		req->buf = uv_buf_init(new char[l], l);
-		memcpy(req->buf.base, s, l);
-
-		uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1, RespondCallback);
+		TcpResponseSink t(tcp);
+		t.RespondRaw(string);
 	}
 }
 
 void IoReactor::End()
 {
 	uv_stop(uv_default_loop());
+}
+
+TcpResponseSink::TcpResponseSink(uv_tcp_t *tcp) : tcp(tcp) {}
+
+void TcpResponseSink::RespondRaw(const std::string &string)
+{
+	unsigned int l = string.length();
+	const char *s = string.c_str();
+
+	WriteReq *req = new WriteReq;
+	req->buf = uv_buf_init(new char[l + 1], l + 1);
+	memcpy(req->buf.base, s, l);
+	req->buf.base[l] = '\n';
+
+	uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1, RespondCallback);
 }

@@ -89,4 +89,12 @@ private:
 	CommandHandler &handler;            ///< The command handler.
 };
 
+class TcpResponseSink : public ResponseSink {
+public:
+	TcpResponseSink(uv_tcp_t *tcp);
+	void RespondRaw(const std::string &response);
+private:
+	uv_tcp_t *tcp;
+};
+
 #endif // PS_IO_REACTOR_HPP
