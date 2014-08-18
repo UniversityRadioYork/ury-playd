@@ -196,7 +196,7 @@ private:
 	 */
 	void HandleCommand(const std::string &line);
 
-	uv_loop_t *loop;
+	uv_loop_t loop;
 
 	Player &player;                     ///< The player.
 	CommandHandler &handler;            ///< The command handler.

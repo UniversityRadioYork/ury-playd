@@ -45,8 +45,10 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
       signals(io_service),
       manager(),
       new_connection(),
-      loop(uv_loop_new())
+      loop()
 {
+	uv_loop_init(&this->loop);
+
 	InitSignals();
 	InitAcceptor(address, port);
 	DoAccept();
@@ -55,7 +57,7 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
 
 void IoReactor::Run()
 {
-	uv_run(loop, UV_RUN_DEFAULT);
+	uv_run(&this->loop, UV_RUN_DEFAULT);
 	io_service.run();
 }
 
