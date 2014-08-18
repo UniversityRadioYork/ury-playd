@@ -5,18 +5,8 @@
  * @file
  * Implementation of the non-virtual aspects of the IoReactor class.
  * @see io/io_reactor.hpp
- * @see io/io_reactor_asio.hpp
- * @see io/io_reactor_asio.cpp
- * @see io/io_reactor_std.hpp
- * @see io/io_reactor_std.cpp
  */
 
-/* This is forced because we require C++11, which has std::chrono, anyway.
-   Some environments fail Boost's std::chrono detection, and don't set this
-   flag, which causes compilation failures. */
-#ifndef BOOST_ASIO_HAS_STD_CHRONO
-#define BOOST_ASIO_HAS_STD_CHRONO
-#endif
 
 #include <csignal>              // SIG*
 #include <string>               // std::string
@@ -32,8 +22,6 @@ extern "C" {
 #include "io_reactor.hpp"                       // IoReactor
 #include "io_response.hpp"                      // ResponseCode
 #include <boost/lexical_cast.hpp>
-#include <boost/asio.hpp>                       // boost::asio::*
-#include <boost/asio/high_resolution_timer.hpp> // boost::asio::high_resolution_timer
 
 const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 20; // ms
 
