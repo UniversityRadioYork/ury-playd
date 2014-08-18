@@ -20,6 +20,11 @@
 
 #include <csignal>              // SIG*
 #include <string>               // std::string
+
+extern "C" {
+#include <uv.h>
+}
+
 #include "../player/player.hpp" // Player
 #include "../cmd.hpp"           // CommandHandler
 #include "../errors.hpp"
@@ -39,7 +44,8 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
       acceptor(io_service),
       signals(io_service),
       manager(),
-      new_connection()
+      new_connection(),
+      loop(uv_loop_new())
 {
 	InitSignals();
 	InitAcceptor(address, port);

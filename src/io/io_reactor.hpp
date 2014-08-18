@@ -23,6 +23,10 @@
 class Player;
 class CommandHandler;
 
+extern "C" {
+#include <uv.h>
+}
+
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
@@ -191,6 +195,8 @@ private:
 	 * @param line The command line received by the IO reactor.
 	 */
 	void HandleCommand(const std::string &line);
+
+	uv_loop_t *loop;
 
 	Player &player;                     ///< The player.
 	CommandHandler &handler;            ///< The command handler.
