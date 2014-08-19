@@ -34,23 +34,27 @@ struct WriteReq {
 	uv_buf_t buf;
 };
 
+/// The function used to allocate and initialise buffers for client reading.
 void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 {
 	*buf = uv_buf_init((char *)malloc(suggested_size), suggested_size);
 }
 
+/// The callback fired when a client connection closes.
 void UvCloseCallback(uv_handle_t *handle)
 {
 	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(handle->data);
 	tcp->Close();
 }
 
+/// The callback fired when some bytes are read from a client connection.
 void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(stream->data);
 	tcp->Read(stream, nread, buf);
 }
 
+/// The callback fired when a new client connection is acquired by the listener.
 void UvListenCallback(uv_stream_t *server, int status)
 {
 	if (status == -1) {
@@ -60,6 +64,7 @@ void UvListenCallback(uv_stream_t *server, int status)
 	reactor->NewConnection(server);
 }
 
+/// The callback fired when a response has been sent to a client.
 void UvRespondCallback(uv_write_t *req, int)
 {
 	// TODO: Handle the int status?
@@ -68,6 +73,7 @@ void UvRespondCallback(uv_write_t *req, int)
 	delete wr;
 }
 
+/// The callback fired when the update timer fires.
 void UvUpdateTimerCallback(uv_timer_t *handle)
 {
 	Player *player = static_cast<Player *>(handle->data);
