@@ -1,0 +1,13 @@
+@import url(http://fonts.googleapis.com/css?family=Merriweather:400,700,400italic|Merriweather+Sans:700|Overlock:400,900);
+
+body {
+	font-family: 'Merriweather', serif;
+}
+
+header>h1 {
+	font-family: 'Overlock', cursive;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Merriweather Sans', sans-serif;
+}
