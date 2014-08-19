@@ -34,24 +34,24 @@ struct WriteReq {
 	uv_buf_t buf;
 };
 
-void AllocBuffer(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
+void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 {
 	*buf = uv_buf_init((char *)malloc(suggested_size), suggested_size);
 }
 
-void CloseCallback(uv_handle_t *handle)
+void UvCloseCallback(uv_handle_t *handle)
 {
 	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(handle->data);
 	tcp->Close();
 }
 
-void ReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(stream->data);
 	tcp->Read(stream, nread, buf);
 }
 
-void ListenCallback(uv_stream_t *server, int status)
+void UvListenCallback(uv_stream_t *server, int status)
 {
 	if (status == -1) {
 		return;
@@ -60,7 +60,7 @@ void ListenCallback(uv_stream_t *server, int status)
 	reactor->NewConnection(server);
 }
 
-void RespondCallback(uv_write_t *req, int)
+void UvRespondCallback(uv_write_t *req, int)
 {
 	// TODO: Handle the int status?
 	WriteReq *wr = (WriteReq *)req;
@@ -68,7 +68,7 @@ void RespondCallback(uv_write_t *req, int)
 	delete wr;
 }
 
-void UpdateTimerCallback(uv_timer_t *handle)
+void UvUpdateTimerCallback(uv_timer_t *handle)
 {
 	Player *player = static_cast<Player *>(handle->data);
 	bool running = player->Update();
@@ -93,7 +93,7 @@ void IoReactor::NewConnection(uv_stream_t *server)
 		this->connections.insert(tcp);
 		client->data = static_cast<void *>(tcp.get());
 
-		uv_read_start((uv_stream_t *)client, AllocBuffer, ReadCallback);
+		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 	} else {
 		uv_close((uv_handle_t *)client, nullptr);
 	}
@@ -121,7 +121,7 @@ void IoReactor::DoUpdateTimer()
 {
 	uv_timer_init(uv_default_loop(), &this->updater);
 	this->updater.data = static_cast<void *>(&this->player);
-	uv_timer_start(&this->updater, UpdateTimerCallback, 0,
+	uv_timer_start(&this->updater, UvUpdateTimerCallback, 0,
 	               PLAYER_UPDATE_PERIOD);
 }
 
@@ -138,7 +138,7 @@ void IoReactor::InitAcceptor(const std::string &address,
 	uv_tcp_bind(&this->server, (const sockaddr *)&bind_addr, 0);
 
 	// TODO: Handle errors from uv_listen.
-	uv_listen((uv_stream_t *)&this->server, 128, ListenCallback);
+	uv_listen((uv_stream_t *)&this->server, 128, UvListenCallback);
 }
 
 void IoReactor::RespondRaw(const std::string &string) const
@@ -174,7 +174,7 @@ void TcpResponseSink::RespondRaw(const std::string &string) const
 	req->buf.base[l] = '\n';
 
 	uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1,
-	         RespondCallback);
+	         UvRespondCallback);
 }
 
 void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
@@ -182,7 +182,7 @@ void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
 {
 	if (nread < 0) {
 		if (nread == UV_EOF) {
-			uv_close((uv_handle_t *)stream, CloseCallback);
+			uv_close((uv_handle_t *)stream, UvCloseCallback);
 		}
 
 		return;
