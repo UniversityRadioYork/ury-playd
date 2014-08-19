@@ -15,10 +15,10 @@
 #include "io_response.hpp"
 
 Tokeniser::Tokeniser(CommandHandler &handler, ResponseSink &response_sink)
-	: handler(handler),
-	response_sink(response_sink),
-	escape_next_character(false),
-	quote_type(Tokeniser::QuoteType::NONE)
+    : handler(handler),
+      response_sink(response_sink),
+      escape_next_character(false),
+      quote_type(Tokeniser::QuoteType::NONE)
 {
 }
 
@@ -32,47 +32,50 @@ void Tokeniser::Feed(const char *start, const char *end)
 		}
 
 		switch (this->quote_type) {
-		case QuoteType::SINGLE:
-			if (c == '\'') {
-				this->quote_type = QuoteType::NONE;
-			}
-			else {
-				Push(c);
-			}
-			break;
-		case QuoteType::DOUBLE:
-			switch (c) {
-			case '\"':
-				this->quote_type = QuoteType::NONE;
-				break;
-			case '\\':
-				this->escape_next_character = true;
-				break;
-			default:
-				Push(c);
-				break;
-			}
-			break;
-		case QuoteType::NONE:
-			switch (c) {
-			case '\n':
-				Emit();
-				break;
-			case '\'':
-				this->quote_type = QuoteType::SINGLE;
-				break;
-			case '\"':
-				this->quote_type = QuoteType::DOUBLE;
-				break;
-			default:
-				if (isspace(c)) {
-					EndWord();
+			case QuoteType::SINGLE:
+				if (c == '\'') {
+					this->quote_type = QuoteType::NONE;
 				} else {
 					Push(c);
 				}
 				break;
-			}
-			break;
+			case QuoteType::DOUBLE:
+				switch (c) {
+					case '\"':
+						this->quote_type =
+						                QuoteType::NONE;
+						break;
+					case '\\':
+						this->escape_next_character =
+						                true;
+						break;
+					default:
+						Push(c);
+						break;
+				}
+				break;
+			case QuoteType::NONE:
+				switch (c) {
+					case '\n':
+						Emit();
+						break;
+					case '\'':
+						this->quote_type = QuoteType::
+						                SINGLE;
+						break;
+					case '\"':
+						this->quote_type = QuoteType::
+						                DOUBLE;
+						break;
+					default:
+						if (isspace(c)) {
+							EndWord();
+						} else {
+							Push(c);
+						}
+						break;
+				}
+				break;
 		}
 	});
 }
@@ -97,9 +100,9 @@ void Tokeniser::Emit()
 	bool valid = this->handler.Handle(words);
 	if (valid) {
 		this->response_sink.Respond(ResponseCode::OKAY, words[0]);
-	}
-	else {
-		this->response_sink.Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
+	} else {
+		this->response_sink.Respond(ResponseCode::WHAT,
+		                            MSG_CMD_INVALID);
 	}
 
 	this->words.clear();

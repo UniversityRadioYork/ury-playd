@@ -29,7 +29,6 @@ extern "C" {
 class CommandHandler;
 class TcpResponseSink;
 
-
 /**
  * The IO reactor, which services input, routes responses, and executes the
  * Player update routine periodically.
@@ -69,6 +68,7 @@ public:
 	void NewConnection(uv_stream_t *server);
 	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
 	void RemoveConnection(TcpResponseSink &sink);
+
 private:
 	void RespondRaw(const std::string &string) const override;
 	void InitAcceptor(const std::string &address, const std::string &port);
@@ -82,8 +82,8 @@ private:
 	uv_tcp_t server;
 	uv_timer_t updater;
 
-	Player &player;                     ///< The player.
-	CommandHandler &handler;            ///< The command handler.
+	Player &player;          ///< The player.
+	CommandHandler &handler; ///< The command handler.
 };
 
 /**
@@ -91,10 +91,12 @@ private:
  */
 class TcpResponseSink : public ResponseSink {
 public:
-	TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp, CommandHandler &handler);
+	TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
+	                CommandHandler &handler);
 	void RespondRaw(const std::string &response) const override;
 	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
 	void Close();
+
 private:
 	IoReactor &parent;
 	uv_tcp_t *tcp;

@@ -7,9 +7,8 @@
  * @see io/io_reactor.hpp
  */
 
-
-#include <csignal>              // SIG*
-#include <string>               // std::string
+#include <csignal> // SIG*
+#include <string>  // std::string
 
 extern "C" {
 #include <uv.h>
@@ -18,9 +17,9 @@ extern "C" {
 #include "../player/player.hpp" // Player
 #include "../cmd.hpp"           // CommandHandler
 #include "../errors.hpp"
-#include "../messages.h"                        // MSG_*
-#include "io_reactor.hpp"                       // IoReactor
-#include "io_response.hpp"                      // ResponseCode
+#include "../messages.h"   // MSG_*
+#include "io_reactor.hpp"  // IoReactor
+#include "io_response.hpp" // ResponseCode
 
 const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 10; // ms
 
@@ -88,7 +87,8 @@ void IoReactor::NewConnection(uv_stream_t *server)
 	uv_tcp_init(uv_default_loop(), client);
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
-		auto tcp = std::make_shared<TcpResponseSink>(*this, client, this->handler);
+		auto tcp = std::make_shared<TcpResponseSink>(*this, client,
+		                                             this->handler);
 		this->player.WelcomeClient(*tcp);
 		this->connections.insert(tcp);
 		client->data = static_cast<void *>(tcp.get());
@@ -106,8 +106,7 @@ void IoReactor::RemoveConnection(TcpResponseSink &conn)
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler,
                      const std::string &address, const std::string &port)
-    : player(player),
-      handler(handler)
+    : player(player), handler(handler)
 {
 	InitAcceptor(address, port);
 	DoUpdateTimer();
@@ -122,7 +121,8 @@ void IoReactor::DoUpdateTimer()
 {
 	uv_timer_init(uv_default_loop(), &this->updater);
 	this->updater.data = static_cast<void *>(&this->player);
-	uv_timer_start(&this->updater, UpdateTimerCallback, 0, PLAYER_UPDATE_PERIOD);
+	uv_timer_start(&this->updater, UpdateTimerCallback, 0,
+	               PLAYER_UPDATE_PERIOD);
 }
 
 void IoReactor::InitAcceptor(const std::string &address,
@@ -157,10 +157,9 @@ void IoReactor::End()
 // TcpResponseSink
 //
 
-TcpResponseSink::TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp, CommandHandler &handler)
-	: parent(parent),
-	  tcp(tcp),
-	  tokeniser(handler, *this)
+TcpResponseSink::TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
+                                 CommandHandler &handler)
+    : parent(parent), tcp(tcp), tokeniser(handler, *this)
 {
 }
 
@@ -174,10 +173,12 @@ void TcpResponseSink::RespondRaw(const std::string &string) const
 	memcpy(req->buf.base, s, l);
 	req->buf.base[l] = '\n';
 
-	uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1, RespondCallback);
+	uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1,
+	         RespondCallback);
 }
 
-void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
+                           const uv_buf_t *buf)
 {
 	if (nread < 0) {
 		if (nread == UV_EOF) {

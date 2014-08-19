@@ -2,10 +2,10 @@
 // Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
 /**
-* @file
-* Declaration of the Tokeniser class.
-* @see io/tokeniser.cpp
-*/
+ * @file
+ * Declaration of the Tokeniser class.
+ * @see io/tokeniser.cpp
+ */
 
 #ifndef PS_TOKENISER_HPP
 #define PS_TOKENISER_HPP
