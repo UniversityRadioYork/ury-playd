@@ -10,9 +10,9 @@
 #ifndef PS_CMD_HPP
 #define PS_CMD_HPP
 
-#include <memory>
 #include <functional>
 #include <map>
+#include <memory>
 #include <vector>
 
 #include "player/player.hpp"

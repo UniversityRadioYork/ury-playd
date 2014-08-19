@@ -10,13 +10,13 @@
 #include <chrono>
 #include <iostream>
 
+#include "audio/audio_system.hpp"
 #include "cmd.hpp"
-#include "io/io_response.hpp"
 #include "io/io_reactor.hpp"
+#include "io/io_response.hpp"
+#include "main.hpp"
 #include "messages.h"
 #include "player/player.hpp"
-#include "audio/audio_system.hpp"
-#include "main.hpp"
 
 /**
  * The main entry point.

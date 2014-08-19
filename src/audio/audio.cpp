@@ -7,16 +7,14 @@
  * @see audio/audio.hpp
  */
 
+#include <algorithm>
 #include <cassert>
 #include <climits>
-#include <algorithm>
-#include <algorithm>
 #include <string>
 
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
 #include "../messages.h"
-
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"

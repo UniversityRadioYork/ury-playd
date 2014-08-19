@@ -10,9 +10,10 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdint>
+
 #include "../cmd.hpp"
-#include "tokeniser.hpp"
 #include "io_response.hpp"
+#include "tokeniser.hpp"
 
 Tokeniser::Tokeniser(CommandHandler &handler, ResponseSink &response_sink)
     : handler(handler),

@@ -7,8 +7,8 @@
  * @see io/io_response.hpp
  */
 
-#include "io_response.hpp" // ResponseSink, ResponseCode
-#include "../errors.hpp"   // Error
+#include "../errors.hpp"
+#include "io_response.hpp"
 
 const std::string RESPONSES[] = {
 	/* ResponseCode::OKAY     */ "OKAY",

@@ -7,19 +7,19 @@
  * @see io/io_reactor.hpp
  */
 
-#include <csignal> // SIG*
-#include <string>  // std::string
+#include <csignal>
+#include <string>
 
 extern "C" {
 #include <uv.h>
 }
 
-#include "../player/player.hpp" // Player
-#include "../cmd.hpp"           // CommandHandler
+#include "../cmd.hpp"
 #include "../errors.hpp"
-#include "../messages.h"   // MSG_*
-#include "io_reactor.hpp"  // IoReactor
-#include "io_response.hpp" // ResponseCode
+#include "../messages.h"
+#include "../player/player.hpp"
+#include "io_reactor.hpp"
+#include "io_response.hpp"
 
 const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 10; // ms
 

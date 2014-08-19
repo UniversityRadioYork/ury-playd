@@ -10,23 +10,22 @@
 #ifndef PS_IO_REACTOR_HPP
 #define PS_IO_REACTOR_HPP
 
-#include "io_response.hpp"
-#include <deque>          // std::deque
-#include <functional>     // std::function
-#include <ostream>        // std::ostream
-#include <set>            // std::set
-#include "io_reactor.hpp" // IoReactor
-#include "tokeniser.hpp"
-#include "../player/player.hpp"
-
-class Player;
-class CommandHandler;
+#include <deque>
+#include <functional>
+#include <ostream>
+#include <set>
 
 extern "C" {
 #include <uv.h>
 }
 
+#include "../player/player.hpp"
+#include "io_reactor.hpp"
+#include "io_response.hpp"
+#include "tokeniser.hpp"
+
 class CommandHandler;
+class Player;
 class TcpResponseSink;
 
 /**

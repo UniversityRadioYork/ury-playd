@@ -7,23 +7,23 @@
  * @see audio/audio_source.hpp
  */
 
-#include <functional>
-#include <string>
-#include <memory>
 #include <cassert>
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
+#include <functional>
 #include <iostream>
-#include <sstream>
 #include <map>
+#include <memory>
+#include <sstream>
+#include <string>
 
-/* ffmpeg */
+// ffmpeg
 extern "C" {
 #ifdef WIN32
 #define inline __inline
 #endif
 #include <libavcodec/avcodec.h>
-#include <libavcodec/version.h> /* For old version patchups */
+#include <libavcodec/version.h> // For old version patchups
 #include <libavformat/avformat.h>
 #include <libavutil/opt.h>
 }
@@ -31,9 +31,8 @@ extern "C" {
 #include "../errors.hpp"
 #include "../messages.h"
 #include "../sample_formats.hpp"
-
-#include "audio_source.hpp"
 #include "audio_resample.hpp"
+#include "audio_source.hpp"
 
 const size_t AudioSource::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 

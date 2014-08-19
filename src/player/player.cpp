@@ -9,18 +9,18 @@
  * @see player/player_state.cpp
  */
 
-#include <stdexcept>
-#include <sstream>
-#include <string>
 #include <cassert>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
-#include "player.hpp"
-#include "player_state.hpp"
-#include "../audio/audio.hpp"
 #include "../audio/audio_system.hpp"
+#include "../audio/audio.hpp"
 #include "../errors.hpp"
 #include "../io/io_response.hpp"
 #include "../messages.h"
+#include "player_state.hpp"
+#include "player.hpp"
 
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
     : file(audio_system),

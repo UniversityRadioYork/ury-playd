@@ -10,12 +10,12 @@
 #ifndef PS_MAIN_HPP
 #define PS_MAIN_HPP
 
-#include <chrono>                 // std::chrono
-#include "audio/audio_system.hpp" // AudioSystem
-#include "cmd.hpp"                // CommandHandler
-#include "io/io_reactor.hpp"      // IoReactor
-#include "player/player.hpp"      // Player
-#include "time_parser.hpp"        // TimeParser
+#include <chrono>
+#include "audio/audio_system.hpp"
+#include "cmd.hpp"
+#include "io/io_reactor.hpp"
+#include "player/player.hpp"
+#include "time_parser.hpp"
 
 /**
  * The Playslave++ application.

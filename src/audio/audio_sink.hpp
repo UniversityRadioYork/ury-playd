@@ -21,8 +21,8 @@
 #include "portaudiocpp/CallbackInterface.hxx"
 #include "portaudiocpp/Stream.hxx"
 
-#include "audio_source.hpp"
 #include "audio_resample.hpp"
+#include "audio_source.hpp"
 #include "ringbuffer.hpp"
 
 /// Type of results emitted during the play callback step.

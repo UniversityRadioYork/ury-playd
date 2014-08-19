@@ -10,12 +10,12 @@
 #ifndef PS_IO_RESPONSE_HPP
 #define PS_IO_RESPONSE_HPP
 
-#include <functional> // std::function
-#include <map>        // std::map
-#include <string>     // std::string
-#include <ostream>    // std::ostream etc.
+#include <functional>
+#include <map>
+#include <ostream>
+#include <string>
 
-#include "../errors.hpp" // Error
+#include "../errors.hpp"
 
 /**
  * Four-character response codes.

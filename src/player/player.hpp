@@ -23,8 +23,8 @@
 #include <utility>
 
 #include "../audio/audio.hpp"
-#include "../time_parser.hpp"
 #include "../io/io_response.hpp"
+#include "../time_parser.hpp"
 
 #include "player_file.hpp"
 #include "player_position.hpp"

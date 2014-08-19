@@ -33,10 +33,9 @@ class CallbackInterface;
 #include "../errors.hpp"
 #include "../messages.h"
 #include "../sample_formats.hpp"
-
 #include "audio.hpp"
-#include "audio_source.hpp"
 #include "audio_sink.hpp"
+#include "audio_source.hpp"
 #include "audio_system.hpp"
 
 AudioSystem::AudioSystem()

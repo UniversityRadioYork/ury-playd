@@ -23,8 +23,8 @@ namespace portaudio {
 class Stream;
 }
 
-class AudioSource;
 class AudioSink;
+class AudioSource;
 
 /**
  * An audio file.

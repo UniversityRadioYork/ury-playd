@@ -25,7 +25,6 @@ extern "C" {
 
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
-
 #include "audio_resample.hpp"
 
 /**
