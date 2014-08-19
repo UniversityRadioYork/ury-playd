@@ -45,14 +45,15 @@ private:
 		DOUBLE
 	};
 
-	void Push(char c);
-	void EndWord();
 	void Emit();
+	void EndWord();
+	void Push(char c);
 
-	ResponseSink &response_sink;
 	CommandHandler &handler;
-	QuoteType quote_type;
+	ResponseSink &response_sink;
+
 	bool escape_next_character;
+	QuoteType quote_type;
 
 	std::vector<std::string> words;
 	std::string current_word;

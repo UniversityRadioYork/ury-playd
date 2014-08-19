@@ -7,6 +7,7 @@
  * @see io/tokeniser.hpp
  */
 
+#include <algorithm>
 #include <cctype>
 #include <cstdint>
 #include "../cmd.hpp"

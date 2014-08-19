@@ -8,6 +8,8 @@
 * @see player/player.hpp
 */
 
+#include <algorithm>
+
 #include "player.hpp"
 #include "player_state.hpp"
 #include "../io/io_response.hpp"

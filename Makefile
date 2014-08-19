@@ -40,7 +40,7 @@ SUBDIRS = audio io player contrib/pa_ringbuffer
 
 # Now we work out which libraries to use, using pkg-config.
 # These packages are always used: the PortAudio C library, and FFmpeg.
-PKGS = portaudio-2.0 libavcodec libavformat libavutil libswresample
+PKGS = portaudio-2.0 libavcodec libavformat libavutil libswresample libuv
 
 # PortAudio's C++ bindings aren't always available, so we bundle them.
 # However, if there is a PortAudioCPP package available, we can make use of it
@@ -71,7 +71,7 @@ COBJECTS = $(patsubst $(srcdir)%,$(builddir)%,$(CSOURCES:.c=.o))
 # Now set up the flags needed for playslave++.
 CFLAGS   += -c $(WARNS) $(PKG_CFLAGS) -g -std=c99
 CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS) -g -std=c++11
-LDFLAGS  += $(PKG_LDFLAGS) -lboost_system
+LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##
 

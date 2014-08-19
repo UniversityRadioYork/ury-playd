@@ -24,9 +24,26 @@ extern "C" {
 
 const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 10; // ms
 
-void AllocBuffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
+//
+// libuv callbacks
+//
+// These should generally trampoline back into class methods.
+//
+
+struct WriteReq {
+	uv_write_t req;
+	uv_buf_t buf;
+};
+
+void AllocBuffer(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 {
 	*buf = uv_buf_init((char *)malloc(suggested_size), suggested_size);
+}
+
+void CloseCallback(uv_handle_t *handle)
+{
+	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(handle->data);
+	tcp->Close();
 }
 
 void ReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
@@ -35,7 +52,7 @@ void ReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 	tcp->Read(stream, nread, buf);
 }
 
-void OnNewConnection(uv_stream_t *server, int status)
+void ListenCallback(uv_stream_t *server, int status)
 {
 	if (status == -1) {
 		return;
@@ -43,6 +60,27 @@ void OnNewConnection(uv_stream_t *server, int status)
 	IoReactor *reactor = static_cast<IoReactor *>(server->data);
 	reactor->NewConnection(server);
 }
+
+void RespondCallback(uv_write_t *req, int)
+{
+	// TODO: Handle the int status?
+	WriteReq *wr = (WriteReq *)req;
+	delete[] wr->buf.base;
+	delete wr;
+}
+
+void UpdateTimerCallback(uv_timer_t *handle)
+{
+	Player *player = static_cast<Player *>(handle->data);
+	bool running = player->Update();
+	if (!running) {
+		uv_stop(uv_default_loop());
+	}
+}
+
+//
+// IoReactor
+//
 
 void IoReactor::NewConnection(uv_stream_t *server)
 {
@@ -80,21 +118,6 @@ void IoReactor::Run()
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
-void UpdateTimerCallback(uv_timer_t *handle)
-{
-	Player *player = static_cast<Player *>(handle->data);
-	bool running = player->Update();
-	if (!running) {
-		uv_stop(uv_default_loop());
-	}
-}
-
-void CloseCallback(uv_handle_t *handle)
-{
-	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(handle->data);
-	tcp->Close();
-}
-
 void IoReactor::DoUpdateTimer()
 {
 	uv_timer_init(uv_default_loop(), &this->updater);
@@ -114,19 +137,8 @@ void IoReactor::InitAcceptor(const std::string &address,
 	uv_ip4_addr(address.c_str(), uport, &bind_addr);
 	uv_tcp_bind(&this->server, (const sockaddr *)&bind_addr, 0);
 
-	int r = uv_listen((uv_stream_t *)&this->server, 128, OnNewConnection);
-}
-
-struct WriteReq {
-	uv_write_t req;
-	uv_buf_t buf;
-};
-
-void RespondCallback(uv_write_t *req, int status)
-{
-	WriteReq *wr = (WriteReq *)req;
-	delete[] wr->buf.base;
-	delete wr;
+	// TODO: Handle errors from uv_listen.
+	uv_listen((uv_stream_t *)&this->server, 128, ListenCallback);
 }
 
 void IoReactor::RespondRaw(const std::string &string) const
