@@ -16,6 +16,8 @@ GZIP       ?= gzip -9 --stdout
 INSTALL    ?= install
 PKG_CONFIG ?= pkg-config
 FORMAT     ?= clang-format -i
+DOXYGEN    ?= doxygen
+GIT        ?= git
 
 # Variables used to decide where to install playd and its man pages.
 prefix      ?= /usr/local
@@ -86,7 +88,7 @@ LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##
 
-.PHONY: clean mkdir install run gdbrun format
+.PHONY: clean mkdir install run gdbrun format gh-pages doc
 
 all: mkdir $(BIN) man
 man: $(MAN_GZ)
@@ -127,3 +129,11 @@ gdbrun: $(BIN)
 format: $(TO_FORMAT)
 	@echo FORMAT $^
 	@$(FORMAT) $^
+
+gh-pages: doc
+	git checkout gh-pages
+	git add doc
+	git commit -m "Update doxygen on gh-pages."
+
+doc:
+	${DOXYGEN}
