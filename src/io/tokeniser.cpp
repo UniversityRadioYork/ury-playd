@@ -97,6 +97,8 @@ void Tokeniser::EndWord()
 
 void Tokeniser::Emit()
 {
+	EndWord();
+
 	bool valid = this->handler.Handle(words);
 	if (valid) {
 		this->response_sink.Respond(ResponseCode::OKAY, words[0]);
