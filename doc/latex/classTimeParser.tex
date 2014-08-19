@@ -1,0 +1,193 @@
+\hypertarget{classTimeParser}{\section{Time\+Parser$<$ Out\+Unit, Int\+Type $>$ Class Template Reference}
+\label{classTimeParser}\index{Time\+Parser$<$ Out\+Unit, Int\+Type $>$@{Time\+Parser$<$ Out\+Unit, Int\+Type $>$}}
+}
+
+
+A class for parsing time strings consisting of an integer and unit into a flat integer representing the number of Out\+Unit units that time string represents.  
+
+
+
+
+{\ttfamily \#include $<$time\+\_\+parser.\+hpp$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{using \hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{Unit\+Map} = std\+::map$<$ std\+::string, std\+::function$<$ Out\+Unit(Int\+Type)$>$$>$}\label{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}
+
+\begin{DoxyCompactList}\small\item\em The type of the map from unit suffixes to functions that convert from an amount of that time unit to a chrono duration of type Out\+Unit capturing the same duration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classTimeParser_a66c6443db8e5d38b8f3d7e7a4eea783a}{Time\+Parser} (const \hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{Unit\+Map} \&\hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{unit\+\_\+map})
+\begin{DoxyCompactList}\small\item\em Constructs a \hyperlink{classTimeParser}{Time\+Parser}. \end{DoxyCompactList}\item 
+Out\+Unit \hyperlink{classTimeParser_a68110dc8c7d2ad1a8f47a29646ad4d1c}{Parse} (const std\+::string \&time\+\_\+str) const 
+\begin{DoxyCompactList}\small\item\em Parses a time, returning it as a std\+::chrono duration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename In\+Unit $>$ }\\static Out\+Unit \hyperlink{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}{Mk\+Time} (Int\+Type raw\+\_\+time)
+\begin{DoxyCompactList}\small\item\em A template for converting an Int\+Type representation of a duration of In\+Unit units into a duration expressed as an Out\+Unit. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::pair$<$ std\+::string, Int\+Type $>$ \hyperlink{classTimeParser_a3f7f36a669233d66e7fe1ca8405eefd5}{Split} (const std\+::string \&time\+\_\+str) const 
+\begin{DoxyCompactList}\small\item\em Splits a time string into a pair of unit and amount. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{\hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{Unit\+Map} \hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{unit\+\_\+map}}\label{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}
+
+\begin{DoxyCompactList}\small\item\em Map from units to handling functions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Out\+Unit, typename Int\+Type = std\+::uint64\+\_\+t$>$class Time\+Parser$<$ Out\+Unit, Int\+Type $>$}
+
+A class for parsing time strings consisting of an integer and unit into a flat integer representing the number of Out\+Unit units that time string represents. 
+
+Definition at line \hyperlink{time__parser_8hpp_source_l00022}{22} of file \hyperlink{time__parser_8hpp_source}{time\+\_\+parser.\+hpp}.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classTimeParser_a66c6443db8e5d38b8f3d7e7a4eea783a}{\index{Time\+Parser@{Time\+Parser}!Time\+Parser@{Time\+Parser}}
+\index{Time\+Parser@{Time\+Parser}!Time\+Parser@{Time\+Parser}}
+\subsubsection[{Time\+Parser}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Out\+Unit, typename Int\+Type  = std\+::uint64\+\_\+t$>$ {\bf Time\+Parser}$<$ Out\+Unit, Int\+Type $>$\+::{\bf Time\+Parser} (
+\begin{DoxyParamCaption}
+\item[{const {\bf Unit\+Map} \&}]{unit\+\_\+map}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTimeParser_a66c6443db8e5d38b8f3d7e7a4eea783a}
+
+
+Constructs a \hyperlink{classTimeParser}{Time\+Parser}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em unit\+\_\+map} & The map from units to their parsers. \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}{Mk\+Time} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{time__parser_8hpp_source_l00036}{36} of file \hyperlink{time__parser_8hpp_source}{time\+\_\+parser.\+hpp}.
+
+
+\begin{DoxyCode}
+00036                                         : \hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{unit\_map}(\hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{unit\_map})
+00037     \{
+00038     \}
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}{\index{Time\+Parser@{Time\+Parser}!Mk\+Time@{Mk\+Time}}
+\index{Mk\+Time@{Mk\+Time}!Time\+Parser@{Time\+Parser}}
+\subsubsection[{Mk\+Time}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Out\+Unit, typename Int\+Type  = std\+::uint64\+\_\+t$>$ template$<$typename In\+Unit $>$ static Out\+Unit {\bf Time\+Parser}$<$ Out\+Unit, Int\+Type $>$\+::Mk\+Time (
+\begin{DoxyParamCaption}
+\item[{Int\+Type}]{raw\+\_\+time}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}}\label{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}
+
+
+A template for converting an Int\+Type representation of a duration of In\+Unit units into a duration expressed as an Out\+Unit. 
+
+For example, \hyperlink{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}{Mk\+Time$<$std\+::chrono\+::seconds$>$} takes in an Int\+Type of seconds and returns a std\+::chrono\+::microseconds\+: applying this to the integer 1 will result in a microseconds variable representing 1,000,000 microseconds.
+
+
+\begin{DoxyParams}{Parameters}
+{\em raw\+\_\+time} & The raw time, as an integer whose units are those used by In\+Unit. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An Out\+Unit capturing the input duration, but in terms of the units used by Out\+Unit. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{time__parser_8hpp_source_l00055}{55} of file \hyperlink{time__parser_8hpp_source}{time\+\_\+parser.\+hpp}.
+
+
+\begin{DoxyCode}
+00056     \{
+00057         \textcolor{keywordflow}{return} std::chrono::duration\_cast<OutUnit>(InUnit(raw\_time));
+00058     \}
+\end{DoxyCode}
+\hypertarget{classTimeParser_a68110dc8c7d2ad1a8f47a29646ad4d1c}{\index{Time\+Parser@{Time\+Parser}!Parse@{Parse}}
+\index{Parse@{Parse}!Time\+Parser@{Time\+Parser}}
+\subsubsection[{Parse}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Out\+Unit, typename Int\+Type  = std\+::uint64\+\_\+t$>$ Out\+Unit {\bf Time\+Parser}$<$ Out\+Unit, Int\+Type $>$\+::Parse (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{time\+\_\+str}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTimeParser_a68110dc8c7d2ad1a8f47a29646ad4d1c}
+
+
+Parses a time, returning it as a std\+::chrono duration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em time\+\_\+str} & The time string. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The time, as an instance of Out\+Unit. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{time__parser_8hpp_source_l00065}{65} of file \hyperlink{time__parser_8hpp_source}{time\+\_\+parser.\+hpp}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00134}{Player\+::\+Seek()}.
+
+
+\begin{DoxyCode}
+00066     \{
+00067         \textcolor{keyword}{auto} seek = \hyperlink{classTimeParser_a3f7f36a669233d66e7fe1ca8405eefd5}{Split}(time\_str);
+00068         \textcolor{keywordflow}{return} \hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{unit\_map}.at(seek.first)(seek.second);
+00069     \}
+\end{DoxyCode}
+\hypertarget{classTimeParser_a3f7f36a669233d66e7fe1ca8405eefd5}{\index{Time\+Parser@{Time\+Parser}!Split@{Split}}
+\index{Split@{Split}!Time\+Parser@{Time\+Parser}}
+\subsubsection[{Split}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Out\+Unit, typename Int\+Type  = std\+::uint64\+\_\+t$>$ std\+::pair$<$std\+::string, Int\+Type$>$ {\bf Time\+Parser}$<$ Out\+Unit, Int\+Type $>$\+::Split (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{time\+\_\+str}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}}\label{classTimeParser_a3f7f36a669233d66e7fe1ca8405eefd5}
+
+
+Splits a time string into a pair of unit and amount. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em time\+\_\+str} & The time string. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A pair of unit string and time amount, as an integer in terms of the named unit. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{time__parser_8hpp_source_l00080}{80} of file \hyperlink{time__parser_8hpp_source}{time\+\_\+parser.\+hpp}.
+
+
+
+Referenced by \hyperlink{time__parser_8hpp_source_l00065}{Time\+Parser$<$ std\+::chrono\+::microseconds $>$\+::\+Parse()}.
+
+
+\begin{DoxyCode}
+00081     \{
+00082         std::istringstream is(time\_str);
+00083         IntType raw\_time;
+00084         std::string rest;
+00085 
+00086         is >> raw\_time >> rest;
+00087         \textcolor{keywordflow}{return} std::make\_pair(rest, raw\_time);
+00088     \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\hyperlink{time__parser_8hpp}{time\+\_\+parser.\+hpp}\end{DoxyCompactItemize}

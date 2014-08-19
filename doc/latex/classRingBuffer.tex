@@ -1,0 +1,322 @@
+\hypertarget{classRingBuffer}{\section{Ring\+Buffer$<$ Rep\+T, Sample\+Count\+T $>$ Class Template Reference}
+\label{classRingBuffer}\index{Ring\+Buffer$<$ Rep\+T, Sample\+Count\+T $>$@{Ring\+Buffer$<$ Rep\+T, Sample\+Count\+T $>$}}
+}
+
+
+A ring buffer.  
+
+
+
+
+{\ttfamily \#include $<$ringbuffer.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classRingBuffer_a2f831ec4941885db960a833cb807465e}{Ring\+Buffer} (int power, int size)
+\begin{DoxyCompactList}\small\item\em Constructs a \hyperlink{classRingBuffer}{Ring\+Buffer}. \end{DoxyCompactList}\item 
+\hypertarget{classRingBuffer_a39d93b7f608eb69a7a569e61b5abc979}{\hyperlink{classRingBuffer_a39d93b7f608eb69a7a569e61b5abc979}{$\sim$\+Ring\+Buffer} ()}\label{classRingBuffer_a39d93b7f608eb69a7a569e61b5abc979}
+
+\begin{DoxyCompactList}\small\item\em Destructs a Pa\+Ring\+Buffer. \end{DoxyCompactList}\item 
+\hypertarget{classRingBuffer_a16e7e006ded5d4aad8b37ee7bea8f90d}{\hyperlink{classRingBuffer_a16e7e006ded5d4aad8b37ee7bea8f90d}{Ring\+Buffer} (const \hyperlink{classRingBuffer}{Ring\+Buffer} \&)=delete}\label{classRingBuffer_a16e7e006ded5d4aad8b37ee7bea8f90d}
+
+\begin{DoxyCompactList}\small\item\em Deleted copy constructor. \end{DoxyCompactList}\item 
+\hypertarget{classRingBuffer_a6f552e291e577aeffc57b846969d11d6}{\hyperlink{classRingBuffer}{Ring\+Buffer} \& \hyperlink{classRingBuffer_a6f552e291e577aeffc57b846969d11d6}{operator=} (const \hyperlink{classRingBuffer}{Ring\+Buffer} \&)=delete}\label{classRingBuffer_a6f552e291e577aeffc57b846969d11d6}
+
+\begin{DoxyCompactList}\small\item\em Deleted copy-\/assignment. \end{DoxyCompactList}\item 
+Sample\+Count\+T \hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{Write\+Capacity} () const 
+\begin{DoxyCompactList}\small\item\em The current write capacity. \end{DoxyCompactList}\item 
+Sample\+Count\+T \hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{Read\+Capacity} () const 
+\begin{DoxyCompactList}\small\item\em The current read capacity. \end{DoxyCompactList}\item 
+Sample\+Count\+T \hyperlink{classRingBuffer_aa7f863968cb641946b0cf341bda11e16}{Write} (Rep\+T $\ast$start, Sample\+Count\+T count)
+\begin{DoxyCompactList}\small\item\em Writes samples from an array into the ring buffer. \end{DoxyCompactList}\item 
+Sample\+Count\+T \hyperlink{classRingBuffer_af892330ee102bd50a493b8afa814a0f0}{Read} (Rep\+T $\ast$start, Sample\+Count\+T count)
+\begin{DoxyCompactList}\small\item\em Reads samples from the ring buffer into an array. \end{DoxyCompactList}\item 
+\hypertarget{classRingBuffer_a1eb1acca6905e7678fbbdb70238cdc26}{void \hyperlink{classRingBuffer_a1eb1acca6905e7678fbbdb70238cdc26}{Flush} ()}\label{classRingBuffer_a1eb1acca6905e7678fbbdb70238cdc26}
+
+\begin{DoxyCompactList}\small\item\em Empties the ring buffer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Sample\+Count\+T \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{Count\+Cast} (ring\+\_\+buffer\+\_\+size\+\_\+t count) const 
+\begin{DoxyCompactList}\small\item\em Converts a ring buffer size into an external size. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{char $\ast$ \hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer}}\label{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}
+
+\begin{DoxyCompactList}\small\item\em The array used by the ringbuffer. \end{DoxyCompactList}\item 
+\hypertarget{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{Pa\+Util\+Ring\+Buffer $\ast$ \hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}}\label{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}
+
+\begin{DoxyCompactList}\small\item\em The internal Port\+Audio ringbuffer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Rep\+T, typename Sample\+Count\+T$>$class Ring\+Buffer$<$ Rep\+T, Sample\+Count\+T $>$}
+
+A ring buffer. 
+
+This ring buffer is based on the Port\+Audio ring buffer, provided in the contrib/ directory. This is stable and performs well, but, as it is C code, necessitates some hoop jumping to integrate and could do with being replaced with a native solution. 
+
+Definition at line \hyperlink{ringbuffer_8hpp_source_l00030}{30} of file \hyperlink{ringbuffer_8hpp_source}{ringbuffer.\+hpp}.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classRingBuffer_a2f831ec4941885db960a833cb807465e}{\index{Ring\+Buffer@{Ring\+Buffer}!Ring\+Buffer@{Ring\+Buffer}}
+\index{Ring\+Buffer@{Ring\+Buffer}!Ring\+Buffer@{Ring\+Buffer}}
+\subsubsection[{Ring\+Buffer}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Rep\+T, typename Sample\+Count\+T$>$ {\bf Ring\+Buffer}$<$ Rep\+T, Sample\+Count\+T $>$\+::{\bf Ring\+Buffer} (
+\begin{DoxyParamCaption}
+\item[{int}]{power, }
+\item[{int}]{size}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classRingBuffer_a2f831ec4941885db960a833cb807465e}
+
+
+Constructs a \hyperlink{classRingBuffer}{Ring\+Buffer}. 
+
+
+\begin{DoxyItemize}
+\item Precondition\+: 0 $<$ power, 0 $<$ size.
+\item Postcondition\+: The \hyperlink{classRingBuffer}{Ring\+Buffer} is fully initialised.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em power} & n, where 2$^\wedge$n is the number of elements in the ring buffer. \\
+\hline
+{\em size} & The size of one element in the ring buffer. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{ringbuffer_8hpp_source_l00042}{42} of file \hyperlink{ringbuffer_8hpp_source}{ringbuffer.\+hpp}.
+
+
+\begin{DoxyCode}
+00043     \{
+00044         assert(0 < power);
+00045         assert(0 < size);
+00046 
+00047         this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb} = \textcolor{keyword}{new} PaUtilRingBuffer;
+00048         this->\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer} = \textcolor{keyword}{new} \textcolor{keywordtype}{char}[(1 << power) * size];
+00049 
+00050         \textcolor{keywordtype}{int} init\_result = PaUtil\_InitializeRingBuffer(
+00051                         this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}, size,
+00052                         static\_cast<ring\_buffer\_size\_t>(1 << power),
+00053                         this->\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer});
+00054         \textcolor{keywordflow}{if} (init\_result != 0) \{
+00055             \textcolor{keywordflow}{throw} \textcolor{keyword}{new} \hyperlink{classInternalError}{InternalError}(\hyperlink{messages_8h_a3bf0477dded19418d7ecac95aeae8856}{MSG\_OUTPUT\_RINGINIT});
+00056         \}
+00057 
+00058         assert(this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb} != \textcolor{keyword}{nullptr});
+00059         assert(this->\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer} != \textcolor{keyword}{nullptr});
+00060     \}
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{\index{Ring\+Buffer@{Ring\+Buffer}!Count\+Cast@{Count\+Cast}}
+\index{Count\+Cast@{Count\+Cast}!Ring\+Buffer@{Ring\+Buffer}}
+\subsubsection[{Count\+Cast}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Rep\+T, typename Sample\+Count\+T$>$ Sample\+Count\+T {\bf Ring\+Buffer}$<$ Rep\+T, Sample\+Count\+T $>$\+::Count\+Cast (
+\begin{DoxyParamCaption}
+\item[{ring\+\_\+buffer\+\_\+size\+\_\+t}]{count}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}}\label{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}
+
+
+Converts a ring buffer size into an external size. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em count} & The size/count in Port\+Audio form. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The size/count after casting to Sample\+Count\+T. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{ringbuffer_8hpp_source_l00174}{174} of file \hyperlink{ringbuffer_8hpp_source}{ringbuffer.\+hpp}.
+
+
+
+Referenced by \hyperlink{ringbuffer_8hpp_source_l00149}{Ring\+Buffer$<$ char, unsigned long $>$\+::\+Read()}, \hyperlink{ringbuffer_8hpp_source_l00093}{Ring\+Buffer$<$ char, unsigned long $>$\+::\+Read\+Capacity()}, \hyperlink{ringbuffer_8hpp_source_l00120}{Ring\+Buffer$<$ char, unsigned long $>$\+::\+Write()}, and \hyperlink{ringbuffer_8hpp_source_l00083}{Ring\+Buffer$<$ char, unsigned long $>$\+::\+Write\+Capacity()}.
+
+
+\begin{DoxyCode}
+00175     \{
+00176         \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}SampleCountT\textcolor{keyword}{>}(count);
+00177     \}
+\end{DoxyCode}
+\hypertarget{classRingBuffer_af892330ee102bd50a493b8afa814a0f0}{\index{Ring\+Buffer@{Ring\+Buffer}!Read@{Read}}
+\index{Read@{Read}!Ring\+Buffer@{Ring\+Buffer}}
+\subsubsection[{Read}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Rep\+T, typename Sample\+Count\+T$>$ Sample\+Count\+T {\bf Ring\+Buffer}$<$ Rep\+T, Sample\+Count\+T $>$\+::Read (
+\begin{DoxyParamCaption}
+\item[{Rep\+T $\ast$}]{start, }
+\item[{Sample\+Count\+T}]{count}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classRingBuffer_af892330ee102bd50a493b8afa814a0f0}
+
+
+Reads samples from the ring buffer into an array. 
+
+To read one sample, pass a count of 1 and take a pointer to the sample variable.
+
+
+\begin{DoxyItemize}
+\item Precondition\+: start points to a valid array, 0 $<$ count $<$= the size of the block of memory pointed to by start, count $<$= \hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{Read\+Capacity()}.
+\item Postcondition\+: The block of memory pointed to by start and bounded by count and \hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{Read\+Capacity()} has been filled with the appropriate number of samples from the front of the ring buffer.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em start} & The start of the array buffer to which we write samples. Must not be nullptr. \\
+\hline
+{\em count} & The number of samples to read. This must not exceed the minimum of \hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{Read\+Capacity()} and the length of the array. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The number of samples read, which should not exceed count. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{Read\+Capacity} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{ringbuffer_8hpp_source_l00149}{149} of file \hyperlink{ringbuffer_8hpp_source}{ringbuffer.\+hpp}.
+
+
+
+Referenced by \hyperlink{audio__sink_8cpp_source_l00176}{Audio\+Sink\+::\+Read\+Samples\+To\+Output()}.
+
+
+\begin{DoxyCode}
+00150     \{
+00151         assert(0 < count);
+00152         assert(count <= \hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{ReadCapacity}());
+00153 
+00154         \textcolor{keywordflow}{return} \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(PaUtil\_ReadRingBuffer(
+00155                         this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}, start,
+00156                         static\_cast<ring\_buffer\_size\_t>(count)));
+00157     \}
+\end{DoxyCode}
+\hypertarget{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{\index{Ring\+Buffer@{Ring\+Buffer}!Read\+Capacity@{Read\+Capacity}}
+\index{Read\+Capacity@{Read\+Capacity}!Ring\+Buffer@{Ring\+Buffer}}
+\subsubsection[{Read\+Capacity}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Rep\+T, typename Sample\+Count\+T$>$ Sample\+Count\+T {\bf Ring\+Buffer}$<$ Rep\+T, Sample\+Count\+T $>$\+::Read\+Capacity (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classRingBuffer_a7086cc66306105db205842af7a88c2d8}
+
+
+The current read capacity. 
+
+\begin{DoxyReturn}{Returns}
+The number of samples available in this ring buffer. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classRingBuffer_af892330ee102bd50a493b8afa814a0f0}{Read} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{ringbuffer_8hpp_source_l00093}{93} of file \hyperlink{ringbuffer_8hpp_source}{ringbuffer.\+hpp}.
+
+
+
+Referenced by \hyperlink{audio__sink_8cpp_source_l00126}{Audio\+Sink\+::\+Play\+Callback\+Step()}, and \hyperlink{ringbuffer_8hpp_source_l00149}{Ring\+Buffer$<$ char, unsigned long $>$\+::\+Read()}.
+
+
+\begin{DoxyCode}
+00094     \{
+00095         \textcolor{keywordflow}{return} \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(PaUtil\_GetRingBufferReadAvailable(this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}));
+00096     \}
+\end{DoxyCode}
+\hypertarget{classRingBuffer_aa7f863968cb641946b0cf341bda11e16}{\index{Ring\+Buffer@{Ring\+Buffer}!Write@{Write}}
+\index{Write@{Write}!Ring\+Buffer@{Ring\+Buffer}}
+\subsubsection[{Write}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Rep\+T, typename Sample\+Count\+T$>$ Sample\+Count\+T {\bf Ring\+Buffer}$<$ Rep\+T, Sample\+Count\+T $>$\+::Write (
+\begin{DoxyParamCaption}
+\item[{Rep\+T $\ast$}]{start, }
+\item[{Sample\+Count\+T}]{count}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classRingBuffer_aa7f863968cb641946b0cf341bda11e16}
+
+
+Writes samples from an array into the ring buffer. 
+
+To write one sample, pass a count of 1 and take a pointer to the sample variable. Note that start pointer is not constant. This is because the underlying implementation of the ring buffer might not guarantee that the array is left untouched.
+
+
+\begin{DoxyItemize}
+\item Precondition\+: start points to a valid array, 0 $<$ count $<$= the size of the block of memory pointed to by start, count $<$= \hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{Write\+Capacity()}.
+\item Postcondition\+: The ringbuffer has been written to with the contents of the memory pointed to by start and bounded by count and \hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{Write\+Capacity()}.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em start} & The start of the array buffer from which we read samples. Must not be nullptr. \\
+\hline
+{\em count} & The number of samples to write. This must not exceed the minimum of \hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{Write\+Capacity()} and the length of the array. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The number of samples written, which should not exceed count. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{Write\+Capacity} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{ringbuffer_8hpp_source_l00120}{120} of file \hyperlink{ringbuffer_8hpp_source}{ringbuffer.\+hpp}.
+
+
+
+Referenced by \hyperlink{audio__sink_8cpp_source_l00076}{Audio\+Sink\+::\+Transfer()}.
+
+
+\begin{DoxyCode}
+00121     \{
+00122         assert(0 < count);
+00123         assert(count <= \hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{WriteCapacity}());
+00124 
+00125         \textcolor{keywordflow}{return} \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(PaUtil\_WriteRingBuffer(
+00126                         this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}, start,
+00127                         static\_cast<ring\_buffer\_size\_t>(count)));
+00128     \}
+\end{DoxyCode}
+\hypertarget{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{\index{Ring\+Buffer@{Ring\+Buffer}!Write\+Capacity@{Write\+Capacity}}
+\index{Write\+Capacity@{Write\+Capacity}!Ring\+Buffer@{Ring\+Buffer}}
+\subsubsection[{Write\+Capacity}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Rep\+T, typename Sample\+Count\+T$>$ Sample\+Count\+T {\bf Ring\+Buffer}$<$ Rep\+T, Sample\+Count\+T $>$\+::Write\+Capacity (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}
+
+
+The current write capacity. 
+
+\begin{DoxyReturn}{Returns}
+The number of samples this ring buffer has space to store. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classRingBuffer_aa7f863968cb641946b0cf341bda11e16}{Write} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{ringbuffer_8hpp_source_l00083}{83} of file \hyperlink{ringbuffer_8hpp_source}{ringbuffer.\+hpp}.
+
+
+
+Referenced by \hyperlink{audio__sink_8cpp_source_l00076}{Audio\+Sink\+::\+Transfer()}, and \hyperlink{ringbuffer_8hpp_source_l00120}{Ring\+Buffer$<$ char, unsigned long $>$\+::\+Write()}.
+
+
+\begin{DoxyCode}
+00084     \{
+00085         \textcolor{keywordflow}{return} \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(PaUtil\_GetRingBufferWriteAvailable(this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}));
+00086     \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/audio/\hyperlink{ringbuffer_8hpp}{ringbuffer.\+hpp}\end{DoxyCompactItemize}

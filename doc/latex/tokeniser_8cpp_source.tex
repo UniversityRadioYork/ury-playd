@@ -1,0 +1,150 @@
+\hypertarget{tokeniser_8cpp_source}{\section{tokeniser.\+cpp}
+\label{tokeniser_8cpp_source}\index{src/io/tokeniser.\+cpp@{src/io/tokeniser.\+cpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00010 \textcolor{preprocessor}{#include <algorithm>}
+00011 \textcolor{preprocessor}{#include <cctype>}
+00012 \textcolor{preprocessor}{#include <cstdint>}
+00013 
+00014 \textcolor{preprocessor}{#include "../cmd.hpp"}
+00015 \textcolor{preprocessor}{#include "\hyperlink{io__response_8hpp}{io\_response.hpp}"}
+00016 \textcolor{preprocessor}{#include "\hyperlink{tokeniser_8hpp}{tokeniser.hpp}"}
+00017 
+\hypertarget{tokeniser_8cpp_source_l00018}{}\hyperlink{classTokeniser_ac69ac105eaf7d81e0632329ee46d2a57}{00018} \hyperlink{classTokeniser_ac69ac105eaf7d81e0632329ee46d2a57}{Tokeniser::Tokeniser}(\hyperlink{classCommandHandler}{CommandHandler} &handler, 
+      \hyperlink{classResponseSink}{ResponseSink} &response\_sink)
+00019     : handler(handler),
+00020       response\_sink(response\_sink),
+00021       escape\_next\_character(false),
+00022       quote\_type(\hyperlink{classTokeniser}{Tokeniser}::\hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4}{QuoteType}::NONE)
+00023 \{
+00024 \}
+00025 
+\hypertarget{tokeniser_8cpp_source_l00026}{}\hyperlink{classTokeniser_ab4b8f1238c89d766a1d72f0ee619406d}{00026} \textcolor{keywordtype}{void} \hyperlink{classTokeniser_ab4b8f1238c89d766a1d72f0ee619406d}{Tokeniser::Feed}(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *start, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nread)
+00027 \{
+00028     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 0; i < nread; i++) \{
+00029         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} c = start[i];
+00030 
+00031         \textcolor{keywordflow}{if} (this->\hyperlink{classTokeniser_ace181afc0f1425b87126becc79458edd}{escape\_next\_character}) \{
+00032             \hyperlink{classTokeniser_a0c62f5dd06a42d478a93595fc78b76fa}{Push}(c);
+00033             \textcolor{keywordflow}{continue};
+00034         \}
+00035 
+00036         \textcolor{keywordflow}{switch} (this->\hyperlink{classTokeniser_a10b7147e055edd438fcb951fc41faf65}{quote\_type}) \{
+00037             \textcolor{keywordflow}{case} \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4a0679273e201afd0bf57af3961f8a23b8}{QuoteType::SINGLE}:
+00038                 \textcolor{keywordflow}{if} (c == \textcolor{charliteral}{'\(\backslash\)''}) \{
+00039                     this->\hyperlink{classTokeniser_a10b7147e055edd438fcb951fc41faf65}{quote\_type} = \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4ab50339a10e1de285ac99d4c3990b8693}{QuoteType::NONE};
+00040                 \} \textcolor{keywordflow}{else} \{
+00041                     \hyperlink{classTokeniser_a0c62f5dd06a42d478a93595fc78b76fa}{Push}(c);
+00042                 \}
+00043                 \textcolor{keywordflow}{break};
+00044 
+00045             \textcolor{keywordflow}{case} \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4afd3e4ece78a7d422280d5ed379482229}{QuoteType::DOUBLE}:
+00046                 \textcolor{keywordflow}{switch} (c) \{
+00047                     \textcolor{keywordflow}{case} \textcolor{charliteral}{'\(\backslash\)"'}:
+00048                         this->\hyperlink{classTokeniser_a10b7147e055edd438fcb951fc41faf65}{quote\_type} =
+00049                                         \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4ab50339a10e1de285ac99d4c3990b8693}{QuoteType::NONE};
+00050                         \textcolor{keywordflow}{break};
+00051 
+00052                     \textcolor{keywordflow}{case} \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:
+00053                         this->\hyperlink{classTokeniser_ace181afc0f1425b87126becc79458edd}{escape\_next\_character} =
+00054                                         \textcolor{keyword}{true};
+00055                         \textcolor{keywordflow}{break};
+00056 
+00057                     \textcolor{keywordflow}{default}:
+00058                         \hyperlink{classTokeniser_a0c62f5dd06a42d478a93595fc78b76fa}{Push}(c);
+00059                         \textcolor{keywordflow}{break};
+00060                 \}
+00061                 \textcolor{keywordflow}{break};
+00062 
+00063             \textcolor{keywordflow}{case} \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4ab50339a10e1de285ac99d4c3990b8693}{QuoteType::NONE}:
+00064                 \textcolor{keywordflow}{switch} (c) \{
+00065                     \textcolor{keywordflow}{case} \textcolor{charliteral}{'\(\backslash\)n'}:
+00066                         \hyperlink{classTokeniser_a71405521b0e9c00a0d9b1a2f32ae10c2}{Emit}();
+00067                         \textcolor{keywordflow}{break};
+00068 
+00069                     \textcolor{keywordflow}{case} \textcolor{charliteral}{'\(\backslash\)''}:
+00070                         this->\hyperlink{classTokeniser_a10b7147e055edd438fcb951fc41faf65}{quote\_type} = \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4a0679273e201afd0bf57af3961f8a23b8}{QuoteType::}
+00071 \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4a0679273e201afd0bf57af3961f8a23b8}{                                        SINGLE};
+00072                         \textcolor{keywordflow}{break};
+00073 
+00074                     \textcolor{keywordflow}{case} \textcolor{charliteral}{'\(\backslash\)"'}:
+00075                         this->\hyperlink{classTokeniser_a10b7147e055edd438fcb951fc41faf65}{quote\_type} = \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4afd3e4ece78a7d422280d5ed379482229}{QuoteType::}
+00076 \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4afd3e4ece78a7d422280d5ed379482229}{                                        DOUBLE};
+00077                         \textcolor{keywordflow}{break};
+00078 
+00079                     \textcolor{keywordflow}{case} \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:
+00080                         this->\hyperlink{classTokeniser_ace181afc0f1425b87126becc79458edd}{escape\_next\_character} =
+00081                                         \textcolor{keyword}{true};
+00082                         \textcolor{keywordflow}{break};
+00083 
+00084                     \textcolor{keywordflow}{default}:
+00085                         isspace(c) ? \hyperlink{classTokeniser_abb18309e5b6cce8fc63cdb4b02e69bf3}{EndWord}()
+00086                                    : \hyperlink{classTokeniser_a0c62f5dd06a42d478a93595fc78b76fa}{Push}(c);
+00087                         \textcolor{keywordflow}{break};
+00088                 \}
+00089                 \textcolor{keywordflow}{break};
+00090         \}
+00091     \}
+00092 \}
+00093 
+\hypertarget{tokeniser_8cpp_source_l00094}{}\hyperlink{classTokeniser_a0c62f5dd06a42d478a93595fc78b76fa}{00094} \textcolor{keywordtype}{void} \hyperlink{classTokeniser_a0c62f5dd06a42d478a93595fc78b76fa}{Tokeniser::Push}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} c)
+00095 \{
+00096     assert(this->\hyperlink{classTokeniser_ace181afc0f1425b87126becc79458edd}{escape\_next\_character} ||
+00097            !(this->\hyperlink{classTokeniser_a10b7147e055edd438fcb951fc41faf65}{quote\_type} == \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4ab50339a10e1de285ac99d4c3990b8693}{QuoteType::NONE} && isspace(c)));
+00098     this->\hyperlink{classTokeniser_a5d703e64476ccc8cbf42cc7c3ef8bc79}{current\_word}.push\_back(c);
+00099     this->\hyperlink{classTokeniser_ace181afc0f1425b87126becc79458edd}{escape\_next\_character} = \textcolor{keyword}{false};
+00100     assert(!this->\hyperlink{classTokeniser_a5d703e64476ccc8cbf42cc7c3ef8bc79}{current\_word}.empty());
+00101 \}
+00102 
+\hypertarget{tokeniser_8cpp_source_l00103}{}\hyperlink{classTokeniser_abb18309e5b6cce8fc63cdb4b02e69bf3}{00103} \textcolor{keywordtype}{void} \hyperlink{classTokeniser_abb18309e5b6cce8fc63cdb4b02e69bf3}{Tokeniser::EndWord}()
+00104 \{
+00105     \textcolor{comment}{// Ignore consecutive runs of whitespace.}
+00106     \textcolor{keywordflow}{if} (this->\hyperlink{classTokeniser_a5d703e64476ccc8cbf42cc7c3ef8bc79}{current\_word}.empty()) \textcolor{keywordflow}{return};
+00107 
+00108     this->\hyperlink{classTokeniser_ac87e935ecd591ec802e223ec341ebbfb}{words}.push\_back(this->\hyperlink{classTokeniser_a5d703e64476ccc8cbf42cc7c3ef8bc79}{current\_word});
+00109 
+00110     this->\hyperlink{classTokeniser_a5d703e64476ccc8cbf42cc7c3ef8bc79}{current\_word}.clear();
+00111 \}
+00112 
+\hypertarget{tokeniser_8cpp_source_l00113}{}\hyperlink{classTokeniser_a71405521b0e9c00a0d9b1a2f32ae10c2}{00113} \textcolor{keywordtype}{void} \hyperlink{classTokeniser_a71405521b0e9c00a0d9b1a2f32ae10c2}{Tokeniser::Emit}()
+00114 \{
+00115     \textcolor{comment}{// Since we assume these, we don't need to set them later.}
+00116     assert(this->\hyperlink{classTokeniser_a10b7147e055edd438fcb951fc41faf65}{quote\_type} == \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4ab50339a10e1de285ac99d4c3990b8693}{QuoteType::NONE});
+00117     assert(!this->\hyperlink{classTokeniser_ace181afc0f1425b87126becc79458edd}{escape\_next\_character});
+00118 
+00119     \textcolor{comment}{// We might still be in a word, in which case we treat the end of a}
+00120     \textcolor{comment}{// line as the end of the word too.}
+00121     \hyperlink{classTokeniser_abb18309e5b6cce8fc63cdb4b02e69bf3}{EndWord}();
+00122 
+00123     \textcolor{comment}{// TODO: Should this happen inside the tokeniser?}
+00124     \textcolor{comment}{// I'd've thought it should be it's own module.}
+00125 
+00126     \hyperlink{classDebug}{Debug}() << \textcolor{stringliteral}{"Received command:"};
+00127     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &word : this->\hyperlink{classTokeniser_ac87e935ecd591ec802e223ec341ebbfb}{words})
+00128         std::cerr << \textcolor{charliteral}{' '} << \textcolor{charliteral}{'"'} << word << \textcolor{charliteral}{'"'};
+00129     std::cerr << std::endl;
+00130 
+00131     \textcolor{keywordtype}{bool} valid = this->\hyperlink{classTokeniser_a779dcc74539e27d10b7d2118fae996e6}{handler}.\hyperlink{classCommandHandler_abc1ad0dfbff50db168d0a65cf05b169e}{Handle}(this->words);
+00132     \textcolor{keywordflow}{if} (valid) \{
+00133         \textcolor{comment}{// TODO: Emit entire command back, not just first word.}
+00134         this->\hyperlink{classTokeniser_a5ae6a740655de2f1cbc5f6723dd56439}{response\_sink}.\hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{Respond}(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a74eb855e4de6fe58228f03006c02fd8a}{ResponseCode::OKAY}, this->words[0
+      ]);
+00135     \} \textcolor{keywordflow}{else} \{
+00136         \textcolor{comment}{// TODO: Better error reporting.}
+00137         this->\hyperlink{classTokeniser_a5ae6a740655de2f1cbc5f6723dd56439}{response\_sink}.\hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{Respond}(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a15a20d86df597f9b2cd041e98e5b4b7f}{ResponseCode::WHAT},
+00138                                     \hyperlink{messages_8h_aae611bdef00661caf3dcce93fc2053fe}{MSG\_CMD\_INVALID});
+00139     \}
+00140 
+00141     this->words.clear();
+00142 
+00143     \textcolor{comment}{// The state should now be clean and ready for another command.}
+00144     assert(this->\hyperlink{classTokeniser_a10b7147e055edd438fcb951fc41faf65}{quote\_type} == \hyperlink{classTokeniser_a71d622e60fae9d6c36c96ba69a4f62e4ab50339a10e1de285ac99d4c3990b8693}{QuoteType::NONE});
+00145     assert(!this->\hyperlink{classTokeniser_ace181afc0f1425b87126becc79458edd}{escape\_next\_character});
+00146     assert(this->\hyperlink{classTokeniser_a5d703e64476ccc8cbf42cc7c3ef8bc79}{current\_word}.empty());
+00147     assert(this->words.empty());
+00148 \}
+\end{DoxyCode}

@@ -1,0 +1,56 @@
+\hypertarget{player__file_8hpp_source}{\section{player\+\_\+file.\+hpp}
+\label{player__file_8hpp_source}\index{src/player/player\+\_\+file.\+hpp@{src/player/player\+\_\+file.\+hpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00010 \textcolor{preprocessor}{#ifndef PS\_PLAYER\_FILE\_HPP}
+00011 \textcolor{preprocessor}{#define PS\_PLAYER\_FILE\_HPP}
+00012 
+00013 \textcolor{preprocessor}{#include <memory>}
+00014 
+00015 \textcolor{preprocessor}{#include "../audio/audio\_system.hpp"}
+00016 \textcolor{preprocessor}{#include "../io/io\_response.hpp"}
+00017 
+00018 \textcolor{keyword}{class }\hyperlink{classAudio}{Audio};
+00019 
+\hypertarget{player__file_8hpp_source_l00024}{}\hyperlink{classPlayerFile}{00024} \textcolor{keyword}{class }\hyperlink{classPlayerFile}{PlayerFile} : \textcolor{keyword}{public} \hyperlink{classResponseSource}{ResponseSource} \{
+00025 \textcolor{keyword}{public}:
+00031     \hyperlink{classPlayerFile_a655a5bf6903cad650c0dc4e33a7e41a5}{PlayerFile}(\textcolor{keyword}{const} \hyperlink{classAudioSystem}{AudioSystem} &\hyperlink{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}{audio\_system});
+00032 
+00037     \textcolor{keywordtype}{void} \hyperlink{classPlayerFile_a92dd004d4ab034bf41f7d5c76847d3c2}{Load}(\textcolor{keyword}{const} std::string &path);
+00038 
+00040     \textcolor{keywordtype}{void} \hyperlink{classPlayerFile_a426f8ad29efd5e16ac7963354087d070}{Start}();
+00041 
+00043     \textcolor{keywordtype}{void} \hyperlink{classPlayerFile_afd4313009b5d51df0df5dc7b59ffcf13}{Stop}();
+00044 
+00046     \textcolor{keywordtype}{void} \hyperlink{classPlayerFile_a394b2e7b4f4d0baee4ff1928a36e9945}{Eject}();
+00047 
+00053     \textcolor{keywordtype}{void} \hyperlink{classPlayerFile_a00f044c74d07d778532953a917c24197}{Emit}(\hyperlink{classResponseSink}{ResponseSink} &sink) \textcolor{keyword}{const override};
+00054 
+00061     \textcolor{keywordtype}{bool} \hyperlink{classPlayerFile_a43d903e65213d3a6b2c8b38924c83c5f}{IsStopped}();
+00062 
+00064     \textcolor{keywordtype}{void} \hyperlink{classPlayerFile_afe0b43a6980e548a6faa87f84d22d65b}{Update}();
+00065 
+00070     \textcolor{keyword}{template} <\textcolor{keyword}{typename} R>
+\hypertarget{player__file_8hpp_source_l00071}{}\hyperlink{classPlayerFile_a072d9788c1449e0e2de3e28b169f2c34}{00071}     R \hyperlink{classPlayerFile_a072d9788c1449e0e2de3e28b169f2c34}{CurrentPosition}()
+00072     \{
+00073         \textcolor{keywordflow}{return} this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio}->CurrentPosition<R>();
+00074     \}
+00075 
+00080     \textcolor{keyword}{template} <\textcolor{keyword}{typename} R>
+\hypertarget{player__file_8hpp_source_l00081}{}\hyperlink{classPlayerFile_a8c270134404d83fe6c9e844abeacf3e5}{00081}     \textcolor{keywordtype}{void} \hyperlink{classPlayerFile_a8c270134404d83fe6c9e844abeacf3e5}{SeekToPosition}(R position)
+00082     \{
+00083         this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio}->SeekToPosition<R>(position);
+00084     \}
+00085 
+00086 \textcolor{keyword}{private}:
+\hypertarget{player__file_8hpp_source_l00088}{}\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{00088}     std::unique\_ptr<Audio> \hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio};
+00089 
+\hypertarget{player__file_8hpp_source_l00091}{}\hyperlink{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}{00091}     \textcolor{keyword}{const} \hyperlink{classAudioSystem}{AudioSystem} &\hyperlink{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}{audio\_system};
+00092 \};
+00093 
+00094 \textcolor{preprocessor}{#endif // PS\_PLAYER\_FILE\_HPP}
+\end{DoxyCode}

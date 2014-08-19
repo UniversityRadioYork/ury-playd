@@ -1,0 +1,514 @@
+\hypertarget{README_8VisualStudio_8md_source}{\section{R\+E\+A\+D\+M\+E.\+Visual\+Studio.\+md}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{# Visual Studio Build Notes}
+00002 
+00003 Visual Studio is a fickle beast, and as of writing the resources provided in
+00004 the \hyperlink{classplayd}{playd} repository won\textcolor{stringliteral}{'t be enough to build from scratch.  Until we}
+00005 \textcolor{stringliteral}{can sort everything out, here are some field notes.}
+00006 \textcolor{stringliteral}{}
+00007 \textcolor{stringliteral}{## Changing Paths}
+00008 \textcolor{stringliteral}{}
+00009 \textcolor{stringliteral}{Currently, the paths given in `playd.vcxproj` are absolute, and will}
+00010 \textcolor{stringliteral}{need to be changed to suit your build environment.  This may be fixed later.}
+00011 \textcolor{stringliteral}{}
+00012 \textcolor{stringliteral}{## PortAudio}
+00013 \textcolor{stringliteral}{}
+00014 \textcolor{stringliteral}{Use cmake, and the shared library (`portaudio-x86.lib`).}
+00015 \textcolor{stringliteral}{}
+00016 \textcolor{stringliteral}{The C++ bindings are \_not\_ built by the cmake-generated Visual Studio}
+00017 \textcolor{stringliteral}{solution.  However, the Visual Studio 7.1 solution in}
+00018 \textcolor{stringliteral}{`bindings\(\backslash\)cpp\(\backslash\)build\(\backslash\)vc7\_1\(\backslash\)static\_library.sln` should work once upgraded to}
+00019 \textcolor{stringliteral}{modern Visual Studio.}
+00020 \textcolor{stringliteral}{}
+00021 \textcolor{stringliteral}{## LibUV}
+00022 \textcolor{stringliteral}{}
+00023 \textcolor{stringliteral}{This \_must\_ be built as a shared library (`vcbuild.bat shared`).  Otherwise,}
+00024 \textcolor{stringliteral}{this should work fine.}
+00025 \textcolor{stringliteral}{}
+00026 \textcolor{stringliteral}{## SoX}
+00027 \textcolor{stringliteral}{}
+00028 \textcolor{stringliteral}{Some persuasion of the dated sources recommended by the SoX build instructions}
+00029 \textcolor{stringliteral}{is necessary to get them to build with modern Visual Studio.  The following}
+00030 \textcolor{stringliteral}{'}hacks\textcolor{stringliteral}{' work on 32-bit VS2013:}
+00031 \textcolor{stringliteral}{}
+00032 \textcolor{stringliteral}{* libflac: Replace all `ftello`/`fseeko` with `ftell`/`fseek`;}
+00033 \textcolor{stringliteral}{* libsndfile: Replace all lrint with \_lrint.}
+00034 \textcolor{stringliteral}{* In the LibSox project, change the following properties:}
+00035 \textcolor{stringliteral}{  * \_\_General/General/Target Extension\_\_ to \_\_.dll\_\_;}
+00036 \textcolor{stringliteral}{  * \_\_General/Project Defaults/Configuration Type\_\_ to}
+00037 \textcolor{stringliteral}{    \_\_Dynamic Library (.dll)\_\_;}
+00038 \textcolor{stringliteral}{  * \_\_Linker/Input/Additional Dependencies\_\_ should contain:}
+00039 \textcolor{stringliteral}{    * `winmm.lib`}
+00040 \textcolor{stringliteral}{    * `libflac.lib`}
+00041 \textcolor{stringliteral}{    * `libgsm.lib`}
+00042 \textcolor{stringliteral}{    * `libid3tag.lib`}
+00043 \textcolor{stringliteral}{    * `liblpc10.lib`}
+00044 \textcolor{stringliteral}{    * `libmad.lib`}
+00045 \textcolor{stringliteral}{    * `libmp3lame.lib`}
+00046 \textcolor{stringliteral}{    * `libogg.lib`}
+00047 \textcolor{stringliteral}{    * `libpng.lib`}
+00048 \textcolor{stringliteral}{    * `libsndfileg72x.lib`}
+00049 \textcolor{stringliteral}{    * `libsndfile-1.lib`}
+00050 \textcolor{stringliteral}{    * `libsndfilegsm610.lib`}
+00051 \textcolor{stringliteral}{    * `libspeex.lib`}
+00052 \textcolor{stringliteral}{    * `libvorbis.lib`}
+00053 \textcolor{stringliteral}{    * `libwavpack.lib`}
+00054 \textcolor{stringliteral}{    * `libzlib.lib`}
+00055 \textcolor{stringliteral}{  * \_\_Linker/Input/Module Definition File\_\_ should point to a file with the}
+00056 \textcolor{stringliteral}{    contents given below;}
+00057 \textcolor{stringliteral}{  * \_\_Linker/General/Link Library Dependencies\_\_ may need to be set to \_\_No\_\_.}
+00058 \textcolor{stringliteral}{}
+00059 \textcolor{stringliteral}{### Module definition file}
+00060 \textcolor{stringliteral}{}
+00061 \textcolor{stringliteral}{This is needed to make LibSoX build a `.lib` file for dynamic linking.}
+00062 \textcolor{stringliteral}{Something like the below should work:}
+00063 \textcolor{stringliteral}{}
+00064 \textcolor{stringliteral}{```}
+00065 \textcolor{stringliteral}{EXPORTS}
+00066 \textcolor{stringliteral}{\_lsx\_ima\_bytes\_per\_block}
+00067 \textcolor{stringliteral}{clear\_fft\_cache}
+00068 \textcolor{stringliteral}{init\_fft\_cache}
+00069 \textcolor{stringliteral}{lsx\_13linear2alaw}
+00070 \textcolor{stringliteral}{lsx\_14linear2ulaw}
+00071 \textcolor{stringliteral}{lsx\_Gsm\_Coder}
+00072 \textcolor{stringliteral}{lsx\_Gsm\_Decoder}
+00073 \textcolor{stringliteral}{lsx\_Gsm\_LPC\_Analysis}
+00074 \textcolor{stringliteral}{lsx\_Gsm\_Long\_Term\_Predictor}
+00075 \textcolor{stringliteral}{lsx\_Gsm\_Long\_Term\_Synthesis\_Filtering}
+00076 \textcolor{stringliteral}{lsx\_Gsm\_Preprocess}
+00077 \textcolor{stringliteral}{lsx\_Gsm\_RPE\_Decoding}
+00078 \textcolor{stringliteral}{lsx\_Gsm\_RPE\_Encoding}
+00079 \textcolor{stringliteral}{lsx\_Gsm\_Short\_Term\_Analysis\_Filter}
+00080 \textcolor{stringliteral}{lsx\_Gsm\_Short\_Term\_Synthesis\_Filter}
+00081 \textcolor{stringliteral}{lsx\_adpcm\_decode}
+00082 \textcolor{stringliteral}{lsx\_adpcm\_encode}
+00083 \textcolor{stringliteral}{lsx\_adpcm\_flush}
+00084 \textcolor{stringliteral}{lsx\_adpcm\_ima\_start}
+00085 \textcolor{stringliteral}{lsx\_adpcm\_init}
+00086 \textcolor{stringliteral}{lsx\_adpcm\_oki\_start}
+00087 \textcolor{stringliteral}{lsx\_adpcm\_read}
+00088 \textcolor{stringliteral}{lsx\_adpcm\_reset}
+00089 \textcolor{stringliteral}{lsx\_adpcm\_stopread}
+00090 \textcolor{stringliteral}{lsx\_adpcm\_stopwrite}
+00091 \textcolor{stringliteral}{lsx\_adpcm\_write}
+00092 \textcolor{stringliteral}{lsx\_aifc\_format\_fn}
+00093 \textcolor{stringliteral}{lsx\_aifcstartwrite}
+00094 \textcolor{stringliteral}{lsx\_aifcstopwrite}
+00095 \textcolor{stringliteral}{lsx\_aiff\_format\_fn}
+00096 \textcolor{stringliteral}{lsx\_aiffstartread}
+00097 \textcolor{stringliteral}{lsx\_aiffstartwrite}
+00098 \textcolor{stringliteral}{lsx\_aiffstopread}
+00099 \textcolor{stringliteral}{lsx\_aiffstopwrite}
+00100 \textcolor{stringliteral}{lsx\_al\_format\_fn}
+00101 \textcolor{stringliteral}{lsx\_alaw2linear16}
+00102 \textcolor{stringliteral}{lsx\_allpass\_effect\_fn}
+00103 \textcolor{stringliteral}{lsx\_apply\_bartlett}
+00104 \textcolor{stringliteral}{lsx\_apply\_blackman}
+00105 \textcolor{stringliteral}{lsx\_apply\_blackman\_nutall}
+00106 \textcolor{stringliteral}{lsx\_apply\_hamming}
+00107 \textcolor{stringliteral}{lsx\_apply\_hann}
+00108 \textcolor{stringliteral}{lsx\_apply\_hann\_f}
+00109 \textcolor{stringliteral}{lsx\_apply\_kaiser}
+00110 \textcolor{stringliteral}{lsx\_au\_format\_fn}
+00111 \textcolor{stringliteral}{lsx\_avr\_format\_fn}
+00112 \textcolor{stringliteral}{lsx\_band\_effect\_fn}
+00113 \textcolor{stringliteral}{lsx\_bandpass\_effect\_fn}
+00114 \textcolor{stringliteral}{lsx\_bandreject\_effect\_fn}
+00115 \textcolor{stringliteral}{lsx\_bass\_effect\_fn}
+00116 \textcolor{stringliteral}{lsx\_bend\_effect\_fn}
+00117 \textcolor{stringliteral}{lsx\_bessel\_I\_0}
+00118 \textcolor{stringliteral}{lsx\_biquad\_effect\_fn}
+00119 \textcolor{stringliteral}{lsx\_biquad\_flow}
+00120 \textcolor{stringliteral}{lsx\_biquad\_getopts}
+00121 \textcolor{stringliteral}{lsx\_biquad\_start}
+00122 \textcolor{stringliteral}{lsx\_cat\_comments}
+00123 \textcolor{stringliteral}{lsx\_cdft}
+00124 \textcolor{stringliteral}{lsx\_cdr\_format\_fn}
+00125 \textcolor{stringliteral}{lsx\_channels\_effect\_fn}
+00126 \textcolor{stringliteral}{lsx\_check\_read\_params}
+00127 \textcolor{stringliteral}{lsx\_chorus\_effect\_fn}
+00128 \textcolor{stringliteral}{lsx\_clearerr}
+00129 \textcolor{stringliteral}{lsx\_close\_dllibrary}
+00130 \textcolor{stringliteral}{lsx\_compand\_effect\_fn}
+00131 \textcolor{stringliteral}{lsx\_compandt\_kill}
+00132 \textcolor{stringliteral}{lsx\_compandt\_parse}
+00133 \textcolor{stringliteral}{lsx\_compandt\_show}
+00134 \textcolor{stringliteral}{lsx\_contrast\_effect\_fn}
+00135 \textcolor{stringliteral}{lsx\_cvsd\_format\_fn}
+00136 \textcolor{stringliteral}{lsx\_cvsdread}
+00137 \textcolor{stringliteral}{lsx\_cvsdstartread}
+00138 \textcolor{stringliteral}{lsx\_cvsdstartwrite}
+00139 \textcolor{stringliteral}{lsx\_cvsdstopread}
+00140 \textcolor{stringliteral}{lsx\_cvsdstopwrite}
+00141 \textcolor{stringliteral}{lsx\_cvsdwrite}
+00142 \textcolor{stringliteral}{lsx\_cvu\_format\_fn}
+00143 \textcolor{stringliteral}{lsx\_dat\_format\_fn}
+00144 \textcolor{stringliteral}{lsx\_dcshift\_effect\_fn}
+00145 \textcolor{stringliteral}{lsx\_ddct}
+00146 \textcolor{stringliteral}{lsx\_ddst}
+00147 \textcolor{stringliteral}{lsx\_debug\_impl}
+00148 \textcolor{stringliteral}{lsx\_debug\_more\_impl}
+00149 \textcolor{stringliteral}{lsx\_debug\_most\_impl}
+00150 \textcolor{stringliteral}{lsx\_deemph\_effect\_fn}
+00151 \textcolor{stringliteral}{lsx\_delay\_effect\_fn}
+00152 \textcolor{stringliteral}{lsx\_design\_lpf}
+00153 \textcolor{stringliteral}{lsx\_dfct}
+00154 \textcolor{stringliteral}{lsx\_dfst}
+00155 \textcolor{stringliteral}{lsx\_dft\_filter\_effect\_fn}
+00156 \textcolor{stringliteral}{lsx\_dither\_effect\_fn}
+00157 \textcolor{stringliteral}{lsx\_divide\_effect\_fn}
+00158 \textcolor{stringliteral}{lsx\_downsample\_effect\_fn}
+00159 \textcolor{stringliteral}{lsx\_dvms\_format\_fn}
+00160 \textcolor{stringliteral}{lsx\_dvmsstartread}
+00161 \textcolor{stringliteral}{lsx\_dvmsstartwrite}
+00162 \textcolor{stringliteral}{lsx\_dvmsstopwrite}
+00163 \textcolor{stringliteral}{lsx\_earwax\_effect\_fn}
+00164 \textcolor{stringliteral}{lsx\_echo\_effect\_fn}
+00165 \textcolor{stringliteral}{lsx\_echos\_effect\_fn}
+00166 \textcolor{stringliteral}{lsx\_effect\_set\_imin}
+00167 \textcolor{stringliteral}{lsx\_effects\_init}
+00168 \textcolor{stringliteral}{lsx\_effects\_quit}
+00169 \textcolor{stringliteral}{lsx\_enum\_option}
+00170 \textcolor{stringliteral}{lsx\_eof}
+00171 \textcolor{stringliteral}{lsx\_equalizer\_effect\_fn}
+00172 \textcolor{stringliteral}{lsx\_error}
+00173 \textcolor{stringliteral}{lsx\_f4\_format\_fn}
+00174 \textcolor{stringliteral}{lsx\_f8\_format\_fn}
+00175 \textcolor{stringliteral}{lsx\_fade\_effect\_fn}
+00176 \textcolor{stringliteral}{lsx\_fail\_errno}
+00177 \textcolor{stringliteral}{lsx\_fail\_impl}
+00178 \textcolor{stringliteral}{lsx\_filelength}
+00179 \textcolor{stringliteral}{lsx\_find\_enum\_text}
+00180 \textcolor{stringliteral}{lsx\_find\_enum\_value}
+00181 \textcolor{stringliteral}{lsx\_find\_file\_extension}
+00182 \textcolor{stringliteral}{lsx\_fir\_effect\_fn}
+00183 \textcolor{stringliteral}{lsx\_fir\_to\_phase}
+00184 \textcolor{stringliteral}{lsx\_firfit\_effect\_fn}
+00185 \textcolor{stringliteral}{lsx\_flanger\_effect\_fn}
+00186 \textcolor{stringliteral}{lsx\_flow\_copy}
+00187 \textcolor{stringliteral}{lsx\_flush}
+00188 \textcolor{stringliteral}{lsx\_g721\_decoder}
+00189 \textcolor{stringliteral}{lsx\_g721\_encoder}
+00190 \textcolor{stringliteral}{lsx\_g723\_24\_decoder}
+00191 \textcolor{stringliteral}{lsx\_g723\_24\_encoder}
+00192 \textcolor{stringliteral}{lsx\_g723\_40\_decoder}
+00193 \textcolor{stringliteral}{lsx\_g723\_40\_encoder}
+00194 \textcolor{stringliteral}{lsx\_g72x\_init\_state}
+00195 \textcolor{stringliteral}{lsx\_g72x\_predictor\_pole}
+00196 \textcolor{stringliteral}{lsx\_g72x\_predictor\_zero}
+00197 \textcolor{stringliteral}{lsx\_g72x\_quantize}
+00198 \textcolor{stringliteral}{lsx\_g72x\_reconstruct}
+00199 \textcolor{stringliteral}{lsx\_g72x\_step\_size}
+00200 \textcolor{stringliteral}{lsx\_g72x\_tandem\_adjust\_alaw}
+00201 \textcolor{stringliteral}{lsx\_g72x\_tandem\_adjust\_ulaw}
+00202 \textcolor{stringliteral}{lsx\_g72x\_update}
+00203 \textcolor{stringliteral}{lsx\_gain\_effect\_fn}
+00204 \textcolor{stringliteral}{lsx\_generate\_wave\_table}
+00205 \textcolor{stringliteral}{lsx\_get\_wave\_enum}
+00206 \textcolor{stringliteral}{lsx\_getopt}
+00207 \textcolor{stringliteral}{lsx\_getopt\_init}
+00208 \textcolor{stringliteral}{lsx\_gsm\_A}
+00209 \textcolor{stringliteral}{lsx\_gsm\_B}
+00210 \textcolor{stringliteral}{lsx\_gsm\_DLB}
+00211 \textcolor{stringliteral}{lsx\_gsm\_FAC}
+00212 \textcolor{stringliteral}{lsx\_gsm\_H}
+00213 \textcolor{stringliteral}{lsx\_gsm\_INVA}
+00214 \textcolor{stringliteral}{lsx\_gsm\_L\_add}
+00215 \textcolor{stringliteral}{lsx\_gsm\_L\_asl}
+00216 \textcolor{stringliteral}{lsx\_gsm\_L\_asr}
+00217 \textcolor{stringliteral}{lsx\_gsm\_L\_mult}
+00218 \textcolor{stringliteral}{lsx\_gsm\_L\_sub}
+00219 \textcolor{stringliteral}{lsx\_gsm\_MAC}
+00220 \textcolor{stringliteral}{lsx\_gsm\_MIC}
+00221 \textcolor{stringliteral}{lsx\_gsm\_NRFAC}
+00222 \textcolor{stringliteral}{lsx\_gsm\_QLB}
+00223 \textcolor{stringliteral}{lsx\_gsm\_abs}
+00224 \textcolor{stringliteral}{lsx\_gsm\_add}
+00225 \textcolor{stringliteral}{lsx\_gsm\_asl}
+00226 \textcolor{stringliteral}{lsx\_gsm\_asr}
+00227 \textcolor{stringliteral}{lsx\_gsm\_create}
+00228 \textcolor{stringliteral}{lsx\_gsm\_decode}
+00229 \textcolor{stringliteral}{lsx\_gsm\_destroy}
+00230 \textcolor{stringliteral}{lsx\_gsm\_div}
+00231 \textcolor{stringliteral}{lsx\_gsm\_encode}
+00232 \textcolor{stringliteral}{lsx\_gsm\_format\_fn}
+00233 \textcolor{stringliteral}{lsx\_gsm\_mult}
+00234 \textcolor{stringliteral}{lsx\_gsm\_mult\_r}
+00235 \textcolor{stringliteral}{lsx\_gsm\_norm}
+00236 \textcolor{stringliteral}{lsx\_gsm\_option}
+00237 \textcolor{stringliteral}{lsx\_gsm\_sub}
+00238 \textcolor{stringliteral}{lsx\_gsrt\_format\_fn}
+00239 \textcolor{stringliteral}{lsx\_hcom\_format\_fn}
+00240 \textcolor{stringliteral}{lsx\_highpass\_effect\_fn}
+00241 \textcolor{stringliteral}{lsx\_hilbert\_effect\_fn}
+00242 \textcolor{stringliteral}{lsx\_htk\_format\_fn}
+00243 \textcolor{stringliteral}{lsx\_ima\_block\_expand\_i}
+00244 \textcolor{stringliteral}{lsx\_ima\_block\_expand\_m}
+00245 \textcolor{stringliteral}{lsx\_ima\_block\_mash\_i}
+00246 \textcolor{stringliteral}{lsx\_ima\_bytes\_per\_block}
+00247 \textcolor{stringliteral}{lsx\_ima\_format\_fn}
+00248 \textcolor{stringliteral}{lsx\_ima\_init\_table}
+00249 \textcolor{stringliteral}{lsx\_ima\_samples\_in}
+00250 \textcolor{stringliteral}{lsx\_ima\_start}
+00251 \textcolor{stringliteral}{lsx\_input\_effect\_fn}
+00252 \textcolor{stringliteral}{lsx\_kaiser\_beta}
+00253 \textcolor{stringliteral}{lsx\_la\_format\_fn}
+00254 \textcolor{stringliteral}{lsx\_loudness\_effect\_fn}
+00255 \textcolor{stringliteral}{lsx\_lowpass\_effect\_fn}
+00256 \textcolor{stringliteral}{lsx\_lpc10\_analys\_}
+00257 \textcolor{stringliteral}{lsx\_lpc10\_bsynz\_}
+00258 \textcolor{stringliteral}{lsx\_lpc10\_chanrd\_}
+00259 \textcolor{stringliteral}{lsx\_lpc10\_chanwr\_}
+00260 \textcolor{stringliteral}{lsx\_lpc10\_contrl\_}
+00261 \textcolor{stringliteral}{lsx\_lpc10\_create\_decoder\_state}
+00262 \textcolor{stringliteral}{lsx\_lpc10\_create\_encoder\_state}
+00263 \textcolor{stringliteral}{lsx\_lpc10\_dcbias\_}
+00264 \textcolor{stringliteral}{lsx\_lpc10\_decode}
+00265 \textcolor{stringliteral}{lsx\_lpc10\_decode\_}
+00266 \textcolor{stringliteral}{lsx\_lpc10\_deemp\_}
+00267 \textcolor{stringliteral}{lsx\_lpc10\_difmag\_}
+00268 \textcolor{stringliteral}{lsx\_lpc10\_dyptrk\_}
+00269 \textcolor{stringliteral}{lsx\_lpc10\_encode}
+00270 \textcolor{stringliteral}{lsx\_lpc10\_encode\_}
+00271 \textcolor{stringliteral}{lsx\_lpc10\_energy\_}
+00272 \textcolor{stringliteral}{lsx\_lpc10\_format\_fn}
+00273 \textcolor{stringliteral}{lsx\_lpc10\_ham84\_}
+00274 \textcolor{stringliteral}{lsx\_lpc10\_hp100\_}
+00275 \textcolor{stringliteral}{lsx\_lpc10\_i\_nint}
+00276 \textcolor{stringliteral}{lsx\_lpc10\_init\_decoder\_state}
+00277 \textcolor{stringliteral}{lsx\_lpc10\_init\_encoder\_state}
+00278 \textcolor{stringliteral}{lsx\_lpc10\_invert\_}
+00279 \textcolor{stringliteral}{lsx\_lpc10\_irc2pc\_}
+00280 \textcolor{stringliteral}{lsx\_lpc10\_ivfilt\_}
+00281 \textcolor{stringliteral}{lsx\_lpc10\_lpcini\_}
+00282 \textcolor{stringliteral}{lsx\_lpc10\_lpfilt\_}
+00283 \textcolor{stringliteral}{lsx\_lpc10\_median\_}
+00284 \textcolor{stringliteral}{lsx\_lpc10\_mload\_}
+00285 \textcolor{stringliteral}{lsx\_lpc10\_onset\_}
+00286 \textcolor{stringliteral}{lsx\_lpc10\_pitsyn\_}
+00287 \textcolor{stringliteral}{lsx\_lpc10\_placea\_}
+00288 \textcolor{stringliteral}{lsx\_lpc10\_placev\_}
+00289 \textcolor{stringliteral}{lsx\_lpc10\_pow\_ii}
+00290 \textcolor{stringliteral}{lsx\_lpc10\_preemp\_}
+00291 \textcolor{stringliteral}{lsx\_lpc10\_prepro\_}
+00292 \textcolor{stringliteral}{lsx\_lpc10\_r\_sign}
+00293 \textcolor{stringliteral}{lsx\_lpc10\_random\_}
+00294 \textcolor{stringliteral}{lsx\_lpc10\_rcchk\_}
+00295 \textcolor{stringliteral}{lsx\_lpc10\_synths\_}
+00296 \textcolor{stringliteral}{lsx\_lpc10\_tbdm\_}
+00297 \textcolor{stringliteral}{lsx\_lpc10\_voicin\_}
+00298 \textcolor{stringliteral}{lsx\_lpc10\_vparms\_}
+00299 \textcolor{stringliteral}{lsx\_lpf\_num\_taps}
+00300 \textcolor{stringliteral}{lsx\_lu\_format\_fn}
+00301 \textcolor{stringliteral}{lsx\_make\_lpf}
+00302 \textcolor{stringliteral}{lsx\_maud\_format\_fn}
+00303 \textcolor{stringliteral}{lsx\_mcompand\_effect\_fn}
+00304 \textcolor{stringliteral}{lsx\_mixer\_effect\_fn}
+00305 \textcolor{stringliteral}{lsx\_ms\_adpcm\_block\_expand\_i}
+00306 \textcolor{stringliteral}{lsx\_ms\_adpcm\_block\_mash\_i}
+00307 \textcolor{stringliteral}{lsx\_ms\_adpcm\_bytes\_per\_block}
+00308 \textcolor{stringliteral}{lsx\_ms\_adpcm\_i\_coef}
+00309 \textcolor{stringliteral}{lsx\_ms\_adpcm\_samples\_in}
+00310 \textcolor{stringliteral}{lsx\_noiseprof\_effect\_fn}
+00311 \textcolor{stringliteral}{lsx\_noisered\_effect\_fn}
+00312 \textcolor{stringliteral}{lsx\_norm\_effect\_fn}
+00313 \textcolor{stringliteral}{lsx\_nul\_format\_fn}
+00314 \textcolor{stringliteral}{lsx\_offset\_seek}
+00315 \textcolor{stringliteral}{lsx\_oops\_effect\_fn}
+00316 \textcolor{stringliteral}{lsx\_open\_dllibrary}
+00317 \textcolor{stringliteral}{lsx\_open\_input\_file}
+00318 \textcolor{stringliteral}{lsx\_output\_effect\_fn}
+00319 \textcolor{stringliteral}{lsx\_overdrive\_effect\_fn}
+00320 \textcolor{stringliteral}{lsx\_pad\_effect\_fn}
+00321 \textcolor{stringliteral}{lsx\_padbytes}
+00322 \textcolor{stringliteral}{lsx\_parse\_frequency\_k}
+00323 \textcolor{stringliteral}{lsx\_parse\_note}
+00324 \textcolor{stringliteral}{lsx\_parsesamples}
+00325 \textcolor{stringliteral}{lsx\_phaser\_effect\_fn}
+00326 \textcolor{stringliteral}{lsx\_pitch\_effect\_fn}
+00327 \textcolor{stringliteral}{lsx\_plot\_fir}
+00328 \textcolor{stringliteral}{lsx\_power\_spectrum}
+00329 \textcolor{stringliteral}{lsx\_power\_spectrum\_f}
+00330 \textcolor{stringliteral}{lsx\_prc\_format\_fn}
+00331 \textcolor{stringliteral}{lsx\_prepare\_spline3}
+00332 \textcolor{stringliteral}{lsx\_rate\_effect\_fn}
+00333 \textcolor{stringliteral}{lsx\_raw\_format\_fn}
+00334 \textcolor{stringliteral}{lsx\_rawread}
+00335 \textcolor{stringliteral}{lsx\_rawseek}
+00336 \textcolor{stringliteral}{lsx\_rawstart}
+00337 \textcolor{stringliteral}{lsx\_rawwrite}
+00338 \textcolor{stringliteral}{lsx\_rdft}
+00339 \textcolor{stringliteral}{lsx\_read3}
+00340 \textcolor{stringliteral}{lsx\_read\_3\_buf}
+00341 \textcolor{stringliteral}{lsx\_read\_b\_buf}
+00342 \textcolor{stringliteral}{lsx\_read\_df\_buf}
+00343 \textcolor{stringliteral}{lsx\_read\_dw\_buf}
+00344 \textcolor{stringliteral}{lsx\_read\_f\_buf}
+00345 \textcolor{stringliteral}{lsx\_read\_qw\_buf}
+00346 \textcolor{stringliteral}{lsx\_read\_w\_buf}
+00347 \textcolor{stringliteral}{lsx\_readb}
+00348 \textcolor{stringliteral}{lsx\_readbuf}
+00349 \textcolor{stringliteral}{lsx\_readchars}
+00350 \textcolor{stringliteral}{lsx\_readdf}
+00351 \textcolor{stringliteral}{lsx\_readdw}
+00352 \textcolor{stringliteral}{lsx\_readf}
+00353 \textcolor{stringliteral}{lsx\_readqw}
+00354 \textcolor{stringliteral}{lsx\_reads}
+00355 \textcolor{stringliteral}{lsx\_readw}
+00356 \textcolor{stringliteral}{lsx\_realloc}
+00357 \textcolor{stringliteral}{lsx\_remix\_effect\_fn}
+00358 \textcolor{stringliteral}{lsx\_repeat\_effect\_fn}
+00359 \textcolor{stringliteral}{lsx\_report\_impl}
+00360 \textcolor{stringliteral}{lsx\_reverb\_effect\_fn}
+00361 \textcolor{stringliteral}{lsx\_reverse\_effect\_fn}
+00362 \textcolor{stringliteral}{lsx\_rewind}
+00363 \textcolor{stringliteral}{lsx\_riaa\_effect\_fn}
+00364 \textcolor{stringliteral}{lsx\_s1\_format\_fn}
+00365 \textcolor{stringliteral}{lsx\_s2\_format\_fn}
+00366 \textcolor{stringliteral}{lsx\_s3\_format\_fn}
+00367 \textcolor{stringliteral}{lsx\_s4\_format\_fn}
+00368 \textcolor{stringliteral}{lsx\_safe\_cdft}
+00369 \textcolor{stringliteral}{lsx\_safe\_rdft}
+00370 \textcolor{stringliteral}{lsx\_seeki}
+00371 \textcolor{stringliteral}{lsx\_set\_dft\_filter}
+00372 \textcolor{stringliteral}{lsx\_set\_dft\_length}
+00373 \textcolor{stringliteral}{lsx\_set\_signal\_defaults}
+00374 \textcolor{stringliteral}{lsx\_sf\_format\_fn}
+00375 \textcolor{stringliteral}{lsx\_sigfigs3}
+00376 \textcolor{stringliteral}{lsx\_sigfigs3p}
+00377 \textcolor{stringliteral}{lsx\_silence\_effect\_fn}
+00378 \textcolor{stringliteral}{lsx\_sinc\_effect\_fn}
+00379 \textcolor{stringliteral}{lsx\_skipbytes}
+00380 \textcolor{stringliteral}{lsx\_sln\_format\_fn}
+00381 \textcolor{stringliteral}{lsx\_smp\_format\_fn}
+00382 \textcolor{stringliteral}{lsx\_sounder\_format\_fn}
+00383 \textcolor{stringliteral}{lsx\_soundtool\_format\_fn}
+00384 \textcolor{stringliteral}{lsx\_sox\_format\_fn}
+00385 \textcolor{stringliteral}{lsx\_speed\_effect\_fn}
+00386 \textcolor{stringliteral}{lsx\_sphere\_format\_fn}
+00387 \textcolor{stringliteral}{lsx\_splice\_effect\_fn}
+00388 \textcolor{stringliteral}{lsx\_spline3}
+00389 \textcolor{stringliteral}{lsx\_stat\_effect\_fn}
+00390 \textcolor{stringliteral}{lsx\_stats\_effect\_fn}
+00391 \textcolor{stringliteral}{lsx\_strcasecmp}
+00392 \textcolor{stringliteral}{lsx\_strends}
+00393 \textcolor{stringliteral}{lsx\_stretch\_effect\_fn}
+00394 \textcolor{stringliteral}{lsx\_strncasecmp}
+00395 \textcolor{stringliteral}{lsx\_svx\_format\_fn}
+00396 \textcolor{stringliteral}{lsx\_swap\_effect\_fn}
+00397 \textcolor{stringliteral}{lsx\_synth\_effect\_fn}
+00398 \textcolor{stringliteral}{lsx\_tell}
+00399 \textcolor{stringliteral}{lsx\_tempo\_effect\_fn}
+00400 \textcolor{stringliteral}{lsx\_tmpfile}
+00401 \textcolor{stringliteral}{lsx\_treble\_effect\_fn}
+00402 \textcolor{stringliteral}{lsx\_tremolo\_effect\_fn}
+00403 \textcolor{stringliteral}{lsx\_trim\_effect\_fn}
+00404 \textcolor{stringliteral}{lsx\_txw\_format\_fn}
+00405 \textcolor{stringliteral}{lsx\_u1\_format\_fn}
+00406 \textcolor{stringliteral}{lsx\_u2\_format\_fn}
+00407 \textcolor{stringliteral}{lsx\_u3\_format\_fn}
+00408 \textcolor{stringliteral}{lsx\_u4\_format\_fn}
+00409 \textcolor{stringliteral}{lsx\_ul\_format\_fn}
+00410 \textcolor{stringliteral}{lsx\_ulaw2linear16}
+00411 \textcolor{stringliteral}{lsx\_unreadb}
+00412 \textcolor{stringliteral}{lsx\_upsample\_effect\_fn}
+00413 \textcolor{stringliteral}{lsx\_usage}
+00414 \textcolor{stringliteral}{lsx\_usage\_lines}
+00415 \textcolor{stringliteral}{lsx\_vad\_effect\_fn}
+00416 \textcolor{stringliteral}{lsx\_voc\_format\_fn}
+00417 \textcolor{stringliteral}{lsx\_vol\_effect\_fn}
+00418 \textcolor{stringliteral}{lsx\_vorbis\_format\_fn}
+00419 \textcolor{stringliteral}{lsx\_vox\_format\_fn}
+00420 \textcolor{stringliteral}{lsx\_vox\_read}
+00421 \textcolor{stringliteral}{lsx\_vox\_start}
+00422 \textcolor{stringliteral}{lsx\_vox\_stopread}
+00423 \textcolor{stringliteral}{lsx\_vox\_stopwrite}
+00424 \textcolor{stringliteral}{lsx\_vox\_write}
+00425 \textcolor{stringliteral}{lsx\_warn\_impl}
+00426 \textcolor{stringliteral}{lsx\_wav\_format\_fn}
+00427 \textcolor{stringliteral}{lsx\_waveaudio\_format\_fn}
+00428 \textcolor{stringliteral}{lsx\_wavpack\_format\_fn}
+00429 \textcolor{stringliteral}{lsx\_write3}
+00430 \textcolor{stringliteral}{lsx\_write\_3\_buf}
+00431 \textcolor{stringliteral}{lsx\_write\_b\_buf}
+00432 \textcolor{stringliteral}{lsx\_write\_df\_buf}
+00433 \textcolor{stringliteral}{lsx\_write\_dw\_buf}
+00434 \textcolor{stringliteral}{lsx\_write\_f\_buf}
+00435 \textcolor{stringliteral}{lsx\_write\_qw\_buf}
+00436 \textcolor{stringliteral}{lsx\_write\_w\_buf}
+00437 \textcolor{stringliteral}{lsx\_writeb}
+00438 \textcolor{stringliteral}{lsx\_writebuf}
+00439 \textcolor{stringliteral}{lsx\_writedf}
+00440 \textcolor{stringliteral}{lsx\_writedw}
+00441 \textcolor{stringliteral}{lsx\_writef}
+00442 \textcolor{stringliteral}{lsx\_writeqw}
+00443 \textcolor{stringliteral}{lsx\_writes}
+00444 \textcolor{stringliteral}{lsx\_writesb}
+00445 \textcolor{stringliteral}{lsx\_writesw}
+00446 \textcolor{stringliteral}{lsx\_writew}
+00447 \textcolor{stringliteral}{lsx\_wve\_format\_fn}
+00448 \textcolor{stringliteral}{lsx\_xa\_format\_fn}
+00449 \textcolor{stringliteral}{lt\_dlclose}
+00450 \textcolor{stringliteral}{lt\_dlerror}
+00451 \textcolor{stringliteral}{lt\_dlexit}
+00452 \textcolor{stringliteral}{lt\_dlforeachfile}
+00453 \textcolor{stringliteral}{lt\_dlinit}
+00454 \textcolor{stringliteral}{lt\_dlopen}
+00455 \textcolor{stringliteral}{lt\_dlopenext}
+00456 \textcolor{stringliteral}{lt\_dlsetsearchpath}
+00457 \textcolor{stringliteral}{lt\_dlsym}
+00458 \textcolor{stringliteral}{sox\_add\_effect}
+00459 \textcolor{stringliteral}{sox\_append\_comment}
+00460 \textcolor{stringliteral}{sox\_append\_comments}
+00461 \textcolor{stringliteral}{sox\_basename}
+00462 \textcolor{stringliteral}{sox\_close}
+00463 \textcolor{stringliteral}{sox\_copy\_comments}
+00464 \textcolor{stringliteral}{sox\_create\_effect}
+00465 \textcolor{stringliteral}{sox\_create\_effects\_chain}
+00466 \textcolor{stringliteral}{sox\_delete\_comments}
+00467 \textcolor{stringliteral}{sox\_delete\_effect}
+00468 \textcolor{stringliteral}{sox\_delete\_effect\_last}
+00469 \textcolor{stringliteral}{sox\_delete\_effects}
+00470 \textcolor{stringliteral}{sox\_delete\_effects\_chain}
+00471 \textcolor{stringliteral}{sox\_effect\_options}
+00472 \textcolor{stringliteral}{sox\_effects\_clips}
+00473 \textcolor{stringliteral}{sox\_find\_comment}
+00474 \textcolor{stringliteral}{sox\_find\_effect}
+00475 \textcolor{stringliteral}{sox\_find\_format}
+00476 \textcolor{stringliteral}{sox\_flow\_effects}
+00477 \textcolor{stringliteral}{sox\_format\_init}
+00478 \textcolor{stringliteral}{sox\_format\_quit}
+00479 \textcolor{stringliteral}{sox\_format\_supports\_encoding}
+00480 \textcolor{stringliteral}{sox\_get\_effect\_fns}
+00481 \textcolor{stringliteral}{sox\_get\_effects\_globals}
+00482 \textcolor{stringliteral}{sox\_get\_encodings\_info}
+00483 \textcolor{stringliteral}{sox\_get\_format\_fns}
+00484 \textcolor{stringliteral}{sox\_get\_globals}
+00485 \textcolor{stringliteral}{sox\_init}
+00486 \textcolor{stringliteral}{sox\_init\_encodinginfo}
+00487 \textcolor{stringliteral}{sox\_is\_playlist}
+00488 \textcolor{stringliteral}{sox\_num\_comments}
+00489 \textcolor{stringliteral}{sox\_open\_mem\_read}
+00490 \textcolor{stringliteral}{sox\_open\_mem\_write}
+00491 \textcolor{stringliteral}{sox\_open\_memstream\_write}
+00492 \textcolor{stringliteral}{sox\_open\_read}
+00493 \textcolor{stringliteral}{sox\_open\_write}
+00494 \textcolor{stringliteral}{sox\_parse\_playlist}
+00495 \textcolor{stringliteral}{sox\_pop\_effect\_last}
+00496 \textcolor{stringliteral}{sox\_precision}
+00497 \textcolor{stringliteral}{sox\_push\_effect\_last}
+00498 \textcolor{stringliteral}{sox\_quit}
+00499 \textcolor{stringliteral}{sox\_read}
+00500 \textcolor{stringliteral}{sox\_seek}
+00501 \textcolor{stringliteral}{sox\_stop\_effect}
+00502 \textcolor{stringliteral}{sox\_strerror}
+00503 \textcolor{stringliteral}{sox\_trim\_clear\_start}
+00504 \textcolor{stringliteral}{sox\_trim\_get\_start}
+00505 \textcolor{stringliteral}{sox\_version}
+00506 \textcolor{stringliteral}{sox\_version\_info}
+00507 \textcolor{stringliteral}{sox\_write}
+00508 \textcolor{stringliteral}{sox\_write\_handler}
+00509 \textcolor{stringliteral}{```}
+\end{DoxyCode}

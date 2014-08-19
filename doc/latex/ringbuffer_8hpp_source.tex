@@ -1,0 +1,103 @@
+\hypertarget{ringbuffer_8hpp_source}{\section{ringbuffer.\+hpp}
+\label{ringbuffer_8hpp_source}\index{src/audio/ringbuffer.\+hpp@{src/audio/ringbuffer.\+hpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00009 \textcolor{preprocessor}{#ifndef PS\_RINGBUFFER\_HPP}
+00010 \textcolor{preprocessor}{#define PS\_RINGBUFFER\_HPP}
+00011 
+00012 \textcolor{preprocessor}{#include <cassert>}
+00013 
+00014 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00015 \textcolor{preprocessor}{#include "../contrib/pa\_ringbuffer/pa\_ringbuffer.h"}
+00016 \}
+00017 
+00018 \textcolor{preprocessor}{#include "../errors.hpp"}
+00019 \textcolor{preprocessor}{#include "../messages.h"}
+00020 
+00029 \textcolor{keyword}{template} <\textcolor{keyword}{typename} RepT, \textcolor{keyword}{typename} SampleCountT>
+\hypertarget{ringbuffer_8hpp_source_l00030}{}\hyperlink{classRingBuffer}{00030} \textcolor{keyword}{class }\hyperlink{classRingBuffer}{RingBuffer} \{
+00031 \textcolor{keyword}{public}:
+\hypertarget{ringbuffer_8hpp_source_l00042}{}\hyperlink{classRingBuffer_a2f831ec4941885db960a833cb807465e}{00042}     \hyperlink{classRingBuffer_a2f831ec4941885db960a833cb807465e}{RingBuffer}(\textcolor{keywordtype}{int} power, \textcolor{keywordtype}{int} size)
+00043     \{
+00044         assert(0 < power);
+00045         assert(0 < size);
+00046 
+00047         this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb} = \textcolor{keyword}{new} PaUtilRingBuffer;
+00048         this->\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer} = \textcolor{keyword}{new} \textcolor{keywordtype}{char}[(1 << power) * size];
+00049 
+00050         \textcolor{keywordtype}{int} init\_result = PaUtil\_InitializeRingBuffer(
+00051                         this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}, size,
+00052                         static\_cast<ring\_buffer\_size\_t>(1 << power),
+00053                         this->\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer});
+00054         \textcolor{keywordflow}{if} (init\_result != 0) \{
+00055             \textcolor{keywordflow}{throw} \textcolor{keyword}{new} \hyperlink{classInternalError}{InternalError}(\hyperlink{messages_8h_a3bf0477dded19418d7ecac95aeae8856}{MSG\_OUTPUT\_RINGINIT});
+00056         \}
+00057 
+00058         assert(this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb} != \textcolor{keyword}{nullptr});
+00059         assert(this->\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer} != \textcolor{keyword}{nullptr});
+00060     \}
+00061 
+\hypertarget{ringbuffer_8hpp_source_l00063}{}\hyperlink{classRingBuffer_a39d93b7f608eb69a7a569e61b5abc979}{00063}     \hyperlink{classRingBuffer_a39d93b7f608eb69a7a569e61b5abc979}{~RingBuffer}()
+00064     \{
+00065         assert(this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb} != \textcolor{keyword}{nullptr});
+00066         \textcolor{keyword}{delete} this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb};
+00067 
+00068         assert(this->\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer} != \textcolor{keyword}{nullptr});
+00069         \textcolor{keyword}{delete}[] this->\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer};
+00070     \}
+00071 
+00073     \hyperlink{classRingBuffer_a2f831ec4941885db960a833cb807465e}{RingBuffer}(\textcolor{keyword}{const} \hyperlink{classRingBuffer}{RingBuffer} &) = \textcolor{keyword}{delete};
+00074 
+00076     \hyperlink{classRingBuffer}{RingBuffer} &\hyperlink{classRingBuffer_a6f552e291e577aeffc57b846969d11d6}{operator=}(\textcolor{keyword}{const} \hyperlink{classRingBuffer}{RingBuffer} &) = \textcolor{keyword}{delete};
+00077 
+\hypertarget{ringbuffer_8hpp_source_l00083}{}\hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{00083}     SampleCountT \hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{WriteCapacity}()\textcolor{keyword}{ const}
+00084 \textcolor{keyword}{    }\{
+00085         \textcolor{keywordflow}{return} \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(PaUtil\_GetRingBufferWriteAvailable(this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}));
+00086     \}
+00087 
+\hypertarget{ringbuffer_8hpp_source_l00093}{}\hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{00093}     SampleCountT \hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{ReadCapacity}()\textcolor{keyword}{ const}
+00094 \textcolor{keyword}{    }\{
+00095         \textcolor{keywordflow}{return} \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(PaUtil\_GetRingBufferReadAvailable(this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}));
+00096     \}
+00097 
+\hypertarget{ringbuffer_8hpp_source_l00120}{}\hyperlink{classRingBuffer_aa7f863968cb641946b0cf341bda11e16}{00120}     SampleCountT \hyperlink{classRingBuffer_aa7f863968cb641946b0cf341bda11e16}{Write}(RepT *start, SampleCountT count)
+00121     \{
+00122         assert(0 < count);
+00123         assert(count <= \hyperlink{classRingBuffer_ab00617ab6e379ad146cb7b80079f4c4c}{WriteCapacity}());
+00124 
+00125         \textcolor{keywordflow}{return} \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(PaUtil\_WriteRingBuffer(
+00126                         this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}, start,
+00127                         static\_cast<ring\_buffer\_size\_t>(count)));
+00128     \}
+00129 
+\hypertarget{ringbuffer_8hpp_source_l00149}{}\hyperlink{classRingBuffer_af892330ee102bd50a493b8afa814a0f0}{00149}     SampleCountT \hyperlink{classRingBuffer_af892330ee102bd50a493b8afa814a0f0}{Read}(RepT *start, SampleCountT count)
+00150     \{
+00151         assert(0 < count);
+00152         assert(count <= \hyperlink{classRingBuffer_a7086cc66306105db205842af7a88c2d8}{ReadCapacity}());
+00153 
+00154         \textcolor{keywordflow}{return} \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(PaUtil\_ReadRingBuffer(
+00155                         this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}, start,
+00156                         static\_cast<ring\_buffer\_size\_t>(count)));
+00157     \}
+00158 
+\hypertarget{ringbuffer_8hpp_source_l00160}{}\hyperlink{classRingBuffer_a1eb1acca6905e7678fbbdb70238cdc26}{00160}     \textcolor{keywordtype}{void} \hyperlink{classRingBuffer_a1eb1acca6905e7678fbbdb70238cdc26}{Flush}()
+00161     \{
+00162         PaUtil\_FlushRingBuffer(this->\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb});
+00163     \}
+00164 
+00165 \textcolor{keyword}{private}:
+\hypertarget{ringbuffer_8hpp_source_l00166}{}\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{00166}     \textcolor{keywordtype}{char} *\hyperlink{classRingBuffer_a09103853af3302b27d2bbd46f1dfbe87}{buffer};         
+\hypertarget{ringbuffer_8hpp_source_l00167}{}\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{00167}     PaUtilRingBuffer *\hyperlink{classRingBuffer_a10985ec171bcc15c1301dc74fcb6e7b2}{rb}; 
+00168 
+\hypertarget{ringbuffer_8hpp_source_l00174}{}\hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{00174}     SampleCountT \hyperlink{classRingBuffer_ae907c82ba714a087d9f35b089f9fbf77}{CountCast}(ring\_buffer\_size\_t count)\textcolor{keyword}{ const}
+00175 \textcolor{keyword}{    }\{
+00176         \textcolor{keywordflow}{return} \textcolor{keyword}{static\_cast<}SampleCountT\textcolor{keyword}{>}(count);
+00177     \}
+00178 \};
+00179 
+00180 \textcolor{preprocessor}{#endif // PS\_RINGBUFFER\_HPP}
+\end{DoxyCode}

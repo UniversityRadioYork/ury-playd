@@ -1,0 +1,14 @@
+<map id="src/player/player_state.hpp" name="src/player/player_state.hpp">
+<area shape="rect" id="node2" href="$player_8hpp.html" title="Declaration of the Player class, and associated types. " alt="" coords="449,80,604,107"/>
+<area shape="rect" id="node11" href="$player_8cpp.html" title="Main implementation file for the Player class. " alt="" coords="615,155,768,181"/>
+<area shape="rect" id="node13" href="$player__state_8cpp.html" title="Implementation of the PlayerState class, and related Player methods. " alt="" coords="793,155,985,181"/>
+<area shape="rect" id="node3" href="$cmd_8hpp.html" title="Declaration of the CommandHandler class. " alt="" coords="156,155,254,181"/>
+<area shape="rect" id="node5" href="$io__reactor_8cpp.html" title="Implementation of the non&#45;virtual aspects of the IoReactor class. " alt="" coords="388,379,539,405"/>
+<area shape="rect" id="node7" href="$io__reactor_8hpp.html" title="Declaration of the IoReactor class. " alt="" coords="95,304,246,331"/>
+<area shape="rect" id="node8" href="$main_8cpp.html" title="Main entry point and implementation of the playd class. " alt="" coords="68,453,169,480"/>
+<area shape="rect" id="node9" href="$main_8hpp.html" title="Declaration of the playd class. " alt="" coords="22,379,124,405"/>
+<area shape="rect" id="node12" href="$player__position_8cpp.html" title="Implementation of the PlayerPosition class, and related Player methods. " alt="" coords="278,155,489,181"/>
+<area shape="rect" id="node4" href="$cmd_8cpp.html" title="Implementation of the CommandHandler class. " alt="" coords="290,229,387,256"/>
+<area shape="rect" id="node6" href="$tokeniser_8hpp.html" title="Declaration of the Tokeniser class. " alt="" coords="120,229,266,256"/>
+<area shape="rect" id="node10" href="$tokeniser_8cpp.html" title="Definition of the Tokeniser class. " alt="" coords="294,304,438,331"/>
+</map>

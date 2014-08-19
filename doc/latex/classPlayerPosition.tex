@@ -1,0 +1,314 @@
+\hypertarget{classPlayerPosition}{\section{Player\+Position Class Reference}
+\label{classPlayerPosition}\index{Player\+Position@{Player\+Position}}
+}
+
+
+Tracker and broadcaster for the \hyperlink{classPlayer}{Player}'s current position in a song.  
+
+
+
+
+{\ttfamily \#include $<$player\+\_\+position.\+hpp$>$}
+
+
+
+Inheritance diagram for Player\+Position\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{classPlayerPosition__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Player\+Position\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=180pt]{classPlayerPosition__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{using \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} = std\+::chrono\+::microseconds}\label{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}
+
+\begin{DoxyCompactList}\small\item\em Unit used for positions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classPlayerPosition_a707498560b9f9189fb6d3cd8e59b77d7}{\hyperlink{classPlayerPosition_a707498560b9f9189fb6d3cd8e59b77d7}{Player\+Position} ()}\label{classPlayerPosition_a707498560b9f9189fb6d3cd8e59b77d7}
+
+\begin{DoxyCompactList}\small\item\em Constructs a \hyperlink{classPlayerPosition}{Player\+Position}. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerPosition_aee2fec4f9cd5db48ee1ed79044c658ab}{Set\+Response\+Period} (\hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} \hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period})
+\begin{DoxyCompactList}\small\item\em Sets the period between position signals. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerPosition_ad39cab72590804238d2384391cb65745}{Update} (\hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} position)
+\begin{DoxyCompactList}\small\item\em Updates the position tracker with the new position. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}{Reset} ()
+\begin{DoxyCompactList}\small\item\em Resets the position tracker's position data. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerPosition_a66963c28fd9dffe0fd7338023310fa92}{Emit} (\hyperlink{classResponseSink}{Response\+Sink} \&sink) const override
+\begin{DoxyCompactList}\small\item\em Emits the current position to a \hyperlink{classResponseSink}{Response\+Sink}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classPlayerPosition_a52f46d4c600724b7ce9f459b93609dc3}{Is\+Ready\+To\+Send} ()
+\begin{DoxyCompactList}\small\item\em Figures out whether it's time to send a position signal. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerPosition_aac73ce9104537702365baf19d50bde14}{Send} ()
+\begin{DoxyCompactList}\small\item\em Sends a position signal to the outside environment, if ready. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{\hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} \hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period}}\label{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}
+
+\begin{DoxyCompactList}\small\item\em The period between each push of the position to the response sink. \end{DoxyCompactList}\item 
+\hypertarget{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{\hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} \hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current}}\label{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}
+
+\begin{DoxyCompactList}\small\item\em The current position of the player. \end{DoxyCompactList}\item 
+\hypertarget{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{\hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} \hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{last}}\label{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}
+
+\begin{DoxyCompactList}\small\item\em The position of the player at the last push. \end{DoxyCompactList}\item 
+bool \hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{has\+\_\+reset}
+\begin{DoxyCompactList}\small\item\em Whether the position was reset since the last push. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Tracker and broadcaster for the \hyperlink{classPlayer}{Player}'s current position in a song. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classPlayer}{Player} 
+
+\hyperlink{classPlayerState}{Player\+State} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{player__position_8hpp_source_l00024}{24} of file \hyperlink{player__position_8hpp_source}{player\+\_\+position.\+hpp}.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classPlayerPosition_a66963c28fd9dffe0fd7338023310fa92}{\index{Player\+Position@{Player\+Position}!Emit@{Emit}}
+\index{Emit@{Emit}!Player\+Position@{Player\+Position}}
+\subsubsection[{Emit}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+Position\+::\+Emit (
+\begin{DoxyParamCaption}
+\item[{{\bf Response\+Sink} \&}]{sink}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}}\label{classPlayerPosition_a66963c28fd9dffe0fd7338023310fa92}
+
+
+Emits the current position to a \hyperlink{classResponseSink}{Response\+Sink}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sink} & The \hyperlink{classResponseSink}{Response\+Sink} to which a T\+I\+M\+E response shall be sent. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classResponseSource_a498ee53cca912cdb6d48043108c39dc1}{Response\+Source}.
+
+
+
+Definition at line \hyperlink{player__position_8cpp_source_l00067}{67} of file \hyperlink{player__position_8cpp_source}{player\+\_\+position.\+cpp}.
+
+
+
+References \hyperlink{player__position_8hpp_source_l00034}{current}, \hyperlink{io__response_8cpp_source_l00025}{Response\+Sink\+::\+Respond()}, and \hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a346ff32eaa3c09983fb2ec057816d352}{T\+I\+M\+E}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00058}{Player\+::\+Welcome\+Client()}.
+
+
+\begin{DoxyCode}
+00068 \{
+00069     std::ostringstream os;
+00070     os << this->\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current}.count();
+00071 
+00072     target.Respond(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a346ff32eaa3c09983fb2ec057816d352}{ResponseCode::TIME}, os.str());
+00073 \}
+\end{DoxyCode}
+\hypertarget{classPlayerPosition_a52f46d4c600724b7ce9f459b93609dc3}{\index{Player\+Position@{Player\+Position}!Is\+Ready\+To\+Send@{Is\+Ready\+To\+Send}}
+\index{Is\+Ready\+To\+Send@{Is\+Ready\+To\+Send}!Player\+Position@{Player\+Position}}
+\subsubsection[{Is\+Ready\+To\+Send}]{\setlength{\rightskip}{0pt plus 5cm}bool Player\+Position\+::\+Is\+Ready\+To\+Send (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classPlayerPosition_a52f46d4c600724b7ce9f459b93609dc3}
+
+
+Figures out whether it's time to send a position signal. 
+
+\begin{DoxyReturn}{Returns}
+True if enough time has elapsed for a signal to be sent; false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{player__position_8cpp_source_l00075}{75} of file \hyperlink{player__position_8cpp_source}{player\+\_\+position.\+cpp}.
+
+
+
+References \hyperlink{player__position_8hpp_source_l00034}{current}, \hyperlink{player__position_8hpp_source_l00043}{has\+\_\+reset}, \hyperlink{player__position_8hpp_source_l00037}{last}, and \hyperlink{player__position_8hpp_source_l00031}{period}.
+
+
+
+Referenced by \hyperlink{player__position_8cpp_source_l00049}{Update()}.
+
+
+\begin{DoxyCode}
+00076 \{
+00077     \textcolor{keywordflow}{return} this->\hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{has\_reset} || (this->\hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{last} + this->\hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period} <= this->
+      \hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current});
+00078 \}
+\end{DoxyCode}
+\hypertarget{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}{\index{Player\+Position@{Player\+Position}!Reset@{Reset}}
+\index{Reset@{Reset}!Player\+Position@{Player\+Position}}
+\subsubsection[{Reset}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+Position\+::\+Reset (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}
+
+
+Resets the position tracker's position data. 
+
+This does not remove any registered push response sink. Call this whenever the song changes, or before a skip. \begin{DoxySeeAlso}{See also}
+\hyperlink{classPlayerPosition_ad39cab72590804238d2384391cb65745}{Update} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{player__position_8cpp_source_l00060}{60} of file \hyperlink{player__position_8cpp_source}{player\+\_\+position.\+cpp}.
+
+
+
+References \hyperlink{player__position_8hpp_source_l00034}{current}, \hyperlink{player__position_8hpp_source_l00043}{has\+\_\+reset}, and \hyperlink{player__position_8hpp_source_l00037}{last}.
+
+
+
+Referenced by \hyperlink{player__position_8cpp_source_l00041}{Player\+Position()}, and \hyperlink{player__position_8cpp_source_l00032}{Player\+::\+Reset\+Position()}.
+
+
+\begin{DoxyCode}
+00061 \{
+00062     this->\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current} = \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit}(0);
+00063     this->\hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{last} = \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit}(0);
+00064     this->\hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{has\_reset} = \textcolor{keyword}{true};
+00065 \}
+\end{DoxyCode}
+\hypertarget{classPlayerPosition_aac73ce9104537702365baf19d50bde14}{\index{Player\+Position@{Player\+Position}!Send@{Send}}
+\index{Send@{Send}!Player\+Position@{Player\+Position}}
+\subsubsection[{Send}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+Position\+::\+Send (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classPlayerPosition_aac73ce9104537702365baf19d50bde14}
+
+
+Sends a position signal to the outside environment, if ready. 
+
+This only sends a signal if the requested amount of time has passed since the last one. \hypertarget{classPlayerPosition_aee2fec4f9cd5db48ee1ed79044c658ab}{\index{Player\+Position@{Player\+Position}!Set\+Response\+Period@{Set\+Response\+Period}}
+\index{Set\+Response\+Period@{Set\+Response\+Period}!Player\+Position@{Player\+Position}}
+\subsubsection[{Set\+Response\+Period}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+Position\+::\+Set\+Response\+Period (
+\begin{DoxyParamCaption}
+\item[{{\bf Player\+Position\+::\+Unit}}]{period}
+\end{DoxyParamCaption}
+)}}\label{classPlayerPosition_aee2fec4f9cd5db48ee1ed79044c658ab}
+
+
+Sets the period between position signals. 
+
+This is shared across all listeners. 
+\begin{DoxyParams}{Parameters}
+{\em period} & The period to wait between responses. \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classResponseSource_a12c45136716adffa59d5e5e1ca80b7ce}{Set\+Response\+Sink} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{player__position_8cpp_source_l00080}{80} of file \hyperlink{player__position_8cpp_source}{player\+\_\+position.\+cpp}.
+
+
+
+References \hyperlink{player__position_8hpp_source_l00031}{period}.
+
+
+
+Referenced by \hyperlink{player__position_8cpp_source_l00021}{Player\+::\+Set\+Position\+Response\+Period()}.
+
+
+\begin{DoxyCode}
+00081 \{
+00082     this->\hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period} = \hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period};
+00083 \}
+\end{DoxyCode}
+\hypertarget{classPlayerPosition_ad39cab72590804238d2384391cb65745}{\index{Player\+Position@{Player\+Position}!Update@{Update}}
+\index{Update@{Update}!Player\+Position@{Player\+Position}}
+\subsubsection[{Update}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+Position\+::\+Update (
+\begin{DoxyParamCaption}
+\item[{const {\bf Player\+Position\+::\+Unit}}]{position}
+\end{DoxyParamCaption}
+)}}\label{classPlayerPosition_ad39cab72590804238d2384391cb65745}
+
+
+Updates the position tracker with the new position. 
+
+This pushes the position to the registered response sink, if necessary. 
+\begin{DoxyParams}{Parameters}
+{\em position} & The new position, in {\itshape Position\+Unit} units. \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}{Reset} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{player__position_8cpp_source_l00049}{49} of file \hyperlink{player__position_8cpp_source}{player\+\_\+position.\+cpp}.
+
+
+
+References \hyperlink{player__position_8hpp_source_l00034}{current}, \hyperlink{player__position_8hpp_source_l00043}{has\+\_\+reset}, \hyperlink{player__position_8cpp_source_l00075}{Is\+Ready\+To\+Send()}, \hyperlink{player__position_8hpp_source_l00037}{last}, and \hyperlink{io__response_8cpp_source_l00047}{Response\+Source\+::\+Push()}.
+
+
+
+Referenced by \hyperlink{player__position_8cpp_source_l00026}{Player\+::\+Update\+Position()}.
+
+
+\begin{DoxyCode}
+00050 \{
+00051     this->\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current} = position;
+00052 
+00053     \textcolor{keywordflow}{if} (\hyperlink{classPlayerPosition_a52f46d4c600724b7ce9f459b93609dc3}{IsReadyToSend}()) \{
+00054         \hyperlink{classResponseSource_a6e3b93326ee043f6d60510acd08de69b}{Push}();
+00055         this->\hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{last} = this->\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current};
+00056         this->\hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{has\_reset} = 0;
+00057     \}
+00058 \}
+\end{DoxyCode}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{\index{Player\+Position@{Player\+Position}!has\+\_\+reset@{has\+\_\+reset}}
+\index{has\+\_\+reset@{has\+\_\+reset}!Player\+Position@{Player\+Position}}
+\subsubsection[{has\+\_\+reset}]{\setlength{\rightskip}{0pt plus 5cm}bool Player\+Position\+::has\+\_\+reset\hspace{0.3cm}{\ttfamily [private]}}}\label{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}
+
+
+Whether the position was reset since the last push. 
+
+This is also set high if the position has never been emitted. 
+
+Definition at line \hyperlink{player__position_8hpp_source_l00043}{43} of file \hyperlink{player__position_8hpp_source}{player\+\_\+position.\+hpp}.
+
+
+
+Referenced by \hyperlink{player__position_8cpp_source_l00075}{Is\+Ready\+To\+Send()}, \hyperlink{player__position_8cpp_source_l00060}{Reset()}, and \hyperlink{player__position_8cpp_source_l00049}{Update()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/player/\hyperlink{player__position_8hpp}{player\+\_\+position.\+hpp}\item 
+src/player/\hyperlink{player__position_8cpp}{player\+\_\+position.\+cpp}\end{DoxyCompactItemize}

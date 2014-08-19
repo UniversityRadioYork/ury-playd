@@ -1,0 +1,415 @@
+\hypertarget{classAudioSystem}{\section{Audio\+System Class Reference}
+\label{classAudioSystem}\index{Audio\+System@{Audio\+System}}
+}
+
+
+An \hyperlink{classAudioSystem}{Audio\+System} represents the entire audio stack used by playd.  
+
+
+
+
+{\ttfamily \#include $<$audio\+\_\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for Audio\+System\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{classAudioSystem__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAudioSystem_a33bfa767bca10a6ce71e72708c586c67}{using \hyperlink{classAudioSystem_a33bfa767bca10a6ce71e72708c586c67}{Device} = std\+::pair$<$ int, std\+::string $>$}\label{classAudioSystem_a33bfa767bca10a6ce71e72708c586c67}
+
+\begin{DoxyCompactList}\small\item\em Type for device entries. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classAudioSystem_ad17cde8deff07ef7d7d56be62df98739}{Audio\+System} ()
+\begin{DoxyCompactList}\small\item\em Constructs an \hyperlink{classAudioSystem}{Audio\+System}, initialising its libraries. \end{DoxyCompactList}\item 
+\hypertarget{classAudioSystem_a9ad830040ea5f68a6a63957c6f281055}{\hyperlink{classAudioSystem_a9ad830040ea5f68a6a63957c6f281055}{$\sim$\+Audio\+System} ()}\label{classAudioSystem_a9ad830040ea5f68a6a63957c6f281055}
+
+\begin{DoxyCompactList}\small\item\em Destructs an \hyperlink{classAudioSystem}{Audio\+System}, uninitialising its libraries. \end{DoxyCompactList}\item 
+\hyperlink{classAudio}{Audio} $\ast$ \hyperlink{classAudioSystem_a2172608177d2bd54377bfc3c61cd117d}{Load} (const std\+::string \&path) const 
+\begin{DoxyCompactList}\small\item\em Loads a file, creating an \hyperlink{classAudio}{Audio} for it. \end{DoxyCompactList}\item 
+void \hyperlink{classAudioSystem_ade3b400828991d02e36a0b61302d30d2}{Set\+Device\+I\+D} (int id)
+\begin{DoxyCompactList}\small\item\em Sets the current device I\+D. \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{classAudioSystem_a33bfa767bca10a6ce71e72708c586c67}{Audio\+System\+::\+Device} $>$ \hyperlink{classAudioSystem_aa268faeb9243c18588631024958856e6}{Get\+Devices\+Info} ()
+\begin{DoxyCompactList}\small\item\em Gets the number and name of each output device entry in the \hyperlink{classAudioSystem}{Audio\+System}. \end{DoxyCompactList}\item 
+bool \hyperlink{classAudioSystem_a001cd82f854883b80b3ed7d35795581b}{Is\+Output\+Device} (int id)
+\begin{DoxyCompactList}\small\item\em Can a sound device output sound? \end{DoxyCompactList}\item 
+portaudio\+::\+Stream $\ast$ \hyperlink{classAudioSystem_a78e8754440e0a29f5fac9ca1cd79a109}{Configure} (std\+::uint8\+\_\+t channel\+\_\+count, \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{Sample\+Format} sample\+\_\+format, double sample\+\_\+rate, size\+\_\+t buffer\+\_\+size, portaudio\+::\+Callback\+Interface \&cb) const 
+\begin{DoxyCompactList}\small\item\em Configures and returns a Port\+Audio stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+const portaudio\+::\+Device \& \hyperlink{classAudioSystem_a513a0de4748574e25cba443f28949a90}{Pa\+Device\+From} (const std\+::string \&id\+\_\+string) const 
+\begin{DoxyCompactList}\small\item\em Converts a string device I\+D to a Port\+Audio device. \end{DoxyCompactList}\item 
+portaudio\+::\+Sample\+Data\+Format \hyperlink{classAudioSystem_aac640b14ad80c2518539bcafe9f4b5ac}{Pa\+Sample\+Format\+From} (\hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{Sample\+Format} fmt) const 
+\begin{DoxyCompactList}\small\item\em Converts a sample format identifier from playd to Port\+Audio. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAudioSystem_a3071e6d8643b3d0275ba63820e6e0072}{std\+::string \hyperlink{classAudioSystem_a3071e6d8643b3d0275ba63820e6e0072}{device\+\_\+id}}\label{classAudioSystem_a3071e6d8643b3d0275ba63820e6e0072}
+
+\begin{DoxyCompactList}\small\item\em The current device I\+D. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+An \hyperlink{classAudioSystem}{Audio\+System} represents the entire audio stack used by playd. 
+
+The \hyperlink{classAudioSystem}{Audio\+System} is responsible for creating \hyperlink{classAudio}{Audio} instances, enumerating and resolving device I\+Ds, and initialising and terminating the audio libraries.
+
+\hyperlink{classAudioSystem}{Audio\+System} is a R\+A\+I\+I-\/style class\+: it loads the audio libraries on construction and unloads them on termination. As such, it's probably not wise to construct multiple \hyperlink{classAudioSystem}{Audio\+System} instances. 
+
+Definition at line \hyperlink{audio__system_8hpp_source_l00040}{40} of file \hyperlink{audio__system_8hpp_source}{audio\+\_\+system.\+hpp}.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classAudioSystem_ad17cde8deff07ef7d7d56be62df98739}{\index{Audio\+System@{Audio\+System}!Audio\+System@{Audio\+System}}
+\index{Audio\+System@{Audio\+System}!Audio\+System@{Audio\+System}}
+\subsubsection[{Audio\+System}]{\setlength{\rightskip}{0pt plus 5cm}Audio\+System\+::\+Audio\+System (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudioSystem_ad17cde8deff07ef7d7d56be62df98739}
+
+
+Constructs an \hyperlink{classAudioSystem}{Audio\+System}, initialising its libraries. 
+
+This sets the current device I\+D to a sane default; use Set\+Device\+I\+D to change it. 
+
+Definition at line \hyperlink{audio__system_8cpp_source_l00041}{41} of file \hyperlink{audio__system_8cpp_source}{audio\+\_\+system.\+cpp}.
+
+
+
+References \hyperlink{audio__system_8hpp_source_l00101}{device\+\_\+id}.
+
+
+\begin{DoxyCode}
+00042 \{
+00043     portaudio::System::initialize();
+00044     sox\_format\_init();
+00045 
+00046     this->\hyperlink{classAudioSystem_a3071e6d8643b3d0275ba63820e6e0072}{device\_id} = -1;
+00047 \}
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classAudioSystem_a78e8754440e0a29f5fac9ca1cd79a109}{\index{Audio\+System@{Audio\+System}!Configure@{Configure}}
+\index{Configure@{Configure}!Audio\+System@{Audio\+System}}
+\subsubsection[{Configure}]{\setlength{\rightskip}{0pt plus 5cm}portaudio\+::\+Stream $\ast$ Audio\+System\+::\+Configure (
+\begin{DoxyParamCaption}
+\item[{std\+::uint8\+\_\+t}]{channel\+\_\+count, }
+\item[{{\bf Sample\+Format}}]{sample\+\_\+format, }
+\item[{double}]{sample\+\_\+rate, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{portaudio\+::\+Callback\+Interface \&}]{cb}
+\end{DoxyParamCaption}
+) const}}\label{classAudioSystem_a78e8754440e0a29f5fac9ca1cd79a109}
+
+
+Configures and returns a Port\+Audio stream. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel\+\_\+count} & The number of channels of the stream will receive. \\
+\hline
+{\em sample\+\_\+format} & The format of the samples the stream will receive. \\
+\hline
+{\em sample\+\_\+rate} & The rate of the samples the stream will receive. \\
+\hline
+{\em buffer\+\_\+size} & The size of the buffer the stream should allocate. \\
+\hline
+{\em cb} & The object that Port\+Audio will call to receive audio. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The configured Port\+Audio stream. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio__system_8cpp_source_l00096}{96} of file \hyperlink{audio__system_8cpp_source}{audio\+\_\+system.\+cpp}.
+
+
+
+References \hyperlink{audio__system_8hpp_source_l00101}{device\+\_\+id}, \hyperlink{audio__system_8cpp_source_l00115}{Pa\+Device\+From()}, and \hyperlink{audio__system_8cpp_source_l00140}{Pa\+Sample\+Format\+From()}.
+
+
+
+Referenced by \hyperlink{audio__system_8cpp_source_l00083}{Load()}.
+
+
+\begin{DoxyCode}
+00100 \{
+00101     \textcolor{keyword}{const} portaudio::Device &device = \hyperlink{classAudioSystem_a513a0de4748574e25cba443f28949a90}{PaDeviceFrom}(this->\hyperlink{classAudioSystem_a3071e6d8643b3d0275ba63820e6e0072}{device\_id});
+00102 
+00103     portaudio::DirectionSpecificStreamParameters out\_pars(
+00104                     device, channel\_count,
+00105                     \hyperlink{classAudioSystem_aac640b14ad80c2518539bcafe9f4b5ac}{PaSampleFormatFrom}(sample\_format), \textcolor{keyword}{true},
+00106                     device.defaultLowOutputLatency(), \textcolor{keyword}{nullptr});
+00107 
+00108     portaudio::StreamParameters pars(
+00109                     portaudio::DirectionSpecificStreamParameters::null(),
+00110                     out\_pars, sample\_rate, buffer\_size, paClipOff);
+00111 
+00112     \textcolor{keywordflow}{return} \textcolor{keyword}{new} portaudio::InterfaceCallbackStream(pars, cb);
+00113 \}
+\end{DoxyCode}
+\hypertarget{classAudioSystem_aa268faeb9243c18588631024958856e6}{\index{Audio\+System@{Audio\+System}!Get\+Devices\+Info@{Get\+Devices\+Info}}
+\index{Get\+Devices\+Info@{Get\+Devices\+Info}!Audio\+System@{Audio\+System}}
+\subsubsection[{Get\+Devices\+Info}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ {\bf Audio\+System\+::\+Device} $>$ Audio\+System\+::\+Get\+Devices\+Info (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudioSystem_aa268faeb9243c18588631024958856e6}
+
+
+Gets the number and name of each output device entry in the \hyperlink{classAudioSystem}{Audio\+System}. 
+
+\begin{DoxyReturn}{Returns}
+List of output devices, as strings. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio__system_8cpp_source_l00055}{55} of file \hyperlink{audio__system_8cpp_source}{audio\+\_\+system.\+cpp}.
+
+
+
+Referenced by \hyperlink{main_8cpp_source_l00040}{playd\+::\+Get\+Device\+I\+D()}, and \hyperlink{main_8cpp_source_l00130}{playd\+::\+Run()}.
+
+
+\begin{DoxyCode}
+00056 \{
+00057     \textcolor{keyword}{auto} &pa = portaudio::System::instance();
+00058     std::vector<AudioSystem::Device> list;
+00059 
+00060     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) \{
+00061         \textcolor{keywordflow}{if} (!(*d).isInputOnlyDevice()) \{
+00062             list.push\_back(std::make\_pair((*d).index(),
+00063                                           (*d).name()));
+00064         \}
+00065     \}
+00066     \textcolor{keywordflow}{return} list;
+00067 \}
+\end{DoxyCode}
+\hypertarget{classAudioSystem_a001cd82f854883b80b3ed7d35795581b}{\index{Audio\+System@{Audio\+System}!Is\+Output\+Device@{Is\+Output\+Device}}
+\index{Is\+Output\+Device@{Is\+Output\+Device}!Audio\+System@{Audio\+System}}
+\subsubsection[{Is\+Output\+Device}]{\setlength{\rightskip}{0pt plus 5cm}bool Audio\+System\+::\+Is\+Output\+Device (
+\begin{DoxyParamCaption}
+\item[{int}]{id}
+\end{DoxyParamCaption}
+)}}\label{classAudioSystem_a001cd82f854883b80b3ed7d35795581b}
+
+
+Can a sound device output sound? 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & Device I\+D. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+If the device can handle outputting sound. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio__system_8cpp_source_l00069}{69} of file \hyperlink{audio__system_8cpp_source}{audio\+\_\+system.\+cpp}.
+
+
+
+Referenced by \hyperlink{main_8cpp_source_l00040}{playd\+::\+Get\+Device\+I\+D()}.
+
+
+\begin{DoxyCode}
+00070 \{
+00071     \textcolor{keyword}{auto} &pa = portaudio::System::instance();
+00072     \textcolor{keywordflow}{if} (id < 0 || id >= pa.deviceCount()) \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00073 
+00074     portaudio::Device &dev = pa.deviceByIndex(\textcolor{keywordtype}{id});
+00075     \textcolor{keywordflow}{return} !dev.isInputOnlyDevice();
+00076 \}
+\end{DoxyCode}
+\hypertarget{classAudioSystem_a2172608177d2bd54377bfc3c61cd117d}{\index{Audio\+System@{Audio\+System}!Load@{Load}}
+\index{Load@{Load}!Audio\+System@{Audio\+System}}
+\subsubsection[{Load}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Audio} $\ast$ Audio\+System\+::\+Load (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{path}
+\end{DoxyParamCaption}
+) const}}\label{classAudioSystem_a2172608177d2bd54377bfc3c61cd117d}
+
+
+Loads a file, creating an \hyperlink{classAudio}{Audio} for it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & The path to a file. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The \hyperlink{classAudio}{Audio} for that file. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio__system_8cpp_source_l00083}{83} of file \hyperlink{audio__system_8cpp_source}{audio\+\_\+system.\+cpp}.
+
+
+
+References \hyperlink{audio__system_8cpp_source_l00096}{Configure()}.
+
+
+
+Referenced by \hyperlink{player__file_8cpp_source_l00025}{Player\+File\+::\+Load()}.
+
+
+\begin{DoxyCode}
+00084 \{
+00085     \textcolor{keyword}{auto} source = \textcolor{keyword}{new} \hyperlink{classAudioSource}{AudioSource}(path);
+00086 
+00087     \hyperlink{classAudioSink_ae5b8370aa17c24c6fc8f8e0c5778168c}{AudioSink::StreamConfigurator} config\_fn = std::bind(
+00088                     &\hyperlink{classAudioSystem_a78e8754440e0a29f5fac9ca1cd79a109}{AudioSystem::Configure}, \textcolor{keyword}{this}, source->ChannelCount(),
+00089                     source->OutputSampleFormat(), source->SampleRate(),
+00090                     source->BufferSampleCapacity(), std::placeholders::\_1);
+00091     \textcolor{keyword}{auto} sink = \textcolor{keyword}{new} \hyperlink{classAudioSink}{AudioSink}(config\_fn, source->BytesPerSample());
+00092 
+00093     \textcolor{keywordflow}{return} \textcolor{keyword}{new} \hyperlink{classAudio}{Audio}(source, sink);
+00094 \}
+\end{DoxyCode}
+\hypertarget{classAudioSystem_a513a0de4748574e25cba443f28949a90}{\index{Audio\+System@{Audio\+System}!Pa\+Device\+From@{Pa\+Device\+From}}
+\index{Pa\+Device\+From@{Pa\+Device\+From}!Audio\+System@{Audio\+System}}
+\subsubsection[{Pa\+Device\+From}]{\setlength{\rightskip}{0pt plus 5cm}const portaudio\+::\+Device \& Audio\+System\+::\+Pa\+Device\+From (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{id\+\_\+string}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [private]}}}\label{classAudioSystem_a513a0de4748574e25cba443f28949a90}
+
+
+Converts a string device I\+D to a Port\+Audio device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id\+\_\+string} & The device I\+D, as a string. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The device. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio__system_8cpp_source_l00115}{115} of file \hyperlink{audio__system_8cpp_source}{audio\+\_\+system.\+cpp}.
+
+
+
+References \hyperlink{messages_8h_source_l00036}{M\+S\+G\+\_\+\+D\+E\+V\+\_\+\+B\+A\+D\+I\+D}.
+
+
+
+Referenced by \hyperlink{audio__system_8cpp_source_l00096}{Configure()}.
+
+
+\begin{DoxyCode}
+00117 \{
+00118     \textcolor{keyword}{auto} &pa = portaudio::System::instance();
+00119 
+00120     PaDeviceIndex id\_pa = 0;
+00121 
+00122     std::istringstream is(id\_string);
+00123     is >> id\_pa;
+00124 
+00125     \textcolor{keywordflow}{if} (id\_pa >= pa.deviceCount()) \{
+00126         \textcolor{keywordflow}{throw} \hyperlink{classConfigError}{ConfigError}(\hyperlink{messages_8h_a80a8cb0d00a63114c8c5c8228fa39ec4}{MSG\_DEV\_BADID});
+00127     \}
+00128 
+00129     \textcolor{keywordflow}{return} pa.deviceByIndex(id\_pa);
+00130 \}
+\end{DoxyCode}
+\hypertarget{classAudioSystem_aac640b14ad80c2518539bcafe9f4b5ac}{\index{Audio\+System@{Audio\+System}!Pa\+Sample\+Format\+From@{Pa\+Sample\+Format\+From}}
+\index{Pa\+Sample\+Format\+From@{Pa\+Sample\+Format\+From}!Audio\+System@{Audio\+System}}
+\subsubsection[{Pa\+Sample\+Format\+From}]{\setlength{\rightskip}{0pt plus 5cm}portaudio\+::\+Sample\+Data\+Format Audio\+System\+::\+Pa\+Sample\+Format\+From (
+\begin{DoxyParamCaption}
+\item[{{\bf Sample\+Format}}]{fmt}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [private]}}}\label{classAudioSystem_aac640b14ad80c2518539bcafe9f4b5ac}
+
+
+Converts a sample format identifier from playd to Port\+Audio. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fmt} & The playd sample format identifier. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The Port\+Audio equivalent of the given Sample\+Format. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio__system_8cpp_source_l00140}{140} of file \hyperlink{audio__system_8cpp_source}{audio\+\_\+system.\+cpp}.
+
+
+
+References \hyperlink{messages_8h_source_l00030}{M\+S\+G\+\_\+\+D\+E\+C\+O\+D\+E\+\_\+\+B\+A\+D\+R\+A\+T\+E}.
+
+
+
+Referenced by \hyperlink{audio__system_8cpp_source_l00096}{Configure()}.
+
+
+\begin{DoxyCode}
+00142 \{
+00143     \textcolor{keywordflow}{try}
+00144     \{
+00145         \textcolor{keywordflow}{return} pa\_from\_sf.at(fmt);
+00146     \}
+00147     \textcolor{keywordflow}{catch} (std::out\_of\_range)
+00148     \{
+00149         \textcolor{keywordflow}{throw} \hyperlink{classFileError}{FileError}(\hyperlink{messages_8h_a6d4302117e822520f5c61b6d40085c4d}{MSG\_DECODE\_BADRATE});
+00150     \}
+00151 \}
+\end{DoxyCode}
+\hypertarget{classAudioSystem_ade3b400828991d02e36a0b61302d30d2}{\index{Audio\+System@{Audio\+System}!Set\+Device\+I\+D@{Set\+Device\+I\+D}}
+\index{Set\+Device\+I\+D@{Set\+Device\+I\+D}!Audio\+System@{Audio\+System}}
+\subsubsection[{Set\+Device\+I\+D}]{\setlength{\rightskip}{0pt plus 5cm}void Audio\+System\+::\+Set\+Device\+I\+D (
+\begin{DoxyParamCaption}
+\item[{int}]{id}
+\end{DoxyParamCaption}
+)}}\label{classAudioSystem_ade3b400828991d02e36a0b61302d30d2}
+
+
+Sets the current device I\+D. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & The device I\+D to use for subsequent Audios. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{audio__system_8cpp_source_l00078}{78} of file \hyperlink{audio__system_8cpp_source}{audio\+\_\+system.\+cpp}.
+
+
+
+References \hyperlink{audio__system_8hpp_source_l00101}{device\+\_\+id}.
+
+
+
+Referenced by \hyperlink{main_8cpp_source_l00130}{playd\+::\+Run()}.
+
+
+\begin{DoxyCode}
+00079 \{
+00080     this->\hyperlink{classAudioSystem_a3071e6d8643b3d0275ba63820e6e0072}{device\_id} = std::to\_string(\textcolor{keywordtype}{id});
+00081 \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/audio/\hyperlink{audio__system_8hpp}{audio\+\_\+system.\+hpp}\item 
+src/audio/\hyperlink{audio__system_8cpp}{audio\+\_\+system.\+cpp}\end{DoxyCompactItemize}

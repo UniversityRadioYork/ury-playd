@@ -1,0 +1,125 @@
+\hypertarget{main_8cpp_source}{\section{main.\+cpp}
+\label{main_8cpp_source}\index{src/main.\+cpp@{src/main.\+cpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00010 \textcolor{preprocessor}{#include <algorithm>}
+00011 \textcolor{preprocessor}{#include <chrono>}
+00012 \textcolor{preprocessor}{#include <iostream>}
+00013 
+00014 \textcolor{preprocessor}{#include "\hyperlink{audio__system_8hpp}{audio/audio\_system.hpp}"}
+00015 \textcolor{preprocessor}{#include "\hyperlink{cmd_8hpp}{cmd.hpp}"}
+00016 \textcolor{preprocessor}{#include "\hyperlink{io__reactor_8hpp}{io/io\_reactor.hpp}"}
+00017 \textcolor{preprocessor}{#include "\hyperlink{io__response_8hpp}{io/io\_response.hpp}"}
+00018 \textcolor{preprocessor}{#include "\hyperlink{main_8hpp}{main.hpp}"}
+00019 \textcolor{preprocessor}{#include "\hyperlink{messages_8h}{messages.h}"}
+00020 \textcolor{preprocessor}{#include "\hyperlink{player_8hpp}{player/player.hpp}"}
+00021 
+\hypertarget{main_8cpp_source_l00028}{}\hyperlink{main_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{00028} \textcolor{keywordtype}{int} \hyperlink{main_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char} *argv[])
+00029 \{
+00030     \hyperlink{classplayd}{playd} ps(argc, argv);
+00031     \textcolor{keywordflow}{return} ps.\hyperlink{classplayd_aee84626965c812db03120ebe3267fcab}{Run}();
+00032 \}
+00033 
+00034 \textcolor{comment}{//}
+00035 \textcolor{comment}{// playd}
+00036 \textcolor{comment}{//}
+00037 
+00038 \textcolor{keyword}{const} std::chrono::microseconds \hyperlink{classplayd_a540bcb2dac9488bcb8e593378005bd07}{playd::POSITION\_PERIOD}(500000);
+00039 
+\hypertarget{main_8cpp_source_l00040}{}\hyperlink{classplayd_a767d029a5d1321e912c1a2a92e8f3c64}{00040} \textcolor{keywordtype}{int} \hyperlink{classplayd_a767d029a5d1321e912c1a2a92e8f3c64}{playd::GetDeviceID}()
+00041 \{
+00042     \textcolor{keywordflow}{if} (this->\hyperlink{classplayd_a58d45d86bd51dea16f476aae648ff63c}{arguments}.size() < 2) \textcolor{keywordflow}{return} -1;
+00043 
+00044     \textcolor{comment}{/* Only accept valid numbers. */}
+00045     \textcolor{keywordtype}{int} id;
+00046     \textcolor{keywordflow}{try}
+00047     \{
+00048         \textcolor{keywordtype}{id} = std::stoi(this->\hyperlink{classplayd_a58d45d86bd51dea16f476aae648ff63c}{arguments}[1]);
+00049     \}
+00050     \textcolor{keywordflow}{catch} (...)
+00051     \{
+00052         \textcolor{comment}{/* Only std::invalid\_argument and std::out\_of\_range are thrown}
+00053 \textcolor{comment}{         * here. */}
+00054         \textcolor{keywordflow}{return} -1;
+00055     \}
+00056 
+00057     \textcolor{comment}{/* Only allow valid (output) devices. */}
+00058     \textcolor{keyword}{auto} device\_list = this->\hyperlink{classplayd_a2c7193680bd18f1e9b3f63f2234485de}{audio}.\hyperlink{classAudioSystem_aa268faeb9243c18588631024958856e6}{GetDevicesInfo}();
+00059     \textcolor{keywordflow}{if} (this->\hyperlink{classplayd_a2c7193680bd18f1e9b3f63f2234485de}{audio}.\hyperlink{classAudioSystem_a001cd82f854883b80b3ed7d35795581b}{IsOutputDevice}(\textcolor{keywordtype}{id})) \{
+00060         \textcolor{keywordflow}{return} id;
+00061     \}
+00062 
+00063     \textcolor{keywordflow}{return} -1;
+00064 \}
+00065 
+\hypertarget{main_8cpp_source_l00080}{}\hyperlink{main_8cpp_a889c521ce751c2db7ba216a612c1d784}{00080} \textcolor{keyword}{const} \hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{Player::TP::UnitMap} \hyperlink{main_8cpp_a889c521ce751c2db7ba216a612c1d784}{UNITS} = \{
+00082     \{ \textcolor{stringliteral}{"us"}, Player::TP::MkTime<std::chrono::microseconds> \},
+00084     \{ \textcolor{stringliteral}{"usec"}, Player::TP::MkTime<std::chrono::microseconds> \},
+00086     \{ \textcolor{stringliteral}{"usecs"}, Player::TP::MkTime<std::chrono::microseconds> \},
+00088     \{ \textcolor{stringliteral}{"ms"}, Player::TP::MkTime<std::chrono::milliseconds> \},
+00090     \{ \textcolor{stringliteral}{"msec"}, Player::TP::MkTime<std::chrono::milliseconds> \},
+00092     \{ \textcolor{stringliteral}{"msecs"}, Player::TP::MkTime<std::chrono::milliseconds> \},
+00094     \{ \textcolor{stringliteral}{"s"}, Player::TP::MkTime<std::chrono::seconds> \},
+00096     \{ \textcolor{stringliteral}{"sec"}, Player::TP::MkTime<std::chrono::seconds> \},
+00098     \{ \textcolor{stringliteral}{"secs"}, Player::TP::MkTime<std::chrono::seconds> \},
+00100     \{ \textcolor{stringliteral}{"m"}, Player::TP::MkTime<std::chrono::minutes> \},
+00102     \{ \textcolor{stringliteral}{"min"}, Player::TP::MkTime<std::chrono::minutes> \},
+00104     \{ \textcolor{stringliteral}{"mins"}, Player::TP::MkTime<std::chrono::minutes> \},
+00106     \{ \textcolor{stringliteral}{"h"}, Player::TP::MkTime<std::chrono::hours> \},
+00108     \{ \textcolor{stringliteral}{"hour"}, Player::TP::MkTime<std::chrono::hours> \},
+00110     \{ \textcolor{stringliteral}{"hours"}, Player::TP::MkTime<std::chrono::hours> \},
+00112     \{ \textcolor{stringliteral}{""}, Player::TP::MkTime<std::chrono::microseconds> \}
+00113 \};
+00114 
+\hypertarget{main_8cpp_source_l00115}{}\hyperlink{classplayd_a2dfa519ee11ce75fbe389fcf3b15e122}{00115} \hyperlink{classplayd_a2dfa519ee11ce75fbe389fcf3b15e122}{playd::playd}(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char} *argv[])
+00116     : audio(), player(audio, time\_parser), handler(player), time\_parser(\hyperlink{main_8cpp_a889c521ce751c2db7ba216a612c1d784}{UNITS})
+00117 \{
+00118     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < argc; i++) \{
+00119         this->\hyperlink{classplayd_a58d45d86bd51dea16f476aae648ff63c}{arguments}.push\_back(std::string(argv[i]));
+00120     \}
+00121 
+00122     \textcolor{keyword}{auto} size = this->\hyperlink{classplayd_a58d45d86bd51dea16f476aae648ff63c}{arguments}.size();
+00123 
+00124     std::string addr = size > 2 ? this->\hyperlink{classplayd_a58d45d86bd51dea16f476aae648ff63c}{arguments}.at(2) : \textcolor{stringliteral}{"0.0.0.0"};
+00125     std::string port = size > 3 ? this->\hyperlink{classplayd_a58d45d86bd51dea16f476aae648ff63c}{arguments}.at(3) : \textcolor{stringliteral}{"1350"};
+00126     this->\hyperlink{classplayd_a066cb450455e1359e4f80cfa5ecb5c05}{io} = decltype(this->\hyperlink{classplayd_a066cb450455e1359e4f80cfa5ecb5c05}{io})(
+00127                     \textcolor{keyword}{new} \hyperlink{classIoReactor}{IoReactor}(this->\hyperlink{classplayd_a8712fc23f3139a2fd2e9dbfb24b998dd}{player}, this->\hyperlink{classplayd_a738bb18c13d3fd7db82ce000dd43d604}{handler}, addr, port));
+00128 \}
+00129 
+\hypertarget{main_8cpp_source_l00130}{}\hyperlink{classplayd_aee84626965c812db03120ebe3267fcab}{00130} \textcolor{keywordtype}{int} \hyperlink{classplayd_aee84626965c812db03120ebe3267fcab}{playd::Run}()
+00131 \{
+00132     \textcolor{keywordflow}{try}
+00133     \{
+00134         \textcolor{comment}{// Don't roll this into the constructor: it'll go out of scope!}
+00135         \textcolor{keywordtype}{int} \textcolor{keywordtype}{id} = this->\hyperlink{classplayd_a767d029a5d1321e912c1a2a92e8f3c64}{GetDeviceID}();
+00136         \textcolor{keywordflow}{if} (\textcolor{keywordtype}{id} == -1) \{
+00137             \textcolor{comment}{/* Oops, user entered an invalid sound device. */}
+00138             \textcolor{keyword}{auto} device\_list = this->\hyperlink{classplayd_a2c7193680bd18f1e9b3f63f2234485de}{audio}.\hyperlink{classAudioSystem_aa268faeb9243c18588631024958856e6}{GetDevicesInfo}();
+00139             \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &device : device\_list) \{
+00140                 std::cout << device.first << \textcolor{stringliteral}{": "}
+00141                           << device.second << std::endl;
+00142             \}
+00143             \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00144         \}
+00145         this->\hyperlink{classplayd_a2c7193680bd18f1e9b3f63f2234485de}{audio}.\hyperlink{classAudioSystem_ade3b400828991d02e36a0b61302d30d2}{SetDeviceID}(\textcolor{keywordtype}{id});
+00146 
+00147         this->\hyperlink{classplayd_a8712fc23f3139a2fd2e9dbfb24b998dd}{player}.\hyperlink{classPlayer_a1e65e04dae199230d80639112ac07288}{SetPositionResponsePeriod}(
+      \hyperlink{classplayd_a540bcb2dac9488bcb8e593378005bd07}{POSITION\_PERIOD});
+00148         this->\hyperlink{classplayd_a8712fc23f3139a2fd2e9dbfb24b998dd}{player}.\hyperlink{classPlayer_a719de5af4d1534c2d805a19d5d995deb}{SetResponseSink}(*this->\hyperlink{classplayd_a066cb450455e1359e4f80cfa5ecb5c05}{io});
+00149         this->\hyperlink{classplayd_a066cb450455e1359e4f80cfa5ecb5c05}{io}->Run();
+00150     \}
+00151     \textcolor{keywordflow}{catch} (\hyperlink{classError}{Error} &error)
+00152     \{
+00153         \hyperlink{classplayd_a066cb450455e1359e4f80cfa5ecb5c05}{io}->RespondWithError(error);
+00154         \hyperlink{classDebug}{Debug}() << \textcolor{stringliteral}{"Unhandled exception caught, going away now."}
+00155                 << std::endl;
+00156         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00157     \}
+00158 
+00159     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00160 \}
+\end{DoxyCode}

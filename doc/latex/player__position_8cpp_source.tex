@@ -1,0 +1,86 @@
+\hypertarget{player__position_8cpp_source}{\section{player\+\_\+position.\+cpp}
+\label{player__position_8cpp_source}\index{src/player/player\+\_\+position.\+cpp@{src/player/player\+\_\+position.\+cpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00011 \textcolor{preprocessor}{#include <chrono>}
+00012 \textcolor{preprocessor}{#include <sstream>}
+00013 
+00014 \textcolor{preprocessor}{#include "../io/io\_response.hpp"}
+00015 \textcolor{preprocessor}{#include "\hyperlink{player_8hpp}{player.hpp}"}
+00016 
+00017 \textcolor{comment}{//}
+00018 \textcolor{comment}{// Player}
+00019 \textcolor{comment}{//}
+00020 
+\hypertarget{player__position_8cpp_source_l00021}{}\hyperlink{classPlayer_a1e65e04dae199230d80639112ac07288}{00021} \textcolor{keywordtype}{void} \hyperlink{classPlayer_a1e65e04dae199230d80639112ac07288}{Player::SetPositionResponsePeriod}(
+      \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{PlayerPosition::Unit} period)
+00022 \{
+00023     this->\hyperlink{classPlayer_a7b0a4ce9f2ebf3d1e026cf3e0ee61152}{position}.\hyperlink{classPlayerPosition_aee2fec4f9cd5db48ee1ed79044c658ab}{SetResponsePeriod}(period);
+00024 \}
+00025 
+\hypertarget{player__position_8cpp_source_l00026}{}\hyperlink{classPlayer_aa055a70690c66e3fd9949358fccadd5c}{00026} \textcolor{keywordtype}{void} \hyperlink{classPlayer_aa055a70690c66e3fd9949358fccadd5c}{Player::UpdatePosition}()
+00027 \{
+00028     \textcolor{keyword}{auto} pos = this->\hyperlink{classPlayer_abcb788a7830c40ae5ba2a219c5341a58}{file}.\hyperlink{classPlayerFile_a072d9788c1449e0e2de3e28b169f2c34}{CurrentPosition}<
+      \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{PlayerPosition::Unit}>();
+00029     this->\hyperlink{classPlayer_a7b0a4ce9f2ebf3d1e026cf3e0ee61152}{position}.\hyperlink{classPlayerPosition_ad39cab72590804238d2384391cb65745}{Update}(pos);
+00030 \}
+00031 
+\hypertarget{player__position_8cpp_source_l00032}{}\hyperlink{classPlayer_a66e226836bf4d6cd206716caeb232094}{00032} \textcolor{keywordtype}{void} \hyperlink{classPlayer_a66e226836bf4d6cd206716caeb232094}{Player::ResetPosition}()
+00033 \{
+00034     this->\hyperlink{classPlayer_a7b0a4ce9f2ebf3d1e026cf3e0ee61152}{position}.\hyperlink{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}{Reset}();
+00035 \}
+00036 
+00037 \textcolor{comment}{//}
+00038 \textcolor{comment}{// PlayerPosition}
+00039 \textcolor{comment}{//}
+00040 
+\hypertarget{player__position_8cpp_source_l00041}{}\hyperlink{classPlayerPosition_a707498560b9f9189fb6d3cd8e59b77d7}{00041} \hyperlink{classPlayerPosition_a707498560b9f9189fb6d3cd8e59b77d7}{PlayerPosition::PlayerPosition}()
+00042 \{
+00043     \textcolor{comment}{// Default to broadcasting the position every time it is changed.}
+00044     this->\hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period} = decltype(this->\hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period})(0);
+00045 
+00046     \hyperlink{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}{Reset}();
+00047 \}
+00048 
+\hypertarget{player__position_8cpp_source_l00049}{}\hyperlink{classPlayerPosition_ad39cab72590804238d2384391cb65745}{00049} \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_ad39cab72590804238d2384391cb65745}{PlayerPosition::Update}(\textcolor{keyword}{const} \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{PlayerPosition::Unit} position)
+00050 \{
+00051     this->\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current} = position;
+00052 
+00053     \textcolor{keywordflow}{if} (\hyperlink{classPlayerPosition_a52f46d4c600724b7ce9f459b93609dc3}{IsReadyToSend}()) \{
+00054         \hyperlink{classResponseSource_a6e3b93326ee043f6d60510acd08de69b}{Push}();
+00055         this->\hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{last} = this->\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current};
+00056         this->\hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{has\_reset} = 0;
+00057     \}
+00058 \}
+00059 
+\hypertarget{player__position_8cpp_source_l00060}{}\hyperlink{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}{00060} \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}{PlayerPosition::Reset}()
+00061 \{
+00062     this->\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current} = \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit}(0);
+00063     this->\hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{last} = \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit}(0);
+00064     this->\hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{has\_reset} = \textcolor{keyword}{true};
+00065 \}
+00066 
+\hypertarget{player__position_8cpp_source_l00067}{}\hyperlink{classPlayerPosition_a66963c28fd9dffe0fd7338023310fa92}{00067} \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_a66963c28fd9dffe0fd7338023310fa92}{PlayerPosition::Emit}(\hyperlink{classResponseSink}{ResponseSink} &target)\textcolor{keyword}{ const}
+00068 \textcolor{keyword}{}\{
+00069     std::ostringstream os;
+00070     os << this->\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current}.count();
+00071 
+00072     target.\hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{Respond}(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a346ff32eaa3c09983fb2ec057816d352}{ResponseCode::TIME}, os.str());
+00073 \}
+00074 
+\hypertarget{player__position_8cpp_source_l00075}{}\hyperlink{classPlayerPosition_a52f46d4c600724b7ce9f459b93609dc3}{00075} \textcolor{keywordtype}{bool} \hyperlink{classPlayerPosition_a52f46d4c600724b7ce9f459b93609dc3}{PlayerPosition::IsReadyToSend}()
+00076 \{
+00077     \textcolor{keywordflow}{return} this->\hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{has\_reset} || (this->\hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{last} + this->\hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period} <= this->
+      \hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current});
+00078 \}
+00079 
+\hypertarget{player__position_8cpp_source_l00080}{}\hyperlink{classPlayerPosition_aee2fec4f9cd5db48ee1ed79044c658ab}{00080} \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_aee2fec4f9cd5db48ee1ed79044c658ab}{PlayerPosition::SetResponsePeriod}(
+      \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{PlayerPosition::Unit} period)
+00081 \{
+00082     this->period = \hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period};
+00083 \}
+\end{DoxyCode}

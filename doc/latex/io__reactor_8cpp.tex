@@ -1,0 +1,66 @@
+\hypertarget{io__reactor_8cpp}{\section{src/io/io\+\_\+reactor.cpp File Reference}
+\label{io__reactor_8cpp}\index{src/io/io\+\_\+reactor.\+cpp@{src/io/io\+\_\+reactor.\+cpp}}
+}
+
+
+Implementation of the non-\/virtual aspects of the \hyperlink{classIoReactor}{Io\+Reactor} class.  
+
+
+{\ttfamily \#include $<$csignal$>$}\\*
+{\ttfamily \#include $<$cstring$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$uv.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}../cmd.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../errors.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../messages.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../player/player.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}io\+\_\+reactor.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}io\+\_\+response.\+hpp\char`\"{}}\\*
+Include dependency graph for io\+\_\+reactor.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{io__reactor_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structWriteReq}{Write\+Req}
+\begin{DoxyCompactList}\small\item\em A structure used to associate a write buffer with a write handle. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{io__reactor_8cpp_ab0c51a1d8447db72e81a13d45448b85f}{void \hyperlink{io__reactor_8cpp_ab0c51a1d8447db72e81a13d45448b85f}{Uv\+Alloc} (uv\+\_\+handle\+\_\+t $\ast$, size\+\_\+t suggested\+\_\+size, uv\+\_\+buf\+\_\+t $\ast$buf)}\label{io__reactor_8cpp_ab0c51a1d8447db72e81a13d45448b85f}
+
+\begin{DoxyCompactList}\small\item\em The function used to allocate and initialise buffers for client reading. \end{DoxyCompactList}\item 
+\hypertarget{io__reactor_8cpp_ab85791c3e9c737453047decfbb7388f4}{void \hyperlink{io__reactor_8cpp_ab85791c3e9c737453047decfbb7388f4}{Uv\+Close\+Callback} (uv\+\_\+handle\+\_\+t $\ast$handle)}\label{io__reactor_8cpp_ab85791c3e9c737453047decfbb7388f4}
+
+\begin{DoxyCompactList}\small\item\em The callback fired when a client connection closes. \end{DoxyCompactList}\item 
+\hypertarget{io__reactor_8cpp_a8c1937e7aebd228e6a5eab19f1add9f9}{void \hyperlink{io__reactor_8cpp_a8c1937e7aebd228e6a5eab19f1add9f9}{Uv\+Read\+Callback} (uv\+\_\+stream\+\_\+t $\ast$stream, ssize\+\_\+t nread, const uv\+\_\+buf\+\_\+t $\ast$buf)}\label{io__reactor_8cpp_a8c1937e7aebd228e6a5eab19f1add9f9}
+
+\begin{DoxyCompactList}\small\item\em The callback fired when some bytes are read from a client connection. \end{DoxyCompactList}\item 
+\hypertarget{io__reactor_8cpp_ab1a411534cf6420d24748b0e78927ebf}{void \hyperlink{io__reactor_8cpp_ab1a411534cf6420d24748b0e78927ebf}{Uv\+Listen\+Callback} (uv\+\_\+stream\+\_\+t $\ast$server, int status)}\label{io__reactor_8cpp_ab1a411534cf6420d24748b0e78927ebf}
+
+\begin{DoxyCompactList}\small\item\em The callback fired when a new client connection is acquired by the listener. \end{DoxyCompactList}\item 
+\hypertarget{io__reactor_8cpp_af58ed397c8d93bffdc01b621d4abaa8c}{void \hyperlink{io__reactor_8cpp_af58ed397c8d93bffdc01b621d4abaa8c}{Uv\+Respond\+Callback} (uv\+\_\+write\+\_\+t $\ast$req, int)}\label{io__reactor_8cpp_af58ed397c8d93bffdc01b621d4abaa8c}
+
+\begin{DoxyCompactList}\small\item\em The callback fired when a response has been sent to a client. \end{DoxyCompactList}\item 
+\hypertarget{io__reactor_8cpp_a4bdadddb08a579d655018f6fa0ac908e}{void \hyperlink{io__reactor_8cpp_a4bdadddb08a579d655018f6fa0ac908e}{Uv\+Update\+Timer\+Callback} (uv\+\_\+timer\+\_\+t $\ast$handle)}\label{io__reactor_8cpp_a4bdadddb08a579d655018f6fa0ac908e}
+
+\begin{DoxyCompactList}\small\item\em The callback fired when the update timer fires. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Implementation of the non-\/virtual aspects of the \hyperlink{classIoReactor}{Io\+Reactor} class. 
+
+The implementation of \hyperlink{classIoReactor}{Io\+Reactor} is based on \href{https://github.com/joyent/libuv}{\tt libuv}, and also makes use of various techniques mentioned in \href{https://nikhilm.github.io/uvbook}{\tt the uvbook}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{io__reactor_8hpp}{io/io\+\_\+reactor.\+hpp} 
+\end{DoxySeeAlso}
+
+
+Definition in file \hyperlink{io__reactor_8cpp_source}{io\+\_\+reactor.\+cpp}.
+

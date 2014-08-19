@@ -1,0 +1,155 @@
+\hypertarget{classResponseSink}{\section{Response\+Sink Class Reference}
+\label{classResponseSink}\index{Response\+Sink@{Response\+Sink}}
+}
+
+
+Abstract class for anything that can be sent a response.  
+
+
+
+
+{\ttfamily \#include $<$io\+\_\+response.\+hpp$>$}
+
+
+
+Inheritance diagram for Response\+Sink\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{classResponseSink__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classResponseSink_a4a5be6c1c271b979d28388974ae86ad2}{using \hyperlink{classResponseSink_a4a5be6c1c271b979d28388974ae86ad2}{Callback} = std\+::function$<$ void(\hyperlink{classResponseSink}{Response\+Sink} \&)$>$}\label{classResponseSink_a4a5be6c1c271b979d28388974ae86ad2}
+
+\begin{DoxyCompactList}\small\item\em A type for callbacks taking a \hyperlink{classResponseSink}{Response\+Sink}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{Respond} (\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546}{Response\+Code} code, const std\+::string \&message) const 
+\begin{DoxyCompactList}\small\item\em Outputs a response. \end{DoxyCompactList}\item 
+void \hyperlink{classResponseSink_a42833a0f1f5e250aa7a41e8bb2fdaac9}{Respond\+With\+Error} (const \hyperlink{classError}{Error} \&error) const 
+\begin{DoxyCompactList}\small\item\em Emits an error as a response. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{classResponseSink_a128a514e39f23f2bcc97fea62e9de3c5}{Respond\+Raw} (const std\+::string \&string) const =0
+\begin{DoxyCompactList}\small\item\em Outputs a raw response string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Abstract class for anything that can be sent a response. 
+
+Usually the responses come from a \hyperlink{classResponseSource}{Response\+Source}, but anything may send a \hyperlink{classResponseSink}{Response\+Sink} a response. \begin{DoxySeeAlso}{See also}
+\hyperlink{classResponseSource}{Response\+Source} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{io__response_8hpp_source_l00049}{49} of file \hyperlink{io__response_8hpp_source}{io\+\_\+response.\+hpp}.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{\index{Response\+Sink@{Response\+Sink}!Respond@{Respond}}
+\index{Respond@{Respond}!Response\+Sink@{Response\+Sink}}
+\subsubsection[{Respond}]{\setlength{\rightskip}{0pt plus 5cm}void Response\+Sink\+::\+Respond (
+\begin{DoxyParamCaption}
+\item[{{\bf Response\+Code}}]{code, }
+\item[{const std\+::string \&}]{message}
+\end{DoxyParamCaption}
+) const}}\label{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}
+
+
+Outputs a response. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em code} & The response code to emit. \\
+\hline
+{\em message} & The response message. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{io__response_8cpp_source_l00025}{25} of file \hyperlink{io__response_8cpp_source}{io\+\_\+response.\+cpp}.
+
+
+
+References \hyperlink{classResponseSink_a128a514e39f23f2bcc97fea62e9de3c5}{Respond\+Raw()}, and \hyperlink{io__response_8cpp_source_l00013}{R\+E\+S\+P\+O\+N\+S\+E\+S}.
+
+
+
+Referenced by \hyperlink{player__file_8cpp_source_l00018}{Player\+File\+::\+Emit()}, \hyperlink{player__state_8cpp_source_l00052}{Player\+State\+::\+Emit()}, \hyperlink{tokeniser_8cpp_source_l00113}{Tokeniser\+::\+Emit()}, \hyperlink{player__position_8cpp_source_l00067}{Player\+Position\+::\+Emit()}, \hyperlink{player_8cpp_source_l00045}{Player\+::\+Playback\+Update()}, \hyperlink{io__response_8cpp_source_l00033}{Respond\+With\+Error()}, and \hyperlink{player_8cpp_source_l00058}{Player\+::\+Welcome\+Client()}.
+
+
+\begin{DoxyCode}
+00026 \{
+00027     \textcolor{comment}{// ResponseCodes are formatted as "CODE message\(\backslash\)n".}
+00028     \textcolor{comment}{// Delegate the actual sending of the response string to the concrete}
+00029     \textcolor{comment}{// implementation.}
+00030     \hyperlink{classResponseSink_a128a514e39f23f2bcc97fea62e9de3c5}{RespondRaw}(\hyperlink{io__response_8cpp_a9c1b923184d71c13e3dccf3756c20986}{RESPONSES}[static\_cast<int>(code)] + \textcolor{stringliteral}{" "} + message);
+00031 \}
+\end{DoxyCode}
+\hypertarget{classResponseSink_a128a514e39f23f2bcc97fea62e9de3c5}{\index{Response\+Sink@{Response\+Sink}!Respond\+Raw@{Respond\+Raw}}
+\index{Respond\+Raw@{Respond\+Raw}!Response\+Sink@{Response\+Sink}}
+\subsubsection[{Respond\+Raw}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Response\+Sink\+::\+Respond\+Raw (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{string}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [pure virtual]}}}\label{classResponseSink_a128a514e39f23f2bcc97fea62e9de3c5}
+
+
+Outputs a raw response string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em string} & The response string, of the form \char`\"{}\+C\+O\+D\+E message\char`\"{}. \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classTcpResponseSink_a20cbf1820d293f620d6ce030fd5aadc6}{Tcp\+Response\+Sink}, and \hyperlink{classIoReactor_a4cfe12db93bda3f7b2c29436c4969006}{Io\+Reactor}.
+
+
+
+Referenced by \hyperlink{io__response_8cpp_source_l00025}{Respond()}.
+
+\hypertarget{classResponseSink_a42833a0f1f5e250aa7a41e8bb2fdaac9}{\index{Response\+Sink@{Response\+Sink}!Respond\+With\+Error@{Respond\+With\+Error}}
+\index{Respond\+With\+Error@{Respond\+With\+Error}!Response\+Sink@{Response\+Sink}}
+\subsubsection[{Respond\+With\+Error}]{\setlength{\rightskip}{0pt plus 5cm}void Response\+Sink\+::\+Respond\+With\+Error (
+\begin{DoxyParamCaption}
+\item[{const {\bf Error} \&}]{error}
+\end{DoxyParamCaption}
+) const}}\label{classResponseSink_a42833a0f1f5e250aa7a41e8bb2fdaac9}
+
+
+Emits an error as a response. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em error} & The error to convert to a response. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{io__response_8cpp_source_l00033}{33} of file \hyperlink{io__response_8cpp_source}{io\+\_\+response.\+cpp}.
+
+
+
+References \hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546ac2759effffc94bb9acc71d69fe3e8a1f}{F\+A\+I\+L}, \hyperlink{errors_8cpp_source_l00017}{Error\+::\+Message()}, and \hyperlink{io__response_8cpp_source_l00025}{Respond()}.
+
+
+\begin{DoxyCode}
+00034 \{
+00035     \hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{Respond}(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546ac2759effffc94bb9acc71d69fe3e8a1f}{ResponseCode::FAIL}, error.\hyperlink{classError_a006605b13a346cf019f60420f1b29b5a}{Message}());
+00036 \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/io/\hyperlink{io__response_8hpp}{io\+\_\+response.\+hpp}\item 
+src/io/\hyperlink{io__response_8cpp}{io\+\_\+response.\+cpp}\end{DoxyCompactItemize}

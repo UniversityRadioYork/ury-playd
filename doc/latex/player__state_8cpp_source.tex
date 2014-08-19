@@ -1,0 +1,85 @@
+\hypertarget{player__state_8cpp_source}{\section{player\+\_\+state.\+cpp}
+\label{player__state_8cpp_source}\index{src/player/player\+\_\+state.\+cpp@{src/player/player\+\_\+state.\+cpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00011 \textcolor{preprocessor}{#include <algorithm>}
+00012 
+00013 \textcolor{preprocessor}{#include "../io/io\_response.hpp"}
+00014 \textcolor{preprocessor}{#include "\hyperlink{player__state_8hpp}{player\_state.hpp}"}
+00015 \textcolor{preprocessor}{#include "\hyperlink{player_8hpp}{player.hpp}"}
+00016 
+00017 \textcolor{comment}{//}
+00018 \textcolor{comment}{// Player}
+00019 \textcolor{comment}{//}
+00020 
+\hypertarget{player__state_8cpp_source_l00021}{}\hyperlink{classPlayer_aa56e60cd7b83a4aa7ebda1e6ec054f4d}{00021} \textcolor{keywordtype}{bool} \hyperlink{classPlayer_aa56e60cd7b83a4aa7ebda1e6ec054f4d}{Player::CurrentStateIn}(\hyperlink{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{PlayerState::List} states)\textcolor{keyword}{ const}
+00022 \textcolor{keyword}{}\{
+00023     \textcolor{keywordflow}{return} this->\hyperlink{classPlayer_afb60fdad921bce05783ef2709e849c27}{state}.\hyperlink{classPlayerState_aa2c0e603dd57dcc37759d716596ffa33}{In}(states);
+00024 \}
+00025 
+\hypertarget{player__state_8cpp_source_l00026}{}\hyperlink{classPlayer_a0688e00b9fa4699dbe15c370b2703a68}{00026} \textcolor{keywordtype}{bool} \hyperlink{classPlayer_a0688e00b9fa4699dbe15c370b2703a68}{Player::IsRunning}()\textcolor{keyword}{ const}
+00027 \textcolor{keyword}{}\{
+00028     \textcolor{keywordflow}{return} this->\hyperlink{classPlayer_afb60fdad921bce05783ef2709e849c27}{state}.\hyperlink{classPlayerState_aeb19817b9da2f6765b990983f87e1527}{IsRunning}();
+00029 \}
+00030 
+\hypertarget{player__state_8cpp_source_l00031}{}\hyperlink{classPlayer_a92807b30e89ece50e94dac493ee56b51}{00031} \textcolor{keywordtype}{void} \hyperlink{classPlayer_a92807b30e89ece50e94dac493ee56b51}{Player::SetState}(\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{PlayerState::State} state)
+00032 \{
+00033     this->state.Set(state);
+00034 \}
+00035 
+00036 \textcolor{comment}{//}
+00037 \textcolor{comment}{// PlayerState}
+00038 \textcolor{comment}{//}
+00039 
+00040 \textcolor{keyword}{const} \hyperlink{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{PlayerState::List} \hyperlink{classPlayerState_aa5e7203a1fa44e8bceffe65b6ad2c554}{PlayerState::AUDIO\_PLAYING\_STATES}
+       = \{
+00041     \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e}{PlayerState::State::PLAYING}
+00042 \};
+00043 
+00044 \textcolor{keyword}{const} \hyperlink{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{PlayerState::List} \hyperlink{classPlayerState_a850bf90685a377001cfc46808cf017a4}{PlayerState::AUDIO\_LOADED\_STATES} =
+       \{
+00045     \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e}{PlayerState::State::PLAYING}, 
+      \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a09d4d696b4e935115b9313e3c412509a}{PlayerState::State::STOPPED}
+00046 \};
+00047 
+\hypertarget{player__state_8cpp_source_l00048}{}\hyperlink{classPlayerState_a6d3de3f57e9db4ec34e5a7403fc03868}{00048} \hyperlink{classPlayerState_a6d3de3f57e9db4ec34e5a7403fc03868}{PlayerState::PlayerState}() : current(\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{State}::EJECTED)
+00049 \{
+00050 \}
+00051 
+\hypertarget{player__state_8cpp_source_l00052}{}\hyperlink{classPlayerState_aa93a9879688bfbd3d89ac102c079cbfd}{00052} \textcolor{keywordtype}{void} \hyperlink{classPlayerState_aa93a9879688bfbd3d89ac102c079cbfd}{PlayerState::Emit}(\hyperlink{classResponseSink}{ResponseSink} &responder)\textcolor{keyword}{ const}
+00053 \textcolor{keyword}{}\{
+00054     responder.\hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{Respond}(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a2b848a8cc886d253d21a77c43cd50aae}{ResponseCode::STATE},
+00055                       \hyperlink{classPlayerState_af9cd9cd0e2d4c24e59ea11d35bdaff78}{PlayerState::STRINGS}.at(this->\hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current}));
+00056 \}
+00057 
+\hypertarget{player__state_8cpp_source_l00058}{}\hyperlink{classPlayerState_aa2c0e603dd57dcc37759d716596ffa33}{00058} \textcolor{keywordtype}{bool} \hyperlink{classPlayerState_aa2c0e603dd57dcc37759d716596ffa33}{PlayerState::In}(\hyperlink{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{PlayerState::List} states)\textcolor{keyword}{ const}
+00059 \textcolor{keyword}{}\{
+00060     \textcolor{keywordflow}{return} std::find(states.begin(), states.end(), this->\hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current}) !=
+00061            states.end();
+00062 \}
+00063 
+\hypertarget{player__state_8cpp_source_l00064}{}\hyperlink{classPlayerState_aeb19817b9da2f6765b990983f87e1527}{00064} \textcolor{keywordtype}{bool} \hyperlink{classPlayerState_aeb19817b9da2f6765b990983f87e1527}{PlayerState::IsRunning}()\textcolor{keyword}{ const}
+00065 \textcolor{keyword}{}\{
+00066     \textcolor{keywordflow}{return} this->\hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current} != \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230}{State::QUITTING};
+00067 \}
+00068 
+00069 \textcolor{comment}{// Private}
+00070 
+00071 \textcolor{keyword}{const} std::map<PlayerState::State, std::string> \hyperlink{classPlayerState_af9cd9cd0e2d4c24e59ea11d35bdaff78}{PlayerState::STRINGS} = \{
+00072     \{ State::STARTING, \textcolor{stringliteral}{"Starting"} \},
+00073     \{ State::EJECTED, \textcolor{stringliteral}{"Ejected"} \},
+00074     \{ State::STOPPED, \textcolor{stringliteral}{"Stopped"} \},
+00075     \{ State::PLAYING, \textcolor{stringliteral}{"Playing"} \},
+00076     \{ State::QUITTING, \textcolor{stringliteral}{"Quitting"} \}
+00077 \};
+00078 
+\hypertarget{player__state_8cpp_source_l00079}{}\hyperlink{classPlayerState_a822999cf7d4cf72ba77f218906bb8aaa}{00079} \textcolor{keywordtype}{void} \hyperlink{classPlayerState_a822999cf7d4cf72ba77f218906bb8aaa}{PlayerState::Set}(\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{PlayerState::State} state)
+00080 \{
+00081     this->\hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current} = state;
+00082     \hyperlink{classResponseSource_a6e3b93326ee043f6d60510acd08de69b}{Push}();
+00083 \}
+\end{DoxyCode}

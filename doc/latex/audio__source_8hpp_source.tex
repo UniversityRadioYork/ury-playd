@@ -1,0 +1,79 @@
+\hypertarget{audio__source_8hpp_source}{\section{audio\+\_\+source.\+hpp}
+\label{audio__source_8hpp_source}\index{src/audio/audio\+\_\+source.\+hpp@{src/audio/audio\+\_\+source.\+hpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00010 \textcolor{preprocessor}{#ifndef PS\_AUDIO\_SOURCE\_HPP}
+00011 \textcolor{preprocessor}{#define PS\_AUDIO\_SOURCE\_HPP}
+00012 
+00013 \textcolor{preprocessor}{#include <array>}
+00014 \textcolor{preprocessor}{#include <chrono>}
+00015 \textcolor{preprocessor}{#include <cstdint>}
+00016 \textcolor{preprocessor}{#include <functional>}
+00017 \textcolor{preprocessor}{#include <string>}
+00018 \textcolor{preprocessor}{#include <vector>}
+00019 
+00020 \textcolor{preprocessor}{#include <sox.h>}
+00021 
+00022 \textcolor{preprocessor}{#include "../errors.hpp"}
+00023 \textcolor{preprocessor}{#include "../sample\_formats.hpp"}
+00024 
+\hypertarget{audio__source_8hpp_source_l00032}{}\hyperlink{classAudioSource}{00032} \textcolor{keyword}{class }\hyperlink{classAudioSource}{AudioSource} \{
+00033 \textcolor{keyword}{public}:
+\hypertarget{audio__source_8hpp_source_l00035}{}\hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159d}{00035}     \textcolor{keyword}{enum class} \hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159d}{DecodeState} : std::uint8\_t \{
+00037         \hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159da22a62bc6e9b3fff5866c4259f046bad8}{WAITING\_FOR\_FRAME},
+00039         \hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159da9b75f3acd3c3480965b0f5ee466e7f25}{DECODING},
+00041         \hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159da581953f6b20ad7f993b64b1dc632032e}{END\_OF\_FILE}
+00042     \};
+00043 
+\hypertarget{audio__source_8hpp_source_l00045}{}\hyperlink{classAudioSource_a836c61e348dbe7df6ba255669c015303}{00045}     \textcolor{keyword}{using} \hyperlink{classAudioSource_a836c61e348dbe7df6ba255669c015303}{DecodeVector} = std::vector<std::uint8\_t>;
+00046 
+\hypertarget{audio__source_8hpp_source_l00048}{}\hyperlink{classAudioSource_aadbadeba50d982d09cfe0d1e05160ef9}{00048}     \textcolor{keyword}{using} \hyperlink{classAudioSource_aadbadeba50d982d09cfe0d1e05160ef9}{DecodeResult} = std::pair<DecodeState, DecodeVector>;
+00049 
+\hypertarget{audio__source_8hpp_source_l00051}{}\hyperlink{classAudioSource_a1c8138ec9ffb9fd1394d0ad0782d60fa}{00051}     \textcolor{keyword}{using} \hyperlink{classAudioSource_a1c8138ec9ffb9fd1394d0ad0782d60fa}{SampleByteCount} = int;
+00052 
+00058     \hyperlink{classAudioSource_abcb925739a649c30663385a15d83af26}{AudioSource}(\textcolor{keyword}{const} std::string &path);
+00059 
+00061     \hyperlink{classAudioSource_a4d4b2be34ec676bf01d1ca1784f79a07}{~AudioSource}();
+00062 
+00067     std::string \hyperlink{classAudioSource_aea5c3828f1b22a9e103a5d56f9ffa5ec}{Path}() \textcolor{keyword}{const};
+00068 
+00075     \hyperlink{classAudioSource_aadbadeba50d982d09cfe0d1e05160ef9}{DecodeResult} \hyperlink{classAudioSource_a6b5071168332523b68593bc47170f36f}{Decode}();
+00076 
+00081     std::uint8\_t \hyperlink{classAudioSource_a267178b39a3a4d2fc86f41f6a96caf03}{ChannelCount}() \textcolor{keyword}{const};
+00082 
+00088     \textcolor{keywordtype}{double} \hyperlink{classAudioSource_aee0c4889919554f3c947a217f4436378}{SampleRate}() \textcolor{keyword}{const};
+00089 
+00094     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{SampleFormat} \hyperlink{classAudioSource_aa6c567c4e2f3c6673d2a289d84aedae0}{OutputSampleFormat}() \textcolor{keyword}{const};
+00095 
+00100     \textcolor{keywordtype}{size\_t} \hyperlink{classAudioSource_af63c7249c1cf8d4ef86274ea2fdc1f26}{BufferSampleCapacity}() \textcolor{keyword}{const};
+00101 
+00108     \textcolor{keywordtype}{size\_t} \hyperlink{classAudioSource_ae6eb4d0fc3d1d60375edc2745b635818}{BytesPerSample}() \textcolor{keyword}{const};
+00109 
+00116     std::uint64\_t \hyperlink{classAudioSource_ad8639603fb59d21f5c1369707f16975c}{Seek}(std::chrono::microseconds position);
+00117 
+00123     std::uint64\_t \hyperlink{classAudioSource_ac0a5d14505c36238d4a8a465122ff06e}{SamplePositionFromMicroseconds}(
+00124                     std::chrono::microseconds position) \textcolor{keyword}{const};
+00125 
+00131     std::chrono::microseconds \hyperlink{classAudioSource_aa9c0d4b60adfc1470a560bbb8e66aaf8}{MicrosecondPositionFromSamples}(
+00132                     std::uint64\_t samples) \textcolor{keyword}{const};
+00133 
+00134 \textcolor{keyword}{private}:
+\hypertarget{audio__source_8hpp_source_l00136}{}\hyperlink{classAudioSource_a9c269c8d9c633bcd11d596c1ba3fd575}{00136}     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} \hyperlink{classAudioSource_a9c269c8d9c633bcd11d596c1ba3fd575}{BUFFER\_SIZE};
+00137 
+\hypertarget{audio__source_8hpp_source_l00140}{}\hyperlink{classAudioSource_abe3899ebe685335a84c5bfee5a20a96f}{00140}     \hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159d}{DecodeState} \hyperlink{classAudioSource_abe3899ebe685335a84c5bfee5a20a96f}{decode\_state};
+00141 
+\hypertarget{audio__source_8hpp_source_l00142}{}\hyperlink{classAudioSource_ad278f3b315e3ad91add683d5eda48a03}{00142}     std::vector<uint8\_t> \hyperlink{classAudioSource_ad278f3b315e3ad91add683d5eda48a03}{buffer}; 
+00143 
+\hypertarget{audio__source_8hpp_source_l00145}{}\hyperlink{classAudioSource_a2bbce89d4bef9cf46b1113de3245655a}{00145}     sox\_format\_t *\hyperlink{classAudioSource_a2bbce89d4bef9cf46b1113de3245655a}{context};
+00146 
+00151     \textcolor{keywordtype}{void} \hyperlink{classAudioSource_a9b10234d7c9f29b17008b4dc3eab2a71}{Open}(\textcolor{keyword}{const} std::string &path);
+00152 
+00154     \textcolor{keywordtype}{void} \hyperlink{classAudioSource_a46444de950d02ac35a695ad167fed2f4}{Close}();
+00155 \};
+00156 
+00157 \textcolor{preprocessor}{#endif // PS\_AUDIO\_SOURCE\_HPP}
+\end{DoxyCode}

@@ -1,0 +1,133 @@
+\hypertarget{audio_8cpp_source}{\section{audio.\+cpp}
+\label{audio_8cpp_source}\index{src/audio/audio.\+cpp@{src/audio/audio.\+cpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00010 \textcolor{preprocessor}{#include <algorithm>}
+00011 \textcolor{preprocessor}{#include <cassert>}
+00012 \textcolor{preprocessor}{#include <climits>}
+00013 \textcolor{preprocessor}{#include <string>}
+00014 
+00015 \textcolor{preprocessor}{#include "../errors.hpp"}
+00016 \textcolor{preprocessor}{#include "../sample\_formats.hpp"}
+00017 \textcolor{preprocessor}{#include "../messages.h"}
+00018 \textcolor{preprocessor}{#include "\hyperlink{audio_8hpp}{audio.hpp}"}
+00019 \textcolor{preprocessor}{#include "\hyperlink{audio__sink_8hpp}{audio\_sink.hpp}"}
+00020 \textcolor{preprocessor}{#include "\hyperlink{audio__source_8hpp}{audio\_source.hpp}"}
+00021 
+\hypertarget{audio_8cpp_source_l00022}{}\hyperlink{classAudio_a05b36040e9d4ea4327de7c04f2e9d6ba}{00022} \hyperlink{classAudio_a05b36040e9d4ea4327de7c04f2e9d6ba}{Audio::Audio}(\hyperlink{classAudioSource}{AudioSource} *source, \hyperlink{classAudioSink}{AudioSink} *sink) : source(source), sink(
+      sink)
+00023 \{
+00024     \hyperlink{classAudio_ad35726949e5de23e62024eba476c7ecf}{ClearFrame}();
+00025 \}
+00026 
+\hypertarget{audio_8cpp_source_l00027}{}\hyperlink{classAudio_a07d67a424301e3e859e78fe30fb05d68}{00027} std::string \hyperlink{classAudio_a07d67a424301e3e859e78fe30fb05d68}{Audio::Path}()\textcolor{keyword}{ const}
+00028 \textcolor{keyword}{}\{
+00029     assert(this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source} != \textcolor{keyword}{nullptr});
+00030     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}->Path();
+00031 \}
+00032 
+\hypertarget{audio_8cpp_source_l00033}{}\hyperlink{classAudio_a545c9a12f31bc6964ac90bbf2358ada2}{00033} \textcolor{keywordtype}{void} \hyperlink{classAudio_a545c9a12f31bc6964ac90bbf2358ada2}{Audio::Start}()
+00034 \{
+00035     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->Start();
+00036 \}
+00037 
+\hypertarget{audio_8cpp_source_l00038}{}\hyperlink{classAudio_a1bd980bcdd3778875b019d7352e75754}{00038} \textcolor{keywordtype}{void} \hyperlink{classAudio_a1bd980bcdd3778875b019d7352e75754}{Audio::Stop}()
+00039 \{
+00040     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->Stop();
+00041 \}
+00042 
+\hypertarget{audio_8cpp_source_l00043}{}\hyperlink{classAudio_ac05b824652de67714008e891b77dc362}{00043} \textcolor{keywordtype}{bool} \hyperlink{classAudio_ac05b824652de67714008e891b77dc362}{Audio::IsStopped}()
+00044 \{
+00045     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->IsStopped();
+00046 \}
+00047 
+\hypertarget{audio_8cpp_source_l00048}{}\hyperlink{classAudio_a992b812a2b1f8456f92ca61ec97e4f80}{00048} std::chrono::microseconds \hyperlink{classAudio_a992b812a2b1f8456f92ca61ec97e4f80}{Audio::CurrentPositionMicroseconds}()
+00049 \{
+00050     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}->MicrosecondPositionFromSamples(
+00051                     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->Position());
+00052 \}
+00053 
+\hypertarget{audio_8cpp_source_l00054}{}\hyperlink{classAudio_a3f9b62150a4acb519f47d6d633a33353}{00054} \textcolor{keywordtype}{void} \hyperlink{classAudio_a3f9b62150a4acb519f47d6d633a33353}{Audio::SeekToPositionMicroseconds}(std::chrono::microseconds 
+      microseconds)
+00055 \{
+00056     \textcolor{keyword}{auto} samples = this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}->Seek(microseconds);
+00057     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->SetPosition(samples);
+00058     \hyperlink{classAudio_ad35726949e5de23e62024eba476c7ecf}{ClearFrame}();
+00059 \}
+00060 
+\hypertarget{audio_8cpp_source_l00061}{}\hyperlink{classAudio_ad35726949e5de23e62024eba476c7ecf}{00061} \textcolor{keywordtype}{void} \hyperlink{classAudio_ad35726949e5de23e62024eba476c7ecf}{Audio::ClearFrame}()
+00062 \{
+00063     this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.clear();
+00064     this->\hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\_iterator} = this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.end();
+00065     this->\hyperlink{classAudio_acec4f6ef3a89f170bdaed5670efd092c}{file\_ended} = \textcolor{keyword}{false};
+00066 \}
+00067 
+\hypertarget{audio_8cpp_source_l00068}{}\hyperlink{classAudio_a6db65dd8ffbd616d3f5dc81b5144c864}{00068} \textcolor{keywordtype}{bool} \hyperlink{classAudio_a6db65dd8ffbd616d3f5dc81b5144c864}{Audio::Update}()
+00069 \{
+00070     \textcolor{keywordtype}{bool} more\_frames\_available = \hyperlink{classAudio_a3d7e118920b983906dc915428242df2e}{DecodeIfFrameEmpty}();
+00071 
+00072     \textcolor{keywordflow}{if} (!\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{FrameFinished}()) \{
+00073         \hyperlink{classAudio_a9657995aa27bef00b6880f5a7bafd629}{TransferFrame}();
+00074     \}
+00075 
+00076     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->SetInputReady(more\_frames\_available);
+00077     this->\hyperlink{classAudio_acec4f6ef3a89f170bdaed5670efd092c}{file\_ended} = !more\_frames\_available;
+00078     \textcolor{keywordflow}{return} more\_frames\_available;
+00079 \}
+00080 
+\hypertarget{audio_8cpp_source_l00081}{}\hyperlink{classAudio_a9657995aa27bef00b6880f5a7bafd629}{00081} \textcolor{keywordtype}{void} \hyperlink{classAudio_a9657995aa27bef00b6880f5a7bafd629}{Audio::TransferFrame}()
+00082 \{
+00083     assert(!this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.empty());
+00084 
+00085     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->Transfer(this->\hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\_iterator}, this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.end());
+00086 
+00087     \textcolor{comment}{// We empty the frame once we're done with it.  This}
+00088     \textcolor{comment}{// maintains FrameFinished(), as an empty frame is a finished one.}
+00089     \textcolor{keywordflow}{if} (\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{FrameFinished}()) \{
+00090         \hyperlink{classAudio_ad35726949e5de23e62024eba476c7ecf}{ClearFrame}();
+00091         assert(\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{FrameFinished}());
+00092     \}
+00093 
+00094     \textcolor{comment}{// The frame iterator should be somewhere between the beginning and}
+00095     \textcolor{comment}{// end of the frame, unless the frame was emptied.}
+00096     assert(this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.empty() ||
+00097            (this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.begin() <= this->\hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\_iterator} &&
+00098             this->\hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\_iterator} < this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.end()));
+00099 \}
+00100 
+\hypertarget{audio_8cpp_source_l00101}{}\hyperlink{classAudio_a3d7e118920b983906dc915428242df2e}{00101} \textcolor{keywordtype}{bool} \hyperlink{classAudio_a3d7e118920b983906dc915428242df2e}{Audio::DecodeIfFrameEmpty}()
+00102 \{
+00103     \textcolor{comment}{// Either the current frame is in progress, or has been emptied.}
+00104     \textcolor{comment}{// AdvanceFrameIterator() establishes this assertion by emptying a}
+00105     \textcolor{comment}{// frame as soon as it finishes.}
+00106     assert(this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.empty() || !\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{FrameFinished}());
+00107 
+00108     \textcolor{keywordtype}{bool} more\_frames\_available = \textcolor{keyword}{true};
+00109 
+00110     \textcolor{keywordflow}{if} (\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{FrameFinished}()) \{
+00111         \hyperlink{classAudioSource_aadbadeba50d982d09cfe0d1e05160ef9}{AudioSource::DecodeResult} result = this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}->Decode();
+00112 
+00113         this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame} = result.second;
+00114         this->\hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\_iterator} = this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.begin();
+00115 
+00116         more\_frames\_available = result.first !=
+00117                                 \hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159da581953f6b20ad7f993b64b1dc632032e}{AudioSource::DecodeState::END\_OF\_FILE};
+00118     \}
+00119 
+00120     \textcolor{keywordflow}{return} more\_frames\_available;
+00121 \}
+00122 
+\hypertarget{audio_8cpp_source_l00123}{}\hyperlink{classAudio_a55e15a8f6e55f018a60fb477959801e5}{00123} \textcolor{keywordtype}{bool} \hyperlink{classAudio_a55e15a8f6e55f018a60fb477959801e5}{Audio::FileEnded}()
+00124 \{
+00125     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_acec4f6ef3a89f170bdaed5670efd092c}{file\_ended};
+00126 \}
+00127 
+\hypertarget{audio_8cpp_source_l00128}{}\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{00128} \textcolor{keywordtype}{bool} \hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{Audio::FrameFinished}()
+00129 \{
+00130     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.end() <= this->\hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\_iterator};
+00131 \}
+\end{DoxyCode}

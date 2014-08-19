@@ -1,0 +1,52 @@
+\hypertarget{time__parser_8hpp_source}{\section{time\+\_\+parser.\+hpp}
+\label{time__parser_8hpp_source}\index{src/time\+\_\+parser.\+hpp@{src/time\+\_\+parser.\+hpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00009 \textcolor{preprocessor}{#ifndef PS\_TIME\_PARSER\_HPP}
+00010 \textcolor{preprocessor}{#define PS\_TIME\_PARSER\_HPP}
+00011 
+00012 \textcolor{preprocessor}{#include <chrono>}
+00013 \textcolor{preprocessor}{#include <cstdint>}
+00014 \textcolor{preprocessor}{#include <sstream>}
+00015 
+00021 \textcolor{keyword}{template} <\textcolor{keyword}{typename} OutUnit, \textcolor{keyword}{typename} IntType = std::u\textcolor{keywordtype}{int}64\_t>
+\hypertarget{time__parser_8hpp_source_l00022}{}\hyperlink{classTimeParser}{00022} \textcolor{keyword}{class }\hyperlink{classTimeParser}{TimeParser} \{
+00023 \textcolor{keyword}{public}:
+\hypertarget{time__parser_8hpp_source_l00029}{}\hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{00029}     \textcolor{keyword}{using} \hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{UnitMap} = std::map<std::string, std::function<OutUnit(IntType)>>;
+00030 
+\hypertarget{time__parser_8hpp_source_l00036}{}\hyperlink{classTimeParser_a66c6443db8e5d38b8f3d7e7a4eea783a}{00036}     \hyperlink{classTimeParser_a66c6443db8e5d38b8f3d7e7a4eea783a}{TimeParser}(\textcolor{keyword}{const} \hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{UnitMap} &\hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{unit\_map}) : unit\_map(unit\_map)
+00037     \{
+00038     \}
+00039 
+00054     \textcolor{keyword}{template} <\textcolor{keyword}{typename} InUnit>
+\hypertarget{time__parser_8hpp_source_l00055}{}\hyperlink{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}{00055}     \textcolor{keyword}{static} OutUnit \hyperlink{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}{MkTime}(IntType raw\_time)
+00056     \{
+00057         \textcolor{keywordflow}{return} std::chrono::duration\_cast<OutUnit>(InUnit(raw\_time));
+00058     \}
+00059 
+\hypertarget{time__parser_8hpp_source_l00065}{}\hyperlink{classTimeParser_a68110dc8c7d2ad1a8f47a29646ad4d1c}{00065}     OutUnit \hyperlink{classTimeParser_a68110dc8c7d2ad1a8f47a29646ad4d1c}{Parse}(\textcolor{keyword}{const} std::string &time\_str)\textcolor{keyword}{ const}
+00066 \textcolor{keyword}{    }\{
+00067         \textcolor{keyword}{auto} seek = \hyperlink{classTimeParser_a3f7f36a669233d66e7fe1ca8405eefd5}{Split}(time\_str);
+00068         \textcolor{keywordflow}{return} \hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{unit\_map}.at(seek.first)(seek.second);
+00069     \}
+00070 
+00071 \textcolor{keyword}{private}:
+\hypertarget{time__parser_8hpp_source_l00072}{}\hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{00072}     \hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{UnitMap} \hyperlink{classTimeParser_a98bb2b31f6ad5210139bc87ef7ad0121}{unit\_map}; 
+00073 
+\hypertarget{time__parser_8hpp_source_l00080}{}\hyperlink{classTimeParser_a3f7f36a669233d66e7fe1ca8405eefd5}{00080}     std::pair<std::string, IntType> \hyperlink{classTimeParser_a3f7f36a669233d66e7fe1ca8405eefd5}{Split}(\textcolor{keyword}{const} std::string &time\_str)\textcolor{keyword}{ const}
+00081 \textcolor{keyword}{    }\{
+00082         std::istringstream is(time\_str);
+00083         IntType raw\_time;
+00084         std::string rest;
+00085 
+00086         is >> raw\_time >> rest;
+00087         \textcolor{keywordflow}{return} std::make\_pair(rest, raw\_time);
+00088     \}
+00089 \};
+00090 
+00091 \textcolor{preprocessor}{#endif // PS\_TIME\_PARSER\_HPP}
+\end{DoxyCode}

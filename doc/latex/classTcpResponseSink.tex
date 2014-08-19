@@ -1,0 +1,237 @@
+\hypertarget{classTcpResponseSink}{\section{Tcp\+Response\+Sink Class Reference}
+\label{classTcpResponseSink}\index{Tcp\+Response\+Sink@{Tcp\+Response\+Sink}}
+}
+
+
+A T\+C\+P connection from a client.  
+
+
+
+
+{\ttfamily \#include $<$io\+\_\+reactor.\+hpp$>$}
+
+
+
+Inheritance diagram for Tcp\+Response\+Sink\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=183pt]{classTcpResponseSink__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Tcp\+Response\+Sink\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classTcpResponseSink__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classTcpResponseSink_aebb4578dd7b9ff9d414c936a27d0969f}{Tcp\+Response\+Sink} (\hyperlink{classIoReactor}{Io\+Reactor} \&\hyperlink{classTcpResponseSink_a190e607290f6ba6b3655c99e44a5e56e}{parent}, uv\+\_\+tcp\+\_\+t $\ast$\hyperlink{classTcpResponseSink_afa43e15736053cef76fbf27bdc3197a9}{tcp}, \hyperlink{classCommandHandler}{Command\+Handler} \&handler)
+\begin{DoxyCompactList}\small\item\em Constructs a \hyperlink{classTcpResponseSink}{Tcp\+Response\+Sink}. \end{DoxyCompactList}\item 
+void \hyperlink{classTcpResponseSink_a20cbf1820d293f620d6ce030fd5aadc6}{Respond\+Raw} (const std\+::string \&response) const override
+\begin{DoxyCompactList}\small\item\em Outputs a raw response string. \end{DoxyCompactList}\item 
+void \hyperlink{classTcpResponseSink_a9ee277599dbd6cfc5853a9145f21694b}{Read} (uv\+\_\+stream\+\_\+t $\ast$stream, ssize\+\_\+t nread, const uv\+\_\+buf\+\_\+t $\ast$buf)
+\begin{DoxyCompactList}\small\item\em Processes a data read on this connection. \end{DoxyCompactList}\item 
+void \hyperlink{classTcpResponseSink_a2e40c526177918ade20bec1e4f66698a}{Close} ()
+\begin{DoxyCompactList}\small\item\em Closes this connection. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classTcpResponseSink_a190e607290f6ba6b3655c99e44a5e56e}{\hyperlink{classIoReactor}{Io\+Reactor} \& \hyperlink{classTcpResponseSink_a190e607290f6ba6b3655c99e44a5e56e}{parent}}\label{classTcpResponseSink_a190e607290f6ba6b3655c99e44a5e56e}
+
+\begin{DoxyCompactList}\small\item\em The parent \hyperlink{classIoReactor}{Io\+Reactor} on which this connection is running. \end{DoxyCompactList}\item 
+\hypertarget{classTcpResponseSink_afa43e15736053cef76fbf27bdc3197a9}{uv\+\_\+tcp\+\_\+t $\ast$ \hyperlink{classTcpResponseSink_afa43e15736053cef76fbf27bdc3197a9}{tcp}}\label{classTcpResponseSink_afa43e15736053cef76fbf27bdc3197a9}
+
+\begin{DoxyCompactList}\small\item\em The libuv handle for the T\+C\+P connection. \end{DoxyCompactList}\item 
+\hypertarget{classTcpResponseSink_ab289c592752e4c1fdc7d38cc9d6c2aab}{\hyperlink{classTokeniser}{Tokeniser} \hyperlink{classTcpResponseSink_ab289c592752e4c1fdc7d38cc9d6c2aab}{tokeniser}}\label{classTcpResponseSink_ab289c592752e4c1fdc7d38cc9d6c2aab}
+
+\begin{DoxyCompactList}\small\item\em The \hyperlink{classTokeniser}{Tokeniser} to which data read on this connection should be sent. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+A T\+C\+P connection from a client. 
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000003}{Todo}]Rename to Connection? \end{DoxyRefDesc}
+
+
+Definition at line \hyperlink{io__reactor_8hpp_source_l00126}{126} of file \hyperlink{io__reactor_8hpp_source}{io\+\_\+reactor.\+hpp}.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classTcpResponseSink_aebb4578dd7b9ff9d414c936a27d0969f}{\index{Tcp\+Response\+Sink@{Tcp\+Response\+Sink}!Tcp\+Response\+Sink@{Tcp\+Response\+Sink}}
+\index{Tcp\+Response\+Sink@{Tcp\+Response\+Sink}!Tcp\+Response\+Sink@{Tcp\+Response\+Sink}}
+\subsubsection[{Tcp\+Response\+Sink}]{\setlength{\rightskip}{0pt plus 5cm}Tcp\+Response\+Sink\+::\+Tcp\+Response\+Sink (
+\begin{DoxyParamCaption}
+\item[{{\bf Io\+Reactor} \&}]{parent, }
+\item[{uv\+\_\+tcp\+\_\+t $\ast$}]{tcp, }
+\item[{{\bf Command\+Handler} \&}]{handler}
+\end{DoxyParamCaption}
+)}}\label{classTcpResponseSink_aebb4578dd7b9ff9d414c936a27d0969f}
+
+
+Constructs a \hyperlink{classTcpResponseSink}{Tcp\+Response\+Sink}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em parent} & The \hyperlink{classIoReactor}{Io\+Reactor} that is the parent of this connection. \\
+\hline
+{\em tcp} & The underlying libuv T\+C\+P stream. \\
+\hline
+{\em handler} & The handler to which read commands should be sent. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{io__reactor_8cpp_source_l00192}{192} of file \hyperlink{io__reactor_8cpp_source}{io\+\_\+reactor.\+cpp}.
+
+
+\begin{DoxyCode}
+00194     : \hyperlink{classTcpResponseSink_a190e607290f6ba6b3655c99e44a5e56e}{parent}(parent), \hyperlink{classTcpResponseSink_afa43e15736053cef76fbf27bdc3197a9}{tcp}(\hyperlink{classTcpResponseSink_afa43e15736053cef76fbf27bdc3197a9}{tcp}), \hyperlink{classTcpResponseSink_ab289c592752e4c1fdc7d38cc9d6c2aab}{tokeniser}(handler, *\textcolor{keyword}{this})
+00195 \{
+00196 \}
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTcpResponseSink_a2e40c526177918ade20bec1e4f66698a}{\index{Tcp\+Response\+Sink@{Tcp\+Response\+Sink}!Close@{Close}}
+\index{Close@{Close}!Tcp\+Response\+Sink@{Tcp\+Response\+Sink}}
+\subsubsection[{Close}]{\setlength{\rightskip}{0pt plus 5cm}void Tcp\+Response\+Sink\+::\+Close (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classTcpResponseSink_a2e40c526177918ade20bec1e4f66698a}
+
+
+Closes this connection. 
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000006}{Todo}]Roll into the destructor/use R\+A\+I\+I? \end{DoxyRefDesc}
+
+
+Definition at line \hyperlink{io__reactor_8cpp_source_l00230}{230} of file \hyperlink{io__reactor_8cpp_source}{io\+\_\+reactor.\+cpp}.
+
+
+
+References \hyperlink{io__reactor_8hpp_source_l00158}{parent}, and \hyperlink{io__reactor_8cpp_source_l00133}{Io\+Reactor\+::\+Remove\+Connection()}.
+
+
+
+Referenced by \hyperlink{io__reactor_8cpp_source_l00064}{Uv\+Close\+Callback()}.
+
+
+\begin{DoxyCode}
+00231 \{
+00232     this->\hyperlink{classTcpResponseSink_a190e607290f6ba6b3655c99e44a5e56e}{parent}.\hyperlink{classIoReactor_af31bb722acf08d10eaa46ea7a1a5d4ca}{RemoveConnection}(*\textcolor{keyword}{this});
+00233 \}
+\end{DoxyCode}
+\hypertarget{classTcpResponseSink_a9ee277599dbd6cfc5853a9145f21694b}{\index{Tcp\+Response\+Sink@{Tcp\+Response\+Sink}!Read@{Read}}
+\index{Read@{Read}!Tcp\+Response\+Sink@{Tcp\+Response\+Sink}}
+\subsubsection[{Read}]{\setlength{\rightskip}{0pt plus 5cm}void Tcp\+Response\+Sink\+::\+Read (
+\begin{DoxyParamCaption}
+\item[{uv\+\_\+stream\+\_\+t $\ast$}]{stream, }
+\item[{ssize\+\_\+t}]{nread, }
+\item[{const uv\+\_\+buf\+\_\+t $\ast$}]{buf}
+\end{DoxyParamCaption}
+)}}\label{classTcpResponseSink_a9ee277599dbd6cfc5853a9145f21694b}
+
+
+Processes a data read on this connection. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em stream} & The libuv T\+C\+P/\+I\+P stream providing the data. \\
+\hline
+{\em nread} & The number of bytes read. \\
+\hline
+{\em buf} & The buffer containing the read data. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{io__reactor_8cpp_source_l00213}{213} of file \hyperlink{io__reactor_8cpp_source}{io\+\_\+reactor.\+cpp}.
+
+
+
+References \hyperlink{tokeniser_8cpp_source_l00026}{Tokeniser\+::\+Feed()}, \hyperlink{io__reactor_8hpp_source_l00164}{tokeniser}, and \hyperlink{io__reactor_8cpp_source_l00064}{Uv\+Close\+Callback()}.
+
+
+
+Referenced by \hyperlink{io__reactor_8cpp_source_l00075}{Uv\+Read\+Callback()}.
+
+
+\begin{DoxyCode}
+00215 \{
+00216     \textcolor{keywordflow}{if} (nread < 0) \{
+00217         \textcolor{keywordflow}{if} (nread == UV\_EOF) \{
+00218             uv\_close((uv\_handle\_t *)stream, \hyperlink{io__reactor_8cpp_ab85791c3e9c737453047decfbb7388f4}{UvCloseCallback});
+00219         \}
+00220 
+00221         \textcolor{keywordflow}{return};
+00222     \}
+00223 
+00224     \textcolor{keywordflow}{if} (buf->base != \textcolor{keyword}{nullptr}) \{
+00225         this->\hyperlink{classTcpResponseSink_ab289c592752e4c1fdc7d38cc9d6c2aab}{tokeniser}.\hyperlink{classTokeniser_ab4b8f1238c89d766a1d72f0ee619406d}{Feed}(buf->base, nread);
+00226         \textcolor{keyword}{delete}[] buf->base;
+00227     \}
+00228 \}
+\end{DoxyCode}
+\hypertarget{classTcpResponseSink_a20cbf1820d293f620d6ce030fd5aadc6}{\index{Tcp\+Response\+Sink@{Tcp\+Response\+Sink}!Respond\+Raw@{Respond\+Raw}}
+\index{Respond\+Raw@{Respond\+Raw}!Tcp\+Response\+Sink@{Tcp\+Response\+Sink}}
+\subsubsection[{Respond\+Raw}]{\setlength{\rightskip}{0pt plus 5cm}void Tcp\+Response\+Sink\+::\+Respond\+Raw (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{string}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}}\label{classTcpResponseSink_a20cbf1820d293f620d6ce030fd5aadc6}
+
+
+Outputs a raw response string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em string} & The response string, of the form \char`\"{}\+C\+O\+D\+E message\char`\"{}. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classResponseSink_a128a514e39f23f2bcc97fea62e9de3c5}{Response\+Sink}.
+
+
+
+Definition at line \hyperlink{io__reactor_8cpp_source_l00198}{198} of file \hyperlink{io__reactor_8cpp_source}{io\+\_\+reactor.\+cpp}.
+
+
+
+References \hyperlink{io__reactor_8cpp_source_l00054}{Write\+Req\+::buf}, \hyperlink{io__reactor_8hpp_source_l00161}{tcp}, and \hyperlink{io__reactor_8cpp_source_l00092}{Uv\+Respond\+Callback()}.
+
+
+\begin{DoxyCode}
+00199 \{
+00200     \hyperlink{classDebug}{Debug}() << \textcolor{stringliteral}{"Sending command:"} << \textcolor{keywordtype}{string} << std::endl;
+00201     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} l = \textcolor{keywordtype}{string}.length();
+00202     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *s = \textcolor{keywordtype}{string}.c\_str();
+00203 
+00204     \hyperlink{structWriteReq}{WriteReq} *req = \textcolor{keyword}{new} \hyperlink{structWriteReq}{WriteReq};
+00205     req->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf} = uv\_buf\_init(\textcolor{keyword}{new} \textcolor{keywordtype}{char}[l + 1], l + 1);
+00206     memcpy(req->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf}.base, s, l);
+00207     req->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf}.base[l] = \textcolor{charliteral}{'\(\backslash\)n'};
+00208 
+00209     uv\_write((uv\_write\_t *)req, (uv\_stream\_t *)\hyperlink{classTcpResponseSink_afa43e15736053cef76fbf27bdc3197a9}{tcp}, &req->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf}, 1,
+00210              \hyperlink{io__reactor_8cpp_af58ed397c8d93bffdc01b621d4abaa8c}{UvRespondCallback});
+00211 \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/io/\hyperlink{io__reactor_8hpp}{io\+\_\+reactor.\+hpp}\item 
+src/io/\hyperlink{io__reactor_8cpp}{io\+\_\+reactor.\+cpp}\end{DoxyCompactItemize}

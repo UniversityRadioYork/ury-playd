@@ -1,0 +1,81 @@
+\hypertarget{sample__formats_8hpp}{\section{src/sample\+\_\+formats.hpp File Reference}
+\label{sample__formats_8hpp}\index{src/sample\+\_\+formats.\+hpp@{src/sample\+\_\+formats.\+hpp}}
+}
+
+
+The Sample\+Format enumeration.  
+
+
+{\ttfamily \#include $<$cstdint$>$}\\*
+Include dependency graph for sample\+\_\+formats.\+hpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{sample__formats_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sample__formats_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{Sample\+Format} \+: std\+::uint8\+\_\+t \{ \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a0f083be5e0e503eb0830e26687f00cf2}{Sample\+Format\+::\+P\+A\+C\+K\+E\+D\+\_\+\+U\+N\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+8}, 
+\hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a3bc6c5371607364846832278d3d39965}{Sample\+Format\+::\+P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+16}, 
+\hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae222eded89afdf8cf763bb1a58a04fc0}{Sample\+Format\+::\+P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+32}, 
+\hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae58d6feb65720ac0b7e1158a2debcf7d}{Sample\+Format\+::\+P\+A\+C\+K\+E\+D\+\_\+\+F\+L\+O\+A\+T\+\_\+32}
+ \}
+\begin{DoxyCompactList}\small\item\em Sample formats available in playd. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The Sample\+Format enumeration. 
+
+
+
+Definition in file \hyperlink{sample__formats_8hpp_source}{sample\+\_\+formats.\+hpp}.
+
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{\index{sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}!Sample\+Format@{Sample\+Format}}
+\index{Sample\+Format@{Sample\+Format}!sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}}
+\subsubsection[{Sample\+Format}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Sample\+Format} \+: std\+::uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}}\label{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}
+
+
+Sample formats available in playd. 
+
+This is the intersection of those sample formats available in ffmpeg and Port\+Audio. In the future, if and when other input and output libraries are used/supported, this may change.
+
+Packed formats are those where each sample contains each audio channel, one packed after the other. Planar formats use separate runs of samples for each channel (each channel has its own sample plane). For the most part, playd deals in the former, resampling instances of the latter. \begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{P\+A\+C\+K\+E\+D\+\_\+\+U\+N\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+8@{P\+A\+C\+K\+E\+D\+\_\+\+U\+N\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+8}!sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}}\index{sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}!P\+A\+C\+K\+E\+D\+\_\+\+U\+N\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+8@{P\+A\+C\+K\+E\+D\+\_\+\+U\+N\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+8}}\item[{\em 
+\hypertarget{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a0f083be5e0e503eb0830e26687f00cf2}{P\+A\+C\+K\+E\+D\+\_\+\+U\+N\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+8}\label{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a0f083be5e0e503eb0830e26687f00cf2}
+}]Packed 8-\/bit unsigned integer. \index{P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+16@{P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+16}!sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}}\index{sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}!P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+16@{P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+16}}\item[{\em 
+\hypertarget{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a3bc6c5371607364846832278d3d39965}{P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+16}\label{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a3bc6c5371607364846832278d3d39965}
+}]Packed 16-\/bit signed integer. \index{P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+32@{P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+32}!sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}}\index{sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}!P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+32@{P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+32}}\item[{\em 
+\hypertarget{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae222eded89afdf8cf763bb1a58a04fc0}{P\+A\+C\+K\+E\+D\+\_\+\+S\+I\+G\+N\+E\+D\+\_\+\+I\+N\+T\+\_\+32}\label{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae222eded89afdf8cf763bb1a58a04fc0}
+}]Packed 32-\/bit signed integer. \index{P\+A\+C\+K\+E\+D\+\_\+\+F\+L\+O\+A\+T\+\_\+32@{P\+A\+C\+K\+E\+D\+\_\+\+F\+L\+O\+A\+T\+\_\+32}!sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}}\index{sample\+\_\+formats.\+hpp@{sample\+\_\+formats.\+hpp}!P\+A\+C\+K\+E\+D\+\_\+\+F\+L\+O\+A\+T\+\_\+32@{P\+A\+C\+K\+E\+D\+\_\+\+F\+L\+O\+A\+T\+\_\+32}}\item[{\em 
+\hypertarget{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae58d6feb65720ac0b7e1158a2debcf7d}{P\+A\+C\+K\+E\+D\+\_\+\+F\+L\+O\+A\+T\+\_\+32}\label{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae58d6feb65720ac0b7e1158a2debcf7d}
+}]Packed 32-\/bit floating point. \end{description}
+\end{Desc}
+
+
+Definition at line \hyperlink{sample__formats_8hpp_source_l00026}{26} of file \hyperlink{sample__formats_8hpp_source}{sample\+\_\+formats.\+hpp}.
+
+
+\begin{DoxyCode}
+00026                         : std::uint8\_t \{
+00027     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a0f083be5e0e503eb0830e26687f00cf2}{PACKED\_UNSIGNED\_INT\_8}, 
+00028     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a3bc6c5371607364846832278d3d39965}{PACKED\_SIGNED\_INT\_16},  
+00029     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae222eded89afdf8cf763bb1a58a04fc0}{PACKED\_SIGNED\_INT\_32},  
+00030     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae58d6feb65720ac0b7e1158a2debcf7d}{PACKED\_FLOAT\_32}        
+00031 \};
+\end{DoxyCode}

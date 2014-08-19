@@ -1,0 +1,301 @@
+\hypertarget{classPlayerFile}{\section{Player\+File Class Reference}
+\label{classPlayerFile}\index{Player\+File@{Player\+File}}
+}
+
+
+The subcomponent of a \hyperlink{classPlayer}{Player} that stores the audio file.  
+
+
+
+
+{\ttfamily \#include $<$player\+\_\+file.\+hpp$>$}
+
+
+
+Inheritance diagram for Player\+File\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{classPlayerFile__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Player\+File\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classPlayerFile__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classPlayerFile_a655a5bf6903cad650c0dc4e33a7e41a5}{Player\+File} (const \hyperlink{classAudioSystem}{Audio\+System} \&\hyperlink{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}{audio\+\_\+system})
+\begin{DoxyCompactList}\small\item\em Constructs a new \hyperlink{classPlayerFile}{Player\+File}. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerFile_a92dd004d4ab034bf41f7d5c76847d3c2}{Load} (const std\+::string \&path)
+\begin{DoxyCompactList}\small\item\em Opens a file and stores it in this \hyperlink{classPlayerFile}{Player\+File}. \end{DoxyCompactList}\item 
+\hypertarget{classPlayerFile_a426f8ad29efd5e16ac7963354087d070}{void \hyperlink{classPlayerFile_a426f8ad29efd5e16ac7963354087d070}{Start} ()}\label{classPlayerFile_a426f8ad29efd5e16ac7963354087d070}
+
+\begin{DoxyCompactList}\small\item\em Starts the current file. \end{DoxyCompactList}\item 
+\hypertarget{classPlayerFile_afd4313009b5d51df0df5dc7b59ffcf13}{void \hyperlink{classPlayerFile_afd4313009b5d51df0df5dc7b59ffcf13}{Stop} ()}\label{classPlayerFile_afd4313009b5d51df0df5dc7b59ffcf13}
+
+\begin{DoxyCompactList}\small\item\em Stops the current file. \end{DoxyCompactList}\item 
+\hypertarget{classPlayerFile_a394b2e7b4f4d0baee4ff1928a36e9945}{void \hyperlink{classPlayerFile_a394b2e7b4f4d0baee4ff1928a36e9945}{Eject} ()}\label{classPlayerFile_a394b2e7b4f4d0baee4ff1928a36e9945}
+
+\begin{DoxyCompactList}\small\item\em Ejects the current file. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerFile_a00f044c74d07d778532953a917c24197}{Emit} (\hyperlink{classResponseSink}{Response\+Sink} \&sink) const override
+\begin{DoxyCompactList}\small\item\em Emits the current filename to a \hyperlink{classResponseSink}{Response\+Sink}. \end{DoxyCompactList}\item 
+bool \hyperlink{classPlayerFile_a43d903e65213d3a6b2c8b38924c83c5f}{Is\+Stopped} ()
+\begin{DoxyCompactList}\small\item\em Checks to see if the file has stopped playing. \end{DoxyCompactList}\item 
+\hypertarget{classPlayerFile_afe0b43a6980e548a6faa87f84d22d65b}{void \hyperlink{classPlayerFile_afe0b43a6980e548a6faa87f84d22d65b}{Update} ()}\label{classPlayerFile_afe0b43a6980e548a6faa87f84d22d65b}
+
+\begin{DoxyCompactList}\small\item\em Updates the file (performing a round of decoding on it, etc.). \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename R $>$ }\\R \hyperlink{classPlayerFile_a072d9788c1449e0e2de3e28b169f2c34}{Current\+Position} ()
+\begin{DoxyCompactList}\small\item\em Return the current position, as a std\+::chrono\+::duration. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename R $>$ }\\void \hyperlink{classPlayerFile_a8c270134404d83fe6c9e844abeacf3e5}{Seek\+To\+Position} (R position)
+\begin{DoxyCompactList}\small\item\em Seek to a position expressed as a std\+::chrono\+::duration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{std\+::unique\+\_\+ptr$<$ \hyperlink{classAudio}{Audio} $>$ \hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio}}\label{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}
+
+\begin{DoxyCompactList}\small\item\em The audio file. \end{DoxyCompactList}\item 
+\hypertarget{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}{const \hyperlink{classAudioSystem}{Audio\+System} \& \hyperlink{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}{audio\+\_\+system}}\label{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}
+
+\begin{DoxyCompactList}\small\item\em The audio system responsible for creating audio files. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+The subcomponent of a \hyperlink{classPlayer}{Player} that stores the audio file. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classPlayer}{Player} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{player__file_8hpp_source_l00024}{24} of file \hyperlink{player__file_8hpp_source}{player\+\_\+file.\+hpp}.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classPlayerFile_a655a5bf6903cad650c0dc4e33a7e41a5}{\index{Player\+File@{Player\+File}!Player\+File@{Player\+File}}
+\index{Player\+File@{Player\+File}!Player\+File@{Player\+File}}
+\subsubsection[{Player\+File}]{\setlength{\rightskip}{0pt plus 5cm}Player\+File\+::\+Player\+File (
+\begin{DoxyParamCaption}
+\item[{const {\bf Audio\+System} \&}]{audio\+\_\+system}
+\end{DoxyParamCaption}
+)}}\label{classPlayerFile_a655a5bf6903cad650c0dc4e33a7e41a5}
+
+
+Constructs a new \hyperlink{classPlayerFile}{Player\+File}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em audio\+\_\+system} & The audio system to use when loading \hyperlink{classAudio}{Audio}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{player__file_8cpp_source_l00013}{13} of file \hyperlink{player__file_8cpp_source}{player\+\_\+file.\+cpp}.
+
+
+\begin{DoxyCode}
+00014     : \hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio}(\textcolor{keyword}{nullptr}), \hyperlink{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}{audio\_system}(audio\_system)
+00015 \{
+00016 \}
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classPlayerFile_a072d9788c1449e0e2de3e28b169f2c34}{\index{Player\+File@{Player\+File}!Current\+Position@{Current\+Position}}
+\index{Current\+Position@{Current\+Position}!Player\+File@{Player\+File}}
+\subsubsection[{Current\+Position}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename R $>$ R Player\+File\+::\+Current\+Position (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classPlayerFile_a072d9788c1449e0e2de3e28b169f2c34}
+
+
+Return the current position, as a std\+::chrono\+::duration. 
+
+\begin{DoxyReturn}{Returns}
+The current position in the audio. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{player__file_8hpp_source_l00071}{71} of file \hyperlink{player__file_8hpp_source}{player\+\_\+file.\+hpp}.
+
+
+
+References \hyperlink{player__file_8hpp_source_l00088}{audio}.
+
+
+
+Referenced by \hyperlink{player__position_8cpp_source_l00026}{Player\+::\+Update\+Position()}.
+
+
+\begin{DoxyCode}
+00072     \{
+00073         \textcolor{keywordflow}{return} this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio}->CurrentPosition<R>();
+00074     \}
+\end{DoxyCode}
+\hypertarget{classPlayerFile_a00f044c74d07d778532953a917c24197}{\index{Player\+File@{Player\+File}!Emit@{Emit}}
+\index{Emit@{Emit}!Player\+File@{Player\+File}}
+\subsubsection[{Emit}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+File\+::\+Emit (
+\begin{DoxyParamCaption}
+\item[{{\bf Response\+Sink} \&}]{sink}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}}\label{classPlayerFile_a00f044c74d07d778532953a917c24197}
+
+
+Emits the current filename to a \hyperlink{classResponseSink}{Response\+Sink}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sink} & The \hyperlink{classResponseSink}{Response\+Sink} to which a F\+I\+L\+E response shall be sent. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classResponseSource_a498ee53cca912cdb6d48043108c39dc1}{Response\+Source}.
+
+
+
+Definition at line \hyperlink{player__file_8cpp_source_l00018}{18} of file \hyperlink{player__file_8cpp_source}{player\+\_\+file.\+cpp}.
+
+
+
+References \hyperlink{player__file_8hpp_source_l00088}{audio}, \hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a9fc5887c030f7a3e19821ebec457e719}{F\+I\+L\+E}, and \hyperlink{io__response_8cpp_source_l00025}{Response\+Sink\+::\+Respond()}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00058}{Player\+::\+Welcome\+Client()}.
+
+
+\begin{DoxyCode}
+00019 \{
+00020     \textcolor{keywordflow}{if} (this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio} != \textcolor{keyword}{nullptr}) \{
+00021         sink.\hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{Respond}(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a9fc5887c030f7a3e19821ebec457e719}{ResponseCode::FILE}, this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio}->Path());
+00022     \}
+00023 \}
+\end{DoxyCode}
+\hypertarget{classPlayerFile_a43d903e65213d3a6b2c8b38924c83c5f}{\index{Player\+File@{Player\+File}!Is\+Stopped@{Is\+Stopped}}
+\index{Is\+Stopped@{Is\+Stopped}!Player\+File@{Player\+File}}
+\subsubsection[{Is\+Stopped}]{\setlength{\rightskip}{0pt plus 5cm}bool Player\+File\+::\+Is\+Stopped (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classPlayerFile_a43d903e65213d3a6b2c8b38924c83c5f}
+
+
+Checks to see if the file has stopped playing. 
+
+\begin{DoxyReturn}{Returns}
+True if the file has stopped; false otherwise. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classPlayerFile_a426f8ad29efd5e16ac7963354087d070}{Start} 
+
+\hyperlink{classPlayerFile_afd4313009b5d51df0df5dc7b59ffcf13}{Stop} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{player__file_8cpp_source_l00056}{56} of file \hyperlink{player__file_8cpp_source}{player\+\_\+file.\+cpp}.
+
+
+
+References \hyperlink{player__file_8hpp_source_l00088}{audio}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00045}{Player\+::\+Playback\+Update()}.
+
+
+\begin{DoxyCode}
+00057 \{
+00058     assert(this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio} != \textcolor{keyword}{nullptr});
+00059     \textcolor{keywordflow}{return} this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio}->IsStopped();
+00060 \}
+\end{DoxyCode}
+\hypertarget{classPlayerFile_a92dd004d4ab034bf41f7d5c76847d3c2}{\index{Player\+File@{Player\+File}!Load@{Load}}
+\index{Load@{Load}!Player\+File@{Player\+File}}
+\subsubsection[{Load}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+File\+::\+Load (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{path}
+\end{DoxyParamCaption}
+)}}\label{classPlayerFile_a92dd004d4ab034bf41f7d5c76847d3c2}
+
+
+Opens a file and stores it in this \hyperlink{classPlayerFile}{Player\+File}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & The absolute path to a track to load. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{player__file_8cpp_source_l00025}{25} of file \hyperlink{player__file_8cpp_source}{player\+\_\+file.\+cpp}.
+
+
+
+References \hyperlink{player__file_8hpp_source_l00088}{audio}, \hyperlink{player__file_8hpp_source_l00091}{audio\+\_\+system}, \hyperlink{player__file_8cpp_source_l00033}{Eject()}, and \hyperlink{audio__system_8cpp_source_l00083}{Audio\+System\+::\+Load()}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00089}{Player\+::\+Load()}.
+
+
+\begin{DoxyCode}
+00026 \{
+00027     \textcolor{keywordflow}{if} (this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio} != \textcolor{keyword}{nullptr}) \{
+00028         \hyperlink{classPlayerFile_a394b2e7b4f4d0baee4ff1928a36e9945}{Eject}();
+00029     \}
+00030     this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio} = decltype(this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio})(this->\hyperlink{classPlayerFile_a8de47bcb924e2c3e10b208a09eb3f05b}{audio\_system}.
+      \hyperlink{classAudioSystem_a2172608177d2bd54377bfc3c61cd117d}{Load}(path));
+00031 \}
+\end{DoxyCode}
+\hypertarget{classPlayerFile_a8c270134404d83fe6c9e844abeacf3e5}{\index{Player\+File@{Player\+File}!Seek\+To\+Position@{Seek\+To\+Position}}
+\index{Seek\+To\+Position@{Seek\+To\+Position}!Player\+File@{Player\+File}}
+\subsubsection[{Seek\+To\+Position}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename R $>$ void Player\+File\+::\+Seek\+To\+Position (
+\begin{DoxyParamCaption}
+\item[{R}]{position}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classPlayerFile_a8c270134404d83fe6c9e844abeacf3e5}
+
+
+Seek to a position expressed as a std\+::chrono\+::duration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em position} & The position to seek to in the audio. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{player__file_8hpp_source_l00081}{81} of file \hyperlink{player__file_8hpp_source}{player\+\_\+file.\+hpp}.
+
+
+
+References \hyperlink{player__file_8hpp_source_l00088}{audio}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00134}{Player\+::\+Seek()}.
+
+
+\begin{DoxyCode}
+00082     \{
+00083         this->\hyperlink{classPlayerFile_a649de02845f72a9d326b5942596ecd6b}{audio}->SeekToPosition<R>(position);
+00084     \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/player/\hyperlink{player__file_8hpp}{player\+\_\+file.\+hpp}\item 
+src/player/\hyperlink{player__file_8cpp}{player\+\_\+file.\+cpp}\end{DoxyCompactItemize}

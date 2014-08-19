@@ -1,0 +1,22 @@
+\hypertarget{sample__formats_8hpp_source}{\section{sample\+\_\+formats.\+hpp}
+\label{sample__formats_8hpp_source}\index{src/sample\+\_\+formats.\+hpp@{src/sample\+\_\+formats.\+hpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00009 \textcolor{preprocessor}{#include <cstdint>}
+00010 
+00011 \textcolor{preprocessor}{#ifndef PS\_SAMPLE\_FORMATS\_HPP}
+00012 \textcolor{preprocessor}{#define PS\_SAMPLE\_FORMATS\_HPP}
+00013 
+\hypertarget{sample__formats_8hpp_source_l00026}{}\hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{00026} \textcolor{keyword}{enum class} \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{SampleFormat} : std::uint8\_t \{
+00027     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a0f083be5e0e503eb0830e26687f00cf2}{PACKED\_UNSIGNED\_INT\_8}, 
+00028     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772a3bc6c5371607364846832278d3d39965}{PACKED\_SIGNED\_INT\_16},  
+00029     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae222eded89afdf8cf763bb1a58a04fc0}{PACKED\_SIGNED\_INT\_32},  
+00030     \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772ae58d6feb65720ac0b7e1158a2debcf7d}{PACKED\_FLOAT\_32}        
+00031 \};
+00032 
+00033 \textcolor{preprocessor}{#endif // PS\_SAMPLE\_FORMATS\_HPP}
+\end{DoxyCode}

@@ -1,0 +1,208 @@
+\hypertarget{io__reactor_8cpp_source}{\section{io\+\_\+reactor.\+cpp}
+\label{io__reactor_8cpp_source}\index{src/io/io\+\_\+reactor.\+cpp@{src/io/io\+\_\+reactor.\+cpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00017 \textcolor{preprocessor}{#include <csignal>}
+00018 \textcolor{preprocessor}{#include <cstring>}
+00019 \textcolor{preprocessor}{#include <string>}
+00020 
+00021 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00022 \textcolor{preprocessor}{#include <uv.h>}
+00023 \}
+00024 
+00025 \textcolor{preprocessor}{#include "../cmd.hpp"}
+00026 \textcolor{preprocessor}{#include "../errors.hpp"}
+00027 \textcolor{preprocessor}{#include "../messages.h"}
+00028 \textcolor{preprocessor}{#include "../player/player.hpp"}
+00029 \textcolor{preprocessor}{#include "\hyperlink{io__reactor_8hpp}{io\_reactor.hpp}"}
+00030 \textcolor{preprocessor}{#include "\hyperlink{io__response_8hpp}{io\_response.hpp}"}
+00031 
+00032 \textcolor{keyword}{const} std::uint16\_t \hyperlink{classIoReactor_a1d8cc56deaa2e801347c21e6490d4f5c}{IoReactor::PLAYER\_UPDATE\_PERIOD} = 5; \textcolor{comment}{// ms}
+00033 
+00034 \textcolor{comment}{//}
+00035 \textcolor{comment}{// libuv callbacks}
+00036 \textcolor{comment}{//}
+00037 \textcolor{comment}{// These should generally trampoline back into class methods.}
+00038 \textcolor{comment}{//}
+00039 
+\hypertarget{io__reactor_8cpp_source_l00052}{}\hyperlink{structWriteReq}{00052} \textcolor{keyword}{struct }\hyperlink{structWriteReq}{WriteReq} \{
+\hypertarget{io__reactor_8cpp_source_l00053}{}\hyperlink{structWriteReq_a1ce5132e8813190d079864301a54090e}{00053}     uv\_write\_t \hyperlink{structWriteReq_a1ce5132e8813190d079864301a54090e}{req}; 
+\hypertarget{io__reactor_8cpp_source_l00054}{}\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{00054}     uv\_buf\_t \hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf};   
+00055 \};
+00056 
+\hypertarget{io__reactor_8cpp_source_l00058}{}\hyperlink{io__reactor_8cpp_ab0c51a1d8447db72e81a13d45448b85f}{00058} \textcolor{keywordtype}{void} \hyperlink{io__reactor_8cpp_ab0c51a1d8447db72e81a13d45448b85f}{UvAlloc}(uv\_handle\_t *, \textcolor{keywordtype}{size\_t} suggested\_size, uv\_buf\_t *buf)
+00059 \{
+00060     *buf = uv\_buf\_init(\textcolor{keyword}{new} \textcolor{keywordtype}{char}[suggested\_size](), suggested\_size);
+00061 \}
+00062 
+\hypertarget{io__reactor_8cpp_source_l00064}{}\hyperlink{io__reactor_8cpp_ab85791c3e9c737453047decfbb7388f4}{00064} \textcolor{keywordtype}{void} \hyperlink{io__reactor_8cpp_ab85791c3e9c737453047decfbb7388f4}{UvCloseCallback}(uv\_handle\_t *handle)
+00065 \{
+00066     \hyperlink{classDebug}{Debug}() << \textcolor{stringliteral}{"Closing client connection"} << std::endl;
+00067     \textcolor{keywordflow}{if} (handle->data != \textcolor{keyword}{nullptr}) \{
+00068         \textcolor{keyword}{auto} tcp = \textcolor{keyword}{static\_cast<}\hyperlink{classTcpResponseSink}{TcpResponseSink} *\textcolor{keyword}{>}(handle->data);
+00069         tcp->\hyperlink{classTcpResponseSink_a2e40c526177918ade20bec1e4f66698a}{Close}();
+00070     \}
+00071     \textcolor{keyword}{delete} handle;
+00072 \}
+00073 
+\hypertarget{io__reactor_8cpp_source_l00075}{}\hyperlink{io__reactor_8cpp_a8c1937e7aebd228e6a5eab19f1add9f9}{00075} \textcolor{keywordtype}{void} \hyperlink{io__reactor_8cpp_a8c1937e7aebd228e6a5eab19f1add9f9}{UvReadCallback}(uv\_stream\_t *stream, ssize\_t nread, \textcolor{keyword}{const} uv\_buf\_t *buf)
+00076 \{
+00077     \hyperlink{classTcpResponseSink}{TcpResponseSink} *tcp = \textcolor{keyword}{static\_cast<}\hyperlink{classTcpResponseSink}{TcpResponseSink} *\textcolor{keyword}{>}(stream->data);
+00078     tcp->\hyperlink{classTcpResponseSink_a9ee277599dbd6cfc5853a9145f21694b}{Read}(stream, nread, buf);
+00079 \}
+00080 
+\hypertarget{io__reactor_8cpp_source_l00082}{}\hyperlink{io__reactor_8cpp_ab1a411534cf6420d24748b0e78927ebf}{00082} \textcolor{keywordtype}{void} \hyperlink{io__reactor_8cpp_ab1a411534cf6420d24748b0e78927ebf}{UvListenCallback}(uv\_stream\_t *server, \textcolor{keywordtype}{int} status)
+00083 \{
+00084     \textcolor{keywordflow}{if} (status == -1) \{
+00085         \textcolor{keywordflow}{return};
+00086     \}
+00087     \hyperlink{classIoReactor}{IoReactor} *reactor = \textcolor{keyword}{static\_cast<}\hyperlink{classIoReactor}{IoReactor} *\textcolor{keyword}{>}(server->data);
+00088     reactor->\hyperlink{classIoReactor_a535c6ff0899391afc02c87b1dfe7c6e2}{NewConnection}(server);
+00089 \}
+00090 
+\hypertarget{io__reactor_8cpp_source_l00092}{}\hyperlink{io__reactor_8cpp_af58ed397c8d93bffdc01b621d4abaa8c}{00092} \textcolor{keywordtype}{void} \hyperlink{io__reactor_8cpp_af58ed397c8d93bffdc01b621d4abaa8c}{UvRespondCallback}(uv\_write\_t *req, \textcolor{keywordtype}{int})
+00093 \{
+00094     \textcolor{comment}{// TODO: Handle the int status?}
+00095     \hyperlink{structWriteReq}{WriteReq} *wr = (\hyperlink{structWriteReq}{WriteReq} *)req;
+00096     \textcolor{keyword}{delete}[] wr->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf}.base;
+00097     \textcolor{keyword}{delete} wr;
+00098 \}
+00099 
+\hypertarget{io__reactor_8cpp_source_l00101}{}\hyperlink{io__reactor_8cpp_a4bdadddb08a579d655018f6fa0ac908e}{00101} \textcolor{keywordtype}{void} \hyperlink{io__reactor_8cpp_a4bdadddb08a579d655018f6fa0ac908e}{UvUpdateTimerCallback}(uv\_timer\_t *handle)
+00102 \{
+00103     \hyperlink{classPlayer}{Player} *player = \textcolor{keyword}{static\_cast<}\hyperlink{classPlayer}{Player} *\textcolor{keyword}{>}(handle->data);
+00104     \textcolor{keywordtype}{bool} running = player->\hyperlink{classPlayer_a91f887a024035be5030aa4b3384705fa}{Update}();
+00105     \textcolor{keywordflow}{if} (!running) \{
+00106         uv\_stop(uv\_default\_loop());
+00107     \}
+00108 \}
+00109 
+00110 \textcolor{comment}{//}
+00111 \textcolor{comment}{// IoReactor}
+00112 \textcolor{comment}{//}
+00113 
+\hypertarget{io__reactor_8cpp_source_l00114}{}\hyperlink{classIoReactor_a535c6ff0899391afc02c87b1dfe7c6e2}{00114} \textcolor{keywordtype}{void} \hyperlink{classIoReactor_a535c6ff0899391afc02c87b1dfe7c6e2}{IoReactor::NewConnection}(uv\_stream\_t *server)
+00115 \{
+00116     uv\_tcp\_t *client = \textcolor{keyword}{new} uv\_tcp\_t();
+00117     uv\_tcp\_init(uv\_default\_loop(), client);
+00118 
+00119     \textcolor{keywordflow}{if} (uv\_accept(server, (uv\_stream\_t *)client) == 0) \{
+00120         \hyperlink{classDebug}{Debug}() << \textcolor{stringliteral}{"New connection"} << std::endl;
+00121         \textcolor{keyword}{auto} tcp = std::make\_shared<TcpResponseSink>(*\textcolor{keyword}{this}, client,
+00122                                                      this->\hyperlink{classIoReactor_a81bf838edb7adf1edcb992bfe61d6b78}{handler});
+00123         this->\hyperlink{classIoReactor_a795397b36da55b59bff63b455a344dea}{player}.\hyperlink{classPlayer_aac35c9a49758150d5c5e0ea2fcd94d16}{WelcomeClient}(*tcp);
+00124         this->\hyperlink{classIoReactor_a15617cf44d3c50d5c2d31e8b1812e140}{connections}.insert(tcp);
+00125         client->data = \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void} *\textcolor{keyword}{>}(tcp.get());
+00126 
+00127         uv\_read\_start((uv\_stream\_t *)client, \hyperlink{io__reactor_8cpp_ab0c51a1d8447db72e81a13d45448b85f}{UvAlloc}, \hyperlink{io__reactor_8cpp_a8c1937e7aebd228e6a5eab19f1add9f9}{UvReadCallback});
+00128     \} \textcolor{keywordflow}{else} \{
+00129         uv\_close((uv\_handle\_t *)client, \hyperlink{io__reactor_8cpp_ab85791c3e9c737453047decfbb7388f4}{UvCloseCallback});
+00130     \}
+00131 \}
+00132 
+\hypertarget{io__reactor_8cpp_source_l00133}{}\hyperlink{classIoReactor_af31bb722acf08d10eaa46ea7a1a5d4ca}{00133} \textcolor{keywordtype}{void} \hyperlink{classIoReactor_af31bb722acf08d10eaa46ea7a1a5d4ca}{IoReactor::RemoveConnection}(\hyperlink{classTcpResponseSink}{TcpResponseSink} &conn)
+00134 \{
+00135     this->\hyperlink{classIoReactor_a15617cf44d3c50d5c2d31e8b1812e140}{connections}.erase(std::make\_shared<TcpResponseSink>(conn));
+00136 \}
+00137 
+\hypertarget{io__reactor_8cpp_source_l00138}{}\hyperlink{classIoReactor_aace954427c447c73caf6b8dbcd367284}{00138} \hyperlink{classIoReactor_aace954427c447c73caf6b8dbcd367284}{IoReactor::IoReactor}(\hyperlink{classPlayer}{Player} &player, \hyperlink{classCommandHandler}{CommandHandler} &handler,
+00139                      \textcolor{keyword}{const} std::string &address, \textcolor{keyword}{const} std::string &port)
+00140     : player(player), handler(handler)
+00141 \{
+00142     \hyperlink{classIoReactor_aab8269bf4512c4c74a56998898b3144e}{InitAcceptor}(address, port);
+00143     \hyperlink{classIoReactor_a8a586b8e9545e79db8dc9bca3657388f}{DoUpdateTimer}();
+00144 \}
+00145 
+\hypertarget{io__reactor_8cpp_source_l00146}{}\hyperlink{classIoReactor_a23f583f9964a6f3f38f983b40f7ae10d}{00146} \textcolor{keywordtype}{void} \hyperlink{classIoReactor_a23f583f9964a6f3f38f983b40f7ae10d}{IoReactor::Run}()
+00147 \{
+00148     uv\_run(uv\_default\_loop(), UV\_RUN\_DEFAULT);
+00149 \}
+00150 
+\hypertarget{io__reactor_8cpp_source_l00151}{}\hyperlink{classIoReactor_a8a586b8e9545e79db8dc9bca3657388f}{00151} \textcolor{keywordtype}{void} \hyperlink{classIoReactor_a8a586b8e9545e79db8dc9bca3657388f}{IoReactor::DoUpdateTimer}()
+00152 \{
+00153     uv\_timer\_init(uv\_default\_loop(), &this->\hyperlink{classIoReactor_a6364acb721e4a7a1374070e317074bbc}{updater});
+00154     this->\hyperlink{classIoReactor_a6364acb721e4a7a1374070e317074bbc}{updater}.data = \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void} *\textcolor{keyword}{>}(&this->\hyperlink{classIoReactor_a795397b36da55b59bff63b455a344dea}{player});
+00155     uv\_timer\_start(&this->\hyperlink{classIoReactor_a6364acb721e4a7a1374070e317074bbc}{updater}, \hyperlink{io__reactor_8cpp_a4bdadddb08a579d655018f6fa0ac908e}{UvUpdateTimerCallback}, 0,
+00156                    \hyperlink{classIoReactor_a1d8cc56deaa2e801347c21e6490d4f5c}{PLAYER\_UPDATE\_PERIOD});
+00157 \}
+00158 
+\hypertarget{io__reactor_8cpp_source_l00159}{}\hyperlink{classIoReactor_aab8269bf4512c4c74a56998898b3144e}{00159} \textcolor{keywordtype}{void} \hyperlink{classIoReactor_aab8269bf4512c4c74a56998898b3144e}{IoReactor::InitAcceptor}(\textcolor{keyword}{const} std::string &address,
+00160                              \textcolor{keyword}{const} std::string &port)
+00161 \{
+00162     \textcolor{keywordtype}{int} uport = std::stoi(port);
+00163 
+00164     uv\_tcp\_init(uv\_default\_loop(), &this->\hyperlink{classIoReactor_a4c9c61af246fda7db1bdd4e2b3170c66}{server});
+00165     this->\hyperlink{classIoReactor_a4c9c61af246fda7db1bdd4e2b3170c66}{server}.data = \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void} *\textcolor{keyword}{>}(\textcolor{keyword}{this});
+00166 
+00167     \textcolor{keyword}{struct }sockaddr\_in bind\_addr;
+00168     uv\_ip4\_addr(address.c\_str(), uport, &bind\_addr);
+00169     uv\_tcp\_bind(&this->\hyperlink{classIoReactor_a4c9c61af246fda7db1bdd4e2b3170c66}{server}, (\textcolor{keyword}{const} sockaddr *)&bind\_addr, 0);
+00170 
+00171     \textcolor{comment}{// TODO: Handle errors from uv\_listen.}
+00172     uv\_listen((uv\_stream\_t *)&this->\hyperlink{classIoReactor_a4c9c61af246fda7db1bdd4e2b3170c66}{server}, 128, \hyperlink{io__reactor_8cpp_ab1a411534cf6420d24748b0e78927ebf}{UvListenCallback});
+00173     \hyperlink{classDebug}{Debug}() << \textcolor{stringliteral}{"Listening at"} << address << \textcolor{stringliteral}{"on"} << port << std::endl;
+00174 \}
+00175 
+\hypertarget{io__reactor_8cpp_source_l00176}{}\hyperlink{classIoReactor_a4cfe12db93bda3f7b2c29436c4969006}{00176} \textcolor{keywordtype}{void} \hyperlink{classIoReactor_a4cfe12db93bda3f7b2c29436c4969006}{IoReactor::RespondRaw}(\textcolor{keyword}{const} std::string &\textcolor{keywordtype}{string})\textcolor{keyword}{ const}
+00177 \textcolor{keyword}{}\{
+00178     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &conn : this->\hyperlink{classIoReactor_a15617cf44d3c50d5c2d31e8b1812e140}{connections}) \{
+00179         conn->RespondRaw(\textcolor{keywordtype}{string});
+00180     \}
+00181 \}
+00182 
+\hypertarget{io__reactor_8cpp_source_l00183}{}\hyperlink{classIoReactor_a3566c7200adb102579d2c330a2cbf91d}{00183} \textcolor{keywordtype}{void} \hyperlink{classIoReactor_a3566c7200adb102579d2c330a2cbf91d}{IoReactor::End}()
+00184 \{
+00185     uv\_stop(uv\_default\_loop());
+00186 \}
+00187 
+00188 \textcolor{comment}{//}
+00189 \textcolor{comment}{// TcpResponseSink}
+00190 \textcolor{comment}{//}
+00191 
+\hypertarget{io__reactor_8cpp_source_l00192}{}\hyperlink{classTcpResponseSink_aebb4578dd7b9ff9d414c936a27d0969f}{00192} \hyperlink{classTcpResponseSink_aebb4578dd7b9ff9d414c936a27d0969f}{TcpResponseSink::TcpResponseSink}(\hyperlink{classIoReactor}{IoReactor} &parent, uv\_tcp\_t *tcp,
+00193                                  \hyperlink{classCommandHandler}{CommandHandler} &handler)
+00194     : parent(parent), tcp(tcp), tokeniser(handler, *this)
+00195 \{
+00196 \}
+00197 
+\hypertarget{io__reactor_8cpp_source_l00198}{}\hyperlink{classTcpResponseSink_a20cbf1820d293f620d6ce030fd5aadc6}{00198} \textcolor{keywordtype}{void} \hyperlink{classTcpResponseSink_a20cbf1820d293f620d6ce030fd5aadc6}{TcpResponseSink::RespondRaw}(\textcolor{keyword}{const} std::string &\textcolor{keywordtype}{string})\textcolor{keyword}{ const}
+00199 \textcolor{keyword}{}\{
+00200     \hyperlink{classDebug}{Debug}() << \textcolor{stringliteral}{"Sending command:"} << \textcolor{keywordtype}{string} << std::endl;
+00201     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} l = \textcolor{keywordtype}{string}.length();
+00202     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *s = \textcolor{keywordtype}{string}.c\_str();
+00203 
+00204     \hyperlink{structWriteReq}{WriteReq} *req = \textcolor{keyword}{new} \hyperlink{structWriteReq}{WriteReq};
+00205     req->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf} = uv\_buf\_init(\textcolor{keyword}{new} \textcolor{keywordtype}{char}[l + 1], l + 1);
+00206     memcpy(req->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf}.base, s, l);
+00207     req->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf}.base[l] = \textcolor{charliteral}{'\(\backslash\)n'};
+00208 
+00209     uv\_write((uv\_write\_t *)req, (uv\_stream\_t *)\hyperlink{classTcpResponseSink_afa43e15736053cef76fbf27bdc3197a9}{tcp}, &req->\hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf}, 1,
+00210              \hyperlink{io__reactor_8cpp_af58ed397c8d93bffdc01b621d4abaa8c}{UvRespondCallback});
+00211 \}
+00212 
+\hypertarget{io__reactor_8cpp_source_l00213}{}\hyperlink{classTcpResponseSink_a9ee277599dbd6cfc5853a9145f21694b}{00213} \textcolor{keywordtype}{void} \hyperlink{classTcpResponseSink_a9ee277599dbd6cfc5853a9145f21694b}{TcpResponseSink::Read}(uv\_stream\_t *stream, ssize\_t nread,
+00214                            \textcolor{keyword}{const} uv\_buf\_t *buf)
+00215 \{
+00216     \textcolor{keywordflow}{if} (nread < 0) \{
+00217         \textcolor{keywordflow}{if} (nread == UV\_EOF) \{
+00218             uv\_close((uv\_handle\_t *)stream, \hyperlink{io__reactor_8cpp_ab85791c3e9c737453047decfbb7388f4}{UvCloseCallback});
+00219         \}
+00220 
+00221         \textcolor{keywordflow}{return};
+00222     \}
+00223 
+00224     \textcolor{keywordflow}{if} (buf->base != \textcolor{keyword}{nullptr}) \{
+00225         this->\hyperlink{classTcpResponseSink_ab289c592752e4c1fdc7d38cc9d6c2aab}{tokeniser}.\hyperlink{classTokeniser_ab4b8f1238c89d766a1d72f0ee619406d}{Feed}(buf->base, nread);
+00226         \textcolor{keyword}{delete}[] buf->base;
+00227     \}
+00228 \}
+00229 
+\hypertarget{io__reactor_8cpp_source_l00230}{}\hyperlink{classTcpResponseSink_a2e40c526177918ade20bec1e4f66698a}{00230} \textcolor{keywordtype}{void} \hyperlink{classTcpResponseSink_a2e40c526177918ade20bec1e4f66698a}{TcpResponseSink::Close}()
+00231 \{
+00232     this->\hyperlink{classTcpResponseSink_a190e607290f6ba6b3655c99e44a5e56e}{parent}.\hyperlink{classIoReactor_af31bb722acf08d10eaa46ea7a1a5d4ca}{RemoveConnection}(*\textcolor{keyword}{this});
+00233 \}
+\end{DoxyCode}

@@ -1,0 +1,532 @@
+\hypertarget{classAudio}{\section{Audio Class Reference}
+\label{classAudio}\index{Audio@{Audio}}
+}
+
+
+An audio file.  
+
+
+
+
+{\ttfamily \#include $<$audio.\+hpp$>$}
+
+
+
+Collaboration diagram for Audio\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classAudio__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classAudio_a05b36040e9d4ea4327de7c04f2e9d6ba}{Audio} (\hyperlink{classAudioSource}{Audio\+Source} $\ast$\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}, \hyperlink{classAudioSink}{Audio\+Sink} $\ast$\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink})
+\begin{DoxyCompactList}\small\item\em Constructs an \hyperlink{classAudio}{Audio} from a source and a sink. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{classAudio_a07d67a424301e3e859e78fe30fb05d68}{Path} () const 
+\begin{DoxyCompactList}\small\item\em Gets the file-\/path of this audio file. \end{DoxyCompactList}\item 
+void \hyperlink{classAudio_a545c9a12f31bc6964ac90bbf2358ada2}{Start} ()
+\begin{DoxyCompactList}\small\item\em Starts playback of this audio file. \end{DoxyCompactList}\item 
+void \hyperlink{classAudio_a1bd980bcdd3778875b019d7352e75754}{Stop} ()
+\begin{DoxyCompactList}\small\item\em Stops playback of this audio file. \end{DoxyCompactList}\item 
+bool \hyperlink{classAudio_a6db65dd8ffbd616d3f5dc81b5144c864}{Update} ()
+\begin{DoxyCompactList}\small\item\em Performs an update cycle on this \hyperlink{classAudio}{Audio}. \end{DoxyCompactList}\item 
+bool \hyperlink{classAudio_ac05b824652de67714008e891b77dc362}{Is\+Stopped} ()
+\begin{DoxyCompactList}\small\item\em Checks to see if audio playback has stopped. \end{DoxyCompactList}\item 
+bool \hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{Frame\+Finished} ()
+\begin{DoxyCompactList}\small\item\em Returns whether the current frame has been finished. \end{DoxyCompactList}\item 
+bool \hyperlink{classAudio_a55e15a8f6e55f018a60fb477959801e5}{File\+Ended} ()
+\begin{DoxyCompactList}\small\item\em Returns whether the audio file has ended. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename R $>$ }\\R \hyperlink{classAudio_a5cdd89a7f22612f23e3a6fb36c7f451f}{Current\+Position} ()
+\begin{DoxyCompactList}\small\item\em Return the current position, as a std\+::chrono\+::duration. \end{DoxyCompactList}\item 
+std\+::chrono\+::microseconds \hyperlink{classAudio_a992b812a2b1f8456f92ca61ec97e4f80}{Current\+Position\+Microseconds} ()
+\begin{DoxyCompactList}\small\item\em Gets the current played position in the song, in microseconds. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename R $>$ }\\void \hyperlink{classAudio_a5b27592a425fb3e1732c04f9654dd644}{Seek\+To\+Position} (R position)
+\begin{DoxyCompactList}\small\item\em Seek to a position expressed as a std\+::chrono\+::duration. \end{DoxyCompactList}\item 
+void \hyperlink{classAudio_a3f9b62150a4acb519f47d6d633a33353}{Seek\+To\+Position\+Microseconds} (std\+::chrono\+::microseconds microseconds)
+\begin{DoxyCompactList}\small\item\em Attempts to seek to the given position in microseconds. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAudio_ad35726949e5de23e62024eba476c7ecf}{void \hyperlink{classAudio_ad35726949e5de23e62024eba476c7ecf}{Clear\+Frame} ()}\label{classAudio_ad35726949e5de23e62024eba476c7ecf}
+
+\begin{DoxyCompactList}\small\item\em Clears the current frame and its iterator. \end{DoxyCompactList}\item 
+bool \hyperlink{classAudio_a3d7e118920b983906dc915428242df2e}{Decode\+If\+Frame\+Empty} ()
+\begin{DoxyCompactList}\small\item\em Decodes a new frame, if the current frame is empty. \end{DoxyCompactList}\item 
+\hypertarget{classAudio_a9657995aa27bef00b6880f5a7bafd629}{void \hyperlink{classAudio_a9657995aa27bef00b6880f5a7bafd629}{Transfer\+Frame} ()}\label{classAudio_a9657995aa27bef00b6880f5a7bafd629}
+
+\begin{DoxyCompactList}\small\item\em Transfers as much of the current frame as possible to the sink. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAudio_a0efa7be67424d967c551ecc82cda02eb}{std\+::unique\+\_\+ptr$<$ \hyperlink{classAudioSource}{Audio\+Source} $>$ \hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}}\label{classAudio_a0efa7be67424d967c551ecc82cda02eb}
+
+\begin{DoxyCompactList}\small\item\em The source of audio data. \end{DoxyCompactList}\item 
+\hypertarget{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{std\+::unique\+\_\+ptr$<$ \hyperlink{classAudioSink}{Audio\+Sink} $>$ \hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}}\label{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}
+
+\begin{DoxyCompactList}\small\item\em The sink to which audio data is sent. \end{DoxyCompactList}\item 
+\hypertarget{classAudio_acec4f6ef3a89f170bdaed5670efd092c}{bool \hyperlink{classAudio_acec4f6ef3a89f170bdaed5670efd092c}{file\+\_\+ended}}\label{classAudio_acec4f6ef3a89f170bdaed5670efd092c}
+
+\begin{DoxyCompactList}\small\item\em Whether the current file has stopped decoding. \end{DoxyCompactList}\item 
+\hypertarget{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{\hyperlink{classAudioSource_a836c61e348dbe7df6ba255669c015303}{Audio\+Source\+::\+Decode\+Vector} \hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}}\label{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}
+
+\begin{DoxyCompactList}\small\item\em The current decoded frame. \end{DoxyCompactList}\item 
+\hypertarget{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{Audio\+Source\+::\+Decode\+Vector\+::iterator \hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\+\_\+iterator}}\label{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}
+
+\begin{DoxyCompactList}\small\item\em The current position in the current decoded frame. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+An audio file. 
+
+\hyperlink{classAudio}{Audio} contains all state pertaining to the output of one file to one stream. It contains a source of audio data and a sink to which it should be sent. 
+
+Definition at line \hyperlink{audio_8hpp_source_l00037}{37} of file \hyperlink{audio_8hpp_source}{audio.\+hpp}.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classAudio_a05b36040e9d4ea4327de7c04f2e9d6ba}{\index{Audio@{Audio}!Audio@{Audio}}
+\index{Audio@{Audio}!Audio@{Audio}}
+\subsubsection[{Audio}]{\setlength{\rightskip}{0pt plus 5cm}Audio\+::\+Audio (
+\begin{DoxyParamCaption}
+\item[{{\bf Audio\+Source} $\ast$}]{source, }
+\item[{{\bf Audio\+Sink} $\ast$}]{sink}
+\end{DoxyParamCaption}
+)}}\label{classAudio_a05b36040e9d4ea4327de7c04f2e9d6ba}
+
+
+Constructs an \hyperlink{classAudio}{Audio} from a source and a sink. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em source} & The source of decoded audio frames. \\
+\hline
+{\em sink} & The target of decoded audio frames. \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classAudioSystem_a2172608177d2bd54377bfc3c61cd117d}{Audio\+System\+::\+Load} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00022}{22} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8cpp_source_l00061}{Clear\+Frame()}.
+
+
+\begin{DoxyCode}
+00022                                                  : \hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}(source), \hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}(sink)
+00023 \{
+00024     \hyperlink{classAudio_ad35726949e5de23e62024eba476c7ecf}{ClearFrame}();
+00025 \}
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classAudio_a5cdd89a7f22612f23e3a6fb36c7f451f}{\index{Audio@{Audio}!Current\+Position@{Current\+Position}}
+\index{Current\+Position@{Current\+Position}!Audio@{Audio}}
+\subsubsection[{Current\+Position}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename R $>$ R Audio\+::\+Current\+Position (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classAudio_a5cdd89a7f22612f23e3a6fb36c7f451f}
+
+
+Return the current position, as a std\+::chrono\+::duration. 
+
+\begin{DoxyReturn}{Returns}
+The current position in the audio. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio_8hpp_source_l00105}{105} of file \hyperlink{audio_8hpp_source}{audio.\+hpp}.
+
+
+
+References \hyperlink{audio_8cpp_source_l00048}{Current\+Position\+Microseconds()}.
+
+
+\begin{DoxyCode}
+00106     \{
+00107         \textcolor{keywordflow}{return} std::chrono::duration\_cast<R>(
+00108                         \hyperlink{classAudio_a992b812a2b1f8456f92ca61ec97e4f80}{CurrentPositionMicroseconds}());
+00109     \}
+\end{DoxyCode}
+\hypertarget{classAudio_a992b812a2b1f8456f92ca61ec97e4f80}{\index{Audio@{Audio}!Current\+Position\+Microseconds@{Current\+Position\+Microseconds}}
+\index{Current\+Position\+Microseconds@{Current\+Position\+Microseconds}!Audio@{Audio}}
+\subsubsection[{Current\+Position\+Microseconds}]{\setlength{\rightskip}{0pt plus 5cm}std\+::chrono\+::microseconds Audio\+::\+Current\+Position\+Microseconds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudio_a992b812a2b1f8456f92ca61ec97e4f80}
+
+
+Gets the current played position in the song, in microseconds. 
+
+As this may be executing whilst the playing callback is running, do not expect it to be highly accurate. \begin{DoxyReturn}{Returns}
+The current position, in microseconds. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00048}{48} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8hpp_source_l00141}{sink}, and \hyperlink{audio_8hpp_source_l00138}{source}.
+
+
+
+Referenced by \hyperlink{audio_8hpp_source_l00105}{Current\+Position()}.
+
+
+\begin{DoxyCode}
+00049 \{
+00050     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}->MicrosecondPositionFromSamples(
+00051                     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->Position());
+00052 \}
+\end{DoxyCode}
+\hypertarget{classAudio_a3d7e118920b983906dc915428242df2e}{\index{Audio@{Audio}!Decode\+If\+Frame\+Empty@{Decode\+If\+Frame\+Empty}}
+\index{Decode\+If\+Frame\+Empty@{Decode\+If\+Frame\+Empty}!Audio@{Audio}}
+\subsubsection[{Decode\+If\+Frame\+Empty}]{\setlength{\rightskip}{0pt plus 5cm}bool Audio\+::\+Decode\+If\+Frame\+Empty (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classAudio_a3d7e118920b983906dc915428242df2e}
+
+
+Decodes a new frame, if the current frame is empty. 
+
+\begin{DoxyReturn}{Returns}
+True if more frames are available to decode; false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00101}{101} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159da581953f6b20ad7f993b64b1dc632032e}{Audio\+Source\+::\+E\+N\+D\+\_\+\+O\+F\+\_\+\+F\+I\+L\+E}, \hyperlink{audio_8hpp_source_l00147}{frame}, \hyperlink{audio_8hpp_source_l00150}{frame\+\_\+iterator}, \hyperlink{audio_8cpp_source_l00128}{Frame\+Finished()}, and \hyperlink{audio_8hpp_source_l00138}{source}.
+
+
+
+Referenced by \hyperlink{audio_8cpp_source_l00068}{Update()}.
+
+
+\begin{DoxyCode}
+00102 \{
+00103     \textcolor{comment}{// Either the current frame is in progress, or has been emptied.}
+00104     \textcolor{comment}{// AdvanceFrameIterator() establishes this assertion by emptying a}
+00105     \textcolor{comment}{// frame as soon as it finishes.}
+00106     assert(this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.empty() || !\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{FrameFinished}());
+00107 
+00108     \textcolor{keywordtype}{bool} more\_frames\_available = \textcolor{keyword}{true};
+00109 
+00110     \textcolor{keywordflow}{if} (\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{FrameFinished}()) \{
+00111         \hyperlink{classAudioSource_aadbadeba50d982d09cfe0d1e05160ef9}{AudioSource::DecodeResult} result = this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}->Decode();
+00112 
+00113         this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame} = result.second;
+00114         this->\hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\_iterator} = this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.begin();
+00115 
+00116         more\_frames\_available = result.first !=
+00117                                 \hyperlink{classAudioSource_a9a2f5de44325c84e69a7af1331aa159da581953f6b20ad7f993b64b1dc632032e}{AudioSource::DecodeState::END\_OF\_FILE};
+00118     \}
+00119 
+00120     \textcolor{keywordflow}{return} more\_frames\_available;
+00121 \}
+\end{DoxyCode}
+\hypertarget{classAudio_a55e15a8f6e55f018a60fb477959801e5}{\index{Audio@{Audio}!File\+Ended@{File\+Ended}}
+\index{File\+Ended@{File\+Ended}!Audio@{Audio}}
+\subsubsection[{File\+Ended}]{\setlength{\rightskip}{0pt plus 5cm}bool Audio\+::\+File\+Ended (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudio_a55e15a8f6e55f018a60fb477959801e5}
+
+
+Returns whether the audio file has ended. 
+
+This does N\+O\+T mean that playback has ended; the ring buffer may still have samples waiting to send to the audio library. \begin{DoxyReturn}{Returns}
+True if there is no audio left to decode; false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00123}{123} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8hpp_source_l00144}{file\+\_\+ended}.
+
+
+\begin{DoxyCode}
+00124 \{
+00125     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_acec4f6ef3a89f170bdaed5670efd092c}{file\_ended};
+00126 \}
+\end{DoxyCode}
+\hypertarget{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{\index{Audio@{Audio}!Frame\+Finished@{Frame\+Finished}}
+\index{Frame\+Finished@{Frame\+Finished}!Audio@{Audio}}
+\subsubsection[{Frame\+Finished}]{\setlength{\rightskip}{0pt plus 5cm}bool Audio\+::\+Frame\+Finished (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}
+
+
+Returns whether the current frame has been finished. 
+
+If this is true, then either the frame is empty, or all of the samples in the frame have been fed to the ringbuffer. \begin{DoxyReturn}{Returns}
+True if the frame is finished; false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00128}{128} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8hpp_source_l00147}{frame}, and \hyperlink{audio_8hpp_source_l00150}{frame\+\_\+iterator}.
+
+
+
+Referenced by \hyperlink{audio_8cpp_source_l00101}{Decode\+If\+Frame\+Empty()}, \hyperlink{audio_8cpp_source_l00081}{Transfer\+Frame()}, and \hyperlink{audio_8cpp_source_l00068}{Update()}.
+
+
+\begin{DoxyCode}
+00129 \{
+00130     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_a0c734b8fe7eb8f80b3985ee0c638f982}{frame}.end() <= this->\hyperlink{classAudio_a9d605091cc66ccfe9f5ae149c9181ba4}{frame\_iterator};
+00131 \}
+\end{DoxyCode}
+\hypertarget{classAudio_ac05b824652de67714008e891b77dc362}{\index{Audio@{Audio}!Is\+Stopped@{Is\+Stopped}}
+\index{Is\+Stopped@{Is\+Stopped}!Audio@{Audio}}
+\subsubsection[{Is\+Stopped}]{\setlength{\rightskip}{0pt plus 5cm}bool Audio\+::\+Is\+Stopped (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudio_ac05b824652de67714008e891b77dc362}
+
+
+Checks to see if audio playback has stopped. 
+
+\begin{DoxyReturn}{Returns}
+True if the audio stream is inactive; false otherwise. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classAudio_a545c9a12f31bc6964ac90bbf2358ada2}{Start} 
+
+\hyperlink{classAudio_a1bd980bcdd3778875b019d7352e75754}{Stop} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00043}{43} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8hpp_source_l00141}{sink}.
+
+
+\begin{DoxyCode}
+00044 \{
+00045     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->IsStopped();
+00046 \}
+\end{DoxyCode}
+\hypertarget{classAudio_a07d67a424301e3e859e78fe30fb05d68}{\index{Audio@{Audio}!Path@{Path}}
+\index{Path@{Path}!Audio@{Audio}}
+\subsubsection[{Path}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Audio\+::\+Path (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classAudio_a07d67a424301e3e859e78fe30fb05d68}
+
+
+Gets the file-\/path of this audio file. 
+
+\begin{DoxyReturn}{Returns}
+The audio file's path. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00027}{27} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8hpp_source_l00138}{source}.
+
+
+\begin{DoxyCode}
+00028 \{
+00029     assert(this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source} != \textcolor{keyword}{nullptr});
+00030     \textcolor{keywordflow}{return} this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}->Path();
+00031 \}
+\end{DoxyCode}
+\hypertarget{classAudio_a5b27592a425fb3e1732c04f9654dd644}{\index{Audio@{Audio}!Seek\+To\+Position@{Seek\+To\+Position}}
+\index{Seek\+To\+Position@{Seek\+To\+Position}!Audio@{Audio}}
+\subsubsection[{Seek\+To\+Position}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename R $>$ void Audio\+::\+Seek\+To\+Position (
+\begin{DoxyParamCaption}
+\item[{R}]{position}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classAudio_a5b27592a425fb3e1732c04f9654dd644}
+
+
+Seek to a position expressed as a std\+::chrono\+::duration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em position} & The position to seek to in the audio. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{audio_8hpp_source_l00124}{124} of file \hyperlink{audio_8hpp_source}{audio.\+hpp}.
+
+
+
+References \hyperlink{audio_8cpp_source_l00054}{Seek\+To\+Position\+Microseconds()}.
+
+
+\begin{DoxyCode}
+00125     \{
+00126         \hyperlink{classAudio_a3f9b62150a4acb519f47d6d633a33353}{SeekToPositionMicroseconds}(std::chrono::duration\_cast<
+00127                         std::chrono::microseconds>(position));
+00128     \}
+\end{DoxyCode}
+\hypertarget{classAudio_a3f9b62150a4acb519f47d6d633a33353}{\index{Audio@{Audio}!Seek\+To\+Position\+Microseconds@{Seek\+To\+Position\+Microseconds}}
+\index{Seek\+To\+Position\+Microseconds@{Seek\+To\+Position\+Microseconds}!Audio@{Audio}}
+\subsubsection[{Seek\+To\+Position\+Microseconds}]{\setlength{\rightskip}{0pt plus 5cm}void Audio\+::\+Seek\+To\+Position\+Microseconds (
+\begin{DoxyParamCaption}
+\item[{std\+::chrono\+::microseconds}]{microseconds}
+\end{DoxyParamCaption}
+)}}\label{classAudio_a3f9b62150a4acb519f47d6d633a33353}
+
+
+Attempts to seek to the given position in microseconds. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em microseconds} & The position to seek to, in microseconds. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00054}{54} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8cpp_source_l00061}{Clear\+Frame()}, \hyperlink{audio_8hpp_source_l00141}{sink}, and \hyperlink{audio_8hpp_source_l00138}{source}.
+
+
+
+Referenced by \hyperlink{audio_8hpp_source_l00124}{Seek\+To\+Position()}.
+
+
+\begin{DoxyCode}
+00055 \{
+00056     \textcolor{keyword}{auto} samples = this->\hyperlink{classAudio_a0efa7be67424d967c551ecc82cda02eb}{source}->Seek(microseconds);
+00057     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->SetPosition(samples);
+00058     \hyperlink{classAudio_ad35726949e5de23e62024eba476c7ecf}{ClearFrame}();
+00059 \}
+\end{DoxyCode}
+\hypertarget{classAudio_a545c9a12f31bc6964ac90bbf2358ada2}{\index{Audio@{Audio}!Start@{Start}}
+\index{Start@{Start}!Audio@{Audio}}
+\subsubsection[{Start}]{\setlength{\rightskip}{0pt plus 5cm}void Audio\+::\+Start (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudio_a545c9a12f31bc6964ac90bbf2358ada2}
+
+
+Starts playback of this audio file. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classAudio_a1bd980bcdd3778875b019d7352e75754}{Stop} 
+
+\hyperlink{classAudio_ac05b824652de67714008e891b77dc362}{Is\+Stopped} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00033}{33} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8hpp_source_l00141}{sink}.
+
+
+\begin{DoxyCode}
+00034 \{
+00035     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->Start();
+00036 \}
+\end{DoxyCode}
+\hypertarget{classAudio_a1bd980bcdd3778875b019d7352e75754}{\index{Audio@{Audio}!Stop@{Stop}}
+\index{Stop@{Stop}!Audio@{Audio}}
+\subsubsection[{Stop}]{\setlength{\rightskip}{0pt plus 5cm}void Audio\+::\+Stop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudio_a1bd980bcdd3778875b019d7352e75754}
+
+
+Stops playback of this audio file. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classAudio_a545c9a12f31bc6964ac90bbf2358ada2}{Start} 
+
+Is\+Halted 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00038}{38} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8hpp_source_l00141}{sink}.
+
+
+\begin{DoxyCode}
+00039 \{
+00040     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->Stop();
+00041 \}
+\end{DoxyCode}
+\hypertarget{classAudio_a6db65dd8ffbd616d3f5dc81b5144c864}{\index{Audio@{Audio}!Update@{Update}}
+\index{Update@{Update}!Audio@{Audio}}
+\subsubsection[{Update}]{\setlength{\rightskip}{0pt plus 5cm}bool Audio\+::\+Update (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classAudio_a6db65dd8ffbd616d3f5dc81b5144c864}
+
+
+Performs an update cycle on this \hyperlink{classAudio}{Audio}. 
+
+This ensures the ring buffer has output to offer to the sound driver. It does this by by asking the \hyperlink{classAudioSource}{Audio\+Source} to decode if necessary. \begin{DoxyReturn}{Returns}
+True if there is more output to send to the sound card; false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{audio_8cpp_source_l00068}{68} of file \hyperlink{audio_8cpp_source}{audio.\+cpp}.
+
+
+
+References \hyperlink{audio_8cpp_source_l00101}{Decode\+If\+Frame\+Empty()}, \hyperlink{audio_8hpp_source_l00144}{file\+\_\+ended}, \hyperlink{audio_8cpp_source_l00128}{Frame\+Finished()}, \hyperlink{audio_8hpp_source_l00141}{sink}, and \hyperlink{audio_8cpp_source_l00081}{Transfer\+Frame()}.
+
+
+\begin{DoxyCode}
+00069 \{
+00070     \textcolor{keywordtype}{bool} more\_frames\_available = \hyperlink{classAudio_a3d7e118920b983906dc915428242df2e}{DecodeIfFrameEmpty}();
+00071 
+00072     \textcolor{keywordflow}{if} (!\hyperlink{classAudio_afab4e39f1e74e9a20ab456da2944a3aa}{FrameFinished}()) \{
+00073         \hyperlink{classAudio_a9657995aa27bef00b6880f5a7bafd629}{TransferFrame}();
+00074     \}
+00075 
+00076     this->\hyperlink{classAudio_ae7dddd283486a0d1555e9bc6a0d63cff}{sink}->SetInputReady(more\_frames\_available);
+00077     this->\hyperlink{classAudio_acec4f6ef3a89f170bdaed5670efd092c}{file\_ended} = !more\_frames\_available;
+00078     \textcolor{keywordflow}{return} more\_frames\_available;
+00079 \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/audio/\hyperlink{audio_8hpp}{audio.\+hpp}\item 
+src/audio/\hyperlink{audio_8cpp}{audio.\+cpp}\end{DoxyCompactItemize}

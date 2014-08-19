@@ -1,0 +1,60 @@
+\hypertarget{audio__system_8hpp_source}{\section{audio\+\_\+system.\+hpp}
+\label{audio__system_8hpp_source}\index{src/audio/audio\+\_\+system.\+hpp@{src/audio/audio\+\_\+system.\+hpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00010 \textcolor{preprocessor}{#ifndef PS\_AUDIO\_SYSTEM\_HPP}
+00011 \textcolor{preprocessor}{#define PS\_AUDIO\_SYSTEM\_HPP}
+00012 
+00013 \textcolor{preprocessor}{#include <functional>}
+00014 \textcolor{preprocessor}{#include <string>}
+00015 \textcolor{preprocessor}{#include <utility>}
+00016 
+00017 \textcolor{preprocessor}{#include "portaudiocpp/SampleDataFormat.hxx"}
+00018 \textcolor{preprocessor}{#include "portaudiocpp/Stream.hxx"}
+00019 \textcolor{keyword}{namespace }portaudio \{
+00020 \textcolor{keyword}{class }CallbackInterface;
+00021 \textcolor{keyword}{class }Device;
+00022 \}
+00023 
+00024 \textcolor{preprocessor}{#include "../sample\_formats.hpp"}
+00025 \textcolor{preprocessor}{#include "\hyperlink{audio__sink_8hpp}{audio\_sink.hpp}"}
+00026 \textcolor{preprocessor}{#include "\hyperlink{audio__source_8hpp}{audio\_source.hpp}"}
+00027 \textcolor{preprocessor}{#include "\hyperlink{audio_8hpp}{audio.hpp}"}
+00028 
+\hypertarget{audio__system_8hpp_source_l00040}{}\hyperlink{classAudioSystem}{00040} \textcolor{keyword}{class }\hyperlink{classAudioSystem}{AudioSystem} \{
+00041 \textcolor{keyword}{public}:
+\hypertarget{audio__system_8hpp_source_l00043}{}\hyperlink{classAudioSystem_a33bfa767bca10a6ce71e72708c586c67}{00043}     \textcolor{keyword}{using} \hyperlink{classAudioSystem_a33bfa767bca10a6ce71e72708c586c67}{Device} = std::pair<int, std::string>;
+00044 
+00050     \hyperlink{classAudioSystem_ad17cde8deff07ef7d7d56be62df98739}{AudioSystem}();
+00051 
+00055     \hyperlink{classAudioSystem_a9ad830040ea5f68a6a63957c6f281055}{~AudioSystem}();
+00056 
+00062     \hyperlink{classAudio}{Audio} *\hyperlink{classAudioSystem_a2172608177d2bd54377bfc3c61cd117d}{Load}(\textcolor{keyword}{const} std::string &path) \textcolor{keyword}{const};
+00063 
+00068     \textcolor{keywordtype}{void} \hyperlink{classAudioSystem_ade3b400828991d02e36a0b61302d30d2}{SetDeviceID}(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id});
+00069 
+00075     std::vector<AudioSystem::Device> \hyperlink{classAudioSystem_aa268faeb9243c18588631024958856e6}{GetDevicesInfo}();
+00076 
+00082     \textcolor{keywordtype}{bool} \hyperlink{classAudioSystem_a001cd82f854883b80b3ed7d35795581b}{IsOutputDevice}(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id});
+00083 
+00095     portaudio::Stream *\hyperlink{classAudioSystem_a78e8754440e0a29f5fac9ca1cd79a109}{Configure}(std::uint8\_t channel\_count,
+00096                                  \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{SampleFormat} sample\_format,
+00097                                  \textcolor{keywordtype}{double} sample\_rate, \textcolor{keywordtype}{size\_t} buffer\_size,
+00098                                  portaudio::CallbackInterface &cb) \textcolor{keyword}{const};
+00099 
+00100 \textcolor{keyword}{private}:
+\hypertarget{audio__system_8hpp_source_l00101}{}\hyperlink{classAudioSystem_a3071e6d8643b3d0275ba63820e6e0072}{00101}     std::string \hyperlink{classAudioSystem_a3071e6d8643b3d0275ba63820e6e0072}{device\_id}; 
+00102 
+00108     \textcolor{keyword}{const} portaudio::Device &\hyperlink{classAudioSystem_a513a0de4748574e25cba443f28949a90}{PaDeviceFrom}(\textcolor{keyword}{const} std::string &id\_string)
+00109                     \textcolor{keyword}{const};
+00110 
+00116     portaudio::SampleDataFormat \hyperlink{classAudioSystem_aac640b14ad80c2518539bcafe9f4b5ac}{PaSampleFormatFrom}(
+      \hyperlink{sample__formats_8hpp_a21cca244e782ff3acc8805fb73236772}{SampleFormat} fmt) \textcolor{keyword}{const};
+00117 \};
+00118 
+00119 \textcolor{preprocessor}{#endif // PS\_AUDIO\_SYSTEM\_HPP}
+\end{DoxyCode}

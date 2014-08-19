@@ -1,0 +1,53 @@
+\hypertarget{io__response_8cpp_source}{\section{io\+\_\+response.\+cpp}
+\label{io__response_8cpp_source}\index{src/io/io\+\_\+response.\+cpp@{src/io/io\+\_\+response.\+cpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00010 \textcolor{preprocessor}{#include "../errors.hpp"}
+00011 \textcolor{preprocessor}{#include "\hyperlink{io__response_8hpp}{io\_response.hpp}"}
+00012 
+\hypertarget{io__response_8cpp_source_l00013}{}\hyperlink{io__response_8hpp_a9c1b923184d71c13e3dccf3756c20986}{00013} \textcolor{keyword}{const} std::string \hyperlink{io__response_8cpp_a9c1b923184d71c13e3dccf3756c20986}{RESPONSES}[] = \{
+00014     \textcolor{comment}{/* ResponseCode::OKAY     */} \textcolor{stringliteral}{"OKAY"},
+00015     \textcolor{comment}{/* ResponseCode::WHAT     */} \textcolor{stringliteral}{"WHAT"},
+00016     \textcolor{comment}{/* ResponseCode::FAIL     */} \textcolor{stringliteral}{"FAIL"},
+00017     \textcolor{comment}{/* ResponseCode::OHAI     */} \textcolor{stringliteral}{"OHAI"},
+00018     \textcolor{comment}{/* ResponseCode::STATE    */} \textcolor{stringliteral}{"STATE"},
+00019     \textcolor{comment}{/* ResponseCode::TIME     */} \textcolor{stringliteral}{"TIME"},
+00020     \textcolor{comment}{/* ResponseCode::FILE     */} \textcolor{stringliteral}{"FILE"},
+00021     \textcolor{comment}{/* ResponseCode::FEATURES */} \textcolor{stringliteral}{"FEATURES"},
+00022     \textcolor{comment}{/* ResponseCode::END      */} \textcolor{stringliteral}{"END"}
+00023 \};
+00024 
+\hypertarget{io__response_8cpp_source_l00025}{}\hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{00025} \textcolor{keywordtype}{void} \hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{ResponseSink::Respond}(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546}{ResponseCode} code, \textcolor{keyword}{const} std::string &message)\textcolor{keyword}{
+       const}
+00026 \textcolor{keyword}{}\{
+00027     \textcolor{comment}{// ResponseCodes are formatted as "CODE message\(\backslash\)n".}
+00028     \textcolor{comment}{// Delegate the actual sending of the response string to the concrete}
+00029     \textcolor{comment}{// implementation.}
+00030     \hyperlink{classResponseSink_a128a514e39f23f2bcc97fea62e9de3c5}{RespondRaw}(\hyperlink{io__response_8cpp_a9c1b923184d71c13e3dccf3756c20986}{RESPONSES}[static\_cast<int>(code)] + \textcolor{stringliteral}{" "} + message);
+00031 \}
+00032 
+\hypertarget{io__response_8cpp_source_l00033}{}\hyperlink{classResponseSink_a42833a0f1f5e250aa7a41e8bb2fdaac9}{00033} \textcolor{keywordtype}{void} \hyperlink{classResponseSink_a42833a0f1f5e250aa7a41e8bb2fdaac9}{ResponseSink::RespondWithError}(\textcolor{keyword}{const} \hyperlink{classError}{Error} &error)\textcolor{keyword}{ const}
+00034 \textcolor{keyword}{}\{
+00035     \hyperlink{classResponseSink_ac2add6144c2804a6f0db34ad30046ed7}{Respond}(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546ac2759effffc94bb9acc71d69fe3e8a1f}{ResponseCode::FAIL}, error.\hyperlink{classError_a006605b13a346cf019f60420f1b29b5a}{Message}());
+00036 \}
+00037 
+00038 \textcolor{comment}{//}
+00039 \textcolor{comment}{// ResponseSource}
+00040 \textcolor{comment}{//}
+00041 
+\hypertarget{io__response_8cpp_source_l00042}{}\hyperlink{classResponseSource_a12c45136716adffa59d5e5e1ca80b7ce}{00042} \textcolor{keywordtype}{void} \hyperlink{classResponseSource_a12c45136716adffa59d5e5e1ca80b7ce}{ResponseSource::SetResponseSink}(\hyperlink{classResponseSink}{ResponseSink} &responder)
+00043 \{
+00044     this->\hyperlink{classResponseSource_a8a3ce306db2d1a0a9b9c563e5e8c4b31}{push\_sink} = &responder;
+00045 \}
+00046 
+\hypertarget{io__response_8cpp_source_l00047}{}\hyperlink{classResponseSource_a6e3b93326ee043f6d60510acd08de69b}{00047} \textcolor{keywordtype}{void} \hyperlink{classResponseSource_a6e3b93326ee043f6d60510acd08de69b}{ResponseSource::Push}()\textcolor{keyword}{ const}
+00048 \textcolor{keyword}{}\{
+00049     \textcolor{keywordflow}{if} (this->\hyperlink{classResponseSource_a8a3ce306db2d1a0a9b9c563e5e8c4b31}{push\_sink} != \textcolor{keyword}{nullptr}) \{
+00050         \hyperlink{classResponseSource_a498ee53cca912cdb6d48043108c39dc1}{Emit}(*this->\hyperlink{classResponseSource_a8a3ce306db2d1a0a9b9c563e5e8c4b31}{push\_sink});
+00051     \}
+00052 \}
+\end{DoxyCode}

@@ -1,0 +1,49 @@
+\hypertarget{player__position_8hpp_source}{\section{player\+\_\+position.\+hpp}
+\label{player__position_8hpp_source}\index{src/player/player\+\_\+position.\+hpp@{src/player/player\+\_\+position.\+hpp}}
+}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// This file is part of playd.}
+00002 \textcolor{comment}{// playd is licenced under the MIT license: see LICENSE.txt.}
+00003 
+00010 \textcolor{preprocessor}{#ifndef PS\_PLAYER\_POSITION\_HPP}
+00011 \textcolor{preprocessor}{#define PS\_PLAYER\_POSITION\_HPP}
+00012 
+00013 \textcolor{preprocessor}{#include <chrono>}
+00014 \textcolor{preprocessor}{#include <functional>}
+00015 \textcolor{preprocessor}{#include <set>}
+00016 
+00017 \textcolor{preprocessor}{#include "../io/io\_response.hpp"}
+00018 
+\hypertarget{player__position_8hpp_source_l00024}{}\hyperlink{classPlayerPosition}{00024} \textcolor{keyword}{class }\hyperlink{classPlayerPosition}{PlayerPosition} : \textcolor{keyword}{public} \hyperlink{classResponseSource}{ResponseSource} \{
+00025 \textcolor{keyword}{public}:
+\hypertarget{player__position_8hpp_source_l00027}{}\hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{00027}     \textcolor{keyword}{using} \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} = std::chrono::microseconds;
+00028 
+00029 \textcolor{keyword}{private}:
+\hypertarget{player__position_8hpp_source_l00031}{}\hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{00031}     \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} \hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period};
+00032 
+\hypertarget{player__position_8hpp_source_l00034}{}\hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{00034}     \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} \hyperlink{classPlayerPosition_a043f477d249cca2eaa00e0e616888bea}{current};
+00035 
+\hypertarget{player__position_8hpp_source_l00037}{}\hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{00037}     \hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} \hyperlink{classPlayerPosition_a4adeb717201c469c16236c2d2d6f9cef}{last};
+00038 
+\hypertarget{player__position_8hpp_source_l00043}{}\hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{00043}     \textcolor{keywordtype}{bool} \hyperlink{classPlayerPosition_a876749ea389ec23a8af6fe26e3e13883}{has\_reset};
+00044 
+00045 \textcolor{keyword}{public}:
+00047     \hyperlink{classPlayerPosition_a707498560b9f9189fb6d3cd8e59b77d7}{PlayerPosition}();
+00048 
+00055     \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_aee2fec4f9cd5db48ee1ed79044c658ab}{SetResponsePeriod}(\hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} \hyperlink{classPlayerPosition_a59fceae86a59fb8ad1fb4e93160f948c}{period});
+00056 
+00064     \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_ad39cab72590804238d2384391cb65745}{Update}(\hyperlink{classPlayerPosition_a535c99057ceca21d8fbe82883c592a66}{Unit} position);
+00065 
+00072     \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_a813e8eb40fdff815683fb7a5b1671ede}{Reset}();
+00073 
+00079     \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_a66963c28fd9dffe0fd7338023310fa92}{Emit}(\hyperlink{classResponseSink}{ResponseSink} &sink) \textcolor{keyword}{const override};
+00080 
+00081 \textcolor{keyword}{private}:
+00087     \textcolor{keywordtype}{bool} \hyperlink{classPlayerPosition_a52f46d4c600724b7ce9f459b93609dc3}{IsReadyToSend}();
+00088 
+00094     \textcolor{keywordtype}{void} \hyperlink{classPlayerPosition_aac73ce9104537702365baf19d50bde14}{Send}();
+00095 \};
+00096 
+00097 \textcolor{preprocessor}{#endif // PS\_PLAYER\_POSITION\_HPP}
+\end{DoxyCode}

@@ -1,0 +1,33 @@
+\hypertarget{structWriteReq}{\section{Write\+Req Struct Reference}
+\label{structWriteReq}\index{Write\+Req@{Write\+Req}}
+}
+
+
+A structure used to associate a write buffer with a write handle.  
+
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structWriteReq_a1ce5132e8813190d079864301a54090e}{uv\+\_\+write\+\_\+t \hyperlink{structWriteReq_a1ce5132e8813190d079864301a54090e}{req}}\label{structWriteReq_a1ce5132e8813190d079864301a54090e}
+
+\begin{DoxyCompactList}\small\item\em The main libuv write handle. \end{DoxyCompactList}\item 
+\hypertarget{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{uv\+\_\+buf\+\_\+t \hyperlink{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}{buf}}\label{structWriteReq_a2e611e010ab154c56c8055dee140b6b5}
+
+\begin{DoxyCompactList}\small\item\em The associated write buffer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A structure used to associate a write buffer with a write handle. 
+
+The \hyperlink{structWriteReq}{Write\+Req} can appear to libuv code as a {\ttfamily uv\+\_\+write\+\_\+t}, as it includes a {\ttfamily uv\+\_\+write\+\_\+t} at the start of its memory footprint. This is a slightly nasty use of low-\/level C, but works well.
+
+This tactic comes from the \href{https://nikhilm.github.io/uvbook/filesystem.html#buffers-and-streams}{\tt Buffers and Streams} section of the uvbook; see the {\itshape Write to pipe} sub-\/section. 
+
+Definition at line \hyperlink{io__reactor_8cpp_source_l00052}{52} of file \hyperlink{io__reactor_8cpp_source}{io\+\_\+reactor.\+cpp}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/io/\hyperlink{io__reactor_8cpp}{io\+\_\+reactor.\+cpp}\end{DoxyCompactItemize}

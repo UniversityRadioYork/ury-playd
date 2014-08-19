@@ -1,0 +1,111 @@
+\hypertarget{main_8cpp}{\section{src/main.cpp File Reference}
+\label{main_8cpp}\index{src/main.\+cpp@{src/main.\+cpp}}
+}
+
+
+Main entry point and implementation of the playd class.  
+
+
+{\ttfamily \#include $<$algorithm$>$}\\*
+{\ttfamily \#include $<$chrono$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include \char`\"{}audio/audio\+\_\+system.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}cmd.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}io/io\+\_\+reactor.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}io/io\+\_\+response.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}main.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}messages.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}player/player.\+hpp\char`\"{}}\\*
+Include dependency graph for main.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{main_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{main_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em The main entry point. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \hyperlink{classTimeParser_adc32afc638ace5060a2134f8f74d3c60}{Player\+::\+T\+P\+::\+Unit\+Map} \hyperlink{main_8cpp_a889c521ce751c2db7ba216a612c1d784}{U\+N\+I\+T\+S}
+\begin{DoxyCompactList}\small\item\em U\+N\+I\+T\+S defines the unit suffixes that playd understands when parsing positions in seek commands. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Main entry point and implementation of the playd class. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{main_8cpp}{main.\+cpp} 
+\end{DoxySeeAlso}
+
+
+Definition in file \hyperlink{main_8cpp_source}{main.\+cpp}.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{main_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{\index{main.\+cpp@{main.\+cpp}!main@{main}}
+\index{main@{main}!main.\+cpp@{main.\+cpp}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{main_8cpp_a0ddf1224851353fc92bfbff6f499fa97}
+
+
+The main entry point. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & Program argument count. \\
+\hline
+{\em argv} & Program argument vector. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The exit code (zero for success; non-\/zero otherwise). 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{main_8cpp_source_l00028}{28} of file \hyperlink{main_8cpp_source}{main.\+cpp}.
+
+
+
+References \hyperlink{main_8cpp_source_l00130}{playd\+::\+Run()}.
+
+
+\begin{DoxyCode}
+00029 \{
+00030     \hyperlink{classplayd}{playd} ps(argc, argv);
+00031     \textcolor{keywordflow}{return} ps.Run();
+00032 \}
+\end{DoxyCode}
+
+
+\subsection{Variable Documentation}
+\hypertarget{main_8cpp_a889c521ce751c2db7ba216a612c1d784}{\index{main.\+cpp@{main.\+cpp}!U\+N\+I\+T\+S@{U\+N\+I\+T\+S}}
+\index{U\+N\+I\+T\+S@{U\+N\+I\+T\+S}!main.\+cpp@{main.\+cpp}}
+\subsubsection[{U\+N\+I\+T\+S}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Player\+::\+T\+P\+::\+Unit\+Map} U\+N\+I\+T\+S}}\label{main_8cpp_a889c521ce751c2db7ba216a612c1d784}
+
+
+U\+N\+I\+T\+S defines the unit suffixes that playd understands when parsing positions in seek commands. 
+
+The suffixes are defined using the \hyperlink{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}{Player\+::\+T\+P\+::\+Mk\+Time} template, in terms of the std\+::chrono duration units.
+
+If no suffix is given, it is treated as the string \char`\"{}\char`\"{}. Therefore, the member of U\+N\+I\+T\+S with suffix \char`\"{}\char`\"{} is the default unit.
+
+The members of U\+N\+I\+T\+S are documented by example.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classTimeParser_af0e270392bd5313b1d60e66e35dbfe82}{Player\+::\+T\+P\+::\+Mk\+Time} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{main_8cpp_source_l00080}{80} of file \hyperlink{main_8cpp_source}{main.\+cpp}.
+

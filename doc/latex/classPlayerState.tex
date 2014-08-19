@@ -1,0 +1,354 @@
+\hypertarget{classPlayerState}{\section{Player\+State Class Reference}
+\label{classPlayerState}\index{Player\+State@{Player\+State}}
+}
+
+
+An object holding and representing the current state of a \hyperlink{classPlayer}{Player}.  
+
+
+
+
+{\ttfamily \#include $<$player\+\_\+state.\+hpp$>$}
+
+
+
+Inheritance diagram for Player\+State\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{classPlayerState__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Player\+State\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classPlayerState__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{State} \+: std\+::uint8\+\_\+t \{ \\*
+\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a034312d8adc8099c1c6f53aaff745e26}{State\+::\+S\+T\+A\+R\+T\+I\+N\+G}, 
+\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a209d5541434371bb6b79dc8cca8fa55b}{State\+::\+E\+J\+E\+C\+T\+E\+D}, 
+\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a09d4d696b4e935115b9313e3c412509a}{State\+::\+S\+T\+O\+P\+P\+E\+D}, 
+\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e}{State\+::\+P\+L\+A\+Y\+I\+N\+G}, 
+\\*
+\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230}{State\+::\+Q\+U\+I\+T\+T\+I\+N\+G}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumeration of states that the player can be in. \end{DoxyCompactList}\item 
+\hypertarget{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{using \hyperlink{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{List} = std\+::initializer\+\_\+list$<$ \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{State} $>$}\label{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}
+
+\begin{DoxyCompactList}\small\item\em A list of states, used for If\+In. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classPlayerState_a6d3de3f57e9db4ec34e5a7403fc03868}{\hyperlink{classPlayerState_a6d3de3f57e9db4ec34e5a7403fc03868}{Player\+State} ()}\label{classPlayerState_a6d3de3f57e9db4ec34e5a7403fc03868}
+
+\begin{DoxyCompactList}\small\item\em Constructs a \hyperlink{classPlayerState}{Player\+State}. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerState_aa93a9879688bfbd3d89ac102c079cbfd}{Emit} (\hyperlink{classResponseSink}{Response\+Sink} \&sink) const override
+\begin{DoxyCompactList}\small\item\em Announces the current state to a \hyperlink{classResponseSink}{Response\+Sink}. \end{DoxyCompactList}\item 
+bool \hyperlink{classPlayerState_aa2c0e603dd57dcc37759d716596ffa33}{In} (\hyperlink{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{List} states) const 
+\begin{DoxyCompactList}\small\item\em Checks whether the current state is in a given list of states. \end{DoxyCompactList}\item 
+bool \hyperlink{classPlayerState_aeb19817b9da2f6765b990983f87e1527}{Is\+Running} () const 
+\begin{DoxyCompactList}\small\item\em Returns whether the player is still running. \end{DoxyCompactList}\item 
+void \hyperlink{classPlayerState_a822999cf7d4cf72ba77f218906bb8aaa}{Set} (\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{State} state)
+\begin{DoxyCompactList}\small\item\em Sets the player's current state. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const \hyperlink{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{List} \hyperlink{classPlayerState_aa5e7203a1fa44e8bceffe65b6ad2c554}{A\+U\+D\+I\+O\+\_\+\+P\+L\+A\+Y\+I\+N\+G\+\_\+\+S\+T\+A\+T\+E\+S}
+\begin{DoxyCompactList}\small\item\em List of states in which the player is playing something. \end{DoxyCompactList}\item 
+static const \hyperlink{classPlayerState_a0f4e455f0579f97740855ccc6177c9f1}{List} \hyperlink{classPlayerState_a850bf90685a377001cfc46808cf017a4}{A\+U\+D\+I\+O\+\_\+\+L\+O\+A\+D\+E\+D\+\_\+\+S\+T\+A\+T\+E\+S}
+\begin{DoxyCompactList}\small\item\em List of states in which some audio is loaded. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{\hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{State} \hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current}}\label{classPlayerState_add16beba271881c0e1e40430b80f5bd6}
+
+\begin{DoxyCompactList}\small\item\em The current state. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const std\+::map$<$ \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{State}, \\*
+std\+::string $>$ \hyperlink{classPlayerState_af9cd9cd0e2d4c24e59ea11d35bdaff78}{S\+T\+R\+I\+N\+G\+S}
+\begin{DoxyCompactList}\small\item\em A mapping between states and their human-\/readable names. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+An object holding and representing the current state of a \hyperlink{classPlayer}{Player}. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classPlayer}{Player} 
+
+\hyperlink{classPlayerPosition}{Player\+Position} 
+\end{DoxySeeAlso}
+
+
+Definition at line \hyperlink{player__state_8hpp_source_l00024}{24} of file \hyperlink{player__state_8hpp_source}{player\+\_\+state.\+hpp}.
+
+
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{classPlayerState_ab013f68ff23d69d677faae624b5dff07}{\index{Player\+State@{Player\+State}!State@{State}}
+\index{State@{State}!Player\+State@{Player\+State}}
+\subsubsection[{State}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Player\+State\+::\+State} \+: std\+::uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}}\label{classPlayerState_ab013f68ff23d69d677faae624b5dff07}
+
+
+Enumeration of states that the player can be in. 
+
+The player is effectively a finite-\/state machine whose behaviour at any given time is dictated by the current state, which is represented by an instance of State. \begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{S\+T\+A\+R\+T\+I\+N\+G@{S\+T\+A\+R\+T\+I\+N\+G}!Player\+State@{Player\+State}}\index{Player\+State@{Player\+State}!S\+T\+A\+R\+T\+I\+N\+G@{S\+T\+A\+R\+T\+I\+N\+G}}\item[{\em 
+\hypertarget{classPlayerState_ab013f68ff23d69d677faae624b5dff07a034312d8adc8099c1c6f53aaff745e26}{S\+T\+A\+R\+T\+I\+N\+G}\label{classPlayerState_ab013f68ff23d69d677faae624b5dff07a034312d8adc8099c1c6f53aaff745e26}
+}]The player has just initialised. \index{E\+J\+E\+C\+T\+E\+D@{E\+J\+E\+C\+T\+E\+D}!Player\+State@{Player\+State}}\index{Player\+State@{Player\+State}!E\+J\+E\+C\+T\+E\+D@{E\+J\+E\+C\+T\+E\+D}}\item[{\em 
+\hypertarget{classPlayerState_ab013f68ff23d69d677faae624b5dff07a209d5541434371bb6b79dc8cca8fa55b}{E\+J\+E\+C\+T\+E\+D}\label{classPlayerState_ab013f68ff23d69d677faae624b5dff07a209d5541434371bb6b79dc8cca8fa55b}
+}]The player has no song loaded. \index{S\+T\+O\+P\+P\+E\+D@{S\+T\+O\+P\+P\+E\+D}!Player\+State@{Player\+State}}\index{Player\+State@{Player\+State}!S\+T\+O\+P\+P\+E\+D@{S\+T\+O\+P\+P\+E\+D}}\item[{\em 
+\hypertarget{classPlayerState_ab013f68ff23d69d677faae624b5dff07a09d4d696b4e935115b9313e3c412509a}{S\+T\+O\+P\+P\+E\+D}\label{classPlayerState_ab013f68ff23d69d677faae624b5dff07a09d4d696b4e935115b9313e3c412509a}
+}]The player has a song loaded and not playing. \index{P\+L\+A\+Y\+I\+N\+G@{P\+L\+A\+Y\+I\+N\+G}!Player\+State@{Player\+State}}\index{Player\+State@{Player\+State}!P\+L\+A\+Y\+I\+N\+G@{P\+L\+A\+Y\+I\+N\+G}}\item[{\em 
+\hypertarget{classPlayerState_ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e}{P\+L\+A\+Y\+I\+N\+G}\label{classPlayerState_ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e}
+}]The player has a song loaded and playing. \index{Q\+U\+I\+T\+T\+I\+N\+G@{Q\+U\+I\+T\+T\+I\+N\+G}!Player\+State@{Player\+State}}\index{Player\+State@{Player\+State}!Q\+U\+I\+T\+T\+I\+N\+G@{Q\+U\+I\+T\+T\+I\+N\+G}}\item[{\em 
+\hypertarget{classPlayerState_ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230}{Q\+U\+I\+T\+T\+I\+N\+G}\label{classPlayerState_ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230}
+}]The player is about to terminate. \end{description}
+\end{Desc}
+
+
+Definition at line \hyperlink{player__state_8hpp_source_l00032}{32} of file \hyperlink{player__state_8hpp_source}{player\+\_\+state.\+hpp}.
+
+
+\begin{DoxyCode}
+00032                      : std::uint8\_t \{
+00033         STARTING, 
+00034         EJECTED,  
+00035         STOPPED,  
+00036         PLAYING,  
+00037         QUITTING  
+00038     \};
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classPlayerState_aa93a9879688bfbd3d89ac102c079cbfd}{\index{Player\+State@{Player\+State}!Emit@{Emit}}
+\index{Emit@{Emit}!Player\+State@{Player\+State}}
+\subsubsection[{Emit}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+State\+::\+Emit (
+\begin{DoxyParamCaption}
+\item[{{\bf Response\+Sink} \&}]{sink}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}}\label{classPlayerState_aa93a9879688bfbd3d89ac102c079cbfd}
+
+
+Announces the current state to a \hyperlink{classResponseSink}{Response\+Sink}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sink} & The \hyperlink{classResponseSink}{Response\+Sink} to which the current state shall be emitted. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classResponseSource_a498ee53cca912cdb6d48043108c39dc1}{Response\+Source}.
+
+
+
+Definition at line \hyperlink{player__state_8cpp_source_l00052}{52} of file \hyperlink{player__state_8cpp_source}{player\+\_\+state.\+cpp}.
+
+
+
+References \hyperlink{player__state_8hpp_source_l00086}{current}, \hyperlink{io__response_8cpp_source_l00025}{Response\+Sink\+::\+Respond()}, \hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a2b848a8cc886d253d21a77c43cd50aae}{S\+T\+A\+T\+E}, and \hyperlink{player__state_8hpp_source_l00083}{S\+T\+R\+I\+N\+G\+S}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00058}{Player\+::\+Welcome\+Client()}.
+
+
+\begin{DoxyCode}
+00053 \{
+00054     responder.Respond(\hyperlink{io__response_8hpp_af5828b68a5f305a17b90321710d9b546a2b848a8cc886d253d21a77c43cd50aae}{ResponseCode::STATE},
+00055                       \hyperlink{classPlayerState_af9cd9cd0e2d4c24e59ea11d35bdaff78}{PlayerState::STRINGS}.at(this->\hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current}));
+00056 \}
+\end{DoxyCode}
+\hypertarget{classPlayerState_aa2c0e603dd57dcc37759d716596ffa33}{\index{Player\+State@{Player\+State}!In@{In}}
+\index{In@{In}!Player\+State@{Player\+State}}
+\subsubsection[{In}]{\setlength{\rightskip}{0pt plus 5cm}bool Player\+State\+::\+In (
+\begin{DoxyParamCaption}
+\item[{{\bf Player\+State\+::\+List}}]{states}
+\end{DoxyParamCaption}
+) const}}\label{classPlayerState_aa2c0e603dd57dcc37759d716596ffa33}
+
+
+Checks whether the current state is in a given list of states. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em states} & The initialiser list of states. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the state is in the List; false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{player__state_8cpp_source_l00058}{58} of file \hyperlink{player__state_8cpp_source}{player\+\_\+state.\+cpp}.
+
+
+
+References \hyperlink{player__state_8hpp_source_l00086}{current}.
+
+
+
+Referenced by \hyperlink{player__state_8cpp_source_l00021}{Player\+::\+Current\+State\+In()}.
+
+
+\begin{DoxyCode}
+00059 \{
+00060     \textcolor{keywordflow}{return} std::find(states.begin(), states.end(), this->\hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current}) !=
+00061            states.end();
+00062 \}
+\end{DoxyCode}
+\hypertarget{classPlayerState_aeb19817b9da2f6765b990983f87e1527}{\index{Player\+State@{Player\+State}!Is\+Running@{Is\+Running}}
+\index{Is\+Running@{Is\+Running}!Player\+State@{Player\+State}}
+\subsubsection[{Is\+Running}]{\setlength{\rightskip}{0pt plus 5cm}bool Player\+State\+::\+Is\+Running (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classPlayerState_aeb19817b9da2f6765b990983f87e1527}
+
+
+Returns whether the player is still running. 
+
+\begin{DoxyReturn}{Returns}
+True if the player is not in the Q\+U\+I\+T\+T\+I\+N\+G state; false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \hyperlink{player__state_8cpp_source_l00064}{64} of file \hyperlink{player__state_8cpp_source}{player\+\_\+state.\+cpp}.
+
+
+
+References \hyperlink{player__state_8hpp_source_l00086}{current}, and \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230}{Q\+U\+I\+T\+T\+I\+N\+G}.
+
+
+
+Referenced by \hyperlink{player__state_8cpp_source_l00026}{Player\+::\+Is\+Running()}.
+
+
+\begin{DoxyCode}
+00065 \{
+00066     \textcolor{keywordflow}{return} this->\hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current} != \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230}{State::QUITTING};
+00067 \}
+\end{DoxyCode}
+\hypertarget{classPlayerState_a822999cf7d4cf72ba77f218906bb8aaa}{\index{Player\+State@{Player\+State}!Set@{Set}}
+\index{Set@{Set}!Player\+State@{Player\+State}}
+\subsubsection[{Set}]{\setlength{\rightskip}{0pt plus 5cm}void Player\+State\+::\+Set (
+\begin{DoxyParamCaption}
+\item[{{\bf Player\+State\+::\+State}}]{state}
+\end{DoxyParamCaption}
+)}}\label{classPlayerState_a822999cf7d4cf72ba77f218906bb8aaa}
+
+
+Sets the player's current state. 
+
+This will automatically emit the new state to any responder that has been registered with this \hyperlink{classPlayerState}{Player\+State} using Set\+Response\+Sink. 
+\begin{DoxyParams}{Parameters}
+{\em state} & The new state. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \hyperlink{player__state_8cpp_source_l00079}{79} of file \hyperlink{player__state_8cpp_source}{player\+\_\+state.\+cpp}.
+
+
+
+References \hyperlink{player__state_8hpp_source_l00086}{current}, and \hyperlink{io__response_8cpp_source_l00047}{Response\+Source\+::\+Push()}.
+
+
+\begin{DoxyCode}
+00080 \{
+00081     this->\hyperlink{classPlayerState_add16beba271881c0e1e40430b80f5bd6}{current} = state;
+00082     \hyperlink{classResponseSource_a6e3b93326ee043f6d60510acd08de69b}{Push}();
+00083 \}
+\end{DoxyCode}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classPlayerState_a850bf90685a377001cfc46808cf017a4}{\index{Player\+State@{Player\+State}!A\+U\+D\+I\+O\+\_\+\+L\+O\+A\+D\+E\+D\+\_\+\+S\+T\+A\+T\+E\+S@{A\+U\+D\+I\+O\+\_\+\+L\+O\+A\+D\+E\+D\+\_\+\+S\+T\+A\+T\+E\+S}}
+\index{A\+U\+D\+I\+O\+\_\+\+L\+O\+A\+D\+E\+D\+\_\+\+S\+T\+A\+T\+E\+S@{A\+U\+D\+I\+O\+\_\+\+L\+O\+A\+D\+E\+D\+\_\+\+S\+T\+A\+T\+E\+S}!Player\+State@{Player\+State}}
+\subsubsection[{A\+U\+D\+I\+O\+\_\+\+L\+O\+A\+D\+E\+D\+\_\+\+S\+T\+A\+T\+E\+S}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Player\+State\+::\+List} Player\+State\+::\+A\+U\+D\+I\+O\+\_\+\+L\+O\+A\+D\+E\+D\+\_\+\+S\+T\+A\+T\+E\+S\hspace{0.3cm}{\ttfamily [static]}}}\label{classPlayerState_a850bf90685a377001cfc46808cf017a4}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+    \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e}{PlayerState::State::PLAYING}, 
+      \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a09d4d696b4e935115b9313e3c412509a}{PlayerState::State::STOPPED}
+\}
+\end{DoxyCode}
+
+
+List of states in which some audio is loaded. 
+
+
+
+Definition at line \hyperlink{player__state_8hpp_source_l00047}{47} of file \hyperlink{player__state_8hpp_source}{player\+\_\+state.\+hpp}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00079}{Player\+::\+Eject()}, \hyperlink{player_8cpp_source_l00134}{Player\+::\+Seek()}, and \hyperlink{player_8cpp_source_l00034}{Player\+::\+Update()}.
+
+\hypertarget{classPlayerState_aa5e7203a1fa44e8bceffe65b6ad2c554}{\index{Player\+State@{Player\+State}!A\+U\+D\+I\+O\+\_\+\+P\+L\+A\+Y\+I\+N\+G\+\_\+\+S\+T\+A\+T\+E\+S@{A\+U\+D\+I\+O\+\_\+\+P\+L\+A\+Y\+I\+N\+G\+\_\+\+S\+T\+A\+T\+E\+S}}
+\index{A\+U\+D\+I\+O\+\_\+\+P\+L\+A\+Y\+I\+N\+G\+\_\+\+S\+T\+A\+T\+E\+S@{A\+U\+D\+I\+O\+\_\+\+P\+L\+A\+Y\+I\+N\+G\+\_\+\+S\+T\+A\+T\+E\+S}!Player\+State@{Player\+State}}
+\subsubsection[{A\+U\+D\+I\+O\+\_\+\+P\+L\+A\+Y\+I\+N\+G\+\_\+\+S\+T\+A\+T\+E\+S}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Player\+State\+::\+List} Player\+State\+::\+A\+U\+D\+I\+O\+\_\+\+P\+L\+A\+Y\+I\+N\+G\+\_\+\+S\+T\+A\+T\+E\+S\hspace{0.3cm}{\ttfamily [static]}}}\label{classPlayerState_aa5e7203a1fa44e8bceffe65b6ad2c554}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+    \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e}{PlayerState::State::PLAYING}
+\}
+\end{DoxyCode}
+
+
+List of states in which the player is playing something. 
+
+
+
+Definition at line \hyperlink{player__state_8hpp_source_l00044}{44} of file \hyperlink{player__state_8hpp_source}{player\+\_\+state.\+hpp}.
+
+
+
+Referenced by \hyperlink{player_8cpp_source_l00159}{Player\+::\+Stop()}, and \hyperlink{player_8cpp_source_l00034}{Player\+::\+Update()}.
+
+\hypertarget{classPlayerState_af9cd9cd0e2d4c24e59ea11d35bdaff78}{\index{Player\+State@{Player\+State}!S\+T\+R\+I\+N\+G\+S@{S\+T\+R\+I\+N\+G\+S}}
+\index{S\+T\+R\+I\+N\+G\+S@{S\+T\+R\+I\+N\+G\+S}!Player\+State@{Player\+State}}
+\subsubsection[{S\+T\+R\+I\+N\+G\+S}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::map$<$ {\bf Player\+State\+::\+State}, std\+::string $>$ Player\+State\+::\+S\+T\+R\+I\+N\+G\+S\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}}\label{classPlayerState_af9cd9cd0e2d4c24e59ea11d35bdaff78}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+    \{ \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a034312d8adc8099c1c6f53aaff745e26}{State::STARTING}, \textcolor{stringliteral}{"Starting"} \},
+    \{ \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a209d5541434371bb6b79dc8cca8fa55b}{State::EJECTED}, \textcolor{stringliteral}{"Ejected"} \},
+    \{ \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a09d4d696b4e935115b9313e3c412509a}{State::STOPPED}, \textcolor{stringliteral}{"Stopped"} \},
+    \{ \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e}{State::PLAYING}, \textcolor{stringliteral}{"Playing"} \},
+    \{ \hyperlink{classPlayerState_ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230}{State::QUITTING}, \textcolor{stringliteral}{"Quitting"} \}
+\}
+\end{DoxyCode}
+
+
+A mapping between states and their human-\/readable names. 
+
+
+
+Definition at line \hyperlink{player__state_8hpp_source_l00083}{83} of file \hyperlink{player__state_8hpp_source}{player\+\_\+state.\+hpp}.
+
+
+
+Referenced by \hyperlink{player__state_8cpp_source_l00052}{Emit()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/player/\hyperlink{player__state_8hpp}{player\+\_\+state.\+hpp}\item 
+src/player/\hyperlink{player__state_8cpp}{player\+\_\+state.\+cpp}\end{DoxyCompactItemize}
