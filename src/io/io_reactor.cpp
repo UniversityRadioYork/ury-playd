@@ -194,7 +194,7 @@ void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
 		return;
 	}
 
-	this->tokeniser.Feed(buf->base, (buf->base) + nread);
+	this->tokeniser.Feed(buf->base, nread);
 }
 
 void TcpResponseSink::Close()

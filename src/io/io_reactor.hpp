@@ -64,8 +64,31 @@ public:
 	 */
 	void End();
 
+	/**
+	 * Accepts a new connection.
+	 *
+	 * This accepts the connection, and adds it to this IoReactor's
+	 * connection pool.
+	 *
+	 * This should be called with a server that has just received a new
+	 * connection.
+	 *
+	 * @param server Pointer to the libuv server accepting connections.
+	 *
+	 * @todo This isn't a great fit for the public interface of IoReactor -
+	 *   separate into a ConnectionPool class?
+	 */
 	void NewConnection(uv_stream_t *server);
-	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
+
+	/**
+	 * Removes a connection.
+	 *
+	 * @param sink The connection to remove.
+	 *
+	 * @todo Rename sink?
+	 * @todo This isn't a great fit for the public interface of IoReactor -
+	 *   separate into a ConnectionPool class?
+	 */
 	void RemoveConnection(TcpResponseSink &sink);
 
 private:
@@ -87,13 +110,34 @@ private:
 
 /**
  * A TCP connection from a client.
+ * @todo Rename to Connection?
  */
 class TcpResponseSink : public ResponseSink {
 public:
+	/**
+	 * Constructs a TcpResponseSink.
+	 * @param parent The IoReactor that is the parent of this connection.
+	 * @param tcp The underlying libuv TCP stream.
+	 * @param handler The handler to which read commands should be sent.
+	 */
 	TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
 	                CommandHandler &handler);
+
 	void RespondRaw(const std::string &response) const override;
+
+	/**
+	 * Processes a data read on this connection.
+	 *
+	 * @param stream The libuv TCP/IP stream providing the data.
+	 * @param nread The number of bytes read.
+	 * @param buf The buffer containing the read data.
+	 */
 	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
+
+	/**
+	 * Closes this connection.
+	 * @todo Roll into the destructor/use RAII?
+	 */
 	void Close();
 
 private:
