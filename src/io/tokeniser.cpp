@@ -25,7 +25,7 @@ Tokeniser::Tokeniser(CommandHandler &handler, ResponseSink &response_sink)
 
 void Tokeniser::Feed(const char *start, const char *end)
 {
-	std::for_each(start, end, [this](char c) {
+	std::for_each(start, end, [this](unsigned char c) {
 		if (this->escape_next_character) {
 			this->escape_next_character = false;
 			Push(c);
