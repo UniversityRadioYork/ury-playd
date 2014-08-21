@@ -23,9 +23,11 @@ Tokeniser::Tokeniser(CommandHandler &handler, ResponseSink &response_sink)
 {
 }
 
-void Tokeniser::Feed(const char *start, const char *end)
+void Tokeniser::Feed(const char *start, int nread)
 {
-	std::for_each(start, end, [this](unsigned char c) {
+	for (int i = 0; i < nread; i++) {
+		char c = start[i];
+
 		if (this->escape_next_character) {
 			this->escape_next_character = false;
 			Push(c);
@@ -78,12 +80,12 @@ void Tokeniser::Feed(const char *start, const char *end)
 				}
 				break;
 		}
-	});
+	}
 }
 
 void Tokeniser::Push(unsigned char c)
 {
-	assert(this->quote_type != QuoteType::SINGLE || !isspace(c));
+	assert(this->quote_type != QuoteType::NONE || !isspace(c));
 	this->current_word.push_back(c);
 	assert(!this->current_word.empty());
 }

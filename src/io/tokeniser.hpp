@@ -34,9 +34,9 @@ public:
 	/**
 	 * Feeds the contents of a character buffer into a Tokeniser.
 	 * @param start The pointer to the start of the character buffer.
-	 * @param end The pointer to the end of the character buffer.
+	 * @param nread The number of elements in the character buffer.
 	 */
-	void Feed(const char *start, const char *end);
+	void Feed(const char *start, int nread);
 
 private:
 	enum class QuoteType : std::uint8_t {
