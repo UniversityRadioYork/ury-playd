@@ -58,7 +58,9 @@ void AudioSystem::OnDevices(std::function<void(const AudioSystem::Device &)> f)
 
 	std::for_each(pa.devicesBegin(), pa.devicesEnd(),
 	              [&f](const portaudio::Device &d) {
-		f(Device(std::to_string(d.index()), std::string(d.name())));
+		if (!d.isInputOnlyDevice()) {
+			f(Device(std::to_string(d.index()), std::string(d.name())));
+		}
 	});
 }
 
