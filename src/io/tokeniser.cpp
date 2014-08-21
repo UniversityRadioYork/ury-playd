@@ -100,9 +100,9 @@ void Tokeniser::Emit()
 {
 	EndWord();
 
-	bool valid = this->handler.Handle(words);
+	bool valid = this->handler.Handle(this->words);
 	if (valid) {
-		this->response_sink.Respond(ResponseCode::OKAY, words[0]);
+		this->response_sink.Respond(ResponseCode::OKAY, this->words[0]);
 	} else {
 		this->response_sink.Respond(ResponseCode::WHAT,
 		                            MSG_CMD_INVALID);
