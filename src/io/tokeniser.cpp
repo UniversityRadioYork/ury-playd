@@ -31,7 +31,7 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 		if (this->escape_next_character) {
 			this->escape_next_character = false;
 			Push(c);
-			return;
+			continue;
 		}
 
 		switch (this->quote_type) {
