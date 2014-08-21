@@ -70,6 +70,10 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 						this->quote_type = QuoteType::
 						                DOUBLE;
 						break;
+					case '\\':
+						this->escape_next_character =
+							true;
+						break;
 					default:
 						if (isspace(c)) {
 							EndWord();
