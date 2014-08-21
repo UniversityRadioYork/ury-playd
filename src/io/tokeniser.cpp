@@ -81,9 +81,11 @@ void Tokeniser::Feed(const char *start, const char *end)
 	});
 }
 
-void Tokeniser::Push(char c)
+void Tokeniser::Push(unsigned char c)
 {
+	assert(this->quote_type != QuoteType::SINGLE || !isspace(c));
 	this->current_word.push_back(c);
+	assert(!this->current_word.empty());
 }
 
 void Tokeniser::EndWord()
@@ -92,21 +94,40 @@ void Tokeniser::EndWord()
 	if (this->current_word.empty()) {
 		return;
 	}
+
 	this->words.push_back(this->current_word);
+	assert(this->words.back() == this->current_word);
+
 	this->current_word.clear();
+	assert(this->current_word.empty());
 }
 
 void Tokeniser::Emit()
 {
+	// Since we assume these, we don't need to set them later.
+	assert(this->quote_type == QuoteType::NONE);
+	assert(!this->escape_next_character);
+
+	// We might still be in a word, in which case we treat the end of a
+	// line as the end of the word too.
 	EndWord();
+	assert(this->current_word.empty());
 
 	bool valid = this->handler.Handle(this->words);
 	if (valid) {
+		// TODO: Emit entire command back, not just first word.
 		this->response_sink.Respond(ResponseCode::OKAY, this->words[0]);
 	} else {
+		// TODO: Better error reporting.
 		this->response_sink.Respond(ResponseCode::WHAT,
 		                            MSG_CMD_INVALID);
 	}
 
 	this->words.clear();
+
+	// The state should now be clean and ready for another command.
+	assert(this->quote_type == QuoteType::NONE);
+	assert(!this->escape_next_character);
+	assert(this->current_word.empty());
+	assert(this->words.empty());
 }

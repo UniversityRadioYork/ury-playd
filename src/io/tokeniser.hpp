@@ -47,7 +47,7 @@ private:
 
 	void Emit();
 	void EndWord();
-	void Push(char c);
+	void Push(unsigned char c);
 
 	CommandHandler &handler;
 	ResponseSink &response_sink;
