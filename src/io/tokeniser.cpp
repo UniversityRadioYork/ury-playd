@@ -23,9 +23,9 @@ Tokeniser::Tokeniser(CommandHandler &handler, ResponseSink &response_sink)
 {
 }
 
-void Tokeniser::Feed(const char *start, int nread)
+void Tokeniser::Feed(const char *start, unsigned int nread)
 {
-	for (int i = 0; i < nread; i++) {
+	for (unsigned int i = 0; i < nread; i++) {
 		unsigned char c = start[i];
 
 		if (this->escape_next_character) {

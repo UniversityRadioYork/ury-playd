@@ -36,7 +36,7 @@ public:
 	 * @param start The pointer to the start of the character buffer.
 	 * @param nread The number of elements in the character buffer.
 	 */
-	void Feed(const char *start, int nread);
+	void Feed(const char *start, unsigned int nread);
 
 private:
 	enum class QuoteType : std::uint8_t {
