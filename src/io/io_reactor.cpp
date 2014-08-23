@@ -21,7 +21,7 @@ extern "C" {
 #include "io_reactor.hpp"
 #include "io_response.hpp"
 
-const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 10; // ms
+const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 5; // ms
 
 //
 // libuv callbacks
