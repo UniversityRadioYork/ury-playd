@@ -209,6 +209,9 @@ bool AudioSource::ReadFrame()
 
 Resampler::ResultVector AudioSource::Resample()
 {
+        if (this->frame->nb_samples == 0) {
+                return Resampler::ResultVector();
+        }
 	return this->resampler->Resample(this->frame);
 }
 
@@ -346,7 +349,7 @@ bool AudioSource::DecodePacket()
 	assert(0 <= this->packet.size);
 
 	bool frame_finished = decode_result.second;
-	return frame_finished || (0 < this->packet.size);
+	return frame_finished || (0 == this->packet.size);
 }
 
 std::pair<int, bool> AudioSource::AvCodecDecode()
