@@ -7,7 +7,7 @@ builddir ?= build
 srcdir ?= src
 
 # The warning flags to use when building playslav e++.
-WARNS ?= -Wall -Wextra -Werror -pedantic
+WARNS ?= -Wall -Wextra -Werror
 
 # Programs used during building.
 CC         ?= gcc

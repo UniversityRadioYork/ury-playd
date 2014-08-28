@@ -65,13 +65,13 @@ public:
 	 * Sets the current device ID.
 	 * @param id The device ID to use for subsequent Audios.
 	 */
-	void SetDeviceID(const std::string &id);
+	void SetDeviceID(int id);
 
 	/**
-	 * Performs a function on each device entry in the AudioSystem.
-	 * @param f The function to call on each device.
+	 * Gets the number and name of each output device entry in the AudioSystem.
+	 * @return List of output devices, as strings.
 	 */
-	void OnDevices(std::function<void(const Device &)> f) const;
+	std::vector<std::pair<int, std::string>> GetDevicesInfo();
 
 	/**
 	 * Configures and returns a PortAudio stream.
