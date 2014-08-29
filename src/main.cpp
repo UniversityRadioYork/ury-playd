@@ -52,12 +52,10 @@ int Playslave::GetDeviceID()
 
 	/* Only allow valid (output) devices. */
 	auto device_list = this->audio.GetDevicesInfo();
-	auto it = std::find_if(device_list.begin(), device_list.end(),
-						    [device_list,id](const std::pair<int, std::string>& val) {
-							        return val.first == id;
-						});
-	if (it != device_list.end()) return id;
-
+	if (this->audio.IsOutputDevice(id)) {
+		return id;
+	}
+	
 	return -1;
 }
 

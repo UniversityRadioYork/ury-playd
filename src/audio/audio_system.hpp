@@ -74,6 +74,13 @@ public:
 	std::vector<AudioSystem::Device> GetDevicesInfo();
 
 	/**
+	 * Can a sound device output sound?
+	 * @param id Device ID.
+	 * @return If the device can handle outputting sound.
+	 */
+	bool IsOutputDevice(int id);
+
+	/**
 	 * Configures and returns a PortAudio stream.
 	 * @param channel_count The number of channels of the stream will
 	 *   receive.

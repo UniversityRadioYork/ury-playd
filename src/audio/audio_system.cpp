@@ -64,6 +64,13 @@ std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()
 	return list;
 }
 
+bool AudioSystem::IsOutputDevice(int id)
+{
+	auto &pa = portaudio::System::instance();
+	portaudio::Device &dev = pa.deviceByIndex(id);
+	return !dev.isInputOnlyDevice();
+}
+
 void AudioSystem::SetDeviceID(int id)
 {
 	this->device_id = std::to_string(id);
