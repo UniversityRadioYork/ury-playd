@@ -40,7 +40,7 @@ class Device;
 class AudioSystem {
 public:
 	/// Type for device entries.
-	using Device = std::pair<std::string, std::string>;
+	using Device = std::pair<int, std::string>;
 
 	/**
 	 * Constructs an AudioSystem, initialising its libraries.
@@ -71,7 +71,7 @@ public:
 	 * Gets the number and name of each output device entry in the AudioSystem.
 	 * @return List of output devices, as strings.
 	 */
-	std::vector<std::pair<int, std::string>> GetDevicesInfo();
+	std::vector<AudioSystem::Device> GetDevicesInfo();
 
 	/**
 	 * Configures and returns a PortAudio stream.

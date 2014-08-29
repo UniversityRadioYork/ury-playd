@@ -51,10 +51,10 @@ AudioSystem::~AudioSystem()
 	portaudio::System::terminate();
 }
 
-std::vector<std::pair<int, std::string>> AudioSystem::GetDevicesInfo()
+std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()
 {
 	auto &pa = portaudio::System::instance();
-	std::vector<std::pair<int, std::string>> list;
+	std::vector<AudioSystem::Device> list;
 
 	for (auto d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) {
 		if (!(*d).isInputOnlyDevice()) {
