@@ -7,6 +7,7 @@
  * @see main.cpp
  */
 
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 
@@ -36,26 +37,26 @@ int main(int argc, char *argv[])
 
 const std::chrono::microseconds Playslave::POSITION_PERIOD(500000);
 
-void Playslave::ListOutputDevices()
+int Playslave::GetDeviceID()
 {
-	this->audio.OnDevices([](const AudioSystem::Device &device) {
-		std::cout << device.first << ": " << device.second << std::endl;
-	});
-}
-
-std::string Playslave::DeviceID()
-{
-	std::string device = "";
-
-	// TODO: Perhaps make this section more robust.
-	if (this->arguments.size() < 2) {
-		ListOutputDevices();
-		throw ConfigError(MSG_DEV_NOID);
-	} else {
-		device = std::string(this->arguments[1]);
+	if (this->arguments.size() < 2) return -1;
+	
+	/* Only accept valid numbers. */
+	int id;
+	try {
+		id = std::stoi(this->arguments[1]);
+	} catch(...) {
+		/* Only std::invalid_argument and std::out_of_range are thrown here. */		
+		return -1;
 	}
 
-	return device;
+	/* Only allow valid (output) devices. */
+	auto device_list = this->audio.GetDevicesInfo();
+	if (this->audio.IsOutputDevice(id)) {
+		return id;
+	}
+	
+	return -1;
 }
 
 /**
@@ -116,20 +117,28 @@ Playslave::Playslave(int argc, char *argv[])
 
 	auto size = this->arguments.size();
 
+	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
+	std::string port = size > 3 ? this->arguments.at(3) : "1350";
 	this->io = decltype(this->io)(new IoReactor(
-	                this->player, this->handler,
-	                2 < size ? this->arguments.at(2) : "0.0.0.0",
-	                3 < size ? this->arguments.at(3) : "1350"));
+	                this->player, this->handler, addr, port));
 }
 
 int Playslave::Run()
 {
-	int exit_code = EXIT_SUCCESS;
-
 	try
 	{
 		// Don't roll this into the constructor: it'll go out of scope!
-		this->audio.SetDeviceID(DeviceID());
+		int id = this->GetDeviceID();
+		if (id == -1) {
+			/* Oops, user entered an invalid sound device. */
+			auto device_list = this->audio.GetDevicesInfo();
+			for (const auto &device : device_list) {
+				std::cout << device.first << ": " << device.second << std::endl;
+			}
+			return EXIT_FAILURE;
+		}
+		this->audio.SetDeviceID(id);
+		
 		this->player.SetPositionResponsePeriod(POSITION_PERIOD);
 		this->player.SetResponseSink(*this->io);
 		this->io->Run();
@@ -139,8 +148,8 @@ int Playslave::Run()
 		io->RespondWithError(error);
 		Debug() << "Unhandled exception caught, going away now."
 		        << std::endl;
-		exit_code = EXIT_FAILURE;
+		return EXIT_FAILURE;
 	}
 
-	return exit_code;
+	return EXIT_SUCCESS;
 }

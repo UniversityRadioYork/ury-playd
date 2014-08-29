@@ -53,15 +53,10 @@ private:
 	std::unique_ptr<IoReactor> io;      ///< The I/O handler.
 
 	/**
-	 * Tries to get the output device ID from stdin.
-	 * If there is no stdin, the program lists the available devices and
-	 * dies.
-	 * @param system The audio system.
-	 * @param argc The program argument count (from main()).
-	 * @param argv The program argument vector (from main()).
-	 * @return The device ID, as a string.
+	 * Tries to get the output device ID from program arguments.
+	 * @return The device ID, -1 if invalid selection (or none).
 	 */
-	std::string DeviceID();
+	int GetDeviceID();
 
 	/**
 	 * Lists on stdout all sound devices to which the audio output may

@@ -43,7 +43,7 @@ AudioSystem::AudioSystem()
 	portaudio::System::initialize();
 	av_register_all();
 
-	SetDeviceID("0");
+	this->device_id = -1;
 }
 
 AudioSystem::~AudioSystem()
@@ -51,22 +51,31 @@ AudioSystem::~AudioSystem()
 	portaudio::System::terminate();
 }
 
-void AudioSystem::OnDevices(std::function<void(const AudioSystem::Device &)> f)
-                const
+std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()
 {
 	auto &pa = portaudio::System::instance();
+	std::vector<AudioSystem::Device> list;
 
-	std::for_each(pa.devicesBegin(), pa.devicesEnd(),
-	              [&f](const portaudio::Device &d) {
-		if (!d.isInputOnlyDevice()) {
-			f(Device(std::to_string(d.index()), std::string(d.name())));
+	for (auto d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) {
+		if (!(*d).isInputOnlyDevice()) {
+			list.push_back(std::make_pair((*d).index(), (*d).name()));
 		}
-	});
+	}
+	return list;
 }
 
-void AudioSystem::SetDeviceID(const std::string &id)
+bool AudioSystem::IsOutputDevice(int id)
 {
-	this->device_id = std::string(id);
+	auto &pa = portaudio::System::instance();
+	if (id < 0 || id >= pa.deviceCount()) return false;
+
+	portaudio::Device &dev = pa.deviceByIndex(id);
+	return !dev.isInputOnlyDevice();
+}
+
+void AudioSystem::SetDeviceID(int id)
+{
+	this->device_id = std::to_string(id);
 }
 
 Audio *AudioSystem::Load(const std::string &path) const
