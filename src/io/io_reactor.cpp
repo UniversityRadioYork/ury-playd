@@ -43,6 +43,7 @@ void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 /// The callback fired when a client connection closes.
 void UvCloseCallback(uv_handle_t *handle)
 {
+	Debug() << "Closing client connection" << std::endl;
 	if (handle->data != nullptr) {
 		auto tcp = static_cast<TcpResponseSink *>(handle->data);
 		tcp->Close();
@@ -96,6 +97,7 @@ void IoReactor::NewConnection(uv_stream_t *server)
 	uv_tcp_init(uv_default_loop(), client);
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
+		Debug() << "New connection" << std::endl;
 		auto tcp = std::make_shared<TcpResponseSink>(*this, client,
 		                                             this->handler);
 		this->player.WelcomeClient(*tcp);
@@ -148,6 +150,7 @@ void IoReactor::InitAcceptor(const std::string &address,
 
 	// TODO: Handle errors from uv_listen.
 	uv_listen((uv_stream_t *)&this->server, 128, UvListenCallback);
+	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
 void IoReactor::RespondRaw(const std::string &string) const
@@ -174,6 +177,7 @@ TcpResponseSink::TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
 
 void TcpResponseSink::RespondRaw(const std::string &string) const
 {
+	Debug() << "Sending command:" << string << std::endl;
 	unsigned int l = string.length();
 	const char *s = string.c_str();
 
@@ -205,6 +209,5 @@ void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
 
 void TcpResponseSink::Close()
 {
-	Debug() << "Closing client connection" << std::endl;
 	this->parent.RemoveConnection(*this);
 }

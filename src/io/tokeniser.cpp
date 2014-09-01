@@ -115,6 +115,11 @@ void Tokeniser::Emit()
 
 	// TODO: Should this happen inside the tokeniser?
 	// I'd've thought it should be it's own module.
+	
+	Debug() << "Received command:";
+	for (const auto &word : this->words) std::cerr << ' ' << '"' << word << '"';
+	std::cerr << std::endl;
+
 	bool valid = this->handler.Handle(this->words);
 	if (valid) {
 		// TODO: Emit entire command back, not just first word.
