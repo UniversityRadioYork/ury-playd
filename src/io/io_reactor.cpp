@@ -45,6 +45,7 @@ void UvCloseCallback(uv_handle_t *handle)
 {
 	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(handle->data);
 	tcp->Close();
+	delete handle;
 }
 
 /// The callback fired when some bytes are read from a client connection.
@@ -89,7 +90,7 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 
 void IoReactor::NewConnection(uv_stream_t *server)
 {
-	uv_tcp_t *client = (uv_tcp_t *)malloc(sizeof(uv_tcp_t));
+	uv_tcp_t *client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
@@ -101,7 +102,7 @@ void IoReactor::NewConnection(uv_stream_t *server)
 
 		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 	} else {
-		uv_close((uv_handle_t *)client, nullptr);
+		uv_close((uv_handle_t *)client, UvCloseCallback);
 	}
 }
 
