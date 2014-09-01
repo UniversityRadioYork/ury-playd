@@ -43,8 +43,10 @@ void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 /// The callback fired when a client connection closes.
 void UvCloseCallback(uv_handle_t *handle)
 {
-	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(handle->data);
-	tcp->Close();
+	if (handle->data != nullptr) {
+		auto tcp = static_cast<TcpResponseSink *>(handle->data);
+		tcp->Close();
+	}
 	delete handle;
 }
 
