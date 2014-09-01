@@ -29,7 +29,6 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 		unsigned char c = start[i];
 
 		if (this->escape_next_character) {
-			this->escape_next_character = false;
 			Push(c);
 			continue;
 		}
@@ -42,44 +41,43 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 					Push(c);
 				}
 				break;
+
 			case QuoteType::DOUBLE:
 				switch (c) {
 					case '\"':
-						this->quote_type =
-						                QuoteType::NONE;
+						this->quote_type = QuoteType::NONE;
 						break;
+
 					case '\\':
-						this->escape_next_character =
-						                true;
+						this->escape_next_character = true;
 						break;
+
 					default:
 						Push(c);
 						break;
 				}
 				break;
+
 			case QuoteType::NONE:
 				switch (c) {
 					case '\n':
 						Emit();
 						break;
+
 					case '\'':
-						this->quote_type = QuoteType::
-						                SINGLE;
+						this->quote_type = QuoteType::SINGLE;
 						break;
+
 					case '\"':
-						this->quote_type = QuoteType::
-						                DOUBLE;
+						this->quote_type = QuoteType::DOUBLE;
 						break;
+
 					case '\\':
-						this->escape_next_character =
-							true;
+						this->escape_next_character = true;
 						break;
+
 					default:
-						if (isspace(c)) {
-							EndWord();
-						} else {
-							Push(c);
-						}
+						isspace(c) ? EndWord() : Push(c);
 						break;
 				}
 				break;
@@ -89,23 +87,20 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 
 void Tokeniser::Push(unsigned char c)
 {
-	assert(this->quote_type != QuoteType::NONE || !isspace(c));
+	assert(this->escape_next_character || !(this->quote_type == QuoteType::NONE && isspace(c)));
 	this->current_word.push_back(c);
+	this->escape_next_character = false;
 	assert(!this->current_word.empty());
 }
 
 void Tokeniser::EndWord()
 {
 	// Ignore consecutive runs of whitespace.
-	if (this->current_word.empty()) {
-		return;
-	}
+	if (this->current_word.empty()) return;
 
 	this->words.push_back(this->current_word);
-	assert(this->words.back() == this->current_word);
 
 	this->current_word.clear();
-	assert(this->current_word.empty());
 }
 
 void Tokeniser::Emit()
@@ -117,16 +112,16 @@ void Tokeniser::Emit()
 	// We might still be in a word, in which case we treat the end of a
 	// line as the end of the word too.
 	EndWord();
-	assert(this->current_word.empty());
 
+	// TODO: Should this happen inside the tokeniser?
+	// I'd've thought it should be it's own module.
 	bool valid = this->handler.Handle(this->words);
 	if (valid) {
 		// TODO: Emit entire command back, not just first word.
 		this->response_sink.Respond(ResponseCode::OKAY, this->words[0]);
 	} else {
 		// TODO: Better error reporting.
-		this->response_sink.Respond(ResponseCode::WHAT,
-		                            MSG_CMD_INVALID);
+		this->response_sink.Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
 	}
 
 	this->words.clear();
