@@ -37,7 +37,7 @@ struct WriteReq {
 /// The function used to allocate and initialise buffers for client reading.
 void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 {
-	*buf = uv_buf_init((char *)malloc(suggested_size), suggested_size);
+	*buf = uv_buf_init(new char[suggested_size](), suggested_size);
 }
 
 /// The callback fired when a client connection closes.
@@ -197,7 +197,10 @@ void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
 		return;
 	}
 
-	this->tokeniser.Feed(buf->base, nread);
+	if (buf->base != nullptr) {
+		this->tokeniser.Feed(buf->base, nread);
+		delete[] buf->base;
+	}
 }
 
 void TcpResponseSink::Close()
