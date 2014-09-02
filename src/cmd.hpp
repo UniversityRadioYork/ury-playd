@@ -47,7 +47,23 @@ private:
 	/// Reference to the Player on which commands run.
 	Player &player;
 
+	/**
+	 * Runs a nullary (0-argument) command.
+	 * @param cmd The command word.
+	 * @return True if the command was successfully found and executed;
+	 *   false otherwise.
+	 * @todo Richer command results.
+	 */
 	bool RunNullary(const std::string &cmd);
+
+	/**
+	 * Runs a unary (1-argument) command.
+	 * @param cmd The command word.
+	 * @param arg The argument to the command.
+	 * @return True if the command was successfully found and executed;
+	 *   false otherwise.
+	 * @todo Richer command results.
+	 */
 	bool RunUnary(const std::string &cmd, const std::string &arg);
 };
 

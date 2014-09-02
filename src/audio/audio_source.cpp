@@ -148,7 +148,7 @@ std::int64_t AudioSource::AvPositionFromMicroseconds(
 
 AudioSource::DecodeResult AudioSource::Decode()
 {
-	Resampler::ResultVector decoded;
+	DecodeVector decoded;
 
 	switch (this->decode_state) {
 		case DecodeState::WAITING_FOR_FRAME:

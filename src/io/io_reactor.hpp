@@ -92,20 +92,32 @@ public:
 	void RemoveConnection(TcpResponseSink &sink);
 
 private:
-	void RespondRaw(const std::string &string) const override;
-	void InitAcceptor(const std::string &address, const std::string &port);
-	void DoUpdateTimer();
-
+	/// The set of connections currently serviced by the IoReactor.
 	std::set<std::shared_ptr<TcpResponseSink>> connections;
 
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
 
-	uv_tcp_t server;
-	uv_timer_t updater;
+	uv_tcp_t server;         ///< The libuv handle for the TCP server.
+	uv_timer_t updater;      ///< The libuv handle for the update timer.
 
 	Player &player;          ///< The player.
 	CommandHandler &handler; ///< The command handler.
+
+	void RespondRaw(const std::string &string) const override;
+
+	/**
+	 * Initialises a TCP acceptor on the given address and port.
+	 *
+	 * @param address The IPv4 address on which the TCP server should
+	 *   listen.
+	 * @param port The TCP port on which the TCP server should listen.
+	 */
+	void InitAcceptor(const std::string &address, const std::string &port);
+
+	/// Sets up a periodic timer to run the playslave++ update loop.
+	void DoUpdateTimer();
+
 };
 
 /**
@@ -123,6 +135,8 @@ public:
 	TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
 	                CommandHandler &handler);
 
+	// Note: This is made public so that the IoReactor can send raw data
+	// to the connection.
 	void RespondRaw(const std::string &response) const override;
 
 	/**
@@ -141,8 +155,13 @@ public:
 	void Close();
 
 private:
+	/// The parent IoReactor on which this connection is running.
 	IoReactor &parent;
+
+	/// The libuv handle for the TCP connection.
 	uv_tcp_t *tcp;
+
+	/// The Tokeniser to which data read on this connection should be sent.
 	Tokeniser tokeniser;
 };
 
