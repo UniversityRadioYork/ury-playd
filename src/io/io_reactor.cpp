@@ -4,6 +4,13 @@
 /**
  * @file
  * Implementation of the non-virtual aspects of the IoReactor class.
+ *
+ * The implementation of IoReactor is based on [libuv][], and also makes use
+ * of various techniques mentioned in [the uvbook][].
+ *
+ * [libuv]: https://github.com/joyent/libuv
+ * [the uvbook]: https://nikhilm.github.io/uvbook
+ *
  * @see io/io_reactor.hpp
  */
 
@@ -29,9 +36,21 @@ const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 5; // ms
 // These should generally trampoline back into class methods.
 //
 
+/**
+ * A structure used to associate a write buffer with a write handle.
+ *
+ * The WriteReq can appear to libuv code as a `uv_write_t`, as it includes a
+ * `uv_write_t` at the start of its memory footprint.  This is a slightly
+ * nasty use of low-level C, but works well.
+ *
+ * This tactic comes from the [Buffers and Streams][b] section of the uvbook;
+ * see the _Write to pipe_ sub-section.
+ *
+ * [b]: https://nikhilm.github.io/uvbook/filesystem.html#buffers-and-streams
+ */
 struct WriteReq {
-	uv_write_t req;
-	uv_buf_t buf;
+	uv_write_t req;	///< The main libuv write handle.
+	uv_buf_t buf;	///< The associated write buffer.
 };
 
 /// The function used to allocate and initialise buffers for client reading.
