@@ -11,9 +11,8 @@
 #define PS_PLAYER_STATE_HPP
 
 #include <cstdint>
-#include <initializer_list>
 #include <functional>
-#include <boost/optional.hpp>
+#include <initializer_list>
 
 #include "../io/io_response.hpp"
 

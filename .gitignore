@@ -17,3 +17,7 @@ doc/
 cov-int/
 build-log.txt
 playslave-plusplus.tgz
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace

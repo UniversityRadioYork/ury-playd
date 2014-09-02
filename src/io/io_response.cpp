@@ -7,8 +7,8 @@
  * @see io/io_response.hpp
  */
 
-#include "io_response.hpp" // ResponseSink, ResponseCode
-#include "../errors.hpp"   // Error
+#include "../errors.hpp"
+#include "io_response.hpp"
 
 const std::string RESPONSES[] = {
 	/* ResponseCode::OKAY     */ "OKAY",
@@ -22,7 +22,7 @@ const std::string RESPONSES[] = {
 	/* ResponseCode::END      */ "END"
 };
 
-void ResponseSink::Respond(ResponseCode code, const std::string &message)
+void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 {
 	// ResponseCodes are formatted as "CODE message\n".
 	// Delegate the actual sending of the response string to the concrete
@@ -30,7 +30,7 @@ void ResponseSink::Respond(ResponseCode code, const std::string &message)
 	RespondRaw(RESPONSES[static_cast<int>(code)] + " " + message);
 }
 
-void ResponseSink::RespondWithError(const Error &error)
+void ResponseSink::RespondWithError(const Error &error) const
 {
 	Respond(ResponseCode::FAIL, error.Message());
 }
@@ -41,12 +41,12 @@ void ResponseSink::RespondWithError(const Error &error)
 
 void ResponseSource::SetResponseSink(ResponseSink &responder)
 {
-	this->push_sink = std::ref(responder);
+	this->push_sink = &responder;
 }
 
 void ResponseSource::Push() const
 {
-	if (this->push_sink.is_initialized()) {
-		Emit(this->push_sink.get().get());
+	if (this->push_sink != nullptr) {
+		Emit(*this->push_sink);
 	}
 }

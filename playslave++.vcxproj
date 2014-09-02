@@ -10,6 +10,50 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\audio\audio.cpp" />
+    <ClCompile Include="src\audio\audio_resample.cpp" />
+    <ClCompile Include="src\audio\audio_sink.cpp" />
+    <ClCompile Include="src\audio\audio_source.cpp" />
+    <ClCompile Include="src\audio\audio_system.cpp" />
+    <ClCompile Include="src\audio\swr.cpp" />
+    <ClCompile Include="src\cmd.cpp" />
+    <ClCompile Include="src\contrib\pa_ringbuffer\pa_ringbuffer.c" />
+    <ClCompile Include="src\errors.cpp" />
+    <ClCompile Include="src\io\io_reactor.cpp" />
+    <ClCompile Include="src\io\io_response.cpp" />
+    <ClCompile Include="src\io\tokeniser.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\player\player.cpp" />
+    <ClCompile Include="src\player\player_file.cpp" />
+    <ClCompile Include="src\player\player_position.cpp" />
+    <ClCompile Include="src\player\player_state.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\audio\audio.hpp" />
+    <ClInclude Include="src\audio\audio_resample.hpp" />
+    <ClInclude Include="src\audio\audio_sink.hpp" />
+    <ClInclude Include="src\audio\audio_source.hpp" />
+    <ClInclude Include="src\audio\audio_system.hpp" />
+    <ClInclude Include="src\audio\ringbuffer.hpp" />
+    <ClInclude Include="src\audio\swr.hpp" />
+    <ClInclude Include="src\cmd.hpp" />
+    <ClInclude Include="src\contrib\pa_ringbuffer\pa_memorybarrier.h" />
+    <ClInclude Include="src\contrib\pa_ringbuffer\pa_ringbuffer.h" />
+    <ClInclude Include="src\errors.hpp" />
+    <ClInclude Include="src\io\io_reactor.hpp" />
+    <ClInclude Include="src\io\io_response.hpp" />
+    <ClInclude Include="src\io\tokeniser.hpp" />
+    <ClInclude Include="src\main.hpp" />
+    <ClInclude Include="src\messages.h" />
+    <ClInclude Include="src\player\player.hpp" />
+    <ClInclude Include="src\player\player_file.hpp" />
+    <ClInclude Include="src\player\player_position.hpp" />
+    <ClInclude Include="src\player\player_state.hpp" />
+    <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\sample_formats.hpp" />
+    <ClInclude Include="src\time_parser.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{625EC8F2-633C-4666-BC4B-25F6BECABA31}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -48,14 +92,15 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\Matt\Documents\boost_1_55_0;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\mattbw\Documents\GitHub\libuv\include;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Users\mattbw\Documents\boost_1_55_0\stage\lib;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\mattbw\Documents\GitHub\libuv\Debug\lib;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;psapi.lib;ws2_32.lib;iphlpapi.lib;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>libcmtd</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -73,45 +118,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="audio\audio.cpp" />
-    <ClCompile Include="audio\audio_source.cpp" />
-    <ClCompile Include="audio\audio_sink.cpp" />
-    <ClCompile Include="audio\audio_resample.cpp" />
-    <ClCompile Include="audio\audio_system.cpp" />
-    <ClCompile Include="audio\swr.cpp" />
-    <ClCompile Include="cmd.cpp" />
-    <ClCompile Include="contrib\pa_ringbuffer.c" />
-    <ClCompile Include="errors.cpp" />
-    <ClCompile Include="io\io_reactor.cpp" />
-    <ClCompile Include="io\io_response.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="player\player.cpp" />
-    <ClCompile Include="player\player_position.cpp" />
-    <ClCompile Include="player\player_state.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="audio\audio.hpp" />
-    <ClInclude Include="audio\audio_source.hpp" />
-    <ClInclude Include="audio\audio_sink.hpp" />
-    <ClInclude Include="audio\audio_resample.hpp" />
-    <ClInclude Include="audio\audio_system.hpp" />
-    <ClInclude Include="audio\ringbuffer.hpp" />
-    <ClInclude Include="audio\swr.hpp" />
-    <ClInclude Include="cmd.hpp" />
-    <ClInclude Include="contrib\pa_memorybarrier.h" />
-    <ClInclude Include="contrib\pa_ringbuffer.h" />
-    <ClInclude Include="errors.hpp" />
-    <ClInclude Include="io\io_reactor.hpp" />
-    <ClInclude Include="io\io_response.hpp" />
-    <ClInclude Include="main.hpp" />
-    <ClInclude Include="messages.h" />
-    <ClInclude Include="player\player.hpp" />
-    <ClInclude Include="player\player_position.hpp" />
-    <ClInclude Include="player\player_state.hpp" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="sample_formats.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -10,9 +10,9 @@
 #ifndef PS_CMD_HPP
 #define PS_CMD_HPP
 
-#include <memory>
 #include <functional>
 #include <map>
+#include <memory>
 #include <vector>
 
 #include "player/player.hpp"
@@ -38,31 +38,32 @@ public:
 
 	/**
 	 * Handles a command line.
-	 * @param line A reference to the line to handle as a command.
+	 * @param words A reference to the list of words in the command.
 	 * @return Whether the command succeeded.
 	 */
-	bool Handle(const std::string &line);
+	bool Handle(const WordList &words);
 
 private:
 	/// Reference to the Player on which commands run.
 	Player &player;
 
 	/**
-	 * Parses a command line into a list of words.
-	 * @param line The line to split into words.
-	 * @return The list of words in the command line.
+	 * Runs a nullary (0-argument) command.
+	 * @param cmd The command word.
+	 * @return True if the command was successfully found and executed;
+	 *   false otherwise.
+	 * @todo Richer command results.
 	 */
-	WordList LineToWords(const std::string &line);
+	bool RunNullary(const std::string &cmd);
 
 	/**
-	 * Runs a command.
-	 * @param words The words that form the command: the first word is taken
-	 *   to be the command name.
-	 * @return true if the command was valid; false otherwise.
+	 * Runs a unary (1-argument) command.
+	 * @param cmd The command word.
+	 * @param arg The argument to the command.
+	 * @return True if the command was successfully found and executed;
+	 *   false otherwise.
+	 * @todo Richer command results.
 	 */
-	bool Run(const WordList &words);
-
-	bool RunNullary(const std::string &cmd);
 	bool RunUnary(const std::string &cmd, const std::string &arg);
 };
 

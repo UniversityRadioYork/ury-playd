@@ -7,9 +7,9 @@
  * @see audio/audio_sink.hpp
  */
 
+#include <algorithm>
 #include <cassert>
 #include <climits>
-#include <algorithm>
 #include <string>
 
 #include "portaudiocpp/PortAudioCpp.hxx"
@@ -17,9 +17,7 @@
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
 #include "../messages.h"
-
 #include "audio_sink.hpp"
-
 #include "ringbuffer.hpp"
 
 const size_t AudioSink::RINGBUF_POWER = 16;

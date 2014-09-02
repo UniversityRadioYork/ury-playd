@@ -10,134 +10,23 @@
 #ifndef PS_IO_REACTOR_HPP
 #define PS_IO_REACTOR_HPP
 
-#include <chrono>
-#include <boost/asio.hpp>
-#include "io_response.hpp"
-#include <deque>          // std::deque
-#include <functional>     // std::function
-#include <ostream>        // std::ostream
-#include <set>            // std::set
-#include "io_reactor.hpp" // IoReactor
+#include <deque>
+#include <functional>
+#include <ostream>
+#include <set>
+
+extern "C" {
+#include <uv.h>
+}
+
 #include "../player/player.hpp"
+#include "io_reactor.hpp"
+#include "io_response.hpp"
+#include "tokeniser.hpp"
 
+class CommandHandler;
 class Player;
-class CommandHandler;
-
-#include <boost/asio.hpp>
-#include <boost/enable_shared_from_this.hpp>
-
-class CommandHandler;
-
-class TcpConnectionManager;
-
-/**
- * A connection using the TCP server.
- */
-class TcpConnection : public std::enable_shared_from_this<TcpConnection>,
-                      public ResponseSink {
-public:
-	/// A shared pointer to a TcpConnection.
-	using Pointer = std::shared_ptr<TcpConnection>;
-
-	/**
-	 * Creates a new TcpConnection.
-	 * @param cmd A function that sends a command line to be handled.
-	 * @param manager The manager that is handling this connection.
-	 * @param io_service The IO service to be used for this connection.
-	 * @param player A const reference to the player.
-	 * @return A TcpConnection.
-	 */
-	explicit TcpConnection(std::function<void(const std::string &)> cmd,
-	                       TcpConnectionManager &manager,
-	                       boost::asio::io_service &io_service,
-	                       const Player &player);
-
-	/// Deleted copy constructor.
-	TcpConnection(const TcpConnection &) = delete;
-
-	/// Deleted copy-assignment.
-	TcpConnection &operator=(const TcpConnection &) = delete;
-
-	/**
-	 * Starts this TcpConnection.
-	 */
-	void Start();
-
-	/**
-	 * Stops this TcpConnection.
-	 */
-	void Stop();
-
-	/**
-	 * Sends a message to this connection.
-	 * @param string The message to send.
-	 */
-	void Send(const std::string &string);
-
-	/**
-	 * Gets the socket to which this connection is attached.
-	 * @return A reference to the TCP socket.
-	 */
-	boost::asio::ip::tcp::socket &Socket();
-
-protected:
-	void RespondRaw(const std::string &string) override;
-
-private:
-	void DoRead();
-	void DoWrite();
-
-	boost::asio::ip::tcp::socket socket;
-	boost::asio::streambuf data;
-	boost::asio::io_service::strand strand;
-	std::deque<std::string> outbox;
-	std::function<void(const std::string &)> cmd;
-	TcpConnectionManager &manager;
-	const Player &player;
-	ResponseSink::Callback new_client_callback;
-
-	bool closing;
-};
-
-/**
- * A manager for TcpConnection objects.
- */
-class TcpConnectionManager {
-public:
-	/// Deleted copy constructor.
-	TcpConnectionManager(const TcpConnectionManager &) = delete;
-
-	/// Deleted copy-assignment.
-	TcpConnectionManager &operator=(const TcpConnectionManager &) = delete;
-
-	explicit TcpConnectionManager();
-
-	/**
-	 * Starts a TcpConnection, registering it with this manager.
-	 * @param c A shared pointer to the TcpConnection.
-	 */
-	void Start(TcpConnection::Pointer c);
-
-	/**
-	 * Stops a TcpConnection, unregistering it with this manager.
-	 * @param c A shared pointer to the TcpConnection.
-	 */
-	void Stop(TcpConnection::Pointer c);
-
-	/**
-	 * Stops and unregisters all connections.
-	 */
-	void StopAll();
-
-	/**
-	 * Sends a message to all connections.
-	 * @param string The message to send.
-	 */
-	void Send(const std::string &string);
-
-private:
-	std::set<TcpConnection::Pointer> connections;
-};
+class TcpResponseSink;
 
 /**
  * The IO reactor, which services input, routes responses, and executes the
@@ -175,39 +64,105 @@ public:
 	 */
 	void End();
 
-private:
-	void RespondRaw(const std::string &string) override;
-	void DoAccept();
-	void InitAcceptor(const std::string &address, const std::string &port);
-	void DoUpdateTimer();
-	void InitSignals();
-
-	/// The period between player updates.
-	static const std::chrono::nanoseconds PLAYER_UPDATE_PERIOD;
+	/**
+	 * Accepts a new connection.
+	 *
+	 * This accepts the connection, and adds it to this IoReactor's
+	 * connection pool.
+	 *
+	 * This should be called with a server that has just received a new
+	 * connection.
+	 *
+	 * @param server Pointer to the libuv server accepting connections.
+	 *
+	 * @todo This isn't a great fit for the public interface of IoReactor -
+	 *   separate into a ConnectionPool class?
+	 */
+	void NewConnection(uv_stream_t *server);
 
 	/**
-	 * Sends a command to the command handler.
-	 * The result of the command is responded on as per the playslave API.
-	 * @param line The command line received by the IO reactor.
+	 * Removes a connection.
+	 *
+	 * @param sink The connection to remove.
+	 *
+	 * @todo Rename sink?
+	 * @todo This isn't a great fit for the public interface of IoReactor -
+	 *   separate into a ConnectionPool class?
 	 */
-	void HandleCommand(const std::string &line);
+	void RemoveConnection(TcpResponseSink &sink);
 
-	Player &player;                     ///< The player.
-	CommandHandler &handler;            ///< The command handler.
-	boost::asio::io_service io_service; ///< The ASIO IO service.
+private:
+	/// The set of connections currently serviced by the IoReactor.
+	std::set<std::shared_ptr<TcpResponseSink>> connections;
 
-	/// The acceptor used to listen for incoming connections.
-	boost::asio::ip::tcp::acceptor acceptor;
+	/// The period between player updates.
+	static const uint16_t PLAYER_UPDATE_PERIOD;
 
-	/// The signal set used to shut the server down on terminations.
-	boost::asio::signal_set signals;
+	uv_tcp_t server;         ///< The libuv handle for the TCP server.
+	uv_timer_t updater;      ///< The libuv handle for the update timer.
 
-	/// The object responsible for managing live connections.
-	TcpConnectionManager manager;
+	Player &player;          ///< The player.
+	CommandHandler &handler; ///< The command handler.
 
-	TcpConnection::Pointer new_connection;
+	void RespondRaw(const std::string &string) const override;
 
-	ResponseSink::Callback new_client_callback;
+	/**
+	 * Initialises a TCP acceptor on the given address and port.
+	 *
+	 * @param address The IPv4 address on which the TCP server should
+	 *   listen.
+	 * @param port The TCP port on which the TCP server should listen.
+	 */
+	void InitAcceptor(const std::string &address, const std::string &port);
+
+	/// Sets up a periodic timer to run the playslave++ update loop.
+	void DoUpdateTimer();
+
+};
+
+/**
+ * A TCP connection from a client.
+ * @todo Rename to Connection?
+ */
+class TcpResponseSink : public ResponseSink {
+public:
+	/**
+	 * Constructs a TcpResponseSink.
+	 * @param parent The IoReactor that is the parent of this connection.
+	 * @param tcp The underlying libuv TCP stream.
+	 * @param handler The handler to which read commands should be sent.
+	 */
+	TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
+	                CommandHandler &handler);
+
+	// Note: This is made public so that the IoReactor can send raw data
+	// to the connection.
+	void RespondRaw(const std::string &response) const override;
+
+	/**
+	 * Processes a data read on this connection.
+	 *
+	 * @param stream The libuv TCP/IP stream providing the data.
+	 * @param nread The number of bytes read.
+	 * @param buf The buffer containing the read data.
+	 */
+	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
+
+	/**
+	 * Closes this connection.
+	 * @todo Roll into the destructor/use RAII?
+	 */
+	void Close();
+
+private:
+	/// The parent IoReactor on which this connection is running.
+	IoReactor &parent;
+
+	/// The libuv handle for the TCP connection.
+	uv_tcp_t *tcp;
+
+	/// The Tokeniser to which data read on this connection should be sent.
+	Tokeniser tokeniser;
 };
 
 #endif // PS_IO_REACTOR_HPP

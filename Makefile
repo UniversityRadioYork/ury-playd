@@ -7,7 +7,7 @@ builddir ?= build
 srcdir ?= src
 
 # The warning flags to use when building playslav e++.
-WARNS ?= -Wall -Wextra -Werror -pedantic
+WARNS ?= -Wall -Wextra -Werror
 
 # Programs used during building.
 CC         ?= gcc
@@ -15,6 +15,7 @@ CXX        ?= g++
 GZIP       ?= gzip -9 --stdout
 INSTALL    ?= install
 PKG_CONFIG ?= pkg-config
+FORMAT     ?= clang-format -i
 
 # Variables used to decide where to install playslave++ and its man pages.
 prefix      ?= /usr/local
@@ -36,11 +37,12 @@ MAN_GZ  = $(builddir)/$(NAME).1.gz
 # This should include all of the source directories for playslave++,
 # excluding any special ones defined below.  The root source directory is
 # implied.
-SUBDIRS = audio io player contrib/pa_ringbuffer
+OWN_SUBDIRS = audio io player
+SUBDIRS     = $(OWN_SUBDIRS) contrib/pa_ringbuffer
 
 # Now we work out which libraries to use, using pkg-config.
 # These packages are always used: the PortAudio C library, and FFmpeg.
-PKGS = portaudio-2.0 libavcodec libavformat libavutil libswresample
+PKGS = portaudio-2.0 libavcodec libavformat libavutil libswresample libuv
 
 # PortAudio's C++ bindings aren't always available, so we bundle them.
 # However, if there is a PortAudioCPP package available, we can make use of it
@@ -68,12 +70,23 @@ OBJECTS  = $(patsubst $(srcdir)%,$(builddir)%,$(SOURCES:.cpp=.o))
 CSOURCES = $(foreach dir,$(SRC_SUBDIRS),$(wildcard $(dir)/*.c))
 COBJECTS = $(patsubst $(srcdir)%,$(builddir)%,$(CSOURCES:.c=.o))
 
+# These are used for source transformations, such as formatting.
+# We don't want to disturb contributed source with these.
+OWN_SRC_SUBDIRS = $(srcdir) $(addprefix $(srcdir)/,$(OWN_SUBDIRS))
+OWN_SOURCES     = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.cpp))
+OWN_CSOURCES    = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.c))
+OWN_HEADERS     = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.hpp))
+OWN_CHEADERS    = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.h))
+TO_FORMAT       = $(OWN_SOURCES) $(OWN_CSOURCES) $(OWN_HEADERS) $(OWN_CHEADERS)
+
 # Now set up the flags needed for playslave++.
 CFLAGS   += -c $(WARNS) $(PKG_CFLAGS) -g -std=c99
 CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS) -g -std=c++11
-LDFLAGS  += $(PKG_LDFLAGS) -lboost_system
+LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##
+
+.PHONY: clean mkdir install run gdbrun format
 
 all: mkdir $(BIN) man
 man: $(MAN_GZ)
@@ -110,3 +123,7 @@ run: $(BIN)
 
 gdbrun: $(BIN)
 	gdb $(BIN)
+
+format: $(TO_FORMAT)
+	@echo FORMAT $^
+	@$(FORMAT) $^

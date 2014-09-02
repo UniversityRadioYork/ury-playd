@@ -4,294 +4,229 @@
 /**
  * @file
  * Implementation of the non-virtual aspects of the IoReactor class.
+ *
+ * The implementation of IoReactor is based on [libuv][], and also makes use
+ * of various techniques mentioned in [the uvbook][].
+ *
+ * [libuv]: https://github.com/joyent/libuv
+ * [the uvbook]: https://nikhilm.github.io/uvbook
+ *
  * @see io/io_reactor.hpp
- * @see io/io_reactor_asio.hpp
- * @see io/io_reactor_asio.cpp
- * @see io/io_reactor_std.hpp
- * @see io/io_reactor_std.cpp
  */
 
-/* This is forced because we require C++11, which has std::chrono, anyway.
-   Some environments fail Boost's std::chrono detection, and don't set this
-   flag, which causes compilation failures. */
-#ifndef BOOST_ASIO_HAS_STD_CHRONO
-#define BOOST_ASIO_HAS_STD_CHRONO
-#endif
+#include <csignal>
+#include <string>
 
-#include <csignal>              // SIG*
-#include <string>               // std::string
-#include "../player/player.hpp" // Player
-#include "../cmd.hpp"           // CommandHandler
+extern "C" {
+#include <uv.h>
+}
+
+#include "../cmd.hpp"
 #include "../errors.hpp"
-#include "../messages.h"                        // MSG_*
-#include "io_reactor.hpp"                       // IoReactor
-#include "io_response.hpp"                      // ResponseCode
-#include <boost/asio.hpp>                       // boost::asio::*
-#include <boost/asio/high_resolution_timer.hpp> // boost::asio::high_resolution_timer
+#include "../messages.h"
+#include "../player/player.hpp"
+#include "io_reactor.hpp"
+#include "io_response.hpp"
 
-const std::chrono::nanoseconds IoReactor::PLAYER_UPDATE_PERIOD(1000);
+const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 5; // ms
+
+//
+// libuv callbacks
+//
+// These should generally trampoline back into class methods.
+//
+
+/**
+ * A structure used to associate a write buffer with a write handle.
+ *
+ * The WriteReq can appear to libuv code as a `uv_write_t`, as it includes a
+ * `uv_write_t` at the start of its memory footprint.  This is a slightly
+ * nasty use of low-level C, but works well.
+ *
+ * This tactic comes from the [Buffers and Streams][b] section of the uvbook;
+ * see the _Write to pipe_ sub-section.
+ *
+ * [b]: https://nikhilm.github.io/uvbook/filesystem.html#buffers-and-streams
+ */
+struct WriteReq {
+	uv_write_t req;	///< The main libuv write handle.
+	uv_buf_t buf;	///< The associated write buffer.
+};
+
+/// The function used to allocate and initialise buffers for client reading.
+void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
+{
+	*buf = uv_buf_init(new char[suggested_size](), suggested_size);
+}
+
+/// The callback fired when a client connection closes.
+void UvCloseCallback(uv_handle_t *handle)
+{
+	Debug() << "Closing client connection" << std::endl;
+	if (handle->data != nullptr) {
+		auto tcp = static_cast<TcpResponseSink *>(handle->data);
+		tcp->Close();
+	}
+	delete handle;
+}
+
+/// The callback fired when some bytes are read from a client connection.
+void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+{
+	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(stream->data);
+	tcp->Read(stream, nread, buf);
+}
+
+/// The callback fired when a new client connection is acquired by the listener.
+void UvListenCallback(uv_stream_t *server, int status)
+{
+	if (status == -1) {
+		return;
+	}
+	IoReactor *reactor = static_cast<IoReactor *>(server->data);
+	reactor->NewConnection(server);
+}
+
+/// The callback fired when a response has been sent to a client.
+void UvRespondCallback(uv_write_t *req, int)
+{
+	// TODO: Handle the int status?
+	WriteReq *wr = (WriteReq *)req;
+	delete[] wr->buf.base;
+	delete wr;
+}
+
+/// The callback fired when the update timer fires.
+void UvUpdateTimerCallback(uv_timer_t *handle)
+{
+	Player *player = static_cast<Player *>(handle->data);
+	bool running = player->Update();
+	if (!running) {
+		uv_stop(uv_default_loop());
+	}
+}
+
+//
+// IoReactor
+//
+
+void IoReactor::NewConnection(uv_stream_t *server)
+{
+	uv_tcp_t *client = new uv_tcp_t();
+	uv_tcp_init(uv_default_loop(), client);
+
+	if (uv_accept(server, (uv_stream_t *)client) == 0) {
+		Debug() << "New connection" << std::endl;
+		auto tcp = std::make_shared<TcpResponseSink>(*this, client,
+		                                             this->handler);
+		this->player.WelcomeClient(*tcp);
+		this->connections.insert(tcp);
+		client->data = static_cast<void *>(tcp.get());
+
+		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
+	} else {
+		uv_close((uv_handle_t *)client, UvCloseCallback);
+	}
+}
+
+void IoReactor::RemoveConnection(TcpResponseSink &conn)
+{
+	this->connections.erase(std::make_shared<TcpResponseSink>(conn));
+}
 
 IoReactor::IoReactor(Player &player, CommandHandler &handler,
                      const std::string &address, const std::string &port)
-    : player(player),
-      handler(handler),
-      io_service(),
-      acceptor(io_service),
-      signals(io_service),
-      manager(),
-      new_connection()
+    : player(player), handler(handler)
 {
-	InitSignals();
 	InitAcceptor(address, port);
-	DoAccept();
 	DoUpdateTimer();
 }
 
 void IoReactor::Run()
 {
-	io_service.run();
-}
-
-void IoReactor::HandleCommand(const std::string &line)
-{
-	bool valid = this->handler.Handle(line);
-	if (valid) {
-		Respond(ResponseCode::OKAY, line);
-	} else {
-		Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
-	}
-}
-
-void IoReactor::InitSignals()
-{
-	this->signals.add(SIGINT);
-	this->signals.add(SIGTERM);
-#ifdef SIGQUIT
-	this->signals.add(SIGQUIT);
-#endif // SIGQUIT
-
-	this->signals.async_wait([this](boost::system::error_code,
-	                                int) { End(); });
+	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
 void IoReactor::DoUpdateTimer()
 {
-	auto tick = std::chrono::duration_cast<
-	                std::chrono::high_resolution_clock::duration>(
-	                PLAYER_UPDATE_PERIOD);
-	boost::asio::high_resolution_timer t(this->io_service, tick);
-	t.async_wait([this](boost::system::error_code) {
-		bool running = this->player.Update();
-		if (running) {
-			DoUpdateTimer();
-		} else {
-			End();
-		}
-	});
+	uv_timer_init(uv_default_loop(), &this->updater);
+	this->updater.data = static_cast<void *>(&this->player);
+	uv_timer_start(&this->updater, UvUpdateTimerCallback, 0,
+	               PLAYER_UPDATE_PERIOD);
 }
 
 void IoReactor::InitAcceptor(const std::string &address,
                              const std::string &port)
 {
-	boost::asio::ip::tcp::resolver resolver(io_service);
-	boost::asio::ip::tcp::endpoint endpoint =
-	                *resolver.resolve({ address, port });
-	this->acceptor.open(endpoint.protocol());
-	this->acceptor.set_option(
-	                boost::asio::ip::tcp::acceptor::reuse_address(true));
-	this->acceptor.bind(endpoint);
-	this->acceptor.listen();
+	int uport = std::stoi(port);
+
+	uv_tcp_init(uv_default_loop(), &this->server);
+	this->server.data = static_cast<void *>(this);
+
+	struct sockaddr_in bind_addr;
+	uv_ip4_addr(address.c_str(), uport, &bind_addr);
+	uv_tcp_bind(&this->server, (const sockaddr *)&bind_addr, 0);
+
+	// TODO: Handle errors from uv_listen.
+	uv_listen((uv_stream_t *)&this->server, 128, UvListenCallback);
+	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoReactor::DoAccept()
+void IoReactor::RespondRaw(const std::string &string) const
 {
-	auto cmd = [this](const std::string &line) { HandleCommand(line); };
-	this->new_connection.reset(new TcpConnection(
-	                cmd, this->manager, this->io_service, this->player));
-	auto on_accept = [this](boost::system::error_code ec) {
-		if (!ec) {
-			this->manager.Start(this->new_connection);
-		}
-		if (this->acceptor.is_open()) {
-			DoAccept();
-		}
-	};
-	this->acceptor.async_accept(this->new_connection->Socket(), on_accept);
-}
-
-void IoReactor::RespondRaw(const std::string &string)
-{
-	this->manager.Send(string);
+	for (const auto &conn : this->connections) {
+		conn->RespondRaw(string);
+	}
 }
 
 void IoReactor::End()
 {
-	this->acceptor.close();
-	this->manager.StopAll();
-	this->io_service.stop();
+	uv_stop(uv_default_loop());
 }
 
 //
-// TcpConnection
+// TcpResponseSink
 //
 
-TcpConnection::TcpConnection(std::function<void(const std::string &)> cmd,
-                             TcpConnectionManager &manager,
-                             boost::asio::io_service &io_service,
-                             const Player &player)
-    : socket(io_service),
-      strand(io_service),
-      outbox(),
-      cmd(cmd),
-      manager(manager),
-      player(player),
-      closing(false)
+TcpResponseSink::TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
+                                 CommandHandler &handler)
+    : parent(parent), tcp(tcp), tokeniser(handler, *this)
 {
 }
 
-void TcpConnection::Start()
+void TcpResponseSink::RespondRaw(const std::string &string) const
 {
-	this->player.WelcomeClient(*this);
-	DoRead();
+	Debug() << "Sending command:" << string << std::endl;
+	unsigned int l = string.length();
+	const char *s = string.c_str();
+
+	WriteReq *req = new WriteReq;
+	req->buf = uv_buf_init(new char[l + 1], l + 1);
+	memcpy(req->buf.base, s, l);
+	req->buf.base[l] = '\n';
+
+	uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1,
+	         UvRespondCallback);
 }
 
-void TcpConnection::Stop()
+void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
+                           const uv_buf_t *buf)
 {
-	this->closing = true;
-	boost::system::error_code ignored_ec;
-	this->socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both,
-	                      ignored_ec);
-	this->socket.close();
-}
-
-boost::asio::ip::tcp::socket &TcpConnection::Socket()
-{
-	return socket;
-}
-
-void TcpConnection::DoRead()
-{
-	// This is needed to keep the TcpConnection alive while it performs the
-	// read.  Otherwise, it'd be destructed as soon as it goes out of the
-	// connection manager's list and cause illegal memory accesses.
-	auto self(shared_from_this());
-
-	boost::asio::async_read_until(socket, data, "\n",
-	                              [this,
-	                               self](const boost::system::error_code &
-	                                                     ec,
-	                                     std::size_t) {
-		if (!ec) {
-			std::istream is(&data);
-			std::string s;
-			std::getline(is, s);
-
-			// If the line ended with CRLF, getline will miss the
-			// CR, so we need to remove it from the line here.
-			if (s.back() == '\r') {
-				s.pop_back();
-			}
-
-			this->cmd(s);
-
-			DoRead();
-		} else if (ec != boost::asio::error::operation_aborted) {
-			this->manager.Stop(shared_from_this());
+	if (nread < 0) {
+		if (nread == UV_EOF) {
+			uv_close((uv_handle_t *)stream, UvCloseCallback);
 		}
-	});
-}
 
-void TcpConnection::Send(const std::string &string)
-{
-	if (this->closing) {
 		return;
 	}
 
-	// This somewhat complex combination of a strand and queue ensure that
-	// only one process actually writes to a TcpConnection at a given time.
-	// Otherwise, writes could interrupt each other.
-	this->strand.post([this, string]() {
-		this->outbox.push_back(string);
-		// If this string is the only one in the queue, then the last
-		// chain
-		// of DoWrite()s will have ended and we need to start a new one.
-		if (this->outbox.size() == 1) {
-			DoWrite();
-		}
-	});
-}
-
-void TcpConnection::DoWrite()
-{
-	// This is needed to keep the TcpConnection alive while it performs the
-	// write.  Otherwise, it'd be destructed as soon as it goes out of the
-	// connection manager's list and cause illegal memory accesses.
-	auto self(shared_from_this());
-
-	std::string string = this->outbox[0];
-	// This is called after the write has finished.
-	auto write_cb = [this, self](const boost::system::error_code &ec,
-	                             std::size_t) {
-		if (!ec) {
-			this->outbox.pop_front();
-			// Keep writing until and unless the outbox is emptied.
-			// After that, the next Send will start DoWrite()ing
-			// again.
-			if (!this->outbox.empty()) {
-				DoWrite();
-			}
-		} else if (ec != boost::asio::error::operation_aborted) {
-			this->manager.Stop(shared_from_this());
-		}
-	};
-
-	// Only add the newline character at the final opportunity.
-	// Makes for easier debug lines.
-	assert(string.back() != '\n');
-	string += '\n';
-	boost::asio::async_write(
-	                this->socket,
-	                boost::asio::buffer(string.c_str(), string.size()),
-	                this->strand.wrap(write_cb));
-}
-
-void TcpConnection::RespondRaw(const std::string &string)
-{
-	Send(string);
-}
-
-//
-// TcpConnectionManager
-//
-
-TcpConnectionManager::TcpConnectionManager()
-{
-}
-
-void TcpConnectionManager::Start(TcpConnection::Pointer c)
-{
-	this->connections.insert(c);
-	c->Start();
-}
-
-void TcpConnectionManager::Stop(TcpConnection::Pointer c)
-{
-	c->Stop();
-	this->connections.erase(c);
-}
-
-void TcpConnectionManager::StopAll()
-{
-	for (auto c : this->connections) {
-		c->Stop();
+	if (buf->base != nullptr) {
+		this->tokeniser.Feed(buf->base, nread);
+		delete[] buf->base;
 	}
-	this->connections.clear();
 }
 
-void TcpConnectionManager::Send(const std::string &string)
+void TcpResponseSink::Close()
 {
-	Debug() << "Send to all:" << string << std::endl;
-	for (auto c : this->connections) {
-		c->Send(string);
-	}
+	this->parent.RemoveConnection(*this);
 }

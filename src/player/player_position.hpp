@@ -13,7 +13,6 @@
 #include <chrono>
 #include <functional>
 #include <set>
-#include <boost/optional.hpp>
 
 #include "../io/io_response.hpp"
 
@@ -34,11 +33,14 @@ private:
 	/// The current position of the player.
 	Unit current;
 
+	/// The position of the player at the last push.
+	Unit last;
+
 	/**
-	 * The position of the player at the last firing of the callbacks.
-	 * This may be empty, if the callbacks have never fired.
+	 * Whether the position was reset since the last push.
+	 * This is also set high if the position has never been emitted.
 	 */
-	boost::optional<Unit> last;
+	bool has_reset;
 
 public:
 	/// Constructs a PlayerPosition.

@@ -7,23 +7,23 @@
  * @see audio/audio_source.hpp
  */
 
-#include <functional>
-#include <string>
-#include <memory>
 #include <cassert>
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
+#include <functional>
 #include <iostream>
-#include <sstream>
 #include <map>
+#include <memory>
+#include <sstream>
+#include <string>
 
-/* ffmpeg */
+// ffmpeg
 extern "C" {
 #ifdef WIN32
 #define inline __inline
 #endif
 #include <libavcodec/avcodec.h>
-#include <libavcodec/version.h> /* For old version patchups */
+#include <libavcodec/version.h> // For old version patchups
 #include <libavformat/avformat.h>
 #include <libavutil/opt.h>
 }
@@ -31,9 +31,8 @@ extern "C" {
 #include "../errors.hpp"
 #include "../messages.h"
 #include "../sample_formats.hpp"
-
-#include "audio_source.hpp"
 #include "audio_resample.hpp"
+#include "audio_source.hpp"
 
 const size_t AudioSource::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
 
@@ -149,7 +148,7 @@ std::int64_t AudioSource::AvPositionFromMicroseconds(
 
 AudioSource::DecodeResult AudioSource::Decode()
 {
-	Resampler::ResultVector decoded;
+	DecodeVector decoded;
 
 	switch (this->decode_state) {
 		case DecodeState::WAITING_FOR_FRAME:
@@ -210,6 +209,9 @@ bool AudioSource::ReadFrame()
 
 Resampler::ResultVector AudioSource::Resample()
 {
+        if (this->frame->nb_samples == 0) {
+                return Resampler::ResultVector();
+        }
 	return this->resampler->Resample(this->frame);
 }
 
@@ -347,7 +349,7 @@ bool AudioSource::DecodePacket()
 	assert(0 <= this->packet.size);
 
 	bool frame_finished = decode_result.second;
-	return frame_finished || (0 < this->packet.size);
+	return frame_finished || (0 == this->packet.size);
 }
 
 std::pair<int, bool> AudioSource::AvCodecDecode()

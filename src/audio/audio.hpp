@@ -23,8 +23,8 @@ namespace portaudio {
 class Stream;
 }
 
-class AudioSource;
 class AudioSink;
+class AudioSource;
 
 /**
  * An audio file.
@@ -151,6 +151,11 @@ private:
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
 
+	/**
+	 * Decodes a new frame, if the current frame is empty.
+	 * @return True if more frames are available to decode; false
+	 *   otherwise.
+	 */
 	bool DecodeIfFrameEmpty();
 
 	/// Transfers as much of the current frame as possible to the sink.

@@ -21,8 +21,8 @@
 #include "portaudiocpp/CallbackInterface.hxx"
 #include "portaudiocpp/Stream.hxx"
 
-#include "audio_source.hpp"
 #include "audio_resample.hpp"
+#include "audio_source.hpp"
 #include "ringbuffer.hpp"
 
 /// Type of results emitted during the play callback step.
@@ -160,18 +160,62 @@ private:
 	 * The callback proper.
 	 * This is executed in a separate thread by PortAudio once a stream is
 	 * playing with the callback registered to it.
+	 * @param inputBuffer The buffer containing input data; ignored.
+	 * @param outputBuffer The output buffer to which our samples should
+	 *   be written.
+	 * @param numFrames The number of samples PortAudio wants to read from
+	 *   @a outputBuffer.
+	 * @param timeInfo The time information from PortAudio; ignored.
+	 * @param statusFlags The PortAudio status flags; ignored.
+	 * @return The number of samples written to the output buffer.
 	 */
 	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
 	                  unsigned long numFrames,
 	                  const PaStreamCallbackTimeInfo *timeInfo,
 	                  PaStreamCallbackFlags statusFlags) override;
+
+	/**
+	 * Performs one step in the callback.
+	 * @param out The output buffer to which our samples should be written.
+	 * @param frames_per_buf The number of samples PortAudio wants to read
+	 *   @a out.
+	 * @param in The result from the previous PlayCallbackStep.
+	 * @return A PlayCallbackStepResult containing the status code and
+	 *   number of samples written as of the end of this step.
+	 */
 	PlayCallbackStepResult PlayCallbackStep(char *out,
 	                                        unsigned long frames_per_buf,
 	                                        PlayCallbackStepResult in);
+
+	/**
+	 * Performs a successful play callback step.
+	 * This ensures that the appropriate number of samples are read into
+	 * PortAudio's buffer.
+	 * @param out The output buffer to which our samples should be written.
+	 * @param avail The number of samples available in the ring buffer.
+	 * @param frames_per_buf The number of samples PortAudio wants to read
+	 *   @a out.
+	 * @param in The result from the previous PlayCallbackStep.
+	 * @return A PlayCallbackStepResult containing the status code and
+	 *   number of samples written as of the end of this step.
+	 */
 	PlayCallbackStepResult PlayCallbackSuccess(char *out,
 	                                           unsigned long avail,
 	                                           unsigned long frames_per_buf,
 	                                           PlayCallbackStepResult in);
+
+	/**
+	 * Performs error cleanup for a failed play callback step.
+	 * This ensures that the output buffer is filled with silence and the
+	 * correct error code is returned.
+	 * @param out The output buffer to which our samples should be written.
+	 * @param avail The number of samples available in the ring buffer.
+	 * @param frames_per_buf The number of samples PortAudio wants to read
+	 *   @a out.
+	 * @param in The result from the previous PlayCallbackStep.
+	 * @return A PlayCallbackStepResult containing the status code and
+	 *   number of samples written as of the end of this step.
+	 */
 	PlayCallbackStepResult PlayCallbackFailure(char *out,
 	                                           unsigned long avail,
 	                                           unsigned long frames_per_buf,

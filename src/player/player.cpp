@@ -9,21 +9,25 @@
  * @see player/player_state.cpp
  */
 
-#include <stdexcept>
-#include <sstream>
-#include <string>
 #include <cassert>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
-#include "player.hpp"
-#include "player_state.hpp"
-#include "../audio/audio.hpp"
 #include "../audio/audio_system.hpp"
+#include "../audio/audio.hpp"
 #include "../errors.hpp"
 #include "../io/io_response.hpp"
 #include "../messages.h"
+#include "player_state.hpp"
+#include "player.hpp"
 
 Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
-    : file(audio_system), position(), state(), time_parser(time_parser)
+    : file(audio_system),
+      position(),
+      state(),
+      time_parser(time_parser),
+      end_sink(nullptr)
 {
 }
 
@@ -41,9 +45,8 @@ bool Player::Update()
 void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
-		if (this->end_sink.is_initialized()) {
-			this->end_sink.get().get().Respond(ResponseCode::END,
-			                                   "");
+		if (this->end_sink != nullptr) {
+			this->end_sink->Respond(ResponseCode::END, "");
 		}
 		Stop();
 		Seek("0");
@@ -66,7 +69,7 @@ void Player::SetResponseSink(ResponseSink &sink)
 	this->file.SetResponseSink(sink);
 	this->position.SetResponseSink(sink);
 	this->state.SetResponseSink(sink);
-	this->end_sink = std::ref(sink);
+	this->end_sink = &sink;
 }
 
 //
@@ -91,7 +94,6 @@ bool Player::Load(const std::string &path)
 		{
 			this->file.Load(path);
 			ResetPosition();
-			Debug() << "Loaded " << path << std::endl;
 			SetState(PlayerState::State::STOPPED);
 		}
 		catch (FileError &)
@@ -100,7 +102,7 @@ bool Player::Load(const std::string &path)
 			Eject();
 			valid = false;
 		}
-		catch (Error &error)
+		catch (Error &)
 		{
 			// Ensure a load failure doesn't leave a corrupted track
 			// loaded.

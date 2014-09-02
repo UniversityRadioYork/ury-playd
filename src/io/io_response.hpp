@@ -10,14 +10,12 @@
 #ifndef PS_IO_RESPONSE_HPP
 #define PS_IO_RESPONSE_HPP
 
-#include <functional> // std::function
-#include <map>        // std::map
-#include <string>     // std::string
-#include <ostream>    // std::ostream etc.
+#include <functional>
+#include <map>
+#include <ostream>
+#include <string>
 
-#include <boost/optional.hpp>
-
-#include "../errors.hpp" // Error
+#include "../errors.hpp"
 
 /**
  * Four-character response codes.
@@ -58,24 +56,21 @@ public:
 	 * @param code The response code to emit.
 	 * @param message The response message.
 	 */
-	void Respond(ResponseCode code, const std::string &message);
+	void Respond(ResponseCode code, const std::string &message) const;
 
 	/**
 	 * Emits an error as a response.
 	 * @param error The error to convert to a response.
 	 */
-	void RespondWithError(const Error &error);
+	void RespondWithError(const Error &error) const;
 
 protected:
 	/**
 	 * Outputs a raw response string.
 	 * @param string The response string, of the form "CODE message".
 	 */
-	virtual void RespondRaw(const std::string &string) = 0;
+	virtual void RespondRaw(const std::string &string) const = 0;
 };
-
-/// Type for slots that accept ResponseSinks.  Yeeeah.
-using ResponseSinkSlot = boost::optional<std::reference_wrapper<ResponseSink>>;
 
 /**
  * Abstract helper class for sources of responses.
@@ -118,7 +113,7 @@ private:
 	 * A ResponseSink to which 'push' responses are emitted.
 	 * If the ResponseSink is not present, responses are not emitted.
 	 */
-	ResponseSinkSlot push_sink;
+	ResponseSink *push_sink;
 };
 
 #endif // PS_IO_RESPONSE_HPP

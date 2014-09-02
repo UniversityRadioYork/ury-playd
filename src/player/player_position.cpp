@@ -10,10 +10,13 @@
 
 #include <chrono>
 #include <sstream>
-#include "player.hpp"
-#include "../io/io_response.hpp"
 
+#include "../io/io_response.hpp"
+#include "player.hpp"
+
+//
 // Player
+//
 
 void Player::SetPositionResponsePeriod(PlayerPosition::Unit period)
 {
@@ -31,7 +34,10 @@ void Player::ResetPosition()
 	this->position.Reset();
 }
 
+//
 // PlayerPosition
+//
+
 PlayerPosition::PlayerPosition()
 {
 	// Default to broadcasting the position every time it is changed.
@@ -47,13 +53,15 @@ void PlayerPosition::Update(const PlayerPosition::Unit position)
 	if (IsReadyToSend()) {
 		Push();
 		this->last = this->current;
+		this->has_reset = 0;
 	}
 }
 
 void PlayerPosition::Reset()
 {
-	this->current = decltype(this->current)(0);
-	this->last = boost::none;
+	this->current = Unit(0);
+	this->last = Unit(0);
+	this->has_reset = true;
 }
 
 void PlayerPosition::Emit(ResponseSink &target) const
@@ -66,7 +74,7 @@ void PlayerPosition::Emit(ResponseSink &target) const
 
 bool PlayerPosition::IsReadyToSend()
 {
-	return (!this->last) || ((*this->last) + this->period <= this->current);
+	return this->has_reset || (this->last + this->period <= this->current);
 }
 
 void PlayerPosition::SetResponsePeriod(PlayerPosition::Unit period)

@@ -32,7 +32,11 @@ void PlayerFile::Load(const std::string &path)
 
 void PlayerFile::Eject()
 {
-	assert(this->audio != nullptr);
+	// Don't bother actually ejecting if there isn't anything to eject.
+	if (this->audio == nullptr) {
+		return;
+	}
+
 	this->audio->Stop();
 	this->audio = nullptr;
 }

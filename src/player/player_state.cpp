@@ -2,15 +2,17 @@
 // Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
 
 /**
-* @file
-* Implementation of the PlayerState class, and related Player methods.
-* @see player/player_state.hpp
-* @see player/player.hpp
-*/
+ * @file
+ * Implementation of the PlayerState class, and related Player methods.
+ * @see player/player_state.hpp
+ * @see player/player.hpp
+ */
 
-#include "player.hpp"
-#include "player_state.hpp"
+#include <algorithm>
+
 #include "../io/io_response.hpp"
+#include "player_state.hpp"
+#include "player.hpp"
 
 //
 // Player

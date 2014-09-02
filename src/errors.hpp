@@ -15,7 +15,6 @@
 
 /**
  * A Playslave exception.
- * @todo Replace the enum with subclasses.
  */
 class Error {
 public:

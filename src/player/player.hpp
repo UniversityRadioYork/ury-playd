@@ -23,8 +23,8 @@
 #include <utility>
 
 #include "../audio/audio.hpp"
-#include "../time_parser.hpp"
 #include "../io/io_response.hpp"
+#include "../time_parser.hpp"
 
 #include "player_file.hpp"
 #include "player_position.hpp"
@@ -41,11 +41,15 @@ public:
 	using TP = TimeParser<std::chrono::microseconds>;
 
 private:
-	PlayerFile file;
-	PlayerPosition position;
-	PlayerState state;
+	PlayerFile file;          ///< The file subcomponent of the Player.
+	PlayerPosition position;  ///< The position subcomponent of the Player.
+	PlayerState state;        ///< The state subcomponent of the Player.
+
+	/// The time parser used to parse seek commands.
 	const TP &time_parser;
-	ResponseSinkSlot end_sink;
+
+	/// The sink to which END responses shall be sent.
+	ResponseSink *end_sink;
 
 public:
 	/**

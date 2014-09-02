@@ -22,9 +22,8 @@ class Device;
 }
 
 #include "../sample_formats.hpp"
-
-#include "audio_source.hpp"
 #include "audio_sink.hpp"
+#include "audio_source.hpp"
 #include "audio.hpp"
 
 /**
@@ -41,7 +40,7 @@ class Device;
 class AudioSystem {
 public:
 	/// Type for device entries.
-	using Device = std::pair<std::string, std::string>;
+	using Device = std::pair<int, std::string>;
 
 	/**
 	 * Constructs an AudioSystem, initialising its libraries.
@@ -66,13 +65,20 @@ public:
 	 * Sets the current device ID.
 	 * @param id The device ID to use for subsequent Audios.
 	 */
-	void SetDeviceID(const std::string &id);
+	void SetDeviceID(int id);
 
 	/**
-	 * Performs a function on each device entry in the AudioSystem.
-	 * @param f The function to call on each device.
+	 * Gets the number and name of each output device entry in the AudioSystem.
+	 * @return List of output devices, as strings.
 	 */
-	void OnDevices(std::function<void(const Device &)> f) const;
+	std::vector<AudioSystem::Device> GetDevicesInfo();
+
+	/**
+	 * Can a sound device output sound?
+	 * @param id Device ID.
+	 * @return If the device can handle outputting sound.
+	 */
+	bool IsOutputDevice(int id);
 
 	/**
 	 * Configures and returns a PortAudio stream.
