@@ -12,11 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\audio\audio.cpp" />
-    <ClCompile Include="src\audio\audio_resample.cpp" />
     <ClCompile Include="src\audio\audio_sink.cpp" />
     <ClCompile Include="src\audio\audio_source.cpp" />
     <ClCompile Include="src\audio\audio_system.cpp" />
-    <ClCompile Include="src\audio\swr.cpp" />
     <ClCompile Include="src\cmd.cpp" />
     <ClCompile Include="src\contrib\pa_ringbuffer\pa_ringbuffer.c" />
     <ClCompile Include="src\errors.cpp" />
@@ -31,12 +29,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\audio\audio.hpp" />
-    <ClInclude Include="src\audio\audio_resample.hpp" />
     <ClInclude Include="src\audio\audio_sink.hpp" />
     <ClInclude Include="src\audio\audio_source.hpp" />
     <ClInclude Include="src\audio\audio_system.hpp" />
     <ClInclude Include="src\audio\ringbuffer.hpp" />
-    <ClInclude Include="src\audio\swr.hpp" />
     <ClInclude Include="src\cmd.hpp" />
     <ClInclude Include="src\contrib\pa_ringbuffer\pa_memorybarrier.h" />
     <ClInclude Include="src\contrib\pa_ringbuffer\pa_ringbuffer.h" />
@@ -63,6 +59,8 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -92,15 +90,16 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\mattbw\Documents\GitHub\libuv\include;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\mattbw\Documents\sox\sox\src;C:\Users\mattbw\Documents\GitHub\libuv\include;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Users\mattbw\Documents\GitHub\libuv\Debug\lib;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;psapi.lib;ws2_32.lib;iphlpapi.lib;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>libcmtd</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>C:\Users\mattbw\Documents\sox\sox\msvc10\Debug\lib;C:\Users\mattbw\Documents\GitHub\libuv\Debug\;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;libflac.lib;libgsm.lib;libid3tag.lib;liblpc10.lib;libmad.lib;libmp3lame.lib;libogg.lib;libpng.lib;libsndfileg72x.lib;libsndfile-1.lib;libsndfilegsm610.lib;libsox.lib;libspeex.lib;libvorbis.lib;libwavpack.lib;libzlib.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

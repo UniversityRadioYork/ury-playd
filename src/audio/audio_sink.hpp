@@ -51,7 +51,7 @@ public:
 	using SamplePosition = std::uint64_t;
 
 	/// Type of iterators used in the Transfer() method.
-	using TransferIterator = Resampler::ResultVector::iterator;
+	using TransferIterator = AudioSource::DecodeVector::iterator;
 
 	/**
 	 * Constructs an AudioSink.

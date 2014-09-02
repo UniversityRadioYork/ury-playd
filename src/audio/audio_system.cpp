@@ -14,7 +14,7 @@
 #include <string>
 
 extern "C" {
-#include "libavformat/avformat.h"
+#include <sox.h>
 #include "portaudio.h"
 }
 
@@ -41,7 +41,7 @@ class CallbackInterface;
 AudioSystem::AudioSystem()
 {
 	portaudio::System::initialize();
-	av_register_all();
+	sox_format_init();
 
 	this->device_id = -1;
 }
@@ -49,6 +49,7 @@ AudioSystem::AudioSystem()
 AudioSystem::~AudioSystem()
 {
 	portaudio::System::terminate();
+	sox_format_quit();
 }
 
 std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()

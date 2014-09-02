@@ -23,8 +23,9 @@ namespace portaudio {
 class Stream;
 }
 
+#include "audio_source.hpp"
+
 class AudioSink;
-class AudioSource;
 
 /**
  * An audio file.
@@ -143,10 +144,10 @@ private:
 	bool file_ended;
 
 	/// The current decoded frame.
-	std::vector<char> frame;
+	AudioSource::DecodeVector frame;
 
 	/// The current position in the current decoded frame.
-	std::vector<char>::iterator frame_iterator;
+	AudioSource::DecodeVector::iterator frame_iterator;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
