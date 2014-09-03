@@ -40,13 +40,17 @@ const std::chrono::microseconds Playslave::POSITION_PERIOD(500000);
 int Playslave::GetDeviceID()
 {
 	if (this->arguments.size() < 2) return -1;
-	
+
 	/* Only accept valid numbers. */
 	int id;
-	try {
+	try
+	{
 		id = std::stoi(this->arguments[1]);
-	} catch(...) {
-		/* Only std::invalid_argument and std::out_of_range are thrown here. */		
+	}
+	catch (...)
+	{
+		/* Only std::invalid_argument and std::out_of_range are thrown
+		 * here. */
 		return -1;
 	}
 
@@ -55,7 +59,7 @@ int Playslave::GetDeviceID()
 	if (this->audio.IsOutputDevice(id)) {
 		return id;
 	}
-	
+
 	return -1;
 }
 
@@ -119,8 +123,8 @@ Playslave::Playslave(int argc, char *argv[])
 
 	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
 	std::string port = size > 3 ? this->arguments.at(3) : "1350";
-	this->io = decltype(this->io)(new IoReactor(
-	                this->player, this->handler, addr, port));
+	this->io = decltype(this->io)(
+	                new IoReactor(this->player, this->handler, addr, port));
 }
 
 int Playslave::Run()
@@ -133,12 +137,13 @@ int Playslave::Run()
 			/* Oops, user entered an invalid sound device. */
 			auto device_list = this->audio.GetDevicesInfo();
 			for (const auto &device : device_list) {
-				std::cout << device.first << ": " << device.second << std::endl;
+				std::cout << device.first << ": "
+				          << device.second << std::endl;
 			}
 			return EXIT_FAILURE;
 		}
 		this->audio.SetDeviceID(id);
-		
+
 		this->player.SetPositionResponsePeriod(POSITION_PERIOD);
 		this->player.SetResponseSink(*this->io);
 		this->io->Run();

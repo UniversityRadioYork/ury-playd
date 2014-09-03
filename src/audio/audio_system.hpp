@@ -68,7 +68,8 @@ public:
 	void SetDeviceID(int id);
 
 	/**
-	 * Gets the number and name of each output device entry in the AudioSystem.
+	 * Gets the number and name of each output device entry in the
+	 * AudioSystem.
 	 * @return List of output devices, as strings.
 	 */
 	std::vector<AudioSystem::Device> GetDevicesInfo();
