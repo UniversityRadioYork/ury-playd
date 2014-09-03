@@ -98,8 +98,8 @@ private:
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
 
-	uv_tcp_t server;         ///< The libuv handle for the TCP server.
-	uv_timer_t updater;      ///< The libuv handle for the update timer.
+	uv_tcp_t server;    ///< The libuv handle for the TCP server.
+	uv_timer_t updater; ///< The libuv handle for the update timer.
 
 	Player &player;          ///< The player.
 	CommandHandler &handler; ///< The command handler.
@@ -117,7 +117,6 @@ private:
 
 	/// Sets up a periodic timer to run the playslave++ update loop.
 	void DoUpdateTimer();
-
 };
 
 /**

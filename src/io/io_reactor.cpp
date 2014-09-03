@@ -49,8 +49,8 @@ const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 5; // ms
  * [b]: https://nikhilm.github.io/uvbook/filesystem.html#buffers-and-streams
  */
 struct WriteReq {
-	uv_write_t req;	///< The main libuv write handle.
-	uv_buf_t buf;	///< The associated write buffer.
+	uv_write_t req; ///< The main libuv write handle.
+	uv_buf_t buf;   ///< The associated write buffer.
 };
 
 /// The function used to allocate and initialise buffers for client reading.

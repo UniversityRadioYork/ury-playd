@@ -58,7 +58,8 @@ std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()
 
 	for (auto d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) {
 		if (!(*d).isInputOnlyDevice()) {
-			list.push_back(std::make_pair((*d).index(), (*d).name()));
+			list.push_back(std::make_pair((*d).index(),
+			                              (*d).name()));
 		}
 	}
 	return list;
