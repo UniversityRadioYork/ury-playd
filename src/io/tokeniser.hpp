@@ -43,9 +43,9 @@ public:
 private:
 	/// Enumeration of quotation types.
 	enum class QuoteType : std::uint8_t {
-		NONE,    ///< Not currently in a quote pair.
-		SINGLE,  ///< In single quotes ('').
-		DOUBLE   ///< In double quotes ("").
+		NONE,   ///< Not currently in a quote pair.
+		SINGLE, ///< In single quotes ('').
+		DOUBLE  ///< In double quotes ("").
 	};
 
 	/// The command handler to which complete lines should be sent.

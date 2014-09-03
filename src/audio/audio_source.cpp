@@ -209,9 +209,9 @@ bool AudioSource::ReadFrame()
 
 Resampler::ResultVector AudioSource::Resample()
 {
-        if (this->frame->nb_samples == 0) {
-                return Resampler::ResultVector();
-        }
+	if (this->frame->nb_samples == 0) {
+		return Resampler::ResultVector();
+	}
 	return this->resampler->Resample(this->frame);
 }
 

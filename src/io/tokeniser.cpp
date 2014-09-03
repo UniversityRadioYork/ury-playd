@@ -45,11 +45,13 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 			case QuoteType::DOUBLE:
 				switch (c) {
 					case '\"':
-						this->quote_type = QuoteType::NONE;
+						this->quote_type =
+						                QuoteType::NONE;
 						break;
 
 					case '\\':
-						this->escape_next_character = true;
+						this->escape_next_character =
+						                true;
 						break;
 
 					default:
@@ -65,19 +67,23 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 						break;
 
 					case '\'':
-						this->quote_type = QuoteType::SINGLE;
+						this->quote_type = QuoteType::
+						                SINGLE;
 						break;
 
 					case '\"':
-						this->quote_type = QuoteType::DOUBLE;
+						this->quote_type = QuoteType::
+						                DOUBLE;
 						break;
 
 					case '\\':
-						this->escape_next_character = true;
+						this->escape_next_character =
+						                true;
 						break;
 
 					default:
-						isspace(c) ? EndWord() : Push(c);
+						isspace(c) ? EndWord()
+						           : Push(c);
 						break;
 				}
 				break;
@@ -87,7 +93,8 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 
 void Tokeniser::Push(unsigned char c)
 {
-	assert(this->escape_next_character || !(this->quote_type == QuoteType::NONE && isspace(c)));
+	assert(this->escape_next_character ||
+	       !(this->quote_type == QuoteType::NONE && isspace(c)));
 	this->current_word.push_back(c);
 	this->escape_next_character = false;
 	assert(!this->current_word.empty());
@@ -115,9 +122,10 @@ void Tokeniser::Emit()
 
 	// TODO: Should this happen inside the tokeniser?
 	// I'd've thought it should be it's own module.
-	
+
 	Debug() << "Received command:";
-	for (const auto &word : this->words) std::cerr << ' ' << '"' << word << '"';
+	for (const auto &word : this->words)
+		std::cerr << ' ' << '"' << word << '"';
 	std::cerr << std::endl;
 
 	bool valid = this->handler.Handle(this->words);
@@ -126,7 +134,8 @@ void Tokeniser::Emit()
 		this->response_sink.Respond(ResponseCode::OKAY, this->words[0]);
 	} else {
 		// TODO: Better error reporting.
-		this->response_sink.Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
+		this->response_sink.Respond(ResponseCode::WHAT,
+		                            MSG_CMD_INVALID);
 	}
 
 	this->words.clear();

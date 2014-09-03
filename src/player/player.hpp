@@ -41,9 +41,9 @@ public:
 	using TP = TimeParser<std::chrono::microseconds>;
 
 private:
-	PlayerFile file;          ///< The file subcomponent of the Player.
-	PlayerPosition position;  ///< The position subcomponent of the Player.
-	PlayerState state;        ///< The state subcomponent of the Player.
+	PlayerFile file;         ///< The file subcomponent of the Player.
+	PlayerPosition position; ///< The position subcomponent of the Player.
+	PlayerState state;       ///< The state subcomponent of the Player.
 
 	/// The time parser used to parse seek commands.
 	const TP &time_parser;
