@@ -65,9 +65,9 @@ do weird things in the presence of Telnet-isms.
 
 ### Requirements
 
-* [libsox][] (latest version)
-* [libuv][] v0.11.28
-* [PortAudio][] V19
+* [libsox][] (1.14.1)
+* [libuv][] (0.11.29)
+* [PortAudio][] (19_20140130)
 * A C++11 compiler (recent versions of [clang][], [gcc][], and Visual Studio
   work)
 
@@ -135,7 +135,8 @@ Studio project is provided, but will need tweaking for your environment.
 
 #### MinGW
 
-Not yet thoroughly tested, but should work.
+We haven't managed ourselves, but assuming you can build all the dependencies,
+(libsox is the difficult one), it should work fine.
 
 ### PortAudio C++ Bindings
 
