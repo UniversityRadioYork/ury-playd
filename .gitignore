@@ -16,7 +16,7 @@ doc/
 # Coverity
 cov-int/
 build-log.txt
-playslave-plusplus.tgz
+playd.tgz
 
 # Sublime Text
 *.sublime-project
