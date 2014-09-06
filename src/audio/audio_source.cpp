@@ -22,21 +22,9 @@ extern "C" {
 #include <sox.h>
 }
 
-// ffmpeg
-extern "C" {
-#ifdef WIN32
-#define inline __inline
-#endif
-#include <libavcodec/avcodec.h>
-#include <libavcodec/version.h> // For old version patchups
-#include <libavformat/avformat.h>
-#include <libavutil/opt.h>
-}
-
 #include "../errors.hpp"
 #include "../messages.h"
 #include "../sample_formats.hpp"
-#include "audio_resample.hpp"
 #include "audio_source.hpp"
 
 // This value is somewhat arbitrary, but corresponds to the minimum buffer size

@@ -21,7 +21,6 @@
 #include "portaudiocpp/CallbackInterface.hxx"
 #include "portaudiocpp/Stream.hxx"
 
-#include "audio_resample.hpp"
 #include "audio_source.hpp"
 #include "ringbuffer.hpp"
 
@@ -60,7 +59,7 @@ public:
 	 * occupies.
 	 */
 	AudioSink(const StreamConfigurator c,
-	          Resampler::SampleByteCount bytes_per_sample);
+	          AudioSource::SampleByteCount bytes_per_sample);
 
 	/**
 	 * Starts the audio stream.
@@ -138,7 +137,7 @@ private:
 	static const size_t RINGBUF_POWER;
 
 	/// Number of bytes in one sample.
-	Resampler::SampleByteCount bytes_per_sample;
+	AudioSource::SampleByteCount bytes_per_sample;
 
 	/// The ring buffer used to transfer samples to the playing callback.
 	RingBuffer<char, unsigned long> ring_buf;

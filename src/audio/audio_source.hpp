@@ -21,7 +21,6 @@
 
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
-#include "audio_resample.hpp"
 
 /**
  * An object responsible for decoding an audio file.
@@ -47,6 +46,9 @@ public:
 
 	/// Type of the result of Decode().
 	using DecodeResult = std::pair<DecodeState, DecodeVector>;
+
+	/// Type for the count of bytes per sample.
+	using SampleByteCount = int;
 
 	/**
 	 * Constructs an AudioSource.
