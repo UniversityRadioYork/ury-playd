@@ -1,9 +1,9 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
- * Declarations of the Playslave Error exception set.
+ * Declarations of the playd Error exception set.
  * @see errors.cpp
  */
 
@@ -14,7 +14,7 @@
 #include <sstream>
 
 /**
- * A Playslave exception.
+ * A playd exception.
  */
 class Error {
 public:
@@ -39,7 +39,7 @@ private:
 //
 
 /**
- * An Error signifying that Playslave has been improperly configured.
+ * An Error signifying that playd has been improperly configured.
  */
 class ConfigError : public Error {
 public:
@@ -51,7 +51,7 @@ public:
 };
 
 /**
- * An Error signifying that Playslave has hit an internal snag.
+ * An Error signifying that playd has hit an internal snag.
  */
 class InternalError : public Error {
 public:
@@ -63,7 +63,7 @@ public:
 };
 
 /**
- * An Error signifying that Playslave can't read a file.
+ * An Error signifying that playd can't read a file.
  */
 class FileError : public Error {
 public:
@@ -74,7 +74,7 @@ public:
 	FileError(const std::string &message) : Error(message) {};
 };
 
-/** Class for telling the human what playslave is doing. */
+/** Class for telling the human what playd is doing. */
 class Debug {
 public:
 	/** Constructor. */

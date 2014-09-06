@@ -1,9 +1,9 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
- * Implementation of the Playslave Error exception set.
+ * Implementation of the playd Error exception set.
  * @see errors.hpp
  */
 

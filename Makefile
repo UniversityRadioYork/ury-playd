@@ -6,7 +6,7 @@ builddir ?= build
 # Where the source resides.
 srcdir ?= src
 
-# The warning flags to use when building playslav e++.
+# The warning flags to use when building playd.
 WARNS ?= -Wall -Wextra -Werror
 
 # Programs used during building.
@@ -17,7 +17,7 @@ INSTALL    ?= install
 PKG_CONFIG ?= pkg-config
 FORMAT     ?= clang-format -i
 
-# Variables used to decide where to install playslave++ and its man pages.
+# Variables used to decide where to install playd and its man pages.
 prefix      ?= /usr/local
 bindir      ?= $(prefix)/bin
 mandir      ?= /usr/share/man/man1
@@ -26,7 +26,7 @@ mandir      ?= /usr/share/man/man1
 
 # The name of the program.  This is hardcoded in several places, such as the
 # man page, so users are not recommended to change it.
-NAME = playslave++
+NAME = playd
 
 # Calculate the path to the outputted program.
 BIN = $(builddir)/$(NAME)
@@ -34,7 +34,7 @@ BIN = $(builddir)/$(NAME)
 MAN_SRC = $(srcdir)/$(NAME).1
 MAN_GZ  = $(builddir)/$(NAME).1.gz
 
-# This should include all of the source directories for playslave++,
+# This should include all of the source directories for playd,
 # excluding any special ones defined below.  The root source directory is
 # implied.
 OWN_SUBDIRS = audio io player
@@ -79,7 +79,7 @@ OWN_HEADERS     = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.hpp))
 OWN_CHEADERS    = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.h))
 TO_FORMAT       = $(OWN_SOURCES) $(OWN_CSOURCES) $(OWN_HEADERS) $(OWN_CHEADERS)
 
-# Now set up the flags needed for playslave++.
+# Now set up the flags needed for playd.
 CFLAGS   += -c $(WARNS) $(PKG_CFLAGS) -g -std=c99
 CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS) -g -std=c++11
 LDFLAGS  += $(PKG_LDFLAGS)

@@ -1,9 +1,9 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
- * Constant human-readable messages used within Playslave.
+ * Constant human-readable messages used within playd.
  */
 
 #ifndef PS_MESSAGES_H
@@ -44,13 +44,13 @@ const std::string MSG_OUTPUT_RINGWRITE = "Ring buffer write error";
 /// Message shown when there is an error initialising the ring buffer.
 const std::string MSG_OUTPUT_RINGINIT = "Ring buffer init error";
 
-/// Message shown when a client connects to Playslave.
-const std::string MSG_OHAI = "Playslave++";
+/// Message shown when a client connects to playd.
+const std::string MSG_OHAI = "playd";
 
-/// Message shown when a client disconnects from Playslave.
+/// Message shown when a client disconnects from playd.
 const std::string MSG_TTFN = "Sleep now";
 
-/// The string providing a space-delimited set of features Playslave implements.
+/// The string providing a space-delimited set of features playd implements.
 const std::string MSG_FEATURES = "FileLoad Seek StopStart Time";
 
 #endif // PS_MESSAGES_H

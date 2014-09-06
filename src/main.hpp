@@ -1,9 +1,9 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
- * Declaration of the Playslave class.
+ * Declaration of the playd class.
  * @see main.cpp
  */
 
@@ -18,25 +18,25 @@
 #include "time_parser.hpp"
 
 /**
- * The Playslave++ application.
+ * The playd application.
  *
- * This class contains all the state required by Playslave, with the exception
+ * This class contains all the state required by playd, with the exception
  * of that introduced by external C libraries.  It is a RAII class, so
- * constructing Playslave will load Playslave's library dependencies, and
+ * constructing playd will load playd's library dependencies, and
  * destructing it will unload them.  It is probably not safe to create more than
- * one Playslave.
+ * one playd.
  */
-class Playslave {
+class playd {
 public:
 	/**
-	 * Constructs a Playslave, initialising its libraries.
+	 * Constructs a playd, initialising its libraries.
 	 * @param argc The argument count from the main function.
 	 * @param argv The argument vector from the main function.
 	 */
-	Playslave(int argc, char *argv[]);
+	playd(int argc, char *argv[]);
 
 	/**
-	 * Runs Playslave.
+	 * Runs playd.
 	 * @return The exit code, which may be returned by the program.
 	 */
 	int Run();
@@ -66,7 +66,7 @@ private:
 	void ListOutputDevices();
 
 	/**
-	 * Registers the Playslave command set on the given Player.
+	 * Registers the playd command set on the given Player.
 	 * @param p The Player on which the commands will act.
 	 */
 	void RegisterCommands(Player *p);

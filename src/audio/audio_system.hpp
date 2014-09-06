@@ -1,5 +1,5 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
@@ -27,7 +27,7 @@ class Device;
 #include "audio.hpp"
 
 /**
- * An AudioSystem represents the entire audio stack used by Playslave++.
+ * An AudioSystem represents the entire audio stack used by playd.
  *
  * The AudioSystem is responsible for creating Audio instances,
  * enumerating and resolving device IDs, and initialising and terminating the
@@ -109,8 +109,8 @@ private:
 	                const;
 
 	/**
-	 * Converts a sample format identifier from playslave++ to PortAudio.
-	 * @param fmt The playslave++ sample format identifier.
+	 * Converts a sample format identifier from playd to PortAudio.
+	 * @param fmt The playd sample format identifier.
 	 * @return The PortAudio equivalent of the given SampleFormat.
 	 */
 	portaudio::SampleDataFormat PaSampleFormatFrom(SampleFormat fmt) const;

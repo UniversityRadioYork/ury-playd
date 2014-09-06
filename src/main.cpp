@@ -1,9 +1,9 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
- * Main entry point and implementation of the Playslave class.
+ * Main entry point and implementation of the playd class.
  * @see main.cpp
  */
 
@@ -27,17 +27,17 @@
  */
 int main(int argc, char *argv[])
 {
-	Playslave ps(argc, argv);
+	playd ps(argc, argv);
 	return ps.Run();
 }
 
 //
-// Playslave
+// playd
 //
 
-const std::chrono::microseconds Playslave::POSITION_PERIOD(500000);
+const std::chrono::microseconds playd::POSITION_PERIOD(500000);
 
-int Playslave::GetDeviceID()
+int playd::GetDeviceID()
 {
 	if (this->arguments.size() < 2) return -1;
 
@@ -64,7 +64,7 @@ int Playslave::GetDeviceID()
 }
 
 /**
- * UNITS defines the unit suffixes that Playslave++ understands when parsing
+ * UNITS defines the unit suffixes that playd understands when parsing
  * positions in seek commands.
  *
  * The suffixes are defined using the Player::TP::MkTime template, in terms
@@ -112,7 +112,7 @@ const Player::TP::UnitMap UNITS = {
 	{ "", Player::TP::MkTime<std::chrono::microseconds> }
 };
 
-Playslave::Playslave(int argc, char *argv[])
+playd::playd(int argc, char *argv[])
     : audio(), player(audio, time_parser), handler(player), time_parser(UNITS)
 {
 	for (int i = 0; i < argc; i++) {
@@ -127,7 +127,7 @@ Playslave::Playslave(int argc, char *argv[])
 	                new IoReactor(this->player, this->handler, addr, port));
 }
 
-int Playslave::Run()
+int playd::Run()
 {
 	try
 	{

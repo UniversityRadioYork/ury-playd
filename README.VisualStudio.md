@@ -1,12 +1,12 @@
 # Visual Studio Build Notes
 
 Visual Studio is a fickle beast, and as of writing the resources provided in
-the playslave++ repository won't be enough to build from scratch.  Until we
+the playd repository won't be enough to build from scratch.  Until we
 can sort everything out, here are some field notes.
 
 ## Changing Paths
 
-Currently, the paths given in `playslave++.vcxproj` are absolute, and will
+Currently, the paths given in `playd.vcxproj` are absolute, and will
 need to be changed to suit your build environment.  This may be fixed later.
 
 ## PortAudio
