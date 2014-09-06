@@ -1,5 +1,5 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
@@ -115,7 +115,7 @@ private:
 	 */
 	void InitAcceptor(const std::string &address, const std::string &port);
 
-	/// Sets up a periodic timer to run the playslave++ update loop.
+	/// Sets up a periodic timer to run the playd update loop.
 	void DoUpdateTimer();
 };
 

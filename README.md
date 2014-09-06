@@ -1,23 +1,23 @@
-# playslave++
+# URY playd
 
-`playslave++` is a very minimal C++ audio player using [libsox][] and
-[PortAudio][], developed primarily by CaptainHayashi and LordAro and designed
-to be composable into bigger systems.
+URY playd (`playd` for short) is a minimal C++ audio player using [libsox][]
+and [PortAudio][], developed by [University Radio York][] (URY) and
+designed to be composable into bigger systems.
 
-All code developed for `playslave++` is licenced under the [MIT licence][]
+All code developed for `playd` is licenced under the [MIT licence][]
 (see LICENCE.txt).  Some code is taken from the [PortAudio][] project
 (see LICENCE.portaudio).
 
 ## Usage
 
-`playslave++ DEVICE-ID [ADDRESS] [PORT]`
+`playd DEVICE-ID [ADDRESS] [PORT]`
 
-* Invoking `playslave++` with no arguments lists the various device IDs
+* Invoking `playd` with no arguments lists the various device IDs
   available to it.
 * Full protocol information is available on the GitHub wiki.
 * On POSIX systems, see the enclosed man page.
 
-`playslave++` understands the following commands via its TCP/IP interface:
+`playd` understands the following commands via its TCP/IP interface:
 
 * `load "/full/path/to/file"` — Loads /full/path/to/file for playback;
 * `eject` — Unloads the current file;
@@ -25,11 +25,11 @@ All code developed for `playslave++` is licenced under the [MIT licence][]
 * `stop` — Stops (pauses) playback;
 * `seek 1m` — Seeks one minute into the current file.  Units supported include
   `h`, `m`, `s`, `ms`, `us` (micros), with `us` assumed if no unit is given.
-* `quit` — Closes `playslave++`.
+* `quit` — Closes `playd`.
 
 ### Sending commands manually
 
-To connect directly to `playslave++` and issue commands to it, you can use
+To connect directly to `playd` and issue commands to it, you can use
 [netcat][]:
 
 ```sh
@@ -41,7 +41,7 @@ On Windows, using [PuTTY][] in _raw mode_ (__not__ Telnet mode)
 with _Implicit CR in every LF_ switched on in the _Terminal_ options should
 work.
 
-__Do _not_ use a Telnet client (or PuTTY in telnet mode)!__  `playslave++` will
+__Do _not_ use a Telnet client (or PuTTY in telnet mode)!__  `playd` will
 do weird things in the presence of Telnet-isms.
 
 ## Features
@@ -76,13 +76,13 @@ build instructions below.
 
 ### POSIX (GNU/Linux, BSD, OS X)
 
-`playslave++` comes with a GNU-compatible Makefile that can be used both to
+`playd` comes with a GNU-compatible Makefile that can be used both to
 make and install.
 
 To use the Makefile, you'll need [GNU Make][] and `pkg-config` (or equivalent),
 and pkg-config packages for PortAudio, libsox and libuv.  We've tested building
-playslave++ on Gentoo, FreeBSD 10, and OS X, but other POSIX-style operating
-systems should work.
+playd on Gentoo, FreeBSD 10, and OS X, but other POSIX-style operating systems
+should work.
 
 Using the Makefile is straightforward:
 
@@ -91,7 +91,7 @@ Using the Makefile is straightforward:
   environment;
 * Run `make` (or whatever GNU Make is called on your OS; in FreeBSD, for
   example, it'd be `gmake`), and, optionally, `sudo make install`.
-  The latter will globally install playslave++ and its man page.
+  The latter will globally install playd and its man page.
 
 #### OS X
 
@@ -101,22 +101,22 @@ you use it!
 ### FreeBSD (10+)
 
 FreeBSD 10 and above come with `clang` 3.3 as standard, which should be able to
-compile `playslave++`.  `gcc` is available through the FreeBSD Ports Collection
+compile `playd`.  `gcc` is available through the FreeBSD Ports Collection
 and package repositories.
 
 You will need `gmake`, as `Makefile` is incompatible with BSD make.  Sorry!
 
-All of `playslave++`'s dependencies are available through both the FreeBSD
-Ports Collection and standard package repository.  (The FreeBSD port for
-PortAudio doesn't build C++ bindings, but we bundle them anyway.)  To install
-them as packages:
+All of `playd`'s dependencies are available through both the FreeBSD Ports
+Collection and standard package repository.  (The FreeBSD port for PortAudio
+doesn't build C++ bindings, but we bundle them anyway.)  To install them as
+packages:
 
 ```
 root:/ # pkg install gmake sox libuv portaudio2 pkgconf
 ```
 
 Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
-`playslave++` (as root):
+`playd` (as root):
 
 ```
 user:~/ % gmake
@@ -129,7 +129,7 @@ root:~/ # gmake install
 
 _For more information, see `README.VisualStudio.md`._
 
-playslave++ **can** be built with Visual Studio (tested with 2013 Premium), but
+playd **can** be built with Visual Studio (tested with 2013 Premium), but
 you will need to source and configure the dependencies manually.  A Visual
 Studio project is provided, but will need tweaking for your environment.
 
@@ -156,16 +156,14 @@ use the bundled bindings.
 It was originally written as an experiment when coming up with a new playout
 system for [University Radio York][].
 
-### Why is it named playslave++?
+### Why is it named `playd`?
 
-The name is meant to be short, snappy, and descriptive of what the program does
-(it's intended to be used by a driver program, in a master/slave
-configuration).
+It's short for __play__er __d__aemon.
 
 ### Can I contribute?
 
-Certainly!  We appreciate any and all pull requests that further the
-playslave++ philosophy.
+Certainly!  We appreciate any and all pull requests in accordance with our
+philosophy.
 
 [clang]:                 http://clang.llvm.org/
 [gcc]:                   https://gcc.gnu.org/

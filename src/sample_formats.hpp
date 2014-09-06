@@ -1,5 +1,5 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
@@ -12,7 +12,7 @@
 #define PS_SAMPLE_FORMATS_HPP
 
 /**
- * Sample formats available in playslave++.
+ * Sample formats available in playd.
  *
  * This is the intersection of those sample formats available in ffmpeg and
  * PortAudio.  In the future, if and when other input and output libraries are
@@ -21,7 +21,7 @@
  * Packed formats are those where each sample contains each audio channel, one
  * packed after the other.  Planar formats use separate runs of samples for each
  * channel (each channel has its own sample plane).  For the most part,
- * playslave++ deals in the former, resampling instances of the latter.
+ * playd deals in the former, resampling instances of the latter.
  */
 enum class SampleFormat : std::uint8_t {
 	PACKED_UNSIGNED_INT_8, ///< Packed 8-bit unsigned integer.

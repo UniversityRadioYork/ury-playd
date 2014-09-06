@@ -1,5 +1,5 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
@@ -85,7 +85,7 @@ public:
 	bool Play();
 
 	/**
-	 * Quits Playslave++.
+	 * Quits playd.
 	 * @return Whether the quit succeeded.
 	 */
 	bool Quit();

@@ -1,5 +1,5 @@
-// This file is part of Playslave-C++.
-// Playslave-C++ is licenced under the MIT license: see LICENSE.txt.
+// This file is part of playd.
+// playd is licenced under the MIT license: see LICENSE.txt.
 
 /**
  * @file
@@ -22,7 +22,7 @@
 #endif
 
 /**
- * The Playslave++ command handler.
+ * The playd command handler.
  */
 class CommandHandler {
 public:
@@ -31,7 +31,7 @@ public:
 
 	/**
 	 * Constructs a CommandHandler.
-	 * @param player A reference to the Player on which the Playslave
+	 * @param player A reference to the Player on which the playd
 	 *   commands will run.
 	 */
 	CommandHandler(Player &player);
