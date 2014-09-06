@@ -1,6 +1,6 @@
 # playslave++
 
-`playslave++` is a very minimal C++ audio player using [FFmpeg][] and
+`playslave++` is a very minimal C++ audio player using [libsox][] and
 [PortAudio][], developed primarily by CaptainHayashi and LordAro and designed to
 be composable into bigger systems.
 
@@ -46,7 +46,7 @@ do weird things in the presence of Telnet-isms.
 
 ## Features
 
-* Theoretically plays anything [FFmpeg][] can play (in practice, more esoteric
+* Plays anything [libsox][] can play (in practice, more esoteric
   formats might not work)
 * Seek (microseconds, seconds, minutes etc)
 * Frequently announces the current position
@@ -65,7 +65,7 @@ do weird things in the presence of Telnet-isms.
 
 ### Requirements
 
-* [FFmpeg][] (latest version)
+* [libsox][] (latest version)
 * [libuv][] v0.11.28
 * [PortAudio][] V19
 * A C++11 compiler (recent versions of [clang][], [gcc][], and Visual Studio
@@ -74,13 +74,13 @@ do weird things in the presence of Telnet-isms.
 `playslave++` probably doesn't work with libav, due to its dependency on
 libswresample.
 
-### POSIX (GNU/Linux, BSD, _possibly_ OSX)
+### POSIX (GNU/Linux, BSD)
 
 `playslave++` comes with a GNU-compatible Makefile that can be used both to make
 and install.
 
 To use the Makefile, you'll need [GNU Make][] and `pkg-config` (or equivalent),
-and pkg-config packages for PortAudio, FFmpeg and libuv.
+and pkg-config packages for PortAudio, libsox and libuv.
 We've tested building playslave++ on Gentoo and FreeBSD 10, but other
 POSIX-style operating systems should work.
 
@@ -91,6 +91,10 @@ Using the Makefile is straightforward:
   environment;
 * Run `make`, and, optionally, `sudo make install`.  The latter will install
   a man page for playslave++, in addition to playslave++ itself.
+
+#### OS X
+
+All dependencies are available in [homebrew](http://brew.sh) - it is highly recommended that you use it!
 
 ### Windows
 
@@ -133,7 +137,7 @@ Certainly!  We appreciate any and all pull requests that further the playslave++
 philosophy.
 
 [clang]:                 http://clang.llvm.org/
-[FFmpeg]:                https://www.ffmpeg.org/
+[libsox]:                http://sox.sourceforge.net/
 [gcc]:                   https://gcc.gnu.org/
 [GNU Make]:              https://www.gnu.org/software/make/
 [libuv]:                 https://github.com/joyent/libuv
