@@ -112,15 +112,15 @@ PortAudio doesn't build C++ bindings, but we bundle them anyway.)  To install
 them as packages:
 
 ```
-root@freebsd:/ # pkg install gmake sox libuv portaudio2 pkgconf
+root:/ # pkg install gmake sox libuv portaudio2 pkgconf
 ```
 
 Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
 `playslave++` (as root):
 
 ```
-user@freebsd:~/ % gmake
-root@freebsd:~/ # gmake install
+user:~/ % gmake
+root:~/ # gmake install
 ```
 
 ### Windows
