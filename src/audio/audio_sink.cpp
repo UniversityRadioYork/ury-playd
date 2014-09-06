@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cassert>
 #include <climits>
+#include <cstring>
 #include <string>
 
 #include "portaudiocpp/PortAudioCpp.hxx"
@@ -23,7 +24,7 @@
 const size_t AudioSink::RINGBUF_POWER = 16;
 
 AudioSink::AudioSink(const StreamConfigurator c,
-                     Resampler::SampleByteCount bytes_per_sample)
+                     AudioSource::SampleByteCount bytes_per_sample)
     : bytes_per_sample(bytes_per_sample),
       ring_buf(RINGBUF_POWER, bytes_per_sample),
       position_sample_count(0),
@@ -96,7 +97,8 @@ void AudioSink::Transfer(AudioSink::TransferIterator &start,
 	}
 	assert(0 < count);
 
-	unsigned long written_count = this->ring_buf.Write(&*start, count);
+	auto start_ptr = reinterpret_cast<char *>(&*start);
+	unsigned long written_count = this->ring_buf.Write(start_ptr, count);
 	// Since we never write more than the ring buffer can take, the written
 	// count should equal the requested written count.
 	assert(written_count == count);
@@ -160,6 +162,7 @@ PlayCallbackStepResult AudioSink::PlayCallbackFailure(
 	if (InputReady()) {
 		// There's been some sort of genuine issue.
 		// Make up some silence to plug the gap.
+		Debug() << "Buffer underflow" << std::endl;
 		memset(out, 0, this->bytes_per_sample * frames_per_buf);
 		result = std::make_pair(paContinue, frames_per_buf);
 	} else {

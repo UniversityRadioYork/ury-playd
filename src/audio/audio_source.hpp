@@ -17,15 +17,10 @@
 #include <string>
 #include <vector>
 
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavutil/frame.h>
-#include <libswresample/swresample.h>
-}
+#include <sox.h>
 
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
-#include "audio_resample.hpp"
 
 /**
  * An object responsible for decoding an audio file.
@@ -47,10 +42,13 @@ public:
 	};
 
 	/// Type of decoded sample vectors.
-	using DecodeVector = Resampler::ResultVector;
+	using DecodeVector = std::vector<std::uint8_t>;
 
 	/// Type of the result of Decode().
 	using DecodeResult = std::pair<DecodeState, DecodeVector>;
+
+	/// Type for the count of bytes per sample.
+	using SampleByteCount = int;
 
 	/**
 	 * Constructs an AudioSource.
@@ -141,21 +139,10 @@ private:
 	/// @see DecodeState
 	DecodeState decode_state;
 
-	/// The ID of the audio stream to decode.
-	int stream_id;
-
 	std::vector<uint8_t> buffer; ///< The decoding buffer.
 
-	AVStream *stream;         ///< The FFmpeg stream being decoded.
-	AVFormatContext *context; ///< The input codec context.
-	AVPacket packet;          ///< The last undecoded packet.
-	AVFrame *frame;           ///< The last decoded frame.
-
-	/// The resampler used to resample frames for output.
-	/// @see Resample
-	std::unique_ptr<Resampler> resampler;
-
-	std::string path; ///< The path of the file loaded in this source.
+	/// Pointer to the SoX context associated with this source.
+	sox_format_t *context;
 
 	/**
 	 * Opens a new file for this AudioSource.
@@ -163,98 +150,8 @@ private:
 	 */
 	void Open(const std::string &path);
 
-	/// Finds the appropriate stream and initialises the stream structures.
-	void InitialiseStream();
-
-	/// Finds the stream information for the audio file.
-	void FindStreamInfo();
-
-	/// Finds the best audio stream and initialises structures for it.
-	void FindStreamAndInitialiseCodec();
-
-	/**
-	 * Opens the FFmpeg codec and sets up the appropriate streams.
-	 *
-	 * @param stream The index of the stream for which this AudioSource
-	 *   should initialise stream structures.
-	 * @param codec A pointer to an AvCodec structure containing the codec
-	 *   found by FindStreamAndInitialiseCodec.
-	 *
-	 * @exception FileError if the codec cannot be opened.
-	 */
-	void InitialiseCodec(int stream, AVCodec *codec);
-
-	/// Initialises the FFmpeg frame structure.
-	void InitialiseFrame();
-
-	/// Initialises the FFmpeg packet structure.
-	void InitialisePacket();
-
-	/// Initialises the appropriate Resampler for the loaded file.
-	void InitialiseResampler();
-
-	/// Attempts to grab a frame to decode.
-	void DoFrame();
-
-	/**
-	 * Pumps the decoder.
-	 * When the decoder finishes, this AudioSource will invoke the
-	 * resampler and reset the state to DecodeState::WAITING_FOR_FRAME.
-	 * @return A DecodeVector containing the results of decoding and
-	 *   resampling if the decoder has finished, or nothing otherwise.
-	 *   Note that, even if the decoder succeeds, the vector may be empty.
-	 */
-	DecodeVector DoDecode();
-
-	/**
-	 * Attempts to read a frame.
-	 * @return True if a frame was read; false otherwise.  If this returns
-	 * false, then the decoder has run out of new frames to read.
-	 */
-	bool ReadFrame();
-
-	/**
-	 * Attempts to decode a single packet.
-	 * @return True if the decoding run has finished; false otherwise.
-	 *   If true, then DecodePacket need not be called again for this
-	 *   frame.
-	 */
-	bool DecodePacket();
-
-	/**
-	 * Performs the resampling step of the decoder.
-	 * This pushes the samples from a successful decode through the
-	 * resampler object, which converts them into a format suitable for
-	 * outputting.
-	 * @return A DecodeVector containing resampled, raw bytes suitable for
-	 *   emitting from the AudioSource.
-	 */
-	DecodeVector Resample();
-
-	/**
-	 * Calls the AvCodec decode function and makes sense of the results.
-	 * @return A pair containing the number of bytes decoded, and whether
-	 *   the got-frame flag was set high.
-	 */
-	std::pair<int, bool> AvCodecDecode();
-
-	/**
-	 * Determines whether this AudioSource's own sample format is planar.
-	 * The output format is _always_ packed (not planar), so this refers
-	 * entirely to the internal, pre-resampling sample format.
-	 * @return True if the internal sample format is planar; false
-	 *   otherwise.
-	 */
-	bool UsingPlanarSampleFormat();
-
-	/**
-	 * Converts a track position, in microseconds, into AV internal units.
-	 * @param position The input position, in microseconds.
-	 * @return The corresponding position, in the appropriate units to be
-	 *   used in FFmpeg functions for this audio source.
-	 */
-	std::int64_t AvPositionFromMicroseconds(
-	                std::chrono::microseconds position);
+	/// Closes the AudioSource's current file.
+	void Close();
 };
 
 #endif // PS_AUDIO_SOURCE_HPP

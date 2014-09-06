@@ -15,6 +15,7 @@
  */
 
 #include <csignal>
+#include <cstring>
 #include <string>
 
 extern "C" {

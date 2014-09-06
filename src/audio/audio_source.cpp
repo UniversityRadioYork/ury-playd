@@ -17,57 +17,42 @@
 #include <sstream>
 #include <string>
 
-// ffmpeg
+// libsox
 extern "C" {
-#ifdef WIN32
-#define inline __inline
-#endif
-#include <libavcodec/avcodec.h>
-#include <libavcodec/version.h> // For old version patchups
-#include <libavformat/avformat.h>
-#include <libavutil/opt.h>
+#include <sox.h>
 }
 
 #include "../errors.hpp"
 #include "../messages.h"
 #include "../sample_formats.hpp"
-#include "audio_resample.hpp"
 #include "audio_source.hpp"
 
-const size_t AudioSource::BUFFER_SIZE = (size_t)FF_MIN_BUFFER_SIZE;
+// This value is somewhat arbitrary, but corresponds to the minimum buffer size
+// used by ffmpeg, so it's probably sensible.
+const size_t AudioSource::BUFFER_SIZE = 16384;
 
 AudioSource::AudioSource(const std::string &path)
-    : decode_state(DecodeState::WAITING_FOR_FRAME),
-      buffer(BUFFER_SIZE),
-      context(nullptr),
-      frame(nullptr),
-      path(path)
+    : buffer(BUFFER_SIZE), context(nullptr)
 {
 	Open(path);
-	InitialiseStream();
-	InitialisePacket();
-	InitialiseFrame();
-	InitialiseResampler();
 }
 
 AudioSource::~AudioSource()
 {
-	if (this->context != nullptr) {
-		avformat_free_context(this->context);
-	}
-	if (this->frame != nullptr) {
-		av_frame_free(&this->frame);
-	}
+	Close();
 }
 
 std::string AudioSource::Path() const
 {
-	return this->path;
+	assert(this->context != nullptr);
+	assert(this->context->filename != nullptr);
+	return std::string(this->context->filename);
 }
 
 std::uint8_t AudioSource::ChannelCount() const
 {
-	return this->stream->codec->channels;
+	assert(this->context != nullptr);
+	return this->context->signal.channels;
 }
 
 size_t AudioSource::BufferSampleCapacity() const
@@ -77,7 +62,8 @@ size_t AudioSource::BufferSampleCapacity() const
 
 double AudioSource::SampleRate() const
 {
-	return (double)this->stream->codec->sample_rate;
+	assert(this->context != nullptr);
+	return this->context->signal.rate;
 }
 
 std::uint64_t AudioSource::SamplePositionFromMicroseconds(
@@ -104,260 +90,101 @@ std::chrono::microseconds AudioSource::MicrosecondPositionFromSamples(
 
 size_t AudioSource::BytesPerSample() const
 {
-	size_t bps = av_get_bytes_per_sample(this->resampler->AVOutputFormat());
-	return ChannelCount() * bps;
+	assert(this->context != nullptr);
+
+	// Since libsox always outputs 32-bit samples, the bytes per sample is
+	// always 4 per channel.
+
+	// SoX has a slightly peculiar notion of sample counts, in that it
+	// regards each channel as having its own separate sample, so we need
+	// to multiply and divide sample counts by the channel count when
+	// talking to SoX.
+	return 4 * ChannelCount();
 }
 
 std::uint64_t AudioSource::Seek(std::chrono::microseconds position)
 {
-	// FFmpeg doesn't use microseconds for its seek positions, so we need to
-	// convert into its own units.
-	std::int64_t ffmpeg_position = AvPositionFromMicroseconds(position);
-	if (av_seek_frame(this->context, this->stream_id, ffmpeg_position,
-	                  AVSEEK_FLAG_ANY) != 0) {
+	assert(this->context != nullptr);
+
+	auto samples = SamplePositionFromMicroseconds(position);
+
+	// See BytesPerSample() for an explanation of this ChannelCount().
+	auto sox_samples = samples * ChannelCount();
+
+	// libsox doesn't seem to like seeking into an ended file, so close
+	// and re-open it first.
+	if (this->decode_state == DecodeState::END_OF_FILE) {
+		std::string path = Path();
+		Close();
+		Open(path);
+	}
+
+	if (sox_seek(this->context, sox_samples, SOX_SEEK_SET) != SOX_SUCCESS) {
 		throw InternalError(MSG_SEEK_FAIL);
 	}
 
 	// Reset the decoder state, because otherwise the decoder will get very
 	// confused.
-	this->decode_state = DecodeState::WAITING_FOR_FRAME;
-	InitialisePacket();
+	this->decode_state = DecodeState::DECODING;
 
-	return SamplePositionFromMicroseconds(position);
-}
-
-std::int64_t AudioSource::AvPositionFromMicroseconds(
-                std::chrono::microseconds position)
-{
-	// FFmpeg reports positions in terms of a 'time base', which is
-	// expressed as a fraction (num/dem) of a second.
-	// So, we need to convert the microseconds into time base units,
-	// which is theoretically done by converting into seconds and then
-	// dividing by the time base fraction.  However, as we're working with
-	// integers, we jiggle that calculation around a bit to minimise
-	// rounding.
-
-	auto position_timebase_microseconds =
-	                (position * this->stream->time_base.den) /
-	                this->stream->time_base.num;
-	auto position_timebase_seconds =
-	                std::chrono::duration_cast<std::chrono::seconds>(
-	                                position_timebase_microseconds);
-	return position_timebase_seconds.count();
+	return samples;
 }
 
 AudioSource::DecodeResult AudioSource::Decode()
 {
+	assert(this->context != nullptr);
+
+	auto buf = reinterpret_cast<sox_sample_t *>(&this->buffer.front());
+
+	// See BytesPerSample() for an explanation of this ChannelCount().
+	auto sox_capacity = BufferSampleCapacity() * ChannelCount();
+	size_t read = sox_read(this->context, buf, sox_capacity);
+
 	DecodeVector decoded;
 
-	switch (this->decode_state) {
-		case DecodeState::WAITING_FOR_FRAME:
-			DoFrame();
-			break;
-		case DecodeState::DECODING:
-			decoded = DoDecode();
-			break;
-		case DecodeState::END_OF_FILE:
-			// Intentionally ignore
-			break;
+	if (read == 0) {
+		this->decode_state = DecodeState::END_OF_FILE;
+	} else {
+		this->decode_state = DecodeState::DECODING;
+
+		// Copy only the bit of the buffer occupied by decoded data
+		// See BytesPerSample() for an explanation of the
+		// ChannelCount() division.
+		auto front = this->buffer.begin();
+		auto read_bytes = (BytesPerSample() * read) / ChannelCount();
+		decoded = DecodeVector(front, front + read_bytes);
 	}
 
 	return std::make_pair(this->decode_state, decoded);
 }
-
-void AudioSource::DoFrame()
-{
-	bool read_frame = ReadFrame();
-
-	if (!read_frame) {
-		// We've run out of frames to decode.
-		// (TODO: Start flushing the buffer here?)
-		this->decode_state = DecodeState::END_OF_FILE;
-	} else if (this->packet.stream_index == this->stream_id) {
-		// Only switch to decoding if the frame belongs to the audio
-		// stream.  Else, we ignore it.
-		this->decode_state = DecodeState::DECODING;
-	}
-}
-
-AudioSource::DecodeVector AudioSource::DoDecode()
-{
-	DecodeVector result;
-
-	bool finished_decoding = DecodePacket();
-	if (finished_decoding) {
-		result = Resample();
-
-		// Get ready to process the next frame.
-		InitialisePacket();
-		this->decode_state = DecodeState::WAITING_FOR_FRAME;
-	} else {
-		// Send through an empty vector, so that the audio output will
-		// safely run its course and make way for the next decode round.
-		result = std::vector<char>();
-	}
-
-	return result;
-}
-
-bool AudioSource::ReadFrame()
-{
-	// av_read_frame uses non-zero returns to signal errors.
-	int read_result = av_read_frame(this->context, &this->packet);
-	return 0 == read_result;
-}
-
-Resampler::ResultVector AudioSource::Resample()
-{
-	if (this->frame->nb_samples == 0) {
-		return Resampler::ResultVector();
-	}
-	return this->resampler->Resample(this->frame);
-}
-
-static const std::map<AVSampleFormat, SampleFormat> sf_from_av = {
-	{ AV_SAMPLE_FMT_U8, SampleFormat::PACKED_UNSIGNED_INT_8 },
-	{ AV_SAMPLE_FMT_S16, SampleFormat::PACKED_SIGNED_INT_16 },
-	{ AV_SAMPLE_FMT_S32, SampleFormat::PACKED_SIGNED_INT_32 },
-	{ AV_SAMPLE_FMT_FLT, SampleFormat::PACKED_FLOAT_32 }
-};
 
 /**
  * @return The sample format of the data returned by this decoder.
  */
 SampleFormat AudioSource::OutputSampleFormat() const
 {
-	try
-	{
-		return sf_from_av.at(this->resampler->AVOutputFormat());
-	}
-	catch (std::out_of_range)
-	{
-		throw FileError(MSG_DECODE_BADRATE);
-	}
+	// 'The function sox_read reads len samples in to buf using the format
+	// handler specified by ft. All data read is converted to 32-bit signed
+	// samples before being placed in to buf.'
+	return SampleFormat::PACKED_SIGNED_INT_32;
 }
 
 void AudioSource::Open(const std::string &path)
 {
-	this->context = nullptr;
+	Close();
 
-	// FFmpeg reports a file open error using a negative result here.
-	if (avformat_open_input(&this->context, path.c_str(), nullptr,
-	                        nullptr) < 0) {
+	this->context = sox_open_read(path.c_str(), nullptr, nullptr, nullptr);
+	if (this->context == nullptr) {
 		std::ostringstream os;
 		os << "couldn't open " << path;
 		throw FileError(os.str());
-	} else if (this->context == nullptr) {
-		throw std::bad_alloc();
 	}
 }
 
-void AudioSource::InitialiseStream()
+void AudioSource::Close()
 {
-	FindStreamInfo();
-	FindStreamAndInitialiseCodec();
-}
-
-void AudioSource::FindStreamInfo()
-{
-	if (avformat_find_stream_info(this->context, nullptr) < 0) {
-		throw FileError(MSG_DECODE_NOAUDIO);
+	if (this->context != nullptr) {
+		sox_close(this->context);
+		this->context = nullptr;
 	}
-}
-
-void AudioSource::FindStreamAndInitialiseCodec()
-{
-	AVCodec *codec;
-	int stream = av_find_best_stream(this->context, AVMEDIA_TYPE_AUDIO, -1,
-	                                 -1, &codec, 0);
-
-	if (stream < 0) {
-		throw FileError(MSG_DECODE_NOSTREAM);
-	}
-
-	InitialiseCodec(stream, codec);
-}
-
-void AudioSource::InitialiseCodec(int stream, AVCodec *codec)
-{
-	AVCodecContext *codec_context = this->context->streams[stream]->codec;
-	// A negative result here is FFmpeg's way of reporting an opening error.
-	if (avcodec_open2(codec_context, codec, nullptr) < 0) {
-		throw FileError(MSG_DECODE_NOCODEC);
-	}
-
-	this->stream = this->context->streams[stream];
-	this->stream_id = stream;
-}
-
-void AudioSource::InitialiseFrame()
-{
-	this->frame = av_frame_alloc();
-	if (this->frame == nullptr) {
-		throw std::bad_alloc();
-	}
-}
-
-void AudioSource::InitialisePacket()
-{
-	av_init_packet(&this->packet);
-	this->packet.data = &*this->buffer.begin();
-	this->packet.size = this->buffer.size();
-}
-
-void AudioSource::InitialiseResampler()
-{
-	Resampler *rs;
-	AVCodecContext *codec = this->stream->codec;
-
-	// The Audio can only handle packed sample data.
-	// If we're using a sample format that is planar, we need to resample it
-	// into a packed format.  This is done with the PlanarResampler.
-	// Otherwise, we pass it through the (dummy) PackedResampler.
-	if (UsingPlanarSampleFormat()) {
-		rs = new PlanarResampler(codec);
-	} else {
-		rs = new PackedResampler(codec);
-	}
-	this->resampler = std::unique_ptr<Resampler>(rs);
-}
-
-bool AudioSource::UsingPlanarSampleFormat()
-{
-	// The docs for this function explicitly mention a return value of 1 for
-	// planar, 0 for packed.
-	return av_sample_fmt_is_planar(this->stream->codec->sample_fmt) == 1;
-}
-
-bool AudioSource::DecodePacket()
-{
-	assert(this->packet.data != nullptr);
-	assert(0 <= this->packet.size);
-
-	auto decode_result = AvCodecDecode();
-
-	// A negative result here is FFmpeg's way of reporting a decode error.
-	int bytes_decoded = decode_result.first;
-	if (bytes_decoded < 0) {
-		throw FileError(MSG_DECODE_FAIL);
-	}
-
-	// Shift the packet forwards so that, if we haven't finished the packet,
-	// we can resume decoding from where we left off this time.
-	this->packet.data += bytes_decoded;
-	this->packet.size -= bytes_decoded;
-	assert(0 <= this->packet.size);
-
-	bool frame_finished = decode_result.second;
-	return frame_finished || (0 == this->packet.size);
-}
-
-std::pair<int, bool> AudioSource::AvCodecDecode()
-{
-	int frame_finished = 0;
-	int bytes_decoded =
-	                avcodec_decode_audio4(this->stream->codec, this->frame,
-	                                      &frame_finished, &this->packet);
-
-	return std::make_pair(bytes_decoded, frame_finished != 0);
 }
