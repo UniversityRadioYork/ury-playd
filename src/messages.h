@@ -51,6 +51,6 @@ const std::string MSG_OHAI = "playd";
 const std::string MSG_TTFN = "Sleep now";
 
 /// The string providing a space-delimited set of features playd implements.
-const std::string MSG_FEATURES = "FileLoad Seek StopStart Time";
+const std::string MSG_FEATURES = "End FileLoad PlayStop Seek TimeReport";
 
 #endif // PS_MESSAGES_H
