@@ -2,12 +2,17 @@
 
 `playd` implements the BAPS3 Internal API (specifically the `End`, `FileLoad`,
 `PlayStop`, `Seek`, and `TimeReport` features), as described in the [BAPS3
-specification][].
+specification][].  The specification provides more formal definitions of the
+commands supported by `playd`.
+
+## Sending Commands Manually
 
 To talk to `playd`, open a raw TCP/IP session on the host and port on which
 `playd` was started.  For example, using [netcat][]:
 
     nc ${ADDRESS} ${PORT}
+
+On Windows, use [PuTTY][] in _raw mode_ with an _Implicit CR for every LF_.
 
 ## Initial Responses
 
@@ -81,7 +86,7 @@ always in _uppercase_.
 
 Identifies the server program.
 
-### FEATURES _feat1_ _[feat2...]_
+### FEATURES _feat1_ _feat2..._
 
 Lists the BAPS3 feature flags supported by `playd`.
 
@@ -116,4 +121,5 @@ Announces that a valid command has just been received and processed.
 Announces that a bad command was just received.
 
 [BAPS3 specification]: https://UniversityRadioYork.github.io/baps3-spec
+[PuTTY]:               http://www.chiark.greenend.org.uk/~sgtatham/putty/
 [netcat]:              http://nc110.sourceforge.net/
