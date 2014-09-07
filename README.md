@@ -32,10 +32,9 @@ All code developed for `playd` is licenced under the [MIT licence][]
 To connect directly to `playd` and issue commands to it, you can use
 [netcat][]:
 
-```sh
-# If you specified [ADDRESS] or [PORT], replace localhost and 1350 respectively.
-$ nc localhost 1350
-```
+    # If you specified [ADDRESS] or [PORT], replace localhost and 1350 respectively.
+    $ nc localhost 1350
+
 
 On Windows, using [PuTTY][] in _raw mode_ (__not__ Telnet mode)
 with _Implicit CR in every LF_ switched on in the _Terminal_ options should
@@ -111,17 +110,13 @@ Collection and standard package repository.  (The FreeBSD port for PortAudio
 doesn't build C++ bindings, but we bundle them anyway.)  To install them as
 packages:
 
-```
-root:/ # pkg install gmake sox libuv portaudio2 pkgconf
-```
+    root@freebsd:/ # pkg install gmake sox libuv portaudio2 pkgconf
 
 Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
 `playd` (as root):
 
-```
-user:~/ % gmake
-root:~/ # gmake install
-```
+    user:@freebsd~/ % gmake
+    root:@freebsd~/ # gmake install
 
 ### Windows
 
