@@ -132,7 +132,8 @@ format: $(TO_FORMAT)
 
 gh-pages: doc
 	git checkout gh-pages
-	git add doc
+	mv doc/html doxygen
+	git add doxygen
 	git commit -m "Update doxygen on gh-pages."
 
 doc:
