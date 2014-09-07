@@ -115,8 +115,8 @@ packages:
 Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
 `playd` (as root):
 
-    user:@freebsd~/ % gmake
-    root:@freebsd~/ # gmake install
+    user@freebsd:~/ % gmake
+    root@freebsd:~/ # gmake install
 
 ### Windows
 
