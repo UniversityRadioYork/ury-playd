@@ -1,6 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classError.html" title="A playd exception. " alt="" coords="5,56,60,83"/>
-<area shape="rect" id="node2" href="$classConfigError.html" title="An Error signifying that playd has been improperly configured. " alt="" coords="112,5,207,32"/>
-<area shape="rect" id="node3" href="$classFileError.html" title="An Error signifying that playd can&#39;t read a file. " alt="" coords="121,56,197,83"/>
-<area shape="rect" id="node4" href="$classInternalError.html" title="An Error signifying that playd has hit an internal snag. " alt="" coords="108,107,211,133"/>
-</map>

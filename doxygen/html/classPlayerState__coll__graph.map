@@ -1,6 +1,0 @@
-<map id="PlayerState" name="PlayerState">
-<area shape="rect" id="node2" href="$classResponseSource.html" title="Abstract helper class for sources of responses. " alt="" coords="5,193,136,219"/>
-<area shape="rect" id="node3" href="$classResponseSink.html" title="Abstract class for anything that can be sent a response. " alt="" coords="14,96,127,123"/>
-<area shape="rect" id="node5" title="STL class. " alt="" coords="192,96,275,123"/>
-<area shape="rect" id="node6" title="STL class. " alt="" coords="168,5,299,47"/>
-</map>
