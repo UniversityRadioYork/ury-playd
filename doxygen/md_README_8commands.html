@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.7"/>
-<title>URY playd: src/player -&gt; io Relation</title>
+<title>URY playd: Command Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('dir_975424cdae97a07db69e55371758444e.html','');});
+$(document).ready(function(){initNavTree('md_README_8commands.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -86,14 +86,79 @@ $(document).ready(function(){initNavTree('dir_975424cdae97a07db69e55371758444e.h
 </iframe>
 </div>
 
+<div class="header">
+  <div class="headertitle">
+<div class="title">Command Reference </div>  </div>
+</div><!--header-->
 <div class="contents">
-<h3>player &rarr; io Relation</h3><table class="dirtab"><tr class="dirtab"><th class="dirtab">File in src/player</th><th class="dirtab">Includes file in src/io</th></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="player_8cpp.html">player.cpp</a></td><td class="dirtab"><a class="el" href="io__response_8hpp.html">io_response.hpp</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="player_8hpp.html">player.hpp</a></td><td class="dirtab"><a class="el" href="io__response_8hpp.html">io_response.hpp</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="player__file_8cpp.html">player_file.cpp</a></td><td class="dirtab"><a class="el" href="io__response_8hpp.html">io_response.hpp</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="player__file_8hpp.html">player_file.hpp</a></td><td class="dirtab"><a class="el" href="io__response_8hpp.html">io_response.hpp</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="player__position_8cpp.html">player_position.cpp</a></td><td class="dirtab"><a class="el" href="io__response_8hpp.html">io_response.hpp</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="player__position_8hpp.html">player_position.hpp</a></td><td class="dirtab"><a class="el" href="io__response_8hpp.html">io_response.hpp</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="player__state_8cpp.html">player_state.cpp</a></td><td class="dirtab"><a class="el" href="io__response_8hpp.html">io_response.hpp</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="player__state_8hpp.html">player_state.hpp</a></td><td class="dirtab"><a class="el" href="io__response_8hpp.html">io_response.hpp</a></td></tr></table></div><!-- contents -->
+<div class="textblock"><p><code>playd</code> implements the BAPS3 Internal API (specifically the <code>End</code>, <code>FileLoad</code>, <code>PlayStop</code>, <code>Seek</code>, and <code>TimeReport</code> features), as described in the [BAPS3 specification][]. The specification provides more formal definitions of the commands supported by <code>playd</code>.</p>
+<h2>Sending Commands Manually</h2>
+<p>To talk to <code>playd</code>, open a raw TCP/IP session on the host and port on which <code>playd</code> was started. For example, using <a href="http://nc110.sourceforge.net/">netcat</a>: </p><pre class="fragment">nc ${ADDRESS} ${PORT}
+</pre><p>On Windows, use <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a> in <em>raw mode</em> with an <em>Implicit CR for every LF</em>.</p>
+<h2>Initial Responses</h2>
+<p>When connecting to <code>playd</code>, it will send a few initial responses to inform the client of its current state. This will look something like: </p><pre class="fragment">OHAI playd
+FEATURES End FileLoad PlayStop Seek TimeReport
+TIME 0
+STATE Ejected
+</pre><p>This tells the client:</p>
+<ul>
+<li>The name of the server program (<code>playd</code>);</li>
+<li>The BAPS3 features implemented by <code>playd</code>;</li>
+<li>The current position, in microseconds, into the current song (in this example, it is <code>0</code> because there is no song)</li>
+<li>The current state (<code>Ejected</code>, which means no song is loaded).</li>
+</ul>
+<h2>Command Format</h2>
+<p><code>playd</code> uses <em>shell-style</em> commands:</p>
+<ul>
+<li>Each command is a linefeed-delimited <em>line</em> of whitespace-delimited <em>words</em>;</li>
+<li>Whitespace and quotes can be <em>escaped</em> by using backslash;</li>
+<li>Words can be <em>quoted</em> to avoid needing to backslash-escape large amounts of whitespace: either using <em>double quotes</em>, which allows backslash escaping, or <em>single quotes</em>, which doesn't;</li>
+<li>The first word represents the <em>command</em>, and each subsequent word is an <em>argument</em> to that command.</li>
+</ul>
+<h2>Requests</h2>
+<p>These are the requests that clients can send to <code>playd</code>. Request commands are always in <em>lowercase</em>.</p>
+<h3>quit</h3>
+<p>Terminates <code>playd</code>.</p>
+<h3>load <em>file</em></h3>
+<p>Loads <em>file</em>, which is an <em>absolute</em> path to an audio file.</p>
+<h3>eject</h3>
+<p>Unloads the current file, stopping it if it is currently playing.</p>
+<h3>play</h3>
+<p>Starts playing the currently loaded file.</p>
+<h3>stop</h3>
+<p>Stops playing the currently loaded file. This does not alter the position; use <code>seek 0</code> after <code>stop</code> to rewind the file.</p>
+<h3>seek <em>position</em></h3>
+<p>Seeks to <em>position</em>, which may either be an integer (interpreted as microseconds since the beginning of the file), or an integer followed by a suffix denoting the unit. Units supported include <code>s</code> (seconds), <code>m</code> (minutes), <code>h</code> (hours), <code>ms</code> (milliseconds), and <code>us</code> (microseconds).</p>
+<h2>Responses</h2>
+<p>These are the responses sent to clients by <code>playd</code>. Response commands are always in <em>uppercase</em>.</p>
+<h3>OHAI <em>name</em></h3>
+<p>Identifies the server program.</p>
+<h3>FEATURES <em>feat1</em> <em>feat2...</em></h3>
+<p>Lists the BAPS3 feature flags supported by <code>playd</code>.</p>
+<h3>END</h3>
+<p>Marks the end of a file. This is sent if a file finishes playing of its own accord.</p>
+<h3>TIME <em>position</em></h3>
+<p>Announces the current position in the file, in microseconds.</p>
+<h3>STATE <em>state</em></h3>
+<p>Announces a state change. The <em>state</em> will be one of:</p>
+<ul>
+<li><code>Playing</code> - the current file is now being played;</li>
+<li><code>Stopped</code> - the current file is now stopped;</li>
+<li><code>Ejected</code> - the current file has just been ejected;</li>
+<li><code>Quitting</code> - <code>playd</code> is now quitting.</li>
+</ul>
+<h3>FILE <em>file</em></h3>
+<p>Announces that <em>file</em> has just been loaded.</p>
+<h3>OKAY <em>command</em></h3>
+<p>Announces that a valid command has just been received and processed.</p>
+<h3>WHAT <em>error</em></h3>
+<p>Announces that a bad command was just received. </p>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_975424cdae97a07db69e55371758444e.html">player</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:21:22 for URY playd by
+    <li class="footer">Generated on Sun Sep 7 2014 15:21:21 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

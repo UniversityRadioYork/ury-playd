@@ -1,6 +1,7 @@
 var NAVTREE =
 [
   [ "URY playd", "index.html", [
+    [ "Command Reference", "md_README_8commands.html", null ],
     [ "URY playd", "md_README.html", null ],
     [ "Visual Studio Build Notes", "md_README_8VisualStudio.html", null ],
     [ "Todo List", "todo.html", null ],

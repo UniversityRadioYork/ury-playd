@@ -17,5 +17,6 @@ var searchData=
   ['currentposition',['CurrentPosition',['../classAudio.html#a5cdd89a7f22612f23e3a6fb36c7f451f',1,'Audio::CurrentPosition()'],['../classPlayerFile.html#a072d9788c1449e0e2de3e28b169f2c34',1,'PlayerFile::CurrentPosition()']]],
   ['currentpositionmicroseconds',['CurrentPositionMicroseconds',['../classAudio.html#a992b812a2b1f8456f92ca61ec97e4f80',1,'Audio']]],
   ['currentstatein',['CurrentStateIn',['../classPlayer.html#aa56e60cd7b83a4aa7ebda1e6ec054f4d',1,'Player']]],
-  ['currentstatestring',['CurrentStateString',['../classPlayer.html#a361edb67ec9c9db40cf25463f2929b42',1,'Player']]]
+  ['currentstatestring',['CurrentStateString',['../classPlayer.html#a361edb67ec9c9db40cf25463f2929b42',1,'Player']]],
+  ['command_20reference',['Command Reference',['../md_README_8commands.html',1,'']]]
 ];

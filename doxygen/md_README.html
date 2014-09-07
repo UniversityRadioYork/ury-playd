@@ -110,10 +110,9 @@ $(document).ready(function(){initNavTree('md_README.html','');});
 <li><code>quit</code> — Closes <code>playd</code>.</li>
 </ul>
 <h3>Sending commands manually</h3>
-<p>To connect directly to <code>playd</code> and issue commands to it, you can use <a href="http://nc110.sourceforge.net/">netcat</a>:</p>
-<p>```sh </p><h1>If you specified [ADDRESS] or [PORT], replace localhost and 1350 respectively.</h1>
-<p>$ nc localhost 1350 ```</p>
-<p>On Windows, using <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a> in <em>raw mode</em> (<b>not</b> Telnet mode) with <em>Implicit CR in every LF</em> switched on in the <em>Terminal</em> options should work.</p>
+<p>To connect directly to <code>playd</code> and issue commands to it, you can use <a href="http://nc110.sourceforge.net/">netcat</a>: </p><pre class="fragment"># If you specified [ADDRESS] or [PORT], replace localhost and 1350 respectively.
+$ nc localhost 1350
+</pre><p>On Windows, using <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a> in <em>raw mode</em> (<b>not</b> Telnet mode) with <em>Implicit CR in every LF</em> switched on in the <em>Terminal</em> options should work.</p>
 <p><b>Do <em>not</em> use a Telnet client (or PuTTY in telnet mode)!</b> <code>playd</code> will do weird things in the presence of Telnet-isms.</p>
 <h2>Features</h2>
 <ul>
@@ -154,11 +153,10 @@ $(document).ready(function(){initNavTree('md_README.html','');});
 <h3>FreeBSD (10+)</h3>
 <p>FreeBSD 10 and above come with <code>clang</code> 3.3 as standard, which should be able to compile <code>playd</code>. <code>gcc</code> is available through the FreeBSD Ports Collection and package repositories.</p>
 <p>You will need <code>gmake</code>, as <code>Makefile</code> is incompatible with BSD make. Sorry!</p>
-<p>All of <code>playd</code>'s dependencies are available through both the FreeBSD Ports Collection and standard package repository. (The FreeBSD port for PortAudio doesn't build C++ bindings, but we bundle them anyway.) To install them as packages:</p>
-<p>``` root:/ # pkg install gmake sox libuv portaudio2 pkgconf ```</p>
-<p>Then, run <code>gmake</code> (<b>not</b> <code>make</code>), and, optionally, <code>gmake install</code> to install <code>playd</code> (as root):</p>
-<p>``` user:~/ % gmake root:~/ # gmake install ```</p>
-<h3>Windows</h3>
+<p>All of <code>playd</code>'s dependencies are available through both the FreeBSD Ports Collection and standard package repository. (The FreeBSD port for PortAudio doesn't build C++ bindings, but we bundle them anyway.) To install them as packages: </p><pre class="fragment">root@freebsd:/ # pkg install gmake sox libuv portaudio2 pkgconf
+</pre><p>Then, run <code>gmake</code> (<b>not</b> <code>make</code>), and, optionally, <code>gmake install</code> to install <code>playd</code> (as root): </p><pre class="fragment">user:@freebsd~/ % gmake
+root:@freebsd~/ # gmake install
+</pre><h3>Windows</h3>
 <h4>Visual Studio</h4>
 <p><em>For more information, see <code><a class="el" href="README_8VisualStudio_8md_source.html">README.VisualStudio.md</a></code>.</em></p>
 <p>playd <b>can</b> be built with Visual Studio (tested with 2013 Premium), but you will need to source and configure the dependencies manually. A Visual Studio project is provided, but will need tweaking for your environment.</p>
@@ -179,7 +177,7 @@ $(document).ready(function(){initNavTree('md_README.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sun Sep 7 2014 13:05:21 for URY playd by
+    <li class="footer">Generated on Sun Sep 7 2014 15:21:21 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

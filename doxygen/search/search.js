@@ -15,7 +15,7 @@ var indexSectionsWithContent =
   5: "cdlpstuw",
   6: "dqrs",
   7: "defnopqstw",
-  8: "tuv"
+  8: "ctuv"
 };
 
 var indexSectionNames =
