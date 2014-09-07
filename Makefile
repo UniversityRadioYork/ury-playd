@@ -112,7 +112,7 @@ $(builddir)/%.1.gz: $(srcdir)/%.1
 	@< $< $(GZIP) > $@
 
 $(builddir)/%.1.html: $(srcdir)/%.1
-	@echo GROFF(html) $@
+	@echo 'GROFF(html)' $@
 	@< $< $(GROFF_HTML) > $@
 
 clean:
@@ -141,7 +141,7 @@ gh-pages: doc $(MAN_HTML)
 	git rm -rf doxygen
 	mv doc/html doxygen
 	mv ${MAN_HTML} man.html
-	git add doxygen
+	git add doxygen man.html
 	git commit -m "Update doxygen on gh-pages."
 
 doc:
