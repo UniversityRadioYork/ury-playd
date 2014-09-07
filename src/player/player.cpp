@@ -146,6 +146,11 @@ bool Player::Seek(const std::string &time_str)
 		Debug() << "Invalid time units" << std::endl;
 		return false;
 	}
+	catch (SeekError)
+	{
+		Debug() << "No time given" << std::endl;
+		return false;
+	}
 
 	try
 	{
