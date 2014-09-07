@@ -18,7 +18,7 @@ PKG_CONFIG ?= pkg-config
 FORMAT     ?= clang-format -i
 DOXYGEN    ?= doxygen
 GIT        ?= git
-GROFF_HTML ?= groff -Thtml
+GROFF_HTML ?= groff -Thtml -mdoc
 
 # Variables used to decide where to install playd and its man pages.
 prefix      ?= /usr/local
