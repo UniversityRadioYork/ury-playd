@@ -1,5 +1,0 @@
-<map id="Audio" name="Audio">
-<area shape="rect" id="node3" href="$classAudioSink.html" title="An output stream for an Audio file. " alt="" coords="313,97,397,124"/>
-<area shape="rect" id="node5" href="$classRingBuffer.html" title="RingBuffer\&lt; char, unsigned\l long \&gt;" alt="" coords="7,57,199,98"/>
-<area shape="rect" id="node8" href="$classAudioSource.html" title="An object responsible for decoding an audio file. " alt="" coords="304,188,405,215"/>
-</map>
