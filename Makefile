@@ -18,6 +18,7 @@ PKG_CONFIG ?= pkg-config
 FORMAT     ?= clang-format -i
 DOXYGEN    ?= doxygen
 GIT        ?= git
+GROFF_HTML ?= groff -Thtml
 
 # Variables used to decide where to install playd and its man pages.
 prefix      ?= /usr/local
@@ -33,8 +34,9 @@ NAME = playd
 # Calculate the path to the outputted program.
 BIN = $(builddir)/$(NAME)
 
-MAN_SRC = $(srcdir)/$(NAME).1
-MAN_GZ  = $(builddir)/$(NAME).1.gz
+MAN_SRC   = $(srcdir)/$(NAME).1
+MAN_GZ    = $(builddir)/$(NAME).1.gz
+MAN_HTML  = $(builddir)/$(NAME).1.html
 
 # This should include all of the source directories for playd,
 # excluding any special ones defined below.  The root source directory is
@@ -107,7 +109,11 @@ $(builddir)/%.o: $(srcdir)/%.cpp
 
 $(builddir)/%.1.gz: $(srcdir)/%.1
 	@echo GZIP $@
-	@< $< ${GZIP} > $@
+	@< $< $(GZIP) > $@
+
+$(builddir)/%.1.html: $(srcdir)/%.1
+	@echo GROFF(html) $@
+	@< $< $(GROFF_HTML) > $@
 
 clean:
 	@echo CLEAN
@@ -130,10 +136,11 @@ format: $(TO_FORMAT)
 	@echo FORMAT $^
 	@$(FORMAT) $^
 
-gh-pages: doc
+gh-pages: doc $(MAN_HTML)
 	git checkout gh-pages
 	git rm -rf doxygen
 	mv doc/html doxygen
+	mv ${MAN_HTML} man.html
 	git add doxygen
 	git commit -m "Update doxygen on gh-pages."
 
