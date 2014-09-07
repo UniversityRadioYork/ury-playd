@@ -1,0 +1,87 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sun Sep  7 15:21:22 2014 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">is a very simple audio playback program,
+intended to be driven by other, more complex software. Think
+of it as but on a diet.</p>
+
+<p style="margin-top: 1em" valign="top">has a very simple
+feature list: it can load one audio file (given its path),
+it can play that file, it can pause playback of that file,
+it can seek and eject that file, and it periodically sends
+back the current position in that file. It is controlled via
+a simple, line-of-text-based protocol exposed as a TCP
+server.</p>
+
+<p style="margin-top: 1em" valign="top">If supplied with
+zero arguments, enumerates the possible values for the
+argument. Otherwise, it is launched according to the
+provided arguments, the meaning of which is as follows: The
+ID of the device onto which will output audio. This must be
+one of the values provided when is executed with zero
+arguments. Additionally, it must refer to a device capable
+of audio output. If provided, this specifies the TCP/IP
+address to which will bind when listening for client
+connections. Typical values include 127.0.0.1 (connections
+from localhost only) and 0.0.0.0 (connections from
+anywhere). The default is 127.0.0.1. If provided, this
+specifies the TCP/IP port on which will listen for client
+connections. The default is 1350. speaks a text-based
+protocol which is simple to understand but, for reasons of
+brevity (and the fact that the protocol is not yet finalised
+and may quickly outpace this man page in development), is
+not documented here. Refer to
+https://github.com/UniversityRadioYork/ury-playd/wiki/playd-API
+for the latest protocol documentation. Since only speaks
+TCP/IP (by design), it can be difficult to speak with it
+from a terminal on the local machine. We recommend the use
+of a program such as to bridge this gap in functionality.
+The command</p>
+
+<p style="margin-top: 1em" valign="top">will produce a
+listing similar to the following: 0: HDA ATI SB: ALC892
+Analog (hw:0,0) 1: HDA ATI SB: ALC892 Digital (hw:0,1) 2:
+HDA ATI SB: ALC892 Alt Analog (hw:0,2) 3: HDA NVidia: ID 42
+Digital (hw:1,3) 4: Plantronics GameCom 780: USB Audio
+(hw:2,0) 5: sysdefault 6: front 7: surround40 8: default 9:
+dmix</p>
+
+<p style="margin-top: 1em" valign="top">Suppose we want to
+output on the GameCom. The command</p>
+
+<p style="margin-top: 1em" valign="top">will start on its
+default address (localhost) and port, outputting on device
+ID 4.</p>
+
+<p style="margin-top: 1em" valign="top">If we should need
+more control over the address and port, we may supply them
+as additional arguments, for example:</p>
+
+<p style="margin-top: 1em" valign="top">To now connect to
+from the local terminal, one can use a command such as:</p>
+
+<p style="margin-top: 1em" valign="top">This example,
+hopefully, covers all command-line usage of Yes. See
+https://github.com/UniversityRadioYork/ury-playd/issues for
+the issue tracker.</p>
+<hr>
+</body>
+</html>
