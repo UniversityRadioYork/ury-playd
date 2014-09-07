@@ -18,6 +18,9 @@ cov-int/
 build-log.txt
 playd.tgz
 
+# Vim
+*.sw?
+
 # Sublime Text
 *.sublime-project
 *.sublime-workspace
