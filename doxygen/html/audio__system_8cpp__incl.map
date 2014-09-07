@@ -1,0 +1,10 @@
+<map id="src/audio/audio_system.cpp" name="src/audio/audio_system.cpp">
+<area shape="rect" id="node17" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="1553,326,1650,353"/>
+<area shape="rect" id="node19" href="$messages_8h.html" title="Constant human&#45;readable messages used within playd. " alt="" coords="3021,326,3128,353"/>
+<area shape="rect" id="node20" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="1262,326,1421,353"/>
+<area shape="rect" id="node22" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="1929,169,2012,196"/>
+<area shape="rect" id="node28" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="1597,244,1731,271"/>
+<area shape="rect" id="node31" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="2447,169,2563,196"/>
+<area shape="rect" id="node35" href="$audio__system_8hpp.html" title="Declaration of the AudioSystem class. " alt="" coords="1974,87,2109,114"/>
+<area shape="rect" id="node32" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="2769,244,2877,271"/>
+</map>

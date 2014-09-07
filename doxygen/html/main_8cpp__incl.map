@@ -1,0 +1,20 @@
+<map id="src/main.cpp" name="src/main.cpp">
+<area shape="rect" id="node5" href="$audio__system_8hpp.html" title="Declaration of the AudioSystem class. " alt="" coords="1795,528,1968,555"/>
+<area shape="rect" id="node26" href="$messages_8h.html" title="Constant human&#45;readable messages used within playd. " alt="" coords="2805,759,2912,786"/>
+<area shape="rect" id="node28" href="$cmd_8hpp.html" title="Declaration of the CommandHandler class. " alt="" coords="580,304,655,331"/>
+<area shape="rect" id="node30" href="$player_8hpp.html" title="Declaration of the Player class, and associated types. " alt="" coords="767,379,897,405"/>
+<area shape="rect" id="node32" href="$io__response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="1344,528,1496,555"/>
+<area shape="rect" id="node39" href="$io__reactor_8hpp.html" title="Declaration of the IoReactor class. " alt="" coords="1391,155,1519,181"/>
+<area shape="rect" id="node43" href="$main_8hpp.html" title="Declaration of the playd class. " alt="" coords="793,80,871,107"/>
+<area shape="rect" id="node11" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="1931,759,2090,786"/>
+<area shape="rect" id="node13" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="1819,603,1935,629"/>
+<area shape="rect" id="node18" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="1957,677,2091,704"/>
+<area shape="rect" id="node27" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="1493,603,1576,629"/>
+<area shape="rect" id="node23" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="2622,677,2730,704"/>
+<area shape="rect" id="node21" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="2267,759,2365,786"/>
+<area shape="rect" id="node34" href="$time__parser_8hpp.html" title="The TimeParser template class. " alt="" coords="342,677,477,704"/>
+<area shape="rect" id="node35" href="$player__file_8hpp.html" title="Declaration of the PlayerFile class, and associated types. " alt="" coords="1243,453,1357,480"/>
+<area shape="rect" id="node36" href="$player__position_8hpp.html" title="Declaration of the PlayerPosition class. " alt="" coords="971,453,1117,480"/>
+<area shape="rect" id="node38" href="$player__state_8hpp.html" title="Declaration of the PlayerState class, and associated types. " alt="" coords="769,453,895,480"/>
+<area shape="rect" id="node42" href="$tokeniser_8hpp.html" title="Declaration of the Tokeniser class. " alt="" coords="1280,229,1387,256"/>
+</map>
