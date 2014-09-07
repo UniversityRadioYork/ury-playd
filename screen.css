@@ -1,18 +1,44 @@
-@import url(http://fonts.googleapis.com/css?family=Merriweather:400,700,400italic|Merriweather+Sans:700|Overlock:400,900);
+@import url(http://fonts.googleapis.com/css?family=Merriweather:400,700,400italic|Merriweather+Sans:700|Roboto+Slab:700);
+
+html {
+	background-color: #fafafa;
+}
 
 body {
+	font-size: 14pt;
 	font-family: 'Merriweather', serif;
+	color: rgba(0, 0, 0, 0.85);
 }
 
 header {
+	padding-bottom: 1rem;
+	border-bottom: 3pt solid #b388ff;
 	text-align: center;
-	padding: 1rem;
-	border-bottom: 3pt solid black;
 }
 header h1 {
-	font-family: 'Overlock', cursive;
+	color: #1a237e;
+	font-family: 'Roboto Slab', serif;
+	font-size: 3rem;
+	margin: 0;
+}
+header p {
+	color: #5c6bc0;
+	margin: 0;
+	margin-top: 6pt;
+	font-style: italic;
 }
 
 h1, h2, h3, h4, h5, h6 {
 	font-family: 'Merriweather Sans', sans-serif;
 }
+
+a:link {
+	color: #5677fc;
+}
+a:active {
+	color: #e51c23;
+}
+a:visited {
+	color: #673ab7;
+}
+
