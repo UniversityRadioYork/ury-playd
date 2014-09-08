@@ -45,11 +45,7 @@ bool Player::Update()
 void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
-		if (this->end_sink != nullptr) {
-			this->end_sink->Respond(ResponseCode::END, "");
-		}
-		Stop();
-		Seek("0");
+		End();
 	} else {
 		UpdatePosition();
 	}
@@ -70,6 +66,21 @@ void Player::SetResponseSink(ResponseSink &sink)
 	this->position.SetResponseSink(sink);
 	this->state.SetResponseSink(sink);
 	this->end_sink = &sink;
+}
+
+void Player::End()
+{
+	if (this->end_sink != nullptr) {
+		this->end_sink->Respond(ResponseCode::END, "");
+	}
+	Stop();
+
+	// Rewind the file back to the start.  We can't use Seek() here
+	// in case End() is called from Seek(); a seek failure could start an
+	// infinite loop.
+	this->file.SeekToPosition(std::chrono::seconds(0));
+	this->ResetPosition();
+	this->UpdatePosition();
 }
 
 //
@@ -159,7 +170,11 @@ bool Player::Seek(const std::string &time_str)
 	catch (SeekError)
 	{
 		Debug() << "Seek failure" << std::endl;
-		return false;
+
+		// Make it look to the client as if the seek ran off the end of
+		// the file.
+		End();
+		return true;
 	}
 
 	this->ResetPosition();
