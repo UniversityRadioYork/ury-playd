@@ -3,8 +3,7 @@ language: cpp
 # Ubuntu 12.04 doesn't have a libuv package, so we install it from source.
 before_script:
   - wget https://github.com/joyent/libuv/archive/v0.11.29.tar.gz -O /tmp/libuv.tar.gz
-  - pushd
-  - cd /tmp
+  - pushd /tmp
   - tar xzf libuv.tar.gz
   - cd libuv-0.11.29
   - sh autogen.sh
