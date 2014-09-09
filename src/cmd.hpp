@@ -10,7 +10,6 @@
 #ifndef PS_CMD_HPP
 #define PS_CMD_HPP
 
-#include <functional>
 #include <map>
 #include <memory>
 #include <vector>

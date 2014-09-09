@@ -10,7 +10,6 @@
 #ifndef PS_PLAYER_POSITION_HPP
 #define PS_PLAYER_POSITION_HPP
 
-#include <functional>
 #include <set>
 
 #include "../audio/audio_source.hpp"

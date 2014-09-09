@@ -10,8 +10,6 @@
 #ifndef PS_IO_REACTOR_HPP
 #define PS_IO_REACTOR_HPP
 
-#include <deque>
-#include <functional>
 #include <ostream>
 #include <set>
 

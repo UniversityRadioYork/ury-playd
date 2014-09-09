@@ -10,7 +10,6 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
-#include <functional>
 #include <iostream>
 #include <map>
 #include <memory>

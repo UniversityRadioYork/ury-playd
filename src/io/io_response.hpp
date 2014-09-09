@@ -10,7 +10,6 @@
 #ifndef PS_IO_RESPONSE_HPP
 #define PS_IO_RESPONSE_HPP
 
-#include <functional>
 #include <map>
 #include <ostream>
 #include <string>

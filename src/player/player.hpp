@@ -14,7 +14,6 @@
 #define PS_PLAYER_HPP
 
 #include <cstdint>
-#include <functional>
 #include <initializer_list>
 #include <map>
 #include <memory>
