@@ -101,20 +101,17 @@ bool Player::Load(const std::string &path)
 {
 	bool valid = !path.empty();
 	if (valid) {
-		try
-		{
+		try {
 			this->file.Load(path);
 			ResetPosition();
 			SetState(PlayerState::State::STOPPED);
 		}
-		catch (FileError &)
-		{
+		catch (FileError &) {
 			// File errors aren't fatal, so catch them here.
 			Eject();
 			valid = false;
 		}
-		catch (Error &)
-		{
+		catch (Error &) {
 			// Ensure a load failure doesn't leave a corrupted track
 			// loaded.
 			Eject();
@@ -148,27 +145,22 @@ bool Player::Seek(const std::string &time_str)
 
 	AudioSource::MicrosecondPosition position(0);
 
-	try
-	{
+	try {
 		position = this->time_parser.Parse(time_str);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		Debug() << "Invalid time units" << std::endl;
 		return false;
 	}
-	catch (SeekError)
-	{
+	catch (SeekError) {
 		Debug() << "No time given" << std::endl;
 		return false;
 	}
 
-	try
-	{
+	try {
 		this->file.SeekToPosition(position);
 	}
-	catch (SeekError)
-	{
+	catch (SeekError) {
 		Debug() << "Seek failure" << std::endl;
 
 		// Make it look to the client as if the seek ran off the end of

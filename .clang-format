@@ -1,11 +1,18 @@
 ---
-BasedOnStyle:  Google
-AccessModifierOffset: -8
-ColumnLimit:     80
-SpacesBeforeTrailingComments: 1
-IndentWidth:     8
-TabWidth:        8
-UseTab:          ForIndentation
-BreakBeforeBraces: Stroustrup
-ContinuationIndentWidth: 16
-Cpp11BracedListStyle: false
+BasedOnStyle: Google
+
+AllowShortBlocksOnASingleLine:    false
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces:                Stroustrup
+Cpp11BracedListStyle:             false
+Language:                         Cpp
+PointerAlignment:                 Right
+Standard:                         Cpp11
+UseTab:                           ForIndentation
+
+AccessModifierOffset:         -8
+ColumnLimit:                  80
+SpacesBeforeTrailingComments:  1
+IndentWidth:                   8
+TabWidth:                      8
+ContinuationIndentWidth:      16

@@ -108,7 +108,8 @@ public:
 	 * Attempts to seek to the given position in microseconds.
 	 * @param microseconds The position to seek to, in microseconds.
 	 */
-	void SeekToPositionMicroseconds(AudioSource::MicrosecondPosition microseconds);
+	void SeekToPositionMicroseconds(
+	                AudioSource::MicrosecondPosition microseconds);
 
 private:
 	/// The source of audio data.

@@ -42,12 +42,10 @@ int playd::GetDeviceID()
 
 	/* Only accept valid numbers. */
 	int id;
-	try
-	{
+	try {
 		id = std::stoi(this->arguments[1]);
 	}
-	catch (...)
-	{
+	catch (...) {
 		/* Only std::invalid_argument and std::out_of_range are thrown
 		 * here. */
 		return -1;
@@ -63,11 +61,11 @@ int playd::GetDeviceID()
 }
 
 // Conversion rates from various position units to microseconds.
-const AudioSource::MicrosecondPosition US_RATE =          1;
-const AudioSource::MicrosecondPosition MS_RATE =       1000;
-const AudioSource::MicrosecondPosition  S_RATE =    1000000;
-const AudioSource::MicrosecondPosition  M_RATE =   60000000;
-const AudioSource::MicrosecondPosition  H_RATE = 3600000000;
+const AudioSource::MicrosecondPosition US_RATE = 1;
+const AudioSource::MicrosecondPosition MS_RATE = 1000;
+const AudioSource::MicrosecondPosition S_RATE = 1000000;
+const AudioSource::MicrosecondPosition M_RATE = 60000000;
+const AudioSource::MicrosecondPosition H_RATE = 3600000000;
 
 /**
  * UNITS defines the unit suffixes that playd understands when parsing
@@ -78,15 +76,25 @@ const AudioSource::MicrosecondPosition  H_RATE = 3600000000;
  */
 const Player::TP::UnitMap UNITS = {
 	/// Microseconds; 1us = 1us.
-	{ "us", US_RATE }, { "usec", US_RATE }, { "usecs", US_RATE },
+	{ "us", US_RATE },
+	{ "usec", US_RATE },
+	{ "usecs", US_RATE },
 	/// Milliseconds; 1ms = 1,000us.
-	{ "ms", MS_RATE }, { "msec", MS_RATE }, { "msecs", MS_RATE },
+	{ "ms", MS_RATE },
+	{ "msec", MS_RATE },
+	{ "msecs", MS_RATE },
 	/// Seconds; 1s = 1,000ms = 1,000,000us.
-	{ "s",   S_RATE }, { "sec",   S_RATE }, { "secs",   S_RATE },
+	{ "s", S_RATE },
+	{ "sec", S_RATE },
+	{ "secs", S_RATE },
 	/// Minutes; 1m = 60s = 60,000ms = 60,000,000us.
-	{ "m",   M_RATE }, { "min",   M_RATE }, { "mins",   M_RATE },
+	{ "m", M_RATE },
+	{ "min", M_RATE },
+	{ "mins", M_RATE },
 	/// Hours; 1h = 60m = 3,600s = 3,600,000ms = 3,600,000,000us.
-	{ "h",   H_RATE }, { "hour",  H_RATE }, { "hours",  H_RATE },
+	{ "h", H_RATE },
+	{ "hour", H_RATE },
+	{ "hours", H_RATE },
 	/// When no unit is provided, we assume microseconds.
 	{ "", US_RATE }
 };
@@ -108,8 +116,7 @@ playd::playd(int argc, char *argv[])
 
 int playd::Run()
 {
-	try
-	{
+	try {
 		// Don't roll this into the constructor: it'll go out of scope!
 		int id = this->GetDeviceID();
 		if (id == -1) {
@@ -127,8 +134,7 @@ int playd::Run()
 		this->player.SetResponseSink(*this->io);
 		this->io->Run();
 	}
-	catch (Error &error)
-	{
+	catch (Error &error) {
 		io->RespondWithError(error);
 		Debug() << "Unhandled exception caught, going away now."
 		        << std::endl;

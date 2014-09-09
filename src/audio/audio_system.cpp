@@ -112,8 +112,8 @@ portaudio::Stream *AudioSystem::Configure(
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
 
-const portaudio::Device &AudioSystem::PaDeviceFrom(const std::string &id_string)
-                const
+const portaudio::Device &AudioSystem::PaDeviceFrom(
+                const std::string &id_string) const
 {
 	auto &pa = portaudio::System::instance();
 
@@ -137,15 +137,13 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
 };
 
-portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(SampleFormat fmt)
-                const
+portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(
+                SampleFormat fmt) const
 {
-	try
-	{
+	try {
 		return pa_from_sf.at(fmt);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		throw FileError(MSG_DECODE_BADRATE);
 	}
 }

@@ -93,7 +93,7 @@ void UvRespondCallback(uv_write_t *req, int)
 {
 	// TODO: Handle the int status?
 	WriteReq *wr = (WriteReq *)req;
-	delete[] wr->buf.base;
+	delete[] wr -> buf.base;
 	delete wr;
 }
 
@@ -223,7 +223,7 @@ void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
 
 	if (buf->base != nullptr) {
 		this->tokeniser.Feed(buf->base, nread);
-		delete[] buf->base;
+		delete[] buf -> base;
 	}
 }
 

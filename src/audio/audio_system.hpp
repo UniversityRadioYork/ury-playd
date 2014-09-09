@@ -105,8 +105,8 @@ private:
 	 * @param id_string The device ID, as a string.
 	 * @return The device.
 	 */
-	const portaudio::Device &PaDeviceFrom(const std::string &id_string)
-	                const;
+	const portaudio::Device &PaDeviceFrom(
+	                const std::string &id_string) const;
 
 	/**
 	 * Converts a sample format identifier from playd to PortAudio.
