@@ -99,7 +99,7 @@ LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##
 
-.PHONY: clean mkdir install run gdbrun format gh-pages doc
+.PHONY: clean mkdir install run gdbrun format gh-pages doc libuv
 
 all: mkdir $(BIN) man
 man: $(MAN_GZ)
@@ -154,4 +154,8 @@ gh-pages: doc $(MAN_HTML)
 	git commit -m "Update doxygen on gh-pages."
 
 doc:
-	${DOXYGEN}
+	$(DOXYGEN)
+
+# Helper task for installing libuv.
+libuv:
+	./make_libuv.sh
