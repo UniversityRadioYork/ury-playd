@@ -74,6 +74,19 @@ public:
 	FileError(const std::string &message) : Error(message) {};
 };
 
+/**
+ * An Error signifying that playd can't seek in a file.
+ */
+class SeekError : public Error {
+public:
+	/**
+	 * Constructs a SeekError.
+	 * @param message The human-readable message of the error.
+	 */
+	SeekError(const std::string &message) : Error(message) {};
+};
+
+
 /** Class for telling the human what playd is doing. */
 class Debug {
 public:

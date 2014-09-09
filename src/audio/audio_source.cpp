@@ -119,8 +119,13 @@ std::uint64_t AudioSource::Seek(std::chrono::microseconds position)
 		Open(path);
 	}
 
+	// Have we tried to seek past the end of the file?
+	if (this->context->signal.length < sox_samples) {
+		throw SeekError(MSG_SEEK_FAIL);
+	}
+
 	if (sox_seek(this->context, sox_samples, SOX_SEEK_SET) != SOX_SUCCESS) {
-		throw InternalError(MSG_SEEK_FAIL);
+		throw SeekError(MSG_SEEK_FAIL);
 	}
 
 	// Reset the decoder state, because otherwise the decoder will get very

@@ -45,11 +45,7 @@ bool Player::Update()
 void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
-		if (this->end_sink != nullptr) {
-			this->end_sink->Respond(ResponseCode::END, "");
-		}
-		Stop();
-		Seek("0");
+		End();
 	} else {
 		UpdatePosition();
 	}
@@ -70,6 +66,21 @@ void Player::SetResponseSink(ResponseSink &sink)
 	this->position.SetResponseSink(sink);
 	this->state.SetResponseSink(sink);
 	this->end_sink = &sink;
+}
+
+void Player::End()
+{
+	if (this->end_sink != nullptr) {
+		this->end_sink->Respond(ResponseCode::END, "");
+	}
+	Stop();
+
+	// Rewind the file back to the start.  We can't use Seek() here
+	// in case End() is called from Seek(); a seek failure could start an
+	// infinite loop.
+	this->file.SeekToPosition(std::chrono::seconds(0));
+	this->ResetPosition();
+	this->UpdatePosition();
 }
 
 //
@@ -133,27 +144,43 @@ bool Player::Quit()
 
 bool Player::Seek(const std::string &time_str)
 {
-	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
-		bool success = true;
-		std::chrono::microseconds position(0);
+	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) return false;
 
-		try
-		{
-			position = this->time_parser.Parse(time_str);
-		}
-		catch (std::out_of_range)
-		{
-			success = false;
-		}
+	std::chrono::microseconds position(0);
 
-		if (success) {
-			this->file.SeekToPosition(position);
-			this->ResetPosition();
-			this->UpdatePosition();
-		}
-		return success;
+	try
+	{
+		position = this->time_parser.Parse(time_str);
 	}
-	return false;
+	catch (std::out_of_range)
+	{
+		Debug() << "Invalid time units" << std::endl;
+		return false;
+	}
+	catch (SeekError)
+	{
+		Debug() << "No time given" << std::endl;
+		return false;
+	}
+
+	try
+	{
+		this->file.SeekToPosition(position);
+	}
+	catch (SeekError)
+	{
+		Debug() << "Seek failure" << std::endl;
+
+		// Make it look to the client as if the seek ran off the end of
+		// the file.
+		End();
+		return true;
+	}
+
+	this->ResetPosition();
+	this->UpdatePosition();
+
+	return true;
 }
 
 bool Player::Stop()

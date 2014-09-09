@@ -13,6 +13,9 @@
 #include <cstdint>
 #include <sstream>
 
+#include "errors.hpp"
+#include "messages.h"
+
 /**
  * A class for parsing time strings consisting of an integer and unit into
  * a flat integer representing the number of OutUnit units that time string
@@ -83,7 +86,14 @@ private:
 		IntType raw_time;
 		std::string rest;
 
-		is >> raw_time >> rest;
+		is >> raw_time;
+
+		// Make sure we actually get a time of some form.
+		if (is.fail()) {
+			throw SeekError(MSG_SEEK_FAIL);
+		}
+
+		is >> rest;
 		return std::make_pair(rest, raw_time);
 	}
 };
