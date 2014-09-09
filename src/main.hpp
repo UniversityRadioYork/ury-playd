@@ -10,7 +10,6 @@
 #ifndef PS_MAIN_HPP
 #define PS_MAIN_HPP
 
-#include <chrono>
 #include "audio/audio_system.hpp"
 #include "cmd.hpp"
 #include "io/io_reactor.hpp"
@@ -43,7 +42,7 @@ public:
 
 private:
 	/// The period between position announcements from the Player object.
-	static const std::chrono::microseconds POSITION_PERIOD;
+	static const AudioSource::MicrosecondPosition POSITION_PERIOD;
 
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.

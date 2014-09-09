@@ -10,8 +10,8 @@
 #ifndef PS_AUDIO_SINK_HPP
 #define PS_AUDIO_SINK_HPP
 
-#include <chrono>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <utility>

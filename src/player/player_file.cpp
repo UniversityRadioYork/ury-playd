@@ -7,8 +7,10 @@
  * @see player/player_file.hpp
  */
 
+#include "../audio/audio_system.hpp"
 #include "../io/io_response.hpp"
 #include "player_file.hpp"
+#include "player_position.hpp"
 
 PlayerFile::PlayerFile(const AudioSystem &audio_system)
     : audio(nullptr), audio_system(audio_system)
@@ -63,4 +65,14 @@ void PlayerFile::Update()
 {
 	assert(this->audio != nullptr);
 	this->audio->Update();
+}
+
+PlayerPosition::Unit PlayerFile::CurrentPosition()
+{
+	return this->audio->CurrentPositionMicroseconds();
+}
+
+void PlayerFile::SeekToPosition(PlayerPosition::Unit position)
+{
+	this->audio->SeekToPositionMicroseconds(position);
 }

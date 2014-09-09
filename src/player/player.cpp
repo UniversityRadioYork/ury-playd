@@ -78,7 +78,7 @@ void Player::End()
 	// Rewind the file back to the start.  We can't use Seek() here
 	// in case End() is called from Seek(); a seek failure could start an
 	// infinite loop.
-	this->file.SeekToPosition(std::chrono::seconds(0));
+	this->file.SeekToPosition(0);
 	this->ResetPosition();
 	this->UpdatePosition();
 }
@@ -146,7 +146,7 @@ bool Player::Seek(const std::string &time_str)
 {
 	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) return false;
 
-	std::chrono::microseconds position(0);
+	AudioSource::MicrosecondPosition position(0);
 
 	try
 	{

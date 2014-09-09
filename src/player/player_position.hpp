@@ -10,10 +10,10 @@
 #ifndef PS_PLAYER_POSITION_HPP
 #define PS_PLAYER_POSITION_HPP
 
-#include <chrono>
 #include <functional>
 #include <set>
 
+#include "../audio/audio_source.hpp"
 #include "../io/io_response.hpp"
 
 /**
@@ -24,7 +24,7 @@
 class PlayerPosition : public ResponseSource {
 public:
 	/// Unit used for positions.
-	using Unit = std::chrono::microseconds;
+	using Unit = AudioSource::MicrosecondPosition;
 
 private:
 	/// The period between each push of the position to the response sink.

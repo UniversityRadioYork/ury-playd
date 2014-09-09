@@ -45,13 +45,13 @@ bool Audio::IsStopped()
 	return this->sink->IsStopped();
 }
 
-std::chrono::microseconds Audio::CurrentPositionMicroseconds()
+AudioSource::MicrosecondPosition Audio::CurrentPositionMicroseconds()
 {
 	return this->source->MicrosecondPositionFromSamples(
 	                this->sink->Position());
 }
 
-void Audio::SeekToPositionMicroseconds(std::chrono::microseconds microseconds)
+void Audio::SeekToPositionMicroseconds(AudioSource::MicrosecondPosition microseconds)
 {
 	auto samples = this->source->Seek(microseconds);
 	this->sink->SetPosition(samples);

@@ -14,6 +14,7 @@
 
 #include "../audio/audio_system.hpp"
 #include "../io/io_response.hpp"
+#include "player_position.hpp"
 
 class Audio;
 
@@ -64,24 +65,17 @@ public:
 	void Update();
 
 	/**
-	 * Return the current position, as a std::chrono::duration.
-	 * @return The current position in the audio.
+	 * Return the current position.
+	 * @return The current position in the audio, in PlayerPosition units.
 	 */
-	template <typename R>
-	R CurrentPosition()
-	{
-		return this->audio->CurrentPosition<R>();
-	}
+	PlayerPosition::Unit CurrentPosition();
 
 	/**
-	 * Seek to a position expressed as a std::chrono::duration.
-	 * @param position The position to seek to in the audio.
+	 * Seek to a position.
+	 * @param position The position to seek to in the audio,
+	 *   in PlayerPosition units.
 	 */
-	template <typename R>
-	void SeekToPosition(R position)
-	{
-		this->audio->SeekToPosition<R>(position);
-	}
+	void SeekToPosition(PlayerPosition::Unit position);
 
 private:
 	/// The audio file.
