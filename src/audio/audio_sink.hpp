@@ -23,6 +23,8 @@
 #include "audio_source.hpp"
 #include "ringbuffer.hpp"
 
+#ifdef
+
 /// Type of results emitted during the play callback step.
 typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
 
@@ -179,7 +181,7 @@ private:
 	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
 	                  unsigned long numFrames,
 	                  const PaStreamCallbackTimeInfo *timeInfo,
-	                  PaStreamCallbackFlags statusFlags) override;
+	                  PaStreamCallbackFlags statusFlags);
 
 	/**
 	 * Performs one step in the callback.

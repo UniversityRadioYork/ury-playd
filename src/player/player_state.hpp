@@ -53,7 +53,7 @@ public:
 	 * @param sink The ResponseSink to which the current state shall be
 	 *   emitted.
 	 */
-	void Emit(ResponseSink &sink) const override;
+	void Emit(ResponseSink &sink) const;
 
 	/**
 	 * Checks whether the current state is in a given list of states.

@@ -51,7 +51,7 @@ public:
 	 * @param sink The ResponseSink to which a FILE response shall be
 	 *   sent.
 	 */
-	void Emit(ResponseSink &sink) const override;
+	void Emit(ResponseSink &sink) const;
 
 	/**
 	 * Checks to see if the file has stopped playing.
