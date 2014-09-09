@@ -11,7 +11,6 @@
 #define PS_AUDIO_SINK_HPP
 
 #include <cstdint>
-#include <functional>
 #include <memory>
 #include <string>
 #include <utility>
@@ -28,6 +27,23 @@
 using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
 
 /**
+ * Interface for objects that can configure a PortAudio stream from an
+ * AudioSource.
+ */
+class AudioSinkConfigurator {
+public:
+	/**
+	 * Configures and returns a PortAudio stream.
+	 * @param source The audio source to use to configure the stream.
+	 * @param cb The object that PortAudio will call to receive audio.
+	 * @return The configured PortAudio stream.
+	 */
+	virtual portaudio::Stream *Configure(
+	                const AudioSource &source,
+	                portaudio::CallbackInterface &cb) const = 0;
+};
+
+/**
  * An output stream for an Audio file.
  *
  * An AudioSink consists of a PortAudio output stream and a buffer that
@@ -37,11 +53,6 @@ using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
  */
 class AudioSink : portaudio::CallbackInterface {
 public:
-	/// A function that configures and returns a stream, given this
-	/// AudioSink.
-	using StreamConfigurator = std::function<
-	                portaudio::Stream *(portaudio::CallbackInterface &)>;
-
 	/// Type of results emitted during the play callback step.
 	using PlayCallbackStepResult =
 	                std::pair<PaStreamCallbackResult, unsigned long>;
@@ -54,12 +65,10 @@ public:
 
 	/**
 	 * Constructs an AudioSink.
-	 * @param c A function that can configure PortAudio streams.
-	 * @param bytes_per_sample The number of bytes each audio sample
-	 * occupies.
+	 * @param source The source from which this sink will receive audio.
+	 * @param conf The configurator to use to create streams for this sink.
 	 */
-	AudioSink(const StreamConfigurator c,
-	          AudioSource::SampleByteCount bytes_per_sample);
+	AudioSink(const AudioSource &source, const AudioSinkConfigurator &conf);
 
 	/**
 	 * Starts the audio stream.
