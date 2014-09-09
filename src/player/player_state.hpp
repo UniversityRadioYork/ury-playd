@@ -37,7 +37,7 @@ public:
 	};
 
 	/// A list of states, used for IfIn.
-	using List = std::initializer_list<State>;
+	typedef std::initializer_list<State> List;
 
 	/// List of states in which the player is playing something.
 	const static List AUDIO_PLAYING_STATES;

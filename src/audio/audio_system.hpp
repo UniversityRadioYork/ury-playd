@@ -39,7 +39,7 @@ class Device;
 class AudioSystem : public AudioSinkConfigurator {
 public:
 	/// Type for device entries.
-	using Device = std::pair<int, std::string>;
+	typedef std::pair<int, std::string> Device;
 
 	/**
 	 * Constructs an AudioSystem, initialising its libraries.

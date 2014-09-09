@@ -23,7 +23,7 @@
 class PlayerPosition : public ResponseSource {
 public:
 	/// Unit used for positions.
-	using Unit = AudioSource::MicrosecondPosition;
+	typedef AudioSource::MicrosecondPosition Unit;
 
 private:
 	/// The period between each push of the position to the response sink.

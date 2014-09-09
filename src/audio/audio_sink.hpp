@@ -24,7 +24,7 @@
 #include "ringbuffer.hpp"
 
 /// Type of results emitted during the play callback step.
-using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
+typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
 
 /**
  * Interface for objects that can configure a PortAudio stream from an
@@ -58,10 +58,10 @@ public:
 	                std::pair<PaStreamCallbackResult, unsigned long>;
 
 	/// Type of positions measured in samples.
-	using SamplePosition = std::uint64_t;
+	typedef std::uint64_t SamplePosition;
 
 	/// Type of iterators used in the Transfer() method.
-	using TransferIterator = AudioSource::DecodeVector::iterator;
+	typedef AudioSource::DecodeVector::iterator TransferIterator;
 
 	/**
 	 * Constructs an AudioSink.

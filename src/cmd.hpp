@@ -26,7 +26,7 @@
 class CommandHandler {
 public:
 	/// The type of lists of command words.
-	using WordList = std::vector<std::string>;
+	typedef std::vector<std::string> WordList;
 
 	/**
 	 * Constructs a CommandHandler.

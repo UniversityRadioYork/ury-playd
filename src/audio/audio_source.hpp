@@ -40,16 +40,16 @@ public:
 	};
 
 	/// Type of decoded sample vectors.
-	using DecodeVector = std::vector<std::uint8_t>;
+	typedef std::vector<std::uint8_t> DecodeVector;
 
 	/// Type of the result of Decode().
-	using DecodeResult = std::pair<DecodeState, DecodeVector>;
+	typedef std::pair<DecodeState, DecodeVector> DecodeResult;
 
 	/// Type for the count of bytes per sample.
-	using SampleByteCount = int;
+	typedef int SampleByteCount;
 
 	/// Type for positions expressed in microseconds.
-	using MicrosecondPosition = std::uint64_t;
+	typedef std::uint64_t MicrosecondPosition;
 
 	/**
 	 * Constructs an AudioSource.

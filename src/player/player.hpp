@@ -36,7 +36,7 @@
 class Player {
 public:
 	/// The type of TimeParser the Player expects.
-	using TP = TimeParser<PlayerPosition::Unit>;
+	typedef TimeParser<PlayerPosition::Unit> TP;
 
 private:
 	PlayerFile file;         ///< The file subcomponent of the Player.

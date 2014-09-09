@@ -27,7 +27,7 @@ public:
 	 * The type of the map from unit suffixes to multipliers that convert
 	 * from microseconds to those units.
 	 */
-	using UnitMap = std::map<std::string, OutUnit>;
+	typedef std::map<std::string, OutUnit> UnitMap;
 
 	/**
 	 * Constructs a TimeParser.
