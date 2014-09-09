@@ -1,12 +1,12 @@
 language: cpp
 
 before-install:
-	- sudo apt-get update -qq
-	- sudo apt-get install -y libsox-dev portaudio19-dev libuv-dev
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libsox-dev portaudio19-dev libuv-dev
 
 compiler:
-	- clang
-	- gcc
+  - clang
+  - gcc
 
 script: make
 
