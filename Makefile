@@ -153,13 +153,7 @@ $(builddir)/%.1.html: $(srcdir)/%.1
 
 # Updates the GitHub Pages documentation.
 gh-pages: doc $(MAN_HTML)
-	git checkout gh-pages
-	git rm -rf doxygen
-	mv doc/html doxygen
-	mv ${MAN_HTML} man.html
-	git add doxygen man.html
-	git commit -m "Update doxygen on gh-pages."
-	git push
+	env MAN_HTML=$(MAN_HTML) ./make_gh_pages.sh
 
 # Builds the documentation, using doxygen.
 doc:
