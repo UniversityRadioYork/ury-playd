@@ -10,7 +10,6 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
-#include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -67,25 +66,21 @@ double AudioSource::SampleRate() const
 }
 
 std::uint64_t AudioSource::SamplePositionFromMicroseconds(
-                std::chrono::microseconds usec) const
+                AudioSource::MicrosecondPosition usec) const
 {
 	// The sample rate is expressed in terms of samples per second, so we
 	// need to convert the position to seconds then multiply by the rate.
 	// We do things in a slightly peculiar order to minimise rounding.
 
-	auto sample_micros = usec * SampleRate();
-	return std::chrono::duration_cast<std::chrono::seconds>(sample_micros)
-	                .count();
+	return (usec * SampleRate()) / 1000000;
 }
 
-std::chrono::microseconds AudioSource::MicrosecondPositionFromSamples(
+AudioSource::MicrosecondPosition AudioSource::MicrosecondPositionFromSamples(
                 std::uint64_t samples) const
 {
 	// This is basically SamplePositionFromMicroseconds but backwards.
 
-	auto position_secs = std::chrono::seconds(samples) / SampleRate();
-	return std::chrono::duration_cast<std::chrono::microseconds>(
-	                position_secs);
+	return (samples * 1000000) / SampleRate();
 }
 
 size_t AudioSource::BytesPerSample() const
@@ -102,7 +97,7 @@ size_t AudioSource::BytesPerSample() const
 	return 4 * ChannelCount();
 }
 
-std::uint64_t AudioSource::Seek(std::chrono::microseconds position)
+std::uint64_t AudioSource::Seek(AudioSource::MicrosecondPosition position)
 {
 	assert(this->context != nullptr);
 

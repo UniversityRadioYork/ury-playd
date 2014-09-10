@@ -10,7 +10,6 @@
 #ifndef PS_AUDIO_SYSTEM_HPP
 #define PS_AUDIO_SYSTEM_HPP
 
-#include <functional>
 #include <string>
 #include <utility>
 
@@ -37,10 +36,10 @@ class Device;
  * construction and unloads them on termination.  As such, it's probably not
  * wise to construct multiple AudioSystem instances.
  */
-class AudioSystem {
+class AudioSystem : public AudioSinkConfigurator {
 public:
 	/// Type for device entries.
-	using Device = std::pair<int, std::string>;
+	typedef std::pair<int, std::string> Device;
 
 	/**
 	 * Constructs an AudioSystem, initialising its libraries.
@@ -81,21 +80,9 @@ public:
 	 */
 	bool IsOutputDevice(int id);
 
-	/**
-	 * Configures and returns a PortAudio stream.
-	 * @param channel_count The number of channels of the stream will
-	 *   receive.
-	 * @param sample_format The format of the samples the stream will
-	 *   receive.
-	 * @param sample_rate The rate of the samples the stream will receive.
-	 * @param buffer_size The size of the buffer the stream should allocate.
-	 * @param cb The object that PortAudio will call to receive audio.
-	 * @return The configured PortAudio stream.
-	 */
-	portaudio::Stream *Configure(std::uint8_t channel_count,
-	                             SampleFormat sample_format,
-	                             double sample_rate, size_t buffer_size,
-	                             portaudio::CallbackInterface &cb) const;
+	virtual portaudio::Stream *Configure(
+	                const AudioSource &source,
+	                portaudio::CallbackInterface &cb) const;
 
 private:
 	std::string device_id; ///< The current device ID.
@@ -105,8 +92,8 @@ private:
 	 * @param id_string The device ID, as a string.
 	 * @return The device.
 	 */
-	const portaudio::Device &PaDeviceFrom(const std::string &id_string)
-	                const;
+	const portaudio::Device &PaDeviceFrom(
+	                const std::string &id_string) const;
 
 	/**
 	 * Converts a sample format identifier from playd to PortAudio.

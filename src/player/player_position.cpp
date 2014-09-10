@@ -8,11 +8,11 @@
  * @see player/player.hpp
  */
 
-#include <chrono>
 #include <sstream>
 
 #include "../io/io_response.hpp"
 #include "player.hpp"
+#include "player_position.hpp"
 
 //
 // Player
@@ -25,7 +25,7 @@ void Player::SetPositionResponsePeriod(PlayerPosition::Unit period)
 
 void Player::UpdatePosition()
 {
-	auto pos = this->file.CurrentPosition<PlayerPosition::Unit>();
+	auto pos = this->file.CurrentPosition();
 	this->position.Update(pos);
 }
 
@@ -67,7 +67,7 @@ void PlayerPosition::Reset()
 void PlayerPosition::Emit(ResponseSink &target) const
 {
 	std::ostringstream os;
-	os << this->current.count();
+	os << this->current;
 
 	target.Respond(ResponseCode::TIME, os.str());
 }

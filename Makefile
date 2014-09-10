@@ -20,6 +20,15 @@ DOXYGEN    ?= doxygen
 GIT        ?= git
 GROFF_HTML ?= groff -Thtml -mdoc
 
+# The C standard used to compile playd.
+# This should usually be 'c99'.
+C_STD ?= c99
+
+# The C++ standard used to compile playd.
+# This should usually be 'c++11', but older compilers might need
+# 'c++0x'.
+CXX_STD ?= c++11
+
 # Variables used to decide where to install playd and its man pages.
 prefix      ?= /usr/local
 bindir      ?= $(prefix)/bin
@@ -84,13 +93,13 @@ OWN_CHEADERS    = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.h))
 TO_FORMAT       = $(OWN_SOURCES) $(OWN_CSOURCES) $(OWN_HEADERS) $(OWN_CHEADERS)
 
 # Now set up the flags needed for playd.
-CFLAGS   += -c $(WARNS) $(PKG_CFLAGS) -g -std=c99
-CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS) -g -std=c++11
+CFLAGS   += -c $(WARNS) $(PKG_CFLAGS) -g -std=$(C_STD)
+CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS) -g -std=$(CXX_STD)
 LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##
 
-.PHONY: clean mkdir install run gdbrun format gh-pages doc
+.PHONY: clean mkdir install run gdbrun format gh-pages doc libuv
 
 all: mkdir $(BIN) man
 man: $(MAN_GZ)
@@ -145,4 +154,8 @@ gh-pages: doc $(MAN_HTML)
 	git commit -m "Update doxygen on gh-pages."
 
 doc:
-	${DOXYGEN}
+	$(DOXYGEN)
+
+# Helper task for installing libuv.
+libuv:
+	./make_libuv.sh

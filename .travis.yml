@@ -1,0 +1,17 @@
+language: cpp
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libsox-dev portaudio19-dev
+
+# Ubuntu 12.04 doesn't have a libuv package, so we install it from source.
+before_script:
+  - make libuv
+
+compiler:
+  - clang
+  - gcc
+
+# Ubuntu 12.04's GCC doesn't support std=c++11, so we use c++0x instead.
+script: env CXX_STD=c++0x make
+

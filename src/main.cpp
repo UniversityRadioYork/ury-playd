@@ -8,7 +8,6 @@
  */
 
 #include <algorithm>
-#include <chrono>
 #include <iostream>
 
 #include "audio/audio_system.hpp"
@@ -35,7 +34,7 @@ int main(int argc, char *argv[])
 // playd
 //
 
-const std::chrono::microseconds playd::POSITION_PERIOD(500000);
+const AudioSource::MicrosecondPosition playd::POSITION_PERIOD(500000);
 
 int playd::GetDeviceID()
 {
@@ -43,12 +42,10 @@ int playd::GetDeviceID()
 
 	/* Only accept valid numbers. */
 	int id;
-	try
-	{
+	try {
 		id = std::stoi(this->arguments[1]);
 	}
-	catch (...)
-	{
+	catch (...) {
 		/* Only std::invalid_argument and std::out_of_range are thrown
 		 * here. */
 		return -1;
@@ -63,53 +60,43 @@ int playd::GetDeviceID()
 	return -1;
 }
 
+// Conversion rates from various position units to microseconds.
+const AudioSource::MicrosecondPosition US_RATE = 1;
+const AudioSource::MicrosecondPosition MS_RATE = 1000;
+const AudioSource::MicrosecondPosition S_RATE = 1000000;
+const AudioSource::MicrosecondPosition M_RATE = 60000000;
+const AudioSource::MicrosecondPosition H_RATE = 3600000000;
+
 /**
  * UNITS defines the unit suffixes that playd understands when parsing
  * positions in seek commands.
  *
- * The suffixes are defined using the Player::TP::MkTime template, in terms
- * of the std::chrono duration units.
- *
  * If no suffix is given, it is treated as the string "".  Therefore, the
  * member of UNITS with suffix "" is the default unit.
- *
- * The members of UNITS are documented by example.
- *
- * @see Player::TP::MkTime
  */
 const Player::TP::UnitMap UNITS = {
-	/// 1us = 1 microsecond.
-	{ "us", Player::TP::MkTime<std::chrono::microseconds> },
-	/// 1usec = 1 microsecond.
-	{ "usec", Player::TP::MkTime<std::chrono::microseconds> },
-	/// 2usecs = 2 microseconds.
-	{ "usecs", Player::TP::MkTime<std::chrono::microseconds> },
-	/// 1ms = 1 millisecond.
-	{ "ms", Player::TP::MkTime<std::chrono::milliseconds> },
-	/// 1msec = 1 millisecond.
-	{ "msec", Player::TP::MkTime<std::chrono::milliseconds> },
-	/// 2msecs = 2 milliseconds.
-	{ "msecs", Player::TP::MkTime<std::chrono::milliseconds> },
-	/// 1s = 1 second.
-	{ "s", Player::TP::MkTime<std::chrono::seconds> },
-	/// 1sec = 1 second.
-	{ "sec", Player::TP::MkTime<std::chrono::seconds> },
-	/// 2secs = 2 seconds.
-	{ "secs", Player::TP::MkTime<std::chrono::seconds> },
-	/// 1m = 1 minute.
-	{ "m", Player::TP::MkTime<std::chrono::minutes> },
-	/// 1min = 1 minute.
-	{ "min", Player::TP::MkTime<std::chrono::minutes> },
-	/// 2mins = 2 minutes.
-	{ "mins", Player::TP::MkTime<std::chrono::minutes> },
-	/// 1h = 1 hour.
-	{ "h", Player::TP::MkTime<std::chrono::hours> },
-	/// 1hour = 1 hour.
-	{ "hour", Player::TP::MkTime<std::chrono::hours> },
-	/// 2hours = 2 hours.
-	{ "hours", Player::TP::MkTime<std::chrono::hours> },
+	/// Microseconds; 1us = 1us.
+	{ "us", US_RATE },
+	{ "usec", US_RATE },
+	{ "usecs", US_RATE },
+	/// Milliseconds; 1ms = 1,000us.
+	{ "ms", MS_RATE },
+	{ "msec", MS_RATE },
+	{ "msecs", MS_RATE },
+	/// Seconds; 1s = 1,000ms = 1,000,000us.
+	{ "s", S_RATE },
+	{ "sec", S_RATE },
+	{ "secs", S_RATE },
+	/// Minutes; 1m = 60s = 60,000ms = 60,000,000us.
+	{ "m", M_RATE },
+	{ "min", M_RATE },
+	{ "mins", M_RATE },
+	/// Hours; 1h = 60m = 3,600s = 3,600,000ms = 3,600,000,000us.
+	{ "h", H_RATE },
+	{ "hour", H_RATE },
+	{ "hours", H_RATE },
 	/// When no unit is provided, we assume microseconds.
-	{ "", Player::TP::MkTime<std::chrono::microseconds> }
+	{ "", US_RATE }
 };
 
 playd::playd(int argc, char *argv[])
@@ -129,8 +116,7 @@ playd::playd(int argc, char *argv[])
 
 int playd::Run()
 {
-	try
-	{
+	try {
 		// Don't roll this into the constructor: it'll go out of scope!
 		int id = this->GetDeviceID();
 		if (id == -1) {
@@ -148,8 +134,7 @@ int playd::Run()
 		this->player.SetResponseSink(*this->io);
 		this->io->Run();
 	}
-	catch (Error &error)
-	{
+	catch (Error &error) {
 		io->RespondWithError(error);
 		Debug() << "Unhandled exception caught, going away now."
 		        << std::endl;

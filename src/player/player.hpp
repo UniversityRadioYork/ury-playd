@@ -13,9 +13,7 @@
 #ifndef PS_PLAYER_HPP
 #define PS_PLAYER_HPP
 
-#include <chrono>
 #include <cstdint>
-#include <functional>
 #include <initializer_list>
 #include <map>
 #include <memory>
@@ -38,7 +36,7 @@
 class Player {
 public:
 	/// The type of TimeParser the Player expects.
-	using TP = TimeParser<std::chrono::microseconds>;
+	typedef TimeParser<PlayerPosition::Unit> TP;
 
 private:
 	PlayerFile file;         ///< The file subcomponent of the Player.

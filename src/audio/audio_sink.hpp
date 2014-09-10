@@ -10,7 +10,6 @@
 #ifndef PS_AUDIO_SINK_HPP
 #define PS_AUDIO_SINK_HPP
 
-#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -25,7 +24,24 @@
 #include "ringbuffer.hpp"
 
 /// Type of results emitted during the play callback step.
-using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
+typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
+
+/**
+ * Interface for objects that can configure a PortAudio stream from an
+ * AudioSource.
+ */
+class AudioSinkConfigurator {
+public:
+	/**
+	 * Configures and returns a PortAudio stream.
+	 * @param source The audio source to use to configure the stream.
+	 * @param cb The object that PortAudio will call to receive audio.
+	 * @return The configured PortAudio stream.
+	 */
+	virtual portaudio::Stream *Configure(
+	                const AudioSource &source,
+	                portaudio::CallbackInterface &cb) const = 0;
+};
 
 /**
  * An output stream for an Audio file.
@@ -37,29 +53,21 @@ using PlayCallbackStepResult = std::pair<PaStreamCallbackResult, unsigned long>;
  */
 class AudioSink : portaudio::CallbackInterface {
 public:
-	/// A function that configures and returns a stream, given this
-	/// AudioSink.
-	using StreamConfigurator = std::function<
-	                portaudio::Stream *(portaudio::CallbackInterface &)>;
-
 	/// Type of results emitted during the play callback step.
-	using PlayCallbackStepResult =
-	                std::pair<PaStreamCallbackResult, unsigned long>;
+	typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
 
 	/// Type of positions measured in samples.
-	using SamplePosition = std::uint64_t;
+	typedef std::uint64_t SamplePosition;
 
 	/// Type of iterators used in the Transfer() method.
-	using TransferIterator = AudioSource::DecodeVector::iterator;
+	typedef AudioSource::DecodeVector::iterator TransferIterator;
 
 	/**
 	 * Constructs an AudioSink.
-	 * @param c A function that can configure PortAudio streams.
-	 * @param bytes_per_sample The number of bytes each audio sample
-	 * occupies.
+	 * @param source The source from which this sink will receive audio.
+	 * @param conf The configurator to use to create streams for this sink.
 	 */
-	AudioSink(const StreamConfigurator c,
-	          AudioSource::SampleByteCount bytes_per_sample);
+	AudioSink(const AudioSource &source, const AudioSinkConfigurator &conf);
 
 	/**
 	 * Starts the audio stream.
@@ -171,7 +179,7 @@ private:
 	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
 	                  unsigned long numFrames,
 	                  const PaStreamCallbackTimeInfo *timeInfo,
-	                  PaStreamCallbackFlags statusFlags) override;
+	                  PaStreamCallbackFlags statusFlags);
 
 	/**
 	 * Performs one step in the callback.

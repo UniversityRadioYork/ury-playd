@@ -11,7 +11,6 @@
 #define PS_PLAYER_STATE_HPP
 
 #include <cstdint>
-#include <functional>
 #include <initializer_list>
 
 #include "../io/io_response.hpp"
@@ -38,7 +37,7 @@ public:
 	};
 
 	/// A list of states, used for IfIn.
-	using List = std::initializer_list<State>;
+	typedef std::initializer_list<State> List;
 
 	/// List of states in which the player is playing something.
 	const static List AUDIO_PLAYING_STATES;
@@ -54,7 +53,7 @@ public:
 	 * @param sink The ResponseSink to which the current state shall be
 	 *   emitted.
 	 */
-	void Emit(ResponseSink &sink) const override;
+	void Emit(ResponseSink &sink) const;
 
 	/**
 	 * Checks whether the current state is in a given list of states.

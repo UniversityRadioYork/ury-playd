@@ -11,9 +11,7 @@
 #define PS_AUDIO_SOURCE_HPP
 
 #include <array>
-#include <chrono>
 #include <cstdint>
-#include <functional>
 #include <string>
 #include <vector>
 
@@ -42,13 +40,16 @@ public:
 	};
 
 	/// Type of decoded sample vectors.
-	using DecodeVector = std::vector<std::uint8_t>;
+	typedef std::vector<std::uint8_t> DecodeVector;
 
 	/// Type of the result of Decode().
-	using DecodeResult = std::pair<DecodeState, DecodeVector>;
+	typedef std::pair<DecodeState, DecodeVector> DecodeResult;
 
 	/// Type for the count of bytes per sample.
-	using SampleByteCount = int;
+	typedef int SampleByteCount;
+
+	/// Type for positions expressed in microseconds.
+	typedef std::uint64_t MicrosecondPosition;
 
 	/**
 	 * Constructs an AudioSource.
@@ -113,7 +114,7 @@ public:
 	 * @param position  The new position in the file, in microseconds.
 	 * @return The new position in the file, in samples.
 	 */
-	std::uint64_t Seek(std::chrono::microseconds position);
+	std::uint64_t Seek(AudioSource::MicrosecondPosition position);
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
@@ -121,14 +122,14 @@ public:
 	 * @return The corresponding number of elapsed samples.
 	 */
 	std::uint64_t SamplePositionFromMicroseconds(
-	                std::chrono::microseconds position) const;
+	                AudioSource::MicrosecondPosition position) const;
 
 	/**
 	 * Converts an elapsed sample count to a position in microseconds.
 	 * @param samples The number of elapsed samples.
 	 * @return The corresponding song position, in microseconds.
 	 */
-	std::chrono::microseconds MicrosecondPositionFromSamples(
+	AudioSource::MicrosecondPosition MicrosecondPositionFromSamples(
 	                std::uint64_t samples) const;
 
 private:

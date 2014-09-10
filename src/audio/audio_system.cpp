@@ -83,21 +83,18 @@ void AudioSystem::SetDeviceID(int id)
 Audio *AudioSystem::Load(const std::string &path) const
 {
 	auto source = new AudioSource(path);
-
-	AudioSink::StreamConfigurator config_fn = std::bind(
-	                &AudioSystem::Configure, this, source->ChannelCount(),
-	                source->OutputSampleFormat(), source->SampleRate(),
-	                source->BufferSampleCapacity(), std::placeholders::_1);
-	auto sink = new AudioSink(config_fn, source->BytesPerSample());
-
+	auto sink = new AudioSink(*source, *this);
 	return new Audio(source, sink);
 }
 
 portaudio::Stream *AudioSystem::Configure(
-                std::uint8_t channel_count, SampleFormat sample_format,
-                double sample_rate, size_t buffer_size,
+                const AudioSource &source,
                 portaudio::CallbackInterface &cb) const
 {
+	std::uint8_t channel_count = source.ChannelCount();
+	SampleFormat sample_format = source.OutputSampleFormat();
+	double sample_rate = source.SampleRate();
+	size_t buffer_size = source.BufferSampleCapacity();
 	const portaudio::Device &device = PaDeviceFrom(this->device_id);
 
 	portaudio::DirectionSpecificStreamParameters out_pars(
@@ -112,8 +109,8 @@ portaudio::Stream *AudioSystem::Configure(
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
 
-const portaudio::Device &AudioSystem::PaDeviceFrom(const std::string &id_string)
-                const
+const portaudio::Device &AudioSystem::PaDeviceFrom(
+                const std::string &id_string) const
 {
 	auto &pa = portaudio::System::instance();
 
@@ -137,15 +134,13 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
 };
 
-portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(SampleFormat fmt)
-                const
+portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(
+                SampleFormat fmt) const
 {
-	try
-	{
+	try {
 		return pa_from_sf.at(fmt);
 	}
-	catch (std::out_of_range)
-	{
+	catch (std::out_of_range) {
 		throw FileError(MSG_DECODE_BADRATE);
 	}
 }

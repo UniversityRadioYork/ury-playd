@@ -10,7 +10,6 @@
 #ifndef PS_IO_RESPONSE_HPP
 #define PS_IO_RESPONSE_HPP
 
-#include <functional>
 #include <map>
 #include <ostream>
 #include <string>
@@ -48,9 +47,6 @@ extern const std::string RESPONSES[];
  */
 class ResponseSink {
 public:
-	/// A type for callbacks taking a ResponseSink.
-	using Callback = std::function<void(ResponseSink &)>;
-
 	/**
 	 * Outputs a response.
 	 * @param code The response code to emit.

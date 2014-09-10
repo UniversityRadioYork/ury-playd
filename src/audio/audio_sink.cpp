@@ -19,19 +19,20 @@
 #include "../sample_formats.hpp"
 #include "../messages.h"
 #include "audio_sink.hpp"
+#include "audio_source.hpp"
 #include "ringbuffer.hpp"
 
 const size_t AudioSink::RINGBUF_POWER = 16;
 
-AudioSink::AudioSink(const StreamConfigurator c,
-                     AudioSource::SampleByteCount bytes_per_sample)
-    : bytes_per_sample(bytes_per_sample),
-      ring_buf(RINGBUF_POWER, bytes_per_sample),
+AudioSink::AudioSink(const AudioSource &source,
+                     const AudioSinkConfigurator &conf)
+    : bytes_per_sample(source.BytesPerSample()),
+      ring_buf(RINGBUF_POWER, source.BytesPerSample()),
       position_sample_count(0),
       just_started(false),
       input_ready(false)
 {
-	this->stream = decltype(this->stream)(c(*this));
+	this->stream = decltype(this->stream)(conf.Configure(source, *this));
 }
 
 void AudioSink::Start()

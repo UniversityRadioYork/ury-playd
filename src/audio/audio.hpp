@@ -10,7 +10,6 @@
 #ifndef PS_AUDIO_HPP
 #define PS_AUDIO_HPP
 
-#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -98,40 +97,19 @@ public:
 	bool FileEnded();
 
 	/**
-	 * Return the current position, as a std::chrono::duration.
-	 * @return The current position in the audio.
-	 */
-	template <typename R>
-	R CurrentPosition()
-	{
-		return std::chrono::duration_cast<R>(
-		                CurrentPositionMicroseconds());
-	}
-
-	/**
 	 * Gets the current played position in the song, in microseconds.
 	 * As this may be executing whilst the playing callback is running,
 	 * do not expect it to be highly accurate.
 	 * @return The current position, in microseconds.
 	 */
-	std::chrono::microseconds CurrentPositionMicroseconds();
-
-	/**
-	 * Seek to a position expressed as a std::chrono::duration.
-	 * @param position The position to seek to in the audio.
-	 */
-	template <typename R>
-	void SeekToPosition(R position)
-	{
-		SeekToPositionMicroseconds(std::chrono::duration_cast<
-		                std::chrono::microseconds>(position));
-	}
+	AudioSource::MicrosecondPosition CurrentPositionMicroseconds();
 
 	/**
 	 * Attempts to seek to the given position in microseconds.
 	 * @param microseconds The position to seek to, in microseconds.
 	 */
-	void SeekToPositionMicroseconds(std::chrono::microseconds microseconds);
+	void SeekToPositionMicroseconds(
+	                AudioSource::MicrosecondPosition microseconds);
 
 private:
 	/// The source of audio data.

@@ -10,8 +10,6 @@
 #ifndef PS_IO_REACTOR_HPP
 #define PS_IO_REACTOR_HPP
 
-#include <deque>
-#include <functional>
 #include <ostream>
 #include <set>
 
@@ -104,7 +102,7 @@ private:
 	Player &player;          ///< The player.
 	CommandHandler &handler; ///< The command handler.
 
-	void RespondRaw(const std::string &string) const override;
+	void RespondRaw(const std::string &string) const;
 
 	/**
 	 * Initialises a TCP acceptor on the given address and port.
@@ -136,7 +134,7 @@ public:
 
 	// Note: This is made public so that the IoReactor can send raw data
 	// to the connection.
-	void RespondRaw(const std::string &response) const override;
+	void RespondRaw(const std::string &response) const;
 
 	/**
 	 * Processes a data read on this connection.
