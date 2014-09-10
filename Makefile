@@ -84,13 +84,21 @@ PKG_LDFLAGS += `$(PKG_CONFIG) --libs $(PKGS)`
 
 # Now we make up the source and object directory sets...
 SRC_SUBDIRS = $(srcdir) $(addprefix $(srcdir)/,$(SUBDIRS))
-OBJ_SUBDIRS = $(builddir) $(addprefix $(builddir)/,$(SUBDIRS))
+OBJ_SUBDIRS = $(builddir) $(builddir)/tests $(addprefix $(builddir)/,$(SUBDIRS))
 
 # ...And find the sources to compile and the objects they make.
 SOURCES  = $(foreach dir,$(SRC_SUBDIRS),$(wildcard $(dir)/*.cpp))
 OBJECTS  = $(patsubst $(srcdir)%,$(builddir)%,$(SOURCES:.cpp=.o))
 CSOURCES = $(foreach dir,$(SRC_SUBDIRS),$(wildcard $(dir)/*.c))
 COBJECTS = $(patsubst $(srcdir)%,$(builddir)%,$(CSOURCES:.c=.o))
+
+# When running unit tests, we add in the test objects, defined below.
+# Note that main.o is NOT built during testing, because it contains the main
+# entry point.
+TEST_SOURCES  = $(wildcard $(srcdir)/tests/*.cpp)
+TEST_OBJECTS  = $(patsubst $(srcdir)%,$(builddir)%,$(TEST_SOURCES:.cpp=.o))
+TEST_OBJECTS += $(filter-out $(builddir)/main.o,$(OBJECTS))
+TEST_BIN      = $(builddir)/$(NAME)_test
 
 # These are used for source transformations, such as formatting.
 # We don't want to disturb contributed source with these.
@@ -160,13 +168,26 @@ doc:
 	$(DOXYGEN)
 
 #
+# Tests
+#
+
+test: mkdir $(TEST_BIN)
+	@echo TEST
+	@$(TEST_BIN)
+
+$(TEST_BIN): $(COBJECTS) $(TEST_OBJECTS)
+	@echo LINK $@
+	@$(CXX) $(COBJECTS) $(TEST_OBJECTS) $(LDFLAGS) -o $@
+
+#
 # Special targets
 #
 
 # Cleans up the results of a previous build.
 clean:
 	@echo CLEAN
-	@rm -f $(OBJECTS) $(COBJECTS) $(MAN_GZ) $(BIN)
+	@rm -f $(OBJECTS) $(COBJECTS) $(MAN_HTML) $(MAN_GZ) $(BIN)
+	@rm -f $(TEST_OBJECTS) $(TEST_BIN)
 
 # Makes the build subdirectories.
 mkdir:
