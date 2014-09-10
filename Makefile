@@ -1,3 +1,10 @@
+# This file is part of playd.
+# playd is licenced under the MIT license: see LICENSE.txt.
+
+#
+# This is the GNU Makefile for playd.
+#
+
 ## BEGIN USER-CHANGEABLE VARIABLES ##
 
 # Where to put the object files and other intermediate fluff.
@@ -43,6 +50,7 @@ NAME = playd
 # Calculate the path to the outputted program.
 BIN = $(builddir)/$(NAME)
 
+# Where the raw man page is, and where its processed forms should go.
 MAN_SRC   = $(srcdir)/$(NAME).1
 MAN_GZ    = $(builddir)/$(NAME).1.gz
 MAN_HTML  = $(builddir)/$(NAME).1.html
@@ -54,7 +62,7 @@ OWN_SUBDIRS = audio io player
 SUBDIRS     = $(OWN_SUBDIRS) contrib/pa_ringbuffer
 
 # Now we work out which libraries to use, using pkg-config.
-# These packages are always used: the PortAudio C library, and FFmpeg.
+# These packages are always used: the PortAudio C library, libsox, and libuv.
 PKGS = portaudio-2.0 sox libuv
 
 # PortAudio's C++ bindings aren't always available, so we bundle them.
@@ -62,6 +70,7 @@ PKGS = portaudio-2.0 sox libuv
 # instead.
 HAS_PORTAUDIOCPP ?= $(shell $(PKG_CONFIG) --list-all | grep 'portaudiocpp')
 ifeq "$(HAS_PORTAUDIOCPP)" ""
+  # Add the bundled bindings to the list of things to compile.
   PORTAUDIOCPP_DIR  = contrib/portaudiocpp
   CXXFLAGS         += -I"$(srcdir)/$(PORTAUDIOCPP_DIR)"
   SUBDIRS          += $(PORTAUDIOCPP_DIR)
@@ -102,49 +111,47 @@ LDFLAGS  += $(PKG_LDFLAGS)
 .PHONY: clean mkdir install run gdbrun format gh-pages doc libuv
 
 all: mkdir $(BIN) man
-man: $(MAN_GZ)
 
+#
+# Program
+#
+
+# Rule for making playd itself.
 $(BIN): $(COBJECTS) $(OBJECTS)
 	@echo LINK $@
 	@$(CXX) $(COBJECTS) $(OBJECTS) $(LDFLAGS) -o $@
 
+# Rule for compiling C code.
 $(builddir)/%.o: $(srcdir)/%.c
 	@echo CC $@
 	@$(CC) $(CFLAGS) $< -o $@
 
+# Rule for compiling C++ code.
 $(builddir)/%.o: $(srcdir)/%.cpp
 	@echo CXX $@
 	@$(CXX) $(CXXFLAGS) $< -o $@
 
+#
+# Man pages
+#
+
+# Rule for making the man pages.
+man: $(MAN_GZ)
+# Rule for making compressed versions of man pages.
 $(builddir)/%.1.gz: $(srcdir)/%.1
 	@echo GZIP $@
 	@< $< $(GZIP) > $@
 
+# Rule for making HTML versions of man pages.
 $(builddir)/%.1.html: $(srcdir)/%.1
 	@echo 'GROFF(html)' $@
 	@< $< $(GROFF_HTML) > $@
 
-clean:
-	@echo CLEAN
-	@rm -f $(OBJECTS) $(COBJECTS) $(MAN_GZ) $(BIN)
+#
+# Documentation
+#
 
-mkdir:
-	mkdir -p $(OBJ_SUBDIRS)
-
-install: $(BIN) $(MAN_GZ)
-	$(INSTALL) $(BIN) $(bindir)
-	-$(INSTALL) $(MAN_GZ) $(mandir)
-
-run: $(BIN)
-	./$(BIN)
-
-gdbrun: $(BIN)
-	gdb $(BIN)
-
-format: $(TO_FORMAT)
-	@echo FORMAT $^
-	@$(FORMAT) $^
-
+# Updates the GitHub Pages documentation.
 gh-pages: doc $(MAN_HTML)
 	git checkout gh-pages
 	git rm -rf doxygen
@@ -152,10 +159,43 @@ gh-pages: doc $(MAN_HTML)
 	mv ${MAN_HTML} man.html
 	git add doxygen man.html
 	git commit -m "Update doxygen on gh-pages."
+	git push
 
+# Builds the documentation, using doxygen.
 doc:
 	$(DOXYGEN)
 
-# Helper task for installing libuv.
+#
+# Special targets
+#
+
+# Cleans up the results of a previous build.
+clean:
+	@echo CLEAN
+	@rm -f $(OBJECTS) $(COBJECTS) $(MAN_GZ) $(BIN)
+
+# Makes the build subdirectories.
+mkdir:
+	mkdir -p $(OBJ_SUBDIRS)
+
+# Installs the compiled binary to `bindir`, and the man page to `mandir`.
+install: $(BIN) $(MAN_GZ)
+	$(INSTALL) $(BIN) $(bindir)
+	-$(INSTALL) $(MAN_GZ) $(mandir)
+
+# Runs the compiled binary.
+run: $(BIN)
+	./$(BIN)
+
+# Runs GDB on the compiled binary.
+gdbrun: $(BIN)
+	gdb $(BIN)
+
+# Runs a formatter over the sources.
+format: $(TO_FORMAT)
+	@echo FORMAT $^
+	@$(FORMAT) $^
+
+# Installs libuv from source.
 libuv:
 	./make_libuv.sh
