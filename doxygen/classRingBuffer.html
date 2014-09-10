@@ -330,7 +330,7 @@ template&lt;typename RepT, typename SampleCountT&gt; </div>
 
 <p>Definition at line <a class="el" href="ringbuffer_8hpp_source.html#l00149">149</a> of file <a class="el" href="ringbuffer_8hpp_source.html">ringbuffer.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="audio__sink_8cpp_source.html#l00176">AudioSink::ReadSamplesToOutput()</a>.</p>
+<p>Referenced by <a class="el" href="audio__sink_8cpp_source.html#l00177">AudioSink::ReadSamplesToOutput()</a>.</p>
 <div class="fragment"><div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    {</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        assert(0 &lt; count);</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        assert(count &lt;= <a class="code" href="classRingBuffer.html#a7086cc66306105db205842af7a88c2d8">ReadCapacity</a>());</div>
@@ -374,7 +374,7 @@ template&lt;typename RepT, typename SampleCountT&gt; </div>
 
 <p>Definition at line <a class="el" href="ringbuffer_8hpp_source.html#l00093">93</a> of file <a class="el" href="ringbuffer_8hpp_source.html">ringbuffer.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="audio__sink_8cpp_source.html#l00126">AudioSink::PlayCallbackStep()</a>, and <a class="el" href="ringbuffer_8hpp_source.html#l00149">RingBuffer&lt; char, unsigned long &gt;::Read()</a>.</p>
+<p>Referenced by <a class="el" href="audio__sink_8cpp_source.html#l00127">AudioSink::PlayCallbackStep()</a>, and <a class="el" href="ringbuffer_8hpp_source.html#l00149">RingBuffer&lt; char, unsigned long &gt;::Read()</a>.</p>
 <div class="fragment"><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    {</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classRingBuffer.html#ae907c82ba714a087d9f35b089f9fbf77">CountCast</a>(PaUtil_GetRingBufferReadAvailable(this-&gt;<a class="code" href="classRingBuffer.html#a10985ec171bcc15c1301dc74fcb6e7b2">rb</a>));</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    }</div>
@@ -435,7 +435,7 @@ template&lt;typename RepT, typename SampleCountT&gt; </div>
 
 <p>Definition at line <a class="el" href="ringbuffer_8hpp_source.html#l00120">120</a> of file <a class="el" href="ringbuffer_8hpp_source.html">ringbuffer.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="audio__sink_8cpp_source.html#l00076">AudioSink::Transfer()</a>.</p>
+<p>Referenced by <a class="el" href="audio__sink_8cpp_source.html#l00077">AudioSink::Transfer()</a>.</p>
 <div class="fragment"><div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    {</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        assert(0 &lt; count);</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        assert(count &lt;= <a class="code" href="classRingBuffer.html#ab00617ab6e379ad146cb7b80079f4c4c">WriteCapacity</a>());</div>
@@ -479,7 +479,7 @@ template&lt;typename RepT, typename SampleCountT&gt; </div>
 
 <p>Definition at line <a class="el" href="ringbuffer_8hpp_source.html#l00083">83</a> of file <a class="el" href="ringbuffer_8hpp_source.html">ringbuffer.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="audio__sink_8cpp_source.html#l00076">AudioSink::Transfer()</a>, and <a class="el" href="ringbuffer_8hpp_source.html#l00120">RingBuffer&lt; char, unsigned long &gt;::Write()</a>.</p>
+<p>Referenced by <a class="el" href="audio__sink_8cpp_source.html#l00077">AudioSink::Transfer()</a>, and <a class="el" href="ringbuffer_8hpp_source.html#l00120">RingBuffer&lt; char, unsigned long &gt;::Write()</a>.</p>
 <div class="fragment"><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    {</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classRingBuffer.html#ae907c82ba714a087d9f35b089f9fbf77">CountCast</a>(PaUtil_GetRingBufferWriteAvailable(this-&gt;<a class="code" href="classRingBuffer.html#a10985ec171bcc15c1301dc74fcb6e7b2">rb</a>));</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    }</div>
@@ -497,7 +497,7 @@ template&lt;typename RepT, typename SampleCountT&gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classRingBuffer.html">RingBuffer</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:27:42 for URY playd by
+    <li class="footer">Generated on Wed Sep 10 2014 04:57:37 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

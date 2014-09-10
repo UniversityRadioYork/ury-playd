@@ -13,6 +13,7 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
       [ "ConfigError", "classConfigError.html", "classConfigError" ],
       [ "InternalError", "classInternalError.html", "classInternalError" ],
       [ "FileError", "classFileError.html", "classFileError" ],
+      [ "SeekError", "classSeekError.html", "classSeekError" ],
       [ "Debug", "classDebug.html", "classDebug" ]
     ] ],
     [ "main.cpp", "main_8cpp.html", "main_8cpp" ],

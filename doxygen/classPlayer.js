@@ -1,11 +1,12 @@
 var classPlayer =
 [
-    [ "TP", "classPlayer.html#ab2c65f4a7cbaf6aab6fafbb5633a42c4", null ],
+    [ "TP", "classPlayer.html#af93203250ec5c949be6f8873305bfc15", null ],
     [ "Player", "classPlayer.html#a19fcaf8a2864565adcde9b955a890431", null ],
     [ "Player", "classPlayer.html#ae8015d1f08ba69d663cfdaea1a64d1a4", null ],
     [ "CurrentStateIn", "classPlayer.html#aa56e60cd7b83a4aa7ebda1e6ec054f4d", null ],
     [ "CurrentStateString", "classPlayer.html#a361edb67ec9c9db40cf25463f2929b42", null ],
     [ "Eject", "classPlayer.html#ac93a5310c751e8a9221780933f7a9dd6", null ],
+    [ "End", "classPlayer.html#ad50a9ec133cbfbe88d97064bbe342de4", null ],
     [ "IsRunning", "classPlayer.html#a0688e00b9fa4699dbe15c370b2703a68", null ],
     [ "Load", "classPlayer.html#a41c5eccb1f3b86383eaafe56a40a60e0", null ],
     [ "operator=", "classPlayer.html#ab81d34e4adb4e329d26b1635d866462d", null ],

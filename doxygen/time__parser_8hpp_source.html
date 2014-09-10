@@ -97,60 +97,66 @@ $(document).ready(function(){initNavTree('time__parser_8hpp_source.html','');});
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#ifndef PS_TIME_PARSER_HPP</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#define PS_TIME_PARSER_HPP</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;chrono&gt;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutUnit, <span class="keyword">typename</span> IntType = std::u<span class="keywordtype">int</span>64_t&gt;</div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="classTimeParser.html">   22</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTimeParser.html">TimeParser</a> {</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">   29</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">UnitMap</a> = std::map&lt;std::string, std::function&lt;OutUnit(IntType)&gt;&gt;;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classTimeParser.html#a66c6443db8e5d38b8f3d7e7a4eea783a">   36</a></span>&#160;    <a class="code" href="classTimeParser.html#a66c6443db8e5d38b8f3d7e7a4eea783a">TimeParser</a>(<span class="keyword">const</span> <a class="code" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">UnitMap</a> &amp;<a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>) : unit_map(unit_map)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InUnit&gt;</div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classTimeParser.html#af0e270392bd5313b1d60e66e35dbfe82">   55</a></span>&#160;    <span class="keyword">static</span> OutUnit <a class="code" href="classTimeParser.html#af0e270392bd5313b1d60e66e35dbfe82">MkTime</a>(IntType raw_time)</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> std::chrono::duration_cast&lt;OutUnit&gt;(InUnit(raw_time));</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="classTimeParser.html#a68110dc8c7d2ad1a8f47a29646ad4d1c">   65</a></span>&#160;    OutUnit <a class="code" href="classTimeParser.html#a68110dc8c7d2ad1a8f47a29646ad4d1c">Parse</a>(<span class="keyword">const</span> std::string &amp;time_str)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keyword">auto</span> seek = <a class="code" href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">Split</a>(time_str);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>.at(seek.first)(seek.second);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    }</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">   72</a></span>&#160;    <a class="code" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">UnitMap</a> <a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>; </div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="errors_8hpp.html">errors.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="messages_8h.html">messages.h</a>&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutUnit, <span class="keyword">typename</span> IntType = std::u<span class="keywordtype">int</span>64_t&gt;</div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="classTimeParser.html">   24</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTimeParser.html">TimeParser</a> {</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">   30</a></span>&#160;    <span class="keyword">typedef</span> std::map&lt;std::string, OutUnit&gt; <a class="code" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">UnitMap</a>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classTimeParser.html#a66c6443db8e5d38b8f3d7e7a4eea783a">   37</a></span>&#160;    <a class="code" href="classTimeParser.html#a66c6443db8e5d38b8f3d7e7a4eea783a">TimeParser</a>(<span class="keyword">const</span> <a class="code" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">UnitMap</a> &amp;<a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>) : unit_map(unit_map)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classTimeParser.html#a68110dc8c7d2ad1a8f47a29646ad4d1c">   46</a></span>&#160;    OutUnit <a class="code" href="classTimeParser.html#a68110dc8c7d2ad1a8f47a29646ad4d1c">Parse</a>(<span class="keyword">const</span> std::string &amp;time_str)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">auto</span> seek = <a class="code" href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">Split</a>(time_str);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>.at(seek.first) * seek.second;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    }</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">   53</a></span>&#160;    <a class="code" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">UnitMap</a> <a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">   61</a></span>&#160;    std::pair&lt;std::string, IntType&gt; <a class="code" href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">Split</a>(<span class="keyword">const</span> std::string &amp;time_str)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        std::istringstream is(time_str);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        IntType raw_time;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        std::string rest;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        is &gt;&gt; raw_time;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="comment">// Make sure we actually get a time of some form.</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">if</span> (is.fail()) {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classSeekError.html">SeekError</a>(<a class="code" href="messages_8h.html#aed3c894dfba47c4007dc39b38b5d3dbe">MSG_SEEK_FAIL</a>);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        }</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">   80</a></span>&#160;    std::pair&lt;std::string, IntType&gt; <a class="code" href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">Split</a>(<span class="keyword">const</span> std::string &amp;time_str)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        std::istringstream is(time_str);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        IntType raw_time;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        std::string rest;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        is &gt;&gt; raw_time &gt;&gt; rest;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">return</span> std::make_pair(rest, raw_time);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    }</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;};</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">#endif // PS_TIME_PARSER_HPP</span></div>
-<div class="ttc" id="classTimeParser_html_a66c6443db8e5d38b8f3d7e7a4eea783a"><div class="ttname"><a href="classTimeParser.html#a66c6443db8e5d38b8f3d7e7a4eea783a">TimeParser::TimeParser</a></div><div class="ttdeci">TimeParser(const UnitMap &amp;unit_map)</div><div class="ttdoc">Constructs a TimeParser. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00036">time_parser.hpp:36</a></div></div>
-<div class="ttc" id="classTimeParser_html_af0e270392bd5313b1d60e66e35dbfe82"><div class="ttname"><a href="classTimeParser.html#af0e270392bd5313b1d60e66e35dbfe82">TimeParser::MkTime</a></div><div class="ttdeci">static OutUnit MkTime(IntType raw_time)</div><div class="ttdoc">A template for converting an IntType representation of a duration of InUnit units into a duration exp...</div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00055">time_parser.hpp:55</a></div></div>
-<div class="ttc" id="classTimeParser_html"><div class="ttname"><a href="classTimeParser.html">TimeParser</a></div><div class="ttdoc">A class for parsing time strings consisting of an integer and unit into a flat integer representing t...</div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00022">time_parser.hpp:22</a></div></div>
-<div class="ttc" id="classTimeParser_html_a3f7f36a669233d66e7fe1ca8405eefd5"><div class="ttname"><a href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">TimeParser::Split</a></div><div class="ttdeci">std::pair&lt; std::string, IntType &gt; Split(const std::string &amp;time_str) const </div><div class="ttdoc">Splits a time string into a pair of unit and amount. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00080">time_parser.hpp:80</a></div></div>
-<div class="ttc" id="classTimeParser_html_a98bb2b31f6ad5210139bc87ef7ad0121"><div class="ttname"><a href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">TimeParser::unit_map</a></div><div class="ttdeci">UnitMap unit_map</div><div class="ttdoc">Map from units to handling functions. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00072">time_parser.hpp:72</a></div></div>
-<div class="ttc" id="classTimeParser_html_a68110dc8c7d2ad1a8f47a29646ad4d1c"><div class="ttname"><a href="classTimeParser.html#a68110dc8c7d2ad1a8f47a29646ad4d1c">TimeParser::Parse</a></div><div class="ttdeci">OutUnit Parse(const std::string &amp;time_str) const </div><div class="ttdoc">Parses a time, returning it as a std::chrono duration. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00065">time_parser.hpp:65</a></div></div>
-<div class="ttc" id="classTimeParser_html_adc32afc638ace5060a2134f8f74d3c60"><div class="ttname"><a href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">TimeParser&lt; std::chrono::microseconds &gt;::UnitMap</a></div><div class="ttdeci">std::map&lt; std::string, std::function&lt; std::chrono::microseconds(IntType)&gt;&gt; UnitMap</div><div class="ttdoc">The type of the map from unit suffixes to functions that convert from an amount of that time unit to ...</div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00029">time_parser.hpp:29</a></div></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        is &gt;&gt; rest;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordflow">return</span> std::make_pair(rest, raw_time);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;};</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#endif // PS_TIME_PARSER_HPP</span></div>
+<div class="ttc" id="errors_8hpp_html"><div class="ttname"><a href="errors_8hpp.html">errors.hpp</a></div><div class="ttdoc">Declarations of the playd Error exception set. </div></div>
+<div class="ttc" id="classTimeParser_html_a66c6443db8e5d38b8f3d7e7a4eea783a"><div class="ttname"><a href="classTimeParser.html#a66c6443db8e5d38b8f3d7e7a4eea783a">TimeParser::TimeParser</a></div><div class="ttdeci">TimeParser(const UnitMap &amp;unit_map)</div><div class="ttdoc">Constructs a TimeParser. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00037">time_parser.hpp:37</a></div></div>
+<div class="ttc" id="messages_8h_html"><div class="ttname"><a href="messages_8h.html">messages.h</a></div><div class="ttdoc">Constant human-readable messages used within playd. </div></div>
+<div class="ttc" id="classTimeParser_html_af7c4a18af13785d122219d4547860aff"><div class="ttname"><a href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">TimeParser::UnitMap</a></div><div class="ttdeci">std::map&lt; std::string, OutUnit &gt; UnitMap</div><div class="ttdoc">The type of the map from unit suffixes to multipliers that convert from microseconds to those units...</div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00030">time_parser.hpp:30</a></div></div>
+<div class="ttc" id="classTimeParser_html"><div class="ttname"><a href="classTimeParser.html">TimeParser</a></div><div class="ttdoc">A class for parsing time strings consisting of an integer and unit into a flat integer representing t...</div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00024">time_parser.hpp:24</a></div></div>
+<div class="ttc" id="classTimeParser_html_a3f7f36a669233d66e7fe1ca8405eefd5"><div class="ttname"><a href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">TimeParser::Split</a></div><div class="ttdeci">std::pair&lt; std::string, IntType &gt; Split(const std::string &amp;time_str) const </div><div class="ttdoc">Splits a time string into a pair of unit and amount. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00061">time_parser.hpp:61</a></div></div>
+<div class="ttc" id="classTimeParser_html_a98bb2b31f6ad5210139bc87ef7ad0121"><div class="ttname"><a href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">TimeParser::unit_map</a></div><div class="ttdeci">UnitMap unit_map</div><div class="ttdoc">Map from units to handling functions. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00053">time_parser.hpp:53</a></div></div>
+<div class="ttc" id="messages_8h_html_aed3c894dfba47c4007dc39b38b5d3dbe"><div class="ttname"><a href="messages_8h.html#aed3c894dfba47c4007dc39b38b5d3dbe">MSG_SEEK_FAIL</a></div><div class="ttdeci">const std::string MSG_SEEK_FAIL</div><div class="ttdoc">Message shown when an attempt to seek fails. </div><div class="ttdef"><b>Definition:</b> <a href="messages_8h_source.html#l00033">messages.h:33</a></div></div>
+<div class="ttc" id="classSeekError_html"><div class="ttname"><a href="classSeekError.html">SeekError</a></div><div class="ttdoc">An Error signifying that playd can&#39;t seek in a file. </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00080">errors.hpp:80</a></div></div>
+<div class="ttc" id="classTimeParser_html_a68110dc8c7d2ad1a8f47a29646ad4d1c"><div class="ttname"><a href="classTimeParser.html#a68110dc8c7d2ad1a8f47a29646ad4d1c">TimeParser::Parse</a></div><div class="ttdeci">OutUnit Parse(const std::string &amp;time_str) const </div><div class="ttdoc">Parses a time. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00046">time_parser.hpp:46</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="time__parser_8hpp.html">time_parser.hpp</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:27:41 for URY playd by
+    <li class="footer">Generated on Wed Sep 10 2014 04:57:36 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

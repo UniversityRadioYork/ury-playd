@@ -1,14 +1,15 @@
 var searchData=
 [
   ['sample_5fformats_2ehpp',['sample_formats.hpp',['../sample__formats_8hpp.html',1,'']]],
-  ['samplebytecount',['SampleByteCount',['../classAudioSource.html#a1c8138ec9ffb9fd1394d0ad0782d60fa',1,'AudioSource']]],
+  ['samplebytecount',['SampleByteCount',['../classAudioSource.html#acf36605b1050682da46461b963fea0c8',1,'AudioSource']]],
   ['sampleformat',['SampleFormat',['../sample__formats_8hpp.html#a21cca244e782ff3acc8805fb73236772',1,'sample_formats.hpp']]],
-  ['sampleposition',['SamplePosition',['../classAudioSink.html#ad2d7d33b3e937d057a4d72afad812737',1,'AudioSink']]],
-  ['samplepositionfrommicroseconds',['SamplePositionFromMicroseconds',['../classAudioSource.html#ac0a5d14505c36238d4a8a465122ff06e',1,'AudioSource']]],
+  ['sampleposition',['SamplePosition',['../classAudioSink.html#a2a149948a41e15d702abc1d4ba130590',1,'AudioSink']]],
+  ['samplepositionfrommicroseconds',['SamplePositionFromMicroseconds',['../classAudioSource.html#ac520d0b654be379ea664afb6da6778ff',1,'AudioSource']]],
   ['samplerate',['SampleRate',['../classAudioSource.html#aee0c4889919554f3c947a217f4436378',1,'AudioSource']]],
-  ['seek',['Seek',['../classAudioSource.html#ad8639603fb59d21f5c1369707f16975c',1,'AudioSource::Seek()'],['../classPlayer.html#a873c7e0a5be71efbadeebfbc20d7448a',1,'Player::Seek()']]],
-  ['seektoposition',['SeekToPosition',['../classAudio.html#a5b27592a425fb3e1732c04f9654dd644',1,'Audio::SeekToPosition()'],['../classPlayerFile.html#a8c270134404d83fe6c9e844abeacf3e5',1,'PlayerFile::SeekToPosition()']]],
-  ['seektopositionmicroseconds',['SeekToPositionMicroseconds',['../classAudio.html#a3f9b62150a4acb519f47d6d633a33353',1,'Audio']]],
+  ['seek',['Seek',['../classAudioSource.html#a2c894cd0ae59c2a384f4ecec5c5d066b',1,'AudioSource::Seek()'],['../classPlayer.html#a873c7e0a5be71efbadeebfbc20d7448a',1,'Player::Seek()']]],
+  ['seekerror',['SeekError',['../classSeekError.html',1,'SeekError'],['../classSeekError.html#a45ee0ca58d7343065644300a70f51dff',1,'SeekError::SeekError()']]],
+  ['seektoposition',['SeekToPosition',['../classPlayerFile.html#aa11987f1e604084be073a479392bc431',1,'PlayerFile']]],
+  ['seektopositionmicroseconds',['SeekToPositionMicroseconds',['../classAudio.html#afea93072a3c81ad15f63ce0afc152e30',1,'Audio']]],
   ['send',['Send',['../classPlayerPosition.html#aac73ce9104537702365baf19d50bde14',1,'PlayerPosition']]],
   ['server',['server',['../classIoReactor.html#a4c9c61af246fda7db1bdd4e2b3170c66',1,'IoReactor']]],
   ['set',['Set',['../classPlayerState.html#a822999cf7d4cf72ba77f218906bb8aaa',1,'PlayerState']]],
@@ -29,6 +30,5 @@ var searchData=
   ['stop',['Stop',['../classAudio.html#a1bd980bcdd3778875b019d7352e75754',1,'Audio::Stop()'],['../classAudioSink.html#af1937ad09b555f0b88d285e8fd7cf433',1,'AudioSink::Stop()'],['../classPlayer.html#abe074115b0ffa631ea432a1b84171599',1,'Player::Stop()'],['../classPlayerFile.html#afd4313009b5d51df0df5dc7b59ffcf13',1,'PlayerFile::Stop()']]],
   ['stopped',['STOPPED',['../classPlayerState.html#ab013f68ff23d69d677faae624b5dff07a09d4d696b4e935115b9313e3c412509a',1,'PlayerState']]],
   ['stream',['stream',['../classAudioSink.html#aac90e7d95e98ac08b7c661a301eff1b2',1,'AudioSink']]],
-  ['streamconfigurator',['StreamConfigurator',['../classAudioSink.html#ae5b8370aa17c24c6fc8f8e0c5778168c',1,'AudioSink']]],
   ['strings',['STRINGS',['../classPlayerState.html#af9cd9cd0e2d4c24e59ea11d35bdaff78',1,'PlayerState']]]
 ];

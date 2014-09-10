@@ -1,4 +1,5 @@
 <map id="AudioSystem" name="AudioSystem">
-<area shape="rect" id="node2" title="STL class. " alt="" coords="29,96,112,123"/>
-<area shape="rect" id="node3" title="STL class. " alt="" coords="5,5,136,47"/>
+<area shape="rect" id="node2" href="$classAudioSinkConfigurator.html" title="Interface for objects that can configure a PortAudio stream from an AudioSource. " alt="" coords="5,96,168,123"/>
+<area shape="rect" id="node3" title="STL class. " alt="" coords="192,96,275,123"/>
+<area shape="rect" id="node4" title="STL class. " alt="" coords="168,5,299,47"/>
 </map>

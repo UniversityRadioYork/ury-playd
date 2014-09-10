@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wordlist',['WordList',['../classCommandHandler.html#ae6cc650f171966041b385c8a4a766639',1,'CommandHandler']]]
+  ['wordlist',['WordList',['../classCommandHandler.html#aa6e42a9ec87444f13125b534c322055a',1,'CommandHandler']]]
 ];

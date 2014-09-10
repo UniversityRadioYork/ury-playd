@@ -1,5 +1,6 @@
 var audio__sink_8hpp =
 [
+    [ "AudioSinkConfigurator", "classAudioSinkConfigurator.html", "classAudioSinkConfigurator" ],
     [ "AudioSink", "classAudioSink.html", "classAudioSink" ],
-    [ "PlayCallbackStepResult", "audio__sink_8hpp.html#af1e317131d6c3a3f0adf7c5fca059d74", null ]
+    [ "PlayCallbackStepResult", "audio__sink_8hpp.html#af293e1183657d075db79370d0fdd76ae", null ]
 ];

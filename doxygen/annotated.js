@@ -2,6 +2,7 @@ var annotated =
 [
     [ "Audio", "classAudio.html", "classAudio" ],
     [ "AudioSink", "classAudioSink.html", "classAudioSink" ],
+    [ "AudioSinkConfigurator", "classAudioSinkConfigurator.html", "classAudioSinkConfigurator" ],
     [ "AudioSource", "classAudioSource.html", "classAudioSource" ],
     [ "AudioSystem", "classAudioSystem.html", "classAudioSystem" ],
     [ "CommandHandler", "classCommandHandler.html", "classCommandHandler" ],
@@ -19,6 +20,7 @@ var annotated =
     [ "ResponseSink", "classResponseSink.html", "classResponseSink" ],
     [ "ResponseSource", "classResponseSource.html", "classResponseSource" ],
     [ "RingBuffer", "classRingBuffer.html", "classRingBuffer" ],
+    [ "SeekError", "classSeekError.html", "classSeekError" ],
     [ "TcpResponseSink", "classTcpResponseSink.html", "classTcpResponseSink" ],
     [ "TimeParser", "classTimeParser.html", "classTimeParser" ],
     [ "Tokeniser", "classTokeniser.html", "classTokeniser" ],

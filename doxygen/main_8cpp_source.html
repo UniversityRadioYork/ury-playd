@@ -95,155 +95,158 @@ $(document).ready(function(){initNavTree('main_8cpp_source.html','');});
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">// playd is licenced under the MIT license: see LICENSE.txt.</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;chrono&gt;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="audio__system_8hpp.html">audio/audio_system.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cmd_8hpp.html">cmd.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="io__reactor_8hpp.html">io/io_reactor.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="io__response_8hpp.html">io/io_response.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="main_8hpp.html">main.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="messages_8h.html">messages.h</a>&quot;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="player_8hpp.html">player/player.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">   28</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="classplayd.html">playd</a> ps(argc, argv);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">return</span> ps.<a class="code" href="classplayd.html#aee84626965c812db03120ebe3267fcab">Run</a>();</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">// playd</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">const</span> std::chrono::microseconds <a class="code" href="classplayd.html#a540bcb2dac9488bcb8e593378005bd07">playd::POSITION_PERIOD</a>(500000);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classplayd.html#a767d029a5d1321e912c1a2a92e8f3c64">   40</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classplayd.html#a767d029a5d1321e912c1a2a92e8f3c64">playd::GetDeviceID</a>()</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;{</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.size() &lt; 2) <span class="keywordflow">return</span> -1;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">/* Only accept valid numbers. */</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">int</span> id;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordtype">id</span> = std::stoi(this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>[1]);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    }</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordflow">catch</span> (...)</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="comment">/* Only std::invalid_argument and std::out_of_range are thrown</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">         * here. */</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">return</span> -1;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    }</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="comment">/* Only allow valid (output) devices. */</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">auto</span> device_list = this-&gt;<a class="code" href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">audio</a>.<a class="code" href="classAudioSystem.html#aa268faeb9243c18588631024958856e6">GetDevicesInfo</a>();</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">audio</a>.<a class="code" href="classAudioSystem.html#a001cd82f854883b80b3ed7d35795581b">IsOutputDevice</a>(<span class="keywordtype">id</span>)) {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">return</span> id;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    }</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="audio__system_8hpp.html">audio/audio_system.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cmd_8hpp.html">cmd.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="io__reactor_8hpp.html">io/io_reactor.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="io__response_8hpp.html">io/io_response.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="main_8hpp.html">main.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="messages_8h.html">messages.h</a>&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="player_8hpp.html">player/player.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">   27</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classplayd.html">playd</a> ps(argc, argv);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">return</span> ps.<a class="code" href="classplayd.html#aee84626965c812db03120ebe3267fcab">Run</a>();</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">// playd</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">const</span> <a class="code" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a> <a class="code" href="classplayd.html#a6ac93869e4cb3acfcd282b229f4ef6a9">playd::POSITION_PERIOD</a>(500000);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classplayd.html#a767d029a5d1321e912c1a2a92e8f3c64">   39</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classplayd.html#a767d029a5d1321e912c1a2a92e8f3c64">playd::GetDeviceID</a>()</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.size() &lt; 2) <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="comment">/* Only accept valid numbers. */</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">int</span> id;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordtype">id</span> = std::stoi(this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>[1]);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">catch</span> (...) {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="comment">/* Only std::invalid_argument and std::out_of_range are thrown</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">         * here. */</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    }</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="comment">/* Only allow valid (output) devices. */</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">auto</span> device_list = this-&gt;<a class="code" href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">audio</a>.<a class="code" href="classAudioSystem.html#aa268faeb9243c18588631024958856e6">GetDevicesInfo</a>();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">audio</a>.<a class="code" href="classAudioSystem.html#a001cd82f854883b80b3ed7d35795581b">IsOutputDevice</a>(<span class="keywordtype">id</span>)) {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> id;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">return</span> -1;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">   80</a></span>&#160;<span class="keyword">const</span> <a class="code" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">Player::TP::UnitMap</a> <a class="code" href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">UNITS</a> = {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    { <span class="stringliteral">&quot;us&quot;</span>, Player::TP::MkTime&lt;std::chrono::microseconds&gt; },</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    { <span class="stringliteral">&quot;usec&quot;</span>, Player::TP::MkTime&lt;std::chrono::microseconds&gt; },</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    { <span class="stringliteral">&quot;usecs&quot;</span>, Player::TP::MkTime&lt;std::chrono::microseconds&gt; },</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    { <span class="stringliteral">&quot;ms&quot;</span>, Player::TP::MkTime&lt;std::chrono::milliseconds&gt; },</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    { <span class="stringliteral">&quot;msec&quot;</span>, Player::TP::MkTime&lt;std::chrono::milliseconds&gt; },</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    { <span class="stringliteral">&quot;msecs&quot;</span>, Player::TP::MkTime&lt;std::chrono::milliseconds&gt; },</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    { <span class="stringliteral">&quot;s&quot;</span>, Player::TP::MkTime&lt;std::chrono::seconds&gt; },</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    { <span class="stringliteral">&quot;sec&quot;</span>, Player::TP::MkTime&lt;std::chrono::seconds&gt; },</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    { <span class="stringliteral">&quot;secs&quot;</span>, Player::TP::MkTime&lt;std::chrono::seconds&gt; },</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    { <span class="stringliteral">&quot;m&quot;</span>, Player::TP::MkTime&lt;std::chrono::minutes&gt; },</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    { <span class="stringliteral">&quot;min&quot;</span>, Player::TP::MkTime&lt;std::chrono::minutes&gt; },</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    { <span class="stringliteral">&quot;mins&quot;</span>, Player::TP::MkTime&lt;std::chrono::minutes&gt; },</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    { <span class="stringliteral">&quot;h&quot;</span>, Player::TP::MkTime&lt;std::chrono::hours&gt; },</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    { <span class="stringliteral">&quot;hour&quot;</span>, Player::TP::MkTime&lt;std::chrono::hours&gt; },</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    { <span class="stringliteral">&quot;hours&quot;</span>, Player::TP::MkTime&lt;std::chrono::hours&gt; },</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    { <span class="stringliteral">&quot;&quot;</span>, Player::TP::MkTime&lt;std::chrono::microseconds&gt; }</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;};</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="classplayd.html#a2dfa519ee11ce75fbe389fcf3b15e122">  115</a></span>&#160;<a class="code" href="classplayd.html#a2dfa519ee11ce75fbe389fcf3b15e122">playd::playd</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    : audio(), player(audio, time_parser), handler(player), time_parser(<a class="code" href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">UNITS</a>)</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;{</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; argc; i++) {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.push_back(std::string(argv[i]));</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    }</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keyword">auto</span> size = this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.size();</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    std::string addr = size &gt; 2 ? this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.at(2) : <span class="stringliteral">&quot;0.0.0.0&quot;</span>;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    std::string port = size &gt; 3 ? this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.at(3) : <span class="stringliteral">&quot;1350&quot;</span>;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    this-&gt;<a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a> = decltype(this-&gt;<a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a>)(</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;                    <span class="keyword">new</span> <a class="code" href="classIoReactor.html">IoReactor</a>(this-&gt;<a class="code" href="classplayd.html#a8712fc23f3139a2fd2e9dbfb24b998dd">player</a>, this-&gt;<a class="code" href="classplayd.html#a738bb18c13d3fd7db82ce000dd43d604">handler</a>, addr, port));</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;}</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
-<div class="line"><a name="l00130"></a><span class="lineno"><a class="line" href="classplayd.html#aee84626965c812db03120ebe3267fcab">  130</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classplayd.html#aee84626965c812db03120ebe3267fcab">playd::Run</a>()</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;{</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="comment">// Don&#39;t roll this into the constructor: it&#39;ll go out of scope!</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="keywordtype">int</span> <span class="keywordtype">id</span> = this-&gt;<a class="code" href="classplayd.html#a767d029a5d1321e912c1a2a92e8f3c64">GetDeviceID</a>();</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keywordflow">if</span> (<span class="keywordtype">id</span> == -1) {</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;            <span class="comment">/* Oops, user entered an invalid sound device. */</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;            <span class="keyword">auto</span> device_list = this-&gt;<a class="code" href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">audio</a>.<a class="code" href="classAudioSystem.html#aa268faeb9243c18588631024958856e6">GetDevicesInfo</a>();</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;device : device_list) {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                std::cout &lt;&lt; device.first &lt;&lt; <span class="stringliteral">&quot;: &quot;</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;                          &lt;&lt; device.second &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;            }</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <span class="keywordflow">return</span> EXIT_FAILURE;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        }</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">audio</a>.<a class="code" href="classAudioSystem.html#ade3b400828991d02e36a0b61302d30d2">SetDeviceID</a>(<span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a8712fc23f3139a2fd2e9dbfb24b998dd">player</a>.<a class="code" href="classPlayer.html#a1e65e04dae199230d80639112ac07288">SetPositionResponsePeriod</a>(<a class="code" href="classplayd.html#a540bcb2dac9488bcb8e593378005bd07">POSITION_PERIOD</a>);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a8712fc23f3139a2fd2e9dbfb24b998dd">player</a>.<a class="code" href="classPlayer.html#a719de5af4d1534c2d805a19d5d995deb">SetResponseSink</a>(*this-&gt;<a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a>);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a>-&gt;Run();</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keywordflow">catch</span> (<a class="code" href="classError.html">Error</a> &amp;error)</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    {</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a>-&gt;RespondWithError(error);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <a class="code" href="classDebug.html">Debug</a>() &lt;&lt; <span class="stringliteral">&quot;Unhandled exception caught, going away now.&quot;</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="keywordflow">return</span> EXIT_FAILURE;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordflow">return</span> EXIT_SUCCESS;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;}</div>
-<div class="ttc" id="classplayd_html"><div class="ttname"><a href="classplayd.html">playd</a></div><div class="ttdoc">The playd application. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00029">main.hpp:29</a></div></div>
-<div class="ttc" id="classplayd_html_a8712fc23f3139a2fd2e9dbfb24b998dd"><div class="ttname"><a href="classplayd.html#a8712fc23f3139a2fd2e9dbfb24b998dd">playd::player</a></div><div class="ttdeci">Player player</div><div class="ttdoc">The player subsystem. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00050">main.hpp:50</a></div></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">// Conversion rates from various position units to microseconds.</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">const</span> <a class="code" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a> US_RATE = 1;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">const</span> <a class="code" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a> MS_RATE = 1000;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">const</span> <a class="code" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a> S_RATE = 1000000;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="keyword">const</span> <a class="code" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a> M_RATE = 60000000;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">const</span> <a class="code" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a> H_RATE = 3600000000;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">   77</a></span>&#160;<span class="keyword">const</span> <a class="code" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">Player::TP::UnitMap</a> <a class="code" href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">UNITS</a> = {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    { <span class="stringliteral">&quot;us&quot;</span>, US_RATE },</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    { <span class="stringliteral">&quot;usec&quot;</span>, US_RATE },</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    { <span class="stringliteral">&quot;usecs&quot;</span>, US_RATE },</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    { <span class="stringliteral">&quot;ms&quot;</span>, MS_RATE },</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    { <span class="stringliteral">&quot;msec&quot;</span>, MS_RATE },</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    { <span class="stringliteral">&quot;msecs&quot;</span>, MS_RATE },</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    { <span class="stringliteral">&quot;s&quot;</span>, S_RATE },</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    { <span class="stringliteral">&quot;sec&quot;</span>, S_RATE },</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    { <span class="stringliteral">&quot;secs&quot;</span>, S_RATE },</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    { <span class="stringliteral">&quot;m&quot;</span>, M_RATE },</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    { <span class="stringliteral">&quot;min&quot;</span>, M_RATE },</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    { <span class="stringliteral">&quot;mins&quot;</span>, M_RATE },</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    { <span class="stringliteral">&quot;h&quot;</span>, H_RATE },</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    { <span class="stringliteral">&quot;hour&quot;</span>, H_RATE },</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    { <span class="stringliteral">&quot;hours&quot;</span>, H_RATE },</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    { <span class="stringliteral">&quot;&quot;</span>, US_RATE }</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;};</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="classplayd.html#a2dfa519ee11ce75fbe389fcf3b15e122">  102</a></span>&#160;<a class="code" href="classplayd.html#a2dfa519ee11ce75fbe389fcf3b15e122">playd::playd</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    : audio(), player(audio, time_parser), handler(player), time_parser(<a class="code" href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">UNITS</a>)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;{</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; argc; i++) {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.push_back(std::string(argv[i]));</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keyword">auto</span> size = this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.size();</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    std::string addr = size &gt; 2 ? this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.at(2) : <span class="stringliteral">&quot;0.0.0.0&quot;</span>;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    std::string port = size &gt; 3 ? this-&gt;<a class="code" href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">arguments</a>.at(3) : <span class="stringliteral">&quot;1350&quot;</span>;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    this-&gt;<a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a> = decltype(this-&gt;<a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a>)(</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                    <span class="keyword">new</span> <a class="code" href="classIoReactor.html">IoReactor</a>(this-&gt;<a class="code" href="classplayd.html#a8712fc23f3139a2fd2e9dbfb24b998dd">player</a>, this-&gt;<a class="code" href="classplayd.html#a738bb18c13d3fd7db82ce000dd43d604">handler</a>, addr, port));</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;}</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
+<div class="line"><a name="l00117"></a><span class="lineno"><a class="line" href="classplayd.html#aee84626965c812db03120ebe3267fcab">  117</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classplayd.html#aee84626965c812db03120ebe3267fcab">playd::Run</a>()</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;{</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="comment">// Don&#39;t roll this into the constructor: it&#39;ll go out of scope!</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keywordtype">int</span> <span class="keywordtype">id</span> = this-&gt;<a class="code" href="classplayd.html#a767d029a5d1321e912c1a2a92e8f3c64">GetDeviceID</a>();</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordflow">if</span> (<span class="keywordtype">id</span> == -1) {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            <span class="comment">/* Oops, user entered an invalid sound device. */</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;            <span class="keyword">auto</span> device_list = this-&gt;<a class="code" href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">audio</a>.<a class="code" href="classAudioSystem.html#aa268faeb9243c18588631024958856e6">GetDevicesInfo</a>();</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;device : device_list) {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;                std::cout &lt;&lt; device.first &lt;&lt; <span class="stringliteral">&quot;: &quot;</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;                          &lt;&lt; device.second &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;            }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            <span class="keywordflow">return</span> EXIT_FAILURE;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        }</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">audio</a>.<a class="code" href="classAudioSystem.html#ade3b400828991d02e36a0b61302d30d2">SetDeviceID</a>(<span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a8712fc23f3139a2fd2e9dbfb24b998dd">player</a>.<a class="code" href="classPlayer.html#a1e65e04dae199230d80639112ac07288">SetPositionResponsePeriod</a>(<a class="code" href="classplayd.html#a6ac93869e4cb3acfcd282b229f4ef6a9">POSITION_PERIOD</a>);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a8712fc23f3139a2fd2e9dbfb24b998dd">player</a>.<a class="code" href="classPlayer.html#a719de5af4d1534c2d805a19d5d995deb">SetResponseSink</a>(*this-&gt;<a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a>);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        this-&gt;<a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a>-&gt;Run();</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordflow">catch</span> (<a class="code" href="classError.html">Error</a> &amp;error) {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        <a class="code" href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">io</a>-&gt;RespondWithError(error);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <a class="code" href="classDebug.html">Debug</a>() &lt;&lt; <span class="stringliteral">&quot;Unhandled exception caught, going away now.&quot;</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keywordflow">return</span> EXIT_FAILURE;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keywordflow">return</span> EXIT_SUCCESS;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;}</div>
+<div class="ttc" id="classplayd_html"><div class="ttname"><a href="classplayd.html">playd</a></div><div class="ttdoc">The playd application. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00028">main.hpp:28</a></div></div>
+<div class="ttc" id="classplayd_html_a8712fc23f3139a2fd2e9dbfb24b998dd"><div class="ttname"><a href="classplayd.html#a8712fc23f3139a2fd2e9dbfb24b998dd">playd::player</a></div><div class="ttdeci">Player player</div><div class="ttdoc">The player subsystem. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00049">main.hpp:49</a></div></div>
 <div class="ttc" id="classError_html"><div class="ttname"><a href="classError.html">Error</a></div><div class="ttdoc">A playd exception. </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00019">errors.hpp:19</a></div></div>
 <div class="ttc" id="messages_8h_html"><div class="ttname"><a href="messages_8h.html">messages.h</a></div><div class="ttdoc">Constant human-readable messages used within playd. </div></div>
-<div class="ttc" id="classplayd_html_a767d029a5d1321e912c1a2a92e8f3c64"><div class="ttname"><a href="classplayd.html#a767d029a5d1321e912c1a2a92e8f3c64">playd::GetDeviceID</a></div><div class="ttdeci">int GetDeviceID()</div><div class="ttdoc">Tries to get the output device ID from program arguments. </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00040">main.cpp:40</a></div></div>
-<div class="ttc" id="classPlayer_html_a719de5af4d1534c2d805a19d5d995deb"><div class="ttname"><a href="classPlayer.html#a719de5af4d1534c2d805a19d5d995deb">Player::SetResponseSink</a></div><div class="ttdeci">void SetResponseSink(ResponseSink &amp;sink)</div><div class="ttdoc">Registers a response sink with the Player. </div><div class="ttdef"><b>Definition:</b> <a href="player_8cpp_source.html#l00067">player.cpp:67</a></div></div>
-<div class="ttc" id="classplayd_html_a2c7193680bd18f1e9b3f63f2234485de"><div class="ttname"><a href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">playd::audio</a></div><div class="ttdeci">AudioSystem audio</div><div class="ttdoc">The audio subsystem. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00049">main.hpp:49</a></div></div>
-<div class="ttc" id="classplayd_html_a738bb18c13d3fd7db82ce000dd43d604"><div class="ttname"><a href="classplayd.html#a738bb18c13d3fd7db82ce000dd43d604">playd::handler</a></div><div class="ttdeci">CommandHandler handler</div><div class="ttdoc">The command handler. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00051">main.hpp:51</a></div></div>
+<div class="ttc" id="classplayd_html_a767d029a5d1321e912c1a2a92e8f3c64"><div class="ttname"><a href="classplayd.html#a767d029a5d1321e912c1a2a92e8f3c64">playd::GetDeviceID</a></div><div class="ttdeci">int GetDeviceID()</div><div class="ttdoc">Tries to get the output device ID from program arguments. </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00039">main.cpp:39</a></div></div>
+<div class="ttc" id="classPlayer_html_a719de5af4d1534c2d805a19d5d995deb"><div class="ttname"><a href="classPlayer.html#a719de5af4d1534c2d805a19d5d995deb">Player::SetResponseSink</a></div><div class="ttdeci">void SetResponseSink(ResponseSink &amp;sink)</div><div class="ttdoc">Registers a response sink with the Player. </div><div class="ttdef"><b>Definition:</b> <a href="player_8cpp_source.html#l00063">player.cpp:63</a></div></div>
+<div class="ttc" id="classplayd_html_a2c7193680bd18f1e9b3f63f2234485de"><div class="ttname"><a href="classplayd.html#a2c7193680bd18f1e9b3f63f2234485de">playd::audio</a></div><div class="ttdeci">AudioSystem audio</div><div class="ttdoc">The audio subsystem. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00048">main.hpp:48</a></div></div>
+<div class="ttc" id="classplayd_html_a738bb18c13d3fd7db82ce000dd43d604"><div class="ttname"><a href="classplayd.html#a738bb18c13d3fd7db82ce000dd43d604">playd::handler</a></div><div class="ttdeci">CommandHandler handler</div><div class="ttdoc">The command handler. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00050">main.hpp:50</a></div></div>
+<div class="ttc" id="classTimeParser_html_af7c4a18af13785d122219d4547860aff"><div class="ttname"><a href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">TimeParser&lt; PlayerPosition::Unit &gt;::UnitMap</a></div><div class="ttdeci">std::map&lt; std::string, PlayerPosition::Unit &gt; UnitMap</div><div class="ttdoc">The type of the map from unit suffixes to multipliers that convert from microseconds to those units...</div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00030">time_parser.hpp:30</a></div></div>
 <div class="ttc" id="io__reactor_8hpp_html"><div class="ttname"><a href="io__reactor_8hpp.html">io_reactor.hpp</a></div><div class="ttdoc">Declaration of the IoReactor class. </div></div>
 <div class="ttc" id="cmd_8hpp_html"><div class="ttname"><a href="cmd_8hpp.html">cmd.hpp</a></div><div class="ttdoc">Declaration of the CommandHandler class. </div></div>
 <div class="ttc" id="audio__system_8hpp_html"><div class="ttname"><a href="audio__system_8hpp.html">audio_system.hpp</a></div><div class="ttdoc">Declaration of the AudioSystem class. </div></div>
-<div class="ttc" id="classplayd_html_aee84626965c812db03120ebe3267fcab"><div class="ttname"><a href="classplayd.html#aee84626965c812db03120ebe3267fcab">playd::Run</a></div><div class="ttdeci">int Run()</div><div class="ttdoc">Runs playd. </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00130">main.cpp:130</a></div></div>
+<div class="ttc" id="classplayd_html_aee84626965c812db03120ebe3267fcab"><div class="ttname"><a href="classplayd.html#aee84626965c812db03120ebe3267fcab">playd::Run</a></div><div class="ttdeci">int Run()</div><div class="ttdoc">Runs playd. </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00117">main.cpp:117</a></div></div>
 <div class="ttc" id="classAudioSystem_html_a001cd82f854883b80b3ed7d35795581b"><div class="ttname"><a href="classAudioSystem.html#a001cd82f854883b80b3ed7d35795581b">AudioSystem::IsOutputDevice</a></div><div class="ttdeci">bool IsOutputDevice(int id)</div><div class="ttdoc">Can a sound device output sound? </div><div class="ttdef"><b>Definition:</b> <a href="audio__system_8cpp_source.html#l00069">audio_system.cpp:69</a></div></div>
-<div class="ttc" id="main_8cpp_html_a889c521ce751c2db7ba216a612c1d784"><div class="ttname"><a href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">UNITS</a></div><div class="ttdeci">const Player::TP::UnitMap UNITS</div><div class="ttdoc">UNITS defines the unit suffixes that playd understands when parsing positions in seek commands...</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00080">main.cpp:80</a></div></div>
-<div class="ttc" id="classplayd_html_a58d45d86bd51dea16f476aae648ff63c"><div class="ttname"><a href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">playd::arguments</a></div><div class="ttdeci">std::vector&lt; std::string &gt; arguments</div><div class="ttdoc">The argument vector. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00048">main.hpp:48</a></div></div>
-<div class="ttc" id="classIoReactor_html"><div class="ttname"><a href="classIoReactor.html">IoReactor</a></div><div class="ttdoc">The IO reactor, which services input, routes responses, and executes the Player update routine period...</div><div class="ttdef"><b>Definition:</b> <a href="io__reactor_8hpp_source.html#l00035">io_reactor.hpp:35</a></div></div>
+<div class="ttc" id="main_8cpp_html_a889c521ce751c2db7ba216a612c1d784"><div class="ttname"><a href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">UNITS</a></div><div class="ttdeci">const Player::TP::UnitMap UNITS</div><div class="ttdoc">UNITS defines the unit suffixes that playd understands when parsing positions in seek commands...</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00077">main.cpp:77</a></div></div>
+<div class="ttc" id="classAudioSource_html_ade4ab426deda76ff4c77a1bb44b360df"><div class="ttname"><a href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a></div><div class="ttdeci">std::uint64_t MicrosecondPosition</div><div class="ttdoc">Type for positions expressed in microseconds. </div><div class="ttdef"><b>Definition:</b> <a href="audio__source_8hpp_source.html#l00052">audio_source.hpp:52</a></div></div>
+<div class="ttc" id="classplayd_html_a58d45d86bd51dea16f476aae648ff63c"><div class="ttname"><a href="classplayd.html#a58d45d86bd51dea16f476aae648ff63c">playd::arguments</a></div><div class="ttdeci">std::vector&lt; std::string &gt; arguments</div><div class="ttdoc">The argument vector. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00047">main.hpp:47</a></div></div>
+<div class="ttc" id="classIoReactor_html"><div class="ttname"><a href="classIoReactor.html">IoReactor</a></div><div class="ttdoc">The IO reactor, which services input, routes responses, and executes the Player update routine period...</div><div class="ttdef"><b>Definition:</b> <a href="io__reactor_8hpp_source.html#l00033">io_reactor.hpp:33</a></div></div>
 <div class="ttc" id="player_8hpp_html"><div class="ttname"><a href="player_8hpp.html">player.hpp</a></div><div class="ttdoc">Declaration of the Player class, and associated types. </div></div>
-<div class="ttc" id="classDebug_html"><div class="ttname"><a href="classDebug.html">Debug</a></div><div class="ttdoc">Class for telling the human what playd is doing. </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00078">errors.hpp:78</a></div></div>
-<div class="ttc" id="classplayd_html_a2dfa519ee11ce75fbe389fcf3b15e122"><div class="ttname"><a href="classplayd.html#a2dfa519ee11ce75fbe389fcf3b15e122">playd::playd</a></div><div class="ttdeci">playd(int argc, char *argv[])</div><div class="ttdoc">Constructs a playd, initialising its libraries. </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00115">main.cpp:115</a></div></div>
+<div class="ttc" id="classDebug_html"><div class="ttname"><a href="classDebug.html">Debug</a></div><div class="ttdoc">Class for telling the human what playd is doing. </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00090">errors.hpp:90</a></div></div>
+<div class="ttc" id="classplayd_html_a2dfa519ee11ce75fbe389fcf3b15e122"><div class="ttname"><a href="classplayd.html#a2dfa519ee11ce75fbe389fcf3b15e122">playd::playd</a></div><div class="ttdeci">playd(int argc, char *argv[])</div><div class="ttdoc">Constructs a playd, initialising its libraries. </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00102">main.cpp:102</a></div></div>
 <div class="ttc" id="classAudioSystem_html_ade3b400828991d02e36a0b61302d30d2"><div class="ttname"><a href="classAudioSystem.html#ade3b400828991d02e36a0b61302d30d2">AudioSystem::SetDeviceID</a></div><div class="ttdeci">void SetDeviceID(int id)</div><div class="ttdoc">Sets the current device ID. </div><div class="ttdef"><b>Definition:</b> <a href="audio__system_8cpp_source.html#l00078">audio_system.cpp:78</a></div></div>
 <div class="ttc" id="classPlayer_html_a1e65e04dae199230d80639112ac07288"><div class="ttname"><a href="classPlayer.html#a1e65e04dae199230d80639112ac07288">Player::SetPositionResponsePeriod</a></div><div class="ttdeci">void SetPositionResponsePeriod(PlayerPosition::Unit period)</div><div class="ttdoc">Sets the period between position responses. </div><div class="ttdef"><b>Definition:</b> <a href="player__position_8cpp_source.html#l00021">player_position.cpp:21</a></div></div>
 <div class="ttc" id="io__response_8hpp_html"><div class="ttname"><a href="io__response_8hpp.html">io_response.hpp</a></div><div class="ttdoc">Declaration of classes pertaining to responses to the client. </div></div>
-<div class="ttc" id="classTimeParser_html_adc32afc638ace5060a2134f8f74d3c60"><div class="ttname"><a href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">TimeParser&lt; std::chrono::microseconds &gt;::UnitMap</a></div><div class="ttdeci">std::map&lt; std::string, std::function&lt; std::chrono::microseconds(IntType)&gt;&gt; UnitMap</div><div class="ttdoc">The type of the map from unit suffixes to functions that convert from an amount of that time unit to ...</div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00029">time_parser.hpp:29</a></div></div>
-<div class="ttc" id="main_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdoc">The main entry point. </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00028">main.cpp:28</a></div></div>
+<div class="ttc" id="classplayd_html_a6ac93869e4cb3acfcd282b229f4ef6a9"><div class="ttname"><a href="classplayd.html#a6ac93869e4cb3acfcd282b229f4ef6a9">playd::POSITION_PERIOD</a></div><div class="ttdeci">static const AudioSource::MicrosecondPosition POSITION_PERIOD</div><div class="ttdoc">The period between position announcements from the Player object. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00045">main.hpp:45</a></div></div>
+<div class="ttc" id="main_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdoc">The main entry point. </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00027">main.cpp:27</a></div></div>
 <div class="ttc" id="main_8hpp_html"><div class="ttname"><a href="main_8hpp.html">main.hpp</a></div><div class="ttdoc">Declaration of the playd class. </div></div>
-<div class="ttc" id="classplayd_html_a066cb450455e1359e4f80cfa5ecb5c05"><div class="ttname"><a href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">playd::io</a></div><div class="ttdeci">std::unique_ptr&lt; IoReactor &gt; io</div><div class="ttdoc">The I/O handler. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00053">main.hpp:53</a></div></div>
+<div class="ttc" id="classplayd_html_a066cb450455e1359e4f80cfa5ecb5c05"><div class="ttname"><a href="classplayd.html#a066cb450455e1359e4f80cfa5ecb5c05">playd::io</a></div><div class="ttdeci">std::unique_ptr&lt; IoReactor &gt; io</div><div class="ttdoc">The I/O handler. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00052">main.hpp:52</a></div></div>
 <div class="ttc" id="classAudioSystem_html_aa268faeb9243c18588631024958856e6"><div class="ttname"><a href="classAudioSystem.html#aa268faeb9243c18588631024958856e6">AudioSystem::GetDevicesInfo</a></div><div class="ttdeci">std::vector&lt; AudioSystem::Device &gt; GetDevicesInfo()</div><div class="ttdoc">Gets the number and name of each output device entry in the AudioSystem. </div><div class="ttdef"><b>Definition:</b> <a href="audio__system_8cpp_source.html#l00055">audio_system.cpp:55</a></div></div>
-<div class="ttc" id="classplayd_html_a540bcb2dac9488bcb8e593378005bd07"><div class="ttname"><a href="classplayd.html#a540bcb2dac9488bcb8e593378005bd07">playd::POSITION_PERIOD</a></div><div class="ttdeci">static const std::chrono::microseconds POSITION_PERIOD</div><div class="ttdoc">The period between position announcements from the Player object. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00046">main.hpp:46</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="main_8cpp.html">main.cpp</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:27:41 for URY playd by
+    <li class="footer">Generated on Wed Sep 10 2014 04:57:36 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

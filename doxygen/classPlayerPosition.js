@@ -1,8 +1,8 @@
 var classPlayerPosition =
 [
-    [ "Unit", "classPlayerPosition.html#a535c99057ceca21d8fbe82883c592a66", null ],
+    [ "Unit", "classPlayerPosition.html#a625a88b9c1aa0eb10af8f34960e6350a", null ],
     [ "PlayerPosition", "classPlayerPosition.html#a707498560b9f9189fb6d3cd8e59b77d7", null ],
-    [ "Emit", "classPlayerPosition.html#a66963c28fd9dffe0fd7338023310fa92", null ],
+    [ "Emit", "classPlayerPosition.html#a826e3c70967e99d240941ef045cffd57", null ],
     [ "IsReadyToSend", "classPlayerPosition.html#a52f46d4c600724b7ce9f459b93609dc3", null ],
     [ "Reset", "classPlayerPosition.html#a813e8eb40fdff815683fb7a5b1671ede", null ],
     [ "Send", "classPlayerPosition.html#aac73ce9104537702365baf19d50bde14", null ],

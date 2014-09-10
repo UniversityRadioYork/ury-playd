@@ -13,7 +13,8 @@ var searchData=
   ['audio_5fsystem',['audio_system',['../classPlayerFile.html#a8de47bcb924e2c3e10b208a09eb3f05b',1,'PlayerFile']]],
   ['audio_5fsystem_2ecpp',['audio_system.cpp',['../audio__system_8cpp.html',1,'']]],
   ['audio_5fsystem_2ehpp',['audio_system.hpp',['../audio__system_8hpp.html',1,'']]],
-  ['audiosink',['AudioSink',['../classAudioSink.html',1,'AudioSink'],['../classAudioSink.html#ab4adf46e3e93d35e2b5fb1ab0e75793b',1,'AudioSink::AudioSink()']]],
+  ['audiosink',['AudioSink',['../classAudioSink.html',1,'AudioSink'],['../classAudioSink.html#ac4b34ebdfc02cf6fcb4a4c2784eac270',1,'AudioSink::AudioSink()']]],
+  ['audiosinkconfigurator',['AudioSinkConfigurator',['../classAudioSinkConfigurator.html',1,'']]],
   ['audiosource',['AudioSource',['../classAudioSource.html',1,'AudioSource'],['../classAudioSource.html#abcb925739a649c30663385a15d83af26',1,'AudioSource::AudioSource()']]],
   ['audiosystem',['AudioSystem',['../classAudioSystem.html',1,'AudioSystem'],['../classAudioSystem.html#ad17cde8deff07ef7d7d56be62df98739',1,'AudioSystem::AudioSystem()']]]
 ];

@@ -98,7 +98,6 @@ $(document).ready(function(){initNavTree('main_8cpp.html','');});
 <p>Main entry point and implementation of the playd class.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;algorithm&gt;</code><br />
-<code>#include &lt;chrono&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
 <code>#include &quot;<a class="el" href="audio__system_8hpp_source.html">audio/audio_system.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="cmd_8hpp_source.html">cmd.hpp</a>&quot;</code><br />
@@ -112,8 +111,7 @@ $(document).ready(function(){initNavTree('main_8cpp.html','');});
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="main_8cpp__incl.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="main_8cpp__incl.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 </div>
 <p><a href="main_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -126,7 +124,27 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a889c521ce751c2db7ba216a612c1d784"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">Player::TP::UnitMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">UNITS</a></td></tr>
+<tr class="memitem:a933d06a42856e8f68b34ddb233d160d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a933d06a42856e8f68b34ddb233d160d5"></a>
+const <br class="typebreak" />
+<a class="el" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a>&#160;</td><td class="memItemRight" valign="bottom"><b>US_RATE</b> = 1</td></tr>
+<tr class="separator:a933d06a42856e8f68b34ddb233d160d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01ade3117e8e46a0ce0d2e0ac3fff08a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01ade3117e8e46a0ce0d2e0ac3fff08a"></a>
+const <br class="typebreak" />
+<a class="el" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a>&#160;</td><td class="memItemRight" valign="bottom"><b>MS_RATE</b> = 1000</td></tr>
+<tr class="separator:a01ade3117e8e46a0ce0d2e0ac3fff08a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a171a56d544eff42d892b148714031776"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a171a56d544eff42d892b148714031776"></a>
+const <br class="typebreak" />
+<a class="el" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a>&#160;</td><td class="memItemRight" valign="bottom"><b>S_RATE</b> = 1000000</td></tr>
+<tr class="separator:a171a56d544eff42d892b148714031776"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb201887955d78d9bb1243c0108c4aaf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb201887955d78d9bb1243c0108c4aaf"></a>
+const <br class="typebreak" />
+<a class="el" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a>&#160;</td><td class="memItemRight" valign="bottom"><b>M_RATE</b> = 60000000</td></tr>
+<tr class="separator:abb201887955d78d9bb1243c0108c4aaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2a2624eab2b65dd4acdd9fecf71ef4c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac2a2624eab2b65dd4acdd9fecf71ef4c"></a>
+const <br class="typebreak" />
+<a class="el" href="classAudioSource.html#ade4ab426deda76ff4c77a1bb44b360df">AudioSource::MicrosecondPosition</a>&#160;</td><td class="memItemRight" valign="bottom"><b>H_RATE</b> = 3600000000</td></tr>
+<tr class="separator:ac2a2624eab2b65dd4acdd9fecf71ef4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a889c521ce751c2db7ba216a612c1d784"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">Player::TP::UnitMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a889c521ce751c2db7ba216a612c1d784">UNITS</a></td></tr>
 <tr class="memdesc:a889c521ce751c2db7ba216a612c1d784"><td class="mdescLeft">&#160;</td><td class="mdescRight">UNITS defines the unit suffixes that playd understands when parsing positions in seek commands.  <a href="#a889c521ce751c2db7ba216a612c1d784">More...</a><br /></td></tr>
 <tr class="separator:a889c521ce751c2db7ba216a612c1d784"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -170,14 +188,14 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The exit code (zero for success; non-zero otherwise). </dd></dl>
 
-<p>Definition at line <a class="el" href="main_8cpp_source.html#l00028">28</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p>Definition at line <a class="el" href="main_8cpp_source.html#l00027">27</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 
-<p>References <a class="el" href="main_8cpp_source.html#l00130">playd::Run()</a>.</p>
-<div class="fragment"><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="classplayd.html">playd</a> ps(argc, argv);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">return</span> ps.Run();</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
-<div class="ttc" id="classplayd_html"><div class="ttname"><a href="classplayd.html">playd</a></div><div class="ttdoc">The playd application. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00029">main.hpp:29</a></div></div>
+<p>References <a class="el" href="main_8cpp_source.html#l00117">playd::Run()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classplayd.html">playd</a> ps(argc, argv);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">return</span> ps.Run();</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
+<div class="ttc" id="classplayd_html"><div class="ttname"><a href="classplayd.html">playd</a></div><div class="ttdoc">The playd application. </div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00028">main.hpp:28</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -187,18 +205,39 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">Player::TP::UnitMap</a> UNITS</td>
+          <td class="memname">const <a class="el" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">Player::TP::UnitMap</a> UNITS</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    </div>
+<div class="line">    { <span class="stringliteral">&quot;us&quot;</span>, US_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;usec&quot;</span>, US_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;usecs&quot;</span>, US_RATE },</div>
+<div class="line">    </div>
+<div class="line">    { <span class="stringliteral">&quot;ms&quot;</span>, MS_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;msec&quot;</span>, MS_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;msecs&quot;</span>, MS_RATE },</div>
+<div class="line">    </div>
+<div class="line">    { <span class="stringliteral">&quot;s&quot;</span>, S_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;sec&quot;</span>, S_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;secs&quot;</span>, S_RATE },</div>
+<div class="line">    </div>
+<div class="line">    { <span class="stringliteral">&quot;m&quot;</span>, M_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;min&quot;</span>, M_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;mins&quot;</span>, M_RATE },</div>
+<div class="line">    </div>
+<div class="line">    { <span class="stringliteral">&quot;h&quot;</span>, H_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;hour&quot;</span>, H_RATE },</div>
+<div class="line">    { <span class="stringliteral">&quot;hours&quot;</span>, H_RATE },</div>
+<div class="line">    </div>
+<div class="line">    { <span class="stringliteral">&quot;&quot;</span>, US_RATE }</div>
+<div class="line">}</div>
+</div><!-- fragment -->
 <p>UNITS defines the unit suffixes that playd understands when parsing positions in seek commands. </p>
-<p>The suffixes are defined using the <a class="el" href="classTimeParser.html#af0e270392bd5313b1d60e66e35dbfe82" title="A template for converting an IntType representation of a duration of InUnit units into a duration exp...">Player::TP::MkTime</a> template, in terms of the std::chrono duration units.</p>
-<p>If no suffix is given, it is treated as the string "". Therefore, the member of UNITS with suffix "" is the default unit.</p>
-<p>The members of UNITS are documented by example.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classTimeParser.html#af0e270392bd5313b1d60e66e35dbfe82" title="A template for converting an IntType representation of a duration of InUnit units into a duration exp...">Player::TP::MkTime</a> </dd></dl>
+<p>If no suffix is given, it is treated as the string "". Therefore, the member of UNITS with suffix "" is the default unit. </p>
 
-<p>Definition at line <a class="el" href="main_8cpp_source.html#l00080">80</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p>Definition at line <a class="el" href="main_8cpp_source.html#l00077">77</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 
 </div>
 </div>
@@ -208,7 +247,7 @@ Variables</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="main_8cpp.html">main.cpp</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:27:41 for URY playd by
+    <li class="footer">Generated on Wed Sep 10 2014 04:57:37 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

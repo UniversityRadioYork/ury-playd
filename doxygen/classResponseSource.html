@@ -106,16 +106,14 @@ $(document).ready(function(){initNavTree('classResponseSource.html','');});
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classResponseSource__inherit__graph.svg" width="351" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classResponseSource__inherit__graph.svg" width="351" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Collaboration diagram for ResponseSource:</div>
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classResponseSource__coll__graph.svg" width="144" height="127"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classResponseSource__coll__graph.svg" width="144" height="127"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -144,7 +142,7 @@ Private Attributes</h2></td></tr>
 <p>A <a class="el" href="classResponseSource.html" title="Abstract helper class for sources of responses. ">ResponseSource</a> can both 'push' responses to a registered <a class="el" href="classResponseSink.html" title="Abstract class for anything that can be sent a response. ">ResponseSink</a> and be 'polled' from outside to dump its current response to an external <a class="el" href="classResponseSink.html" title="Abstract class for anything that can be sent a response. ">ResponseSink</a>. For example, <a class="el" href="classPlayerPosition.html" title="Tracker and broadcaster for the Player&#39;s current position in a song. ">PlayerPosition</a> 'pushes' its position every few milliseconds to the outside world, to keep the client aware of the time, but is also 'polled' on a new client connection so that the client immediately gets the current position on connect.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classResponseSink.html" title="Abstract class for anything that can be sent a response. ">ResponseSink</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="io__response_8hpp_source.html#l00087">87</a> of file <a class="el" href="io__response_8hpp_source.html">io_response.hpp</a>.</p>
+<p>Definition at line <a class="el" href="io__response_8hpp_source.html#l00083">83</a> of file <a class="el" href="io__response_8hpp_source.html">io_response.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a498ee53cca912cdb6d48043108c39dc1"></a>
 <div class="memitem">
@@ -176,7 +174,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classPlayerPosition.html#a66963c28fd9dffe0fd7338023310fa92">PlayerPosition</a>, <a class="el" href="classPlayerState.html#aa93a9879688bfbd3d89ac102c079cbfd">PlayerState</a>, and <a class="el" href="classPlayerFile.html#a00f044c74d07d778532953a917c24197">PlayerFile</a>.</p>
+<p>Implemented in <a class="el" href="classPlayerPosition.html#a826e3c70967e99d240941ef045cffd57">PlayerPosition</a>, <a class="el" href="classPlayerState.html#a14a470003b8e080ad1186f10506fbe64">PlayerState</a>, and <a class="el" href="classPlayerFile.html#a7e635b51c2fd51effb93e879ba1b737f">PlayerFile</a>.</p>
 
 <p>Referenced by <a class="el" href="io__response_8cpp_source.html#l00047">Push()</a>.</p>
 
@@ -208,7 +206,7 @@ Private Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="io__response_8cpp_source.html#l00047">47</a> of file <a class="el" href="io__response_8cpp_source.html">io_response.cpp</a>.</p>
 
-<p>References <a class="el" href="classResponseSource.html#a498ee53cca912cdb6d48043108c39dc1">Emit()</a>, and <a class="el" href="io__response_8hpp_source.html#l00116">push_sink</a>.</p>
+<p>References <a class="el" href="classResponseSource.html#a498ee53cca912cdb6d48043108c39dc1">Emit()</a>, and <a class="el" href="io__response_8hpp_source.html#l00112">push_sink</a>.</p>
 
 <p>Referenced by <a class="el" href="player__state_8cpp_source.html#l00079">PlayerState::Set()</a>, and <a class="el" href="player__position_8cpp_source.html#l00049">PlayerPosition::Update()</a>.</p>
 <div class="fragment"><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
@@ -217,7 +215,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 <div class="ttc" id="classResponseSource_html_a498ee53cca912cdb6d48043108c39dc1"><div class="ttname"><a href="classResponseSource.html#a498ee53cca912cdb6d48043108c39dc1">ResponseSource::Emit</a></div><div class="ttdeci">virtual void Emit(ResponseSink &amp;sink) const =0</div><div class="ttdoc">Emits a response to a given ResponseSink. </div></div>
-<div class="ttc" id="classResponseSource_html_a8a3ce306db2d1a0a9b9c563e5e8c4b31"><div class="ttname"><a href="classResponseSource.html#a8a3ce306db2d1a0a9b9c563e5e8c4b31">ResponseSource::push_sink</a></div><div class="ttdeci">ResponseSink * push_sink</div><div class="ttdoc">A ResponseSink to which &#39;push&#39; responses are emitted. </div><div class="ttdef"><b>Definition:</b> <a href="io__response_8hpp_source.html#l00116">io_response.hpp:116</a></div></div>
+<div class="ttc" id="classResponseSource_html_a8a3ce306db2d1a0a9b9c563e5e8c4b31"><div class="ttname"><a href="classResponseSource.html#a8a3ce306db2d1a0a9b9c563e5e8c4b31">ResponseSource::push_sink</a></div><div class="ttdeci">ResponseSink * push_sink</div><div class="ttdoc">A ResponseSink to which &#39;push&#39; responses are emitted. </div><div class="ttdef"><b>Definition:</b> <a href="io__response_8hpp_source.html#l00112">io_response.hpp:112</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -245,13 +243,13 @@ Private Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="io__response_8cpp_source.html#l00042">42</a> of file <a class="el" href="io__response_8cpp_source.html">io_response.cpp</a>.</p>
 
-<p>References <a class="el" href="io__response_8hpp_source.html#l00116">push_sink</a>.</p>
+<p>References <a class="el" href="io__response_8hpp_source.html#l00112">push_sink</a>.</p>
 
-<p>Referenced by <a class="el" href="player_8cpp_source.html#l00067">Player::SetResponseSink()</a>.</p>
+<p>Referenced by <a class="el" href="player_8cpp_source.html#l00063">Player::SetResponseSink()</a>.</p>
 <div class="fragment"><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    this-&gt;<a class="code" href="classResponseSource.html#a8a3ce306db2d1a0a9b9c563e5e8c4b31">push_sink</a> = &amp;responder;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;}</div>
-<div class="ttc" id="classResponseSource_html_a8a3ce306db2d1a0a9b9c563e5e8c4b31"><div class="ttname"><a href="classResponseSource.html#a8a3ce306db2d1a0a9b9c563e5e8c4b31">ResponseSource::push_sink</a></div><div class="ttdeci">ResponseSink * push_sink</div><div class="ttdoc">A ResponseSink to which &#39;push&#39; responses are emitted. </div><div class="ttdef"><b>Definition:</b> <a href="io__response_8hpp_source.html#l00116">io_response.hpp:116</a></div></div>
+<div class="ttc" id="classResponseSource_html_a8a3ce306db2d1a0a9b9c563e5e8c4b31"><div class="ttname"><a href="classResponseSource.html#a8a3ce306db2d1a0a9b9c563e5e8c4b31">ResponseSource::push_sink</a></div><div class="ttdeci">ResponseSink * push_sink</div><div class="ttdoc">A ResponseSink to which &#39;push&#39; responses are emitted. </div><div class="ttdef"><b>Definition:</b> <a href="io__response_8hpp_source.html#l00112">io_response.hpp:112</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -277,7 +275,7 @@ Private Attributes</h2></td></tr>
 <p>A <a class="el" href="classResponseSink.html" title="Abstract class for anything that can be sent a response. ">ResponseSink</a> to which 'push' responses are emitted. </p>
 <p>If the <a class="el" href="classResponseSink.html" title="Abstract class for anything that can be sent a response. ">ResponseSink</a> is not present, responses are not emitted. </p>
 
-<p>Definition at line <a class="el" href="io__response_8hpp_source.html#l00116">116</a> of file <a class="el" href="io__response_8hpp_source.html">io_response.hpp</a>.</p>
+<p>Definition at line <a class="el" href="io__response_8hpp_source.html#l00112">112</a> of file <a class="el" href="io__response_8hpp_source.html">io_response.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="io__response_8cpp_source.html#l00047">Push()</a>, and <a class="el" href="io__response_8cpp_source.html#l00042">SetResponseSink()</a>.</p>
 
@@ -293,7 +291,7 @@ Private Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classResponseSource.html">ResponseSource</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:27:42 for URY playd by
+    <li class="footer">Generated on Wed Sep 10 2014 04:57:37 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

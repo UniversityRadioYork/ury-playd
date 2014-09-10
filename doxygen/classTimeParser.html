@@ -90,7 +90,6 @@ $(document).ready(function(){initNavTree('classTimeParser.html','');});
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classTimeParser-members.html">List of all members</a>  </div>
@@ -103,29 +102,30 @@ $(document).ready(function(){initNavTree('classTimeParser.html','');});
  <a href="classTimeParser.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>&gt;</code></p>
+<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Collaboration diagram for TimeParser&lt; OutUnit, IntType &gt;:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classTimeParser__coll__graph.svg" width="168" height="336"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:adc32afc638ace5060a2134f8f74d3c60"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc32afc638ace5060a2134f8f74d3c60"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">UnitMap</a> = std::map&lt; std::string, std::function&lt; OutUnit(IntType)&gt;&gt;</td></tr>
-<tr class="memdesc:adc32afc638ace5060a2134f8f74d3c60"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the map from unit suffixes to functions that convert from an amount of that time unit to a chrono duration of type OutUnit capturing the same duration. <br /></td></tr>
-<tr class="separator:adc32afc638ace5060a2134f8f74d3c60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7c4a18af13785d122219d4547860aff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af7c4a18af13785d122219d4547860aff"></a>
+typedef std::map&lt; std::string, <br class="typebreak" />
+OutUnit &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">UnitMap</a></td></tr>
+<tr class="memdesc:af7c4a18af13785d122219d4547860aff"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the map from unit suffixes to multipliers that convert from microseconds to those units. <br /></td></tr>
+<tr class="separator:af7c4a18af13785d122219d4547860aff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a66c6443db8e5d38b8f3d7e7a4eea783a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimeParser.html#a66c6443db8e5d38b8f3d7e7a4eea783a">TimeParser</a> (const <a class="el" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">UnitMap</a> &amp;<a class="el" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>)</td></tr>
+<tr class="memitem:a66c6443db8e5d38b8f3d7e7a4eea783a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimeParser.html#a66c6443db8e5d38b8f3d7e7a4eea783a">TimeParser</a> (const <a class="el" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">UnitMap</a> &amp;<a class="el" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>)</td></tr>
 <tr class="memdesc:a66c6443db8e5d38b8f3d7e7a4eea783a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="classTimeParser.html" title="A class for parsing time strings consisting of an integer and unit into a flat integer representing t...">TimeParser</a>.  <a href="#a66c6443db8e5d38b8f3d7e7a4eea783a">More...</a><br /></td></tr>
 <tr class="separator:a66c6443db8e5d38b8f3d7e7a4eea783a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68110dc8c7d2ad1a8f47a29646ad4d1c"><td class="memItemLeft" align="right" valign="top">OutUnit&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimeParser.html#a68110dc8c7d2ad1a8f47a29646ad4d1c">Parse</a> (const std::string &amp;time_str) const </td></tr>
-<tr class="memdesc:a68110dc8c7d2ad1a8f47a29646ad4d1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a time, returning it as a std::chrono duration.  <a href="#a68110dc8c7d2ad1a8f47a29646ad4d1c">More...</a><br /></td></tr>
+<tr class="memdesc:a68110dc8c7d2ad1a8f47a29646ad4d1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a time.  <a href="#a68110dc8c7d2ad1a8f47a29646ad4d1c">More...</a><br /></td></tr>
 <tr class="separator:a68110dc8c7d2ad1a8f47a29646ad4d1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
-Static Public Member Functions</h2></td></tr>
-<tr class="memitem:af0e270392bd5313b1d60e66e35dbfe82"><td class="memTemplParams" colspan="2">template&lt;typename InUnit &gt; </td></tr>
-<tr class="memitem:af0e270392bd5313b1d60e66e35dbfe82"><td class="memTemplItemLeft" align="right" valign="top">static OutUnit&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classTimeParser.html#af0e270392bd5313b1d60e66e35dbfe82">MkTime</a> (IntType raw_time)</td></tr>
-<tr class="memdesc:af0e270392bd5313b1d60e66e35dbfe82"><td class="mdescLeft">&#160;</td><td class="mdescRight">A template for converting an IntType representation of a duration of InUnit units into a duration expressed as an OutUnit.  <a href="#af0e270392bd5313b1d60e66e35dbfe82">More...</a><br /></td></tr>
-<tr class="separator:af0e270392bd5313b1d60e66e35dbfe82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -136,7 +136,7 @@ Private Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a98bb2b31f6ad5210139bc87ef7ad0121"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98bb2b31f6ad5210139bc87ef7ad0121"></a>
-<a class="el" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">UnitMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a></td></tr>
+<a class="el" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">UnitMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a></td></tr>
 <tr class="memdesc:a98bb2b31f6ad5210139bc87ef7ad0121"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map from units to handling functions. <br /></td></tr>
 <tr class="separator:a98bb2b31f6ad5210139bc87ef7ad0121"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -146,7 +146,7 @@ class TimeParser&lt; OutUnit, IntType &gt;</h3>
 
 <p>A class for parsing time strings consisting of an integer and unit into a flat integer representing the number of OutUnit units that time string represents. </p>
 
-<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00022">22</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
+<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00024">24</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a66c6443db8e5d38b8f3d7e7a4eea783a"></a>
 <div class="memitem">
@@ -160,7 +160,7 @@ template&lt;typename OutUnit, typename IntType  = std::uint64_t&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classTimeParser.html">TimeParser</a>&lt; OutUnit, IntType &gt;::<a class="el" href="classTimeParser.html">TimeParser</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classTimeParser.html#adc32afc638ace5060a2134f8f74d3c60">UnitMap</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classTimeParser.html#af7c4a18af13785d122219d4547860aff">UnitMap</a> &amp;&#160;</td>
           <td class="paramname"><em>unit_map</em></td><td>)</td>
           <td></td>
         </tr>
@@ -179,60 +179,17 @@ template&lt;typename OutUnit, typename IntType  = std::uint64_t&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classTimeParser.html#af0e270392bd5313b1d60e66e35dbfe82" title="A template for converting an IntType representation of a duration of InUnit units into a duration exp...">MkTime</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>MkTime </dd></dl>
 
-<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00036">36</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                                        : <a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>(<a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
-<div class="ttc" id="classTimeParser_html_a98bb2b31f6ad5210139bc87ef7ad0121"><div class="ttname"><a href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">TimeParser::unit_map</a></div><div class="ttdeci">UnitMap unit_map</div><div class="ttdoc">Map from units to handling functions. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00072">time_parser.hpp:72</a></div></div>
+<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00037">37</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                                        : <a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>(<a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    }</div>
+<div class="ttc" id="classTimeParser_html_a98bb2b31f6ad5210139bc87ef7ad0121"><div class="ttname"><a href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">TimeParser::unit_map</a></div><div class="ttdeci">UnitMap unit_map</div><div class="ttdoc">Map from units to handling functions. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00053">time_parser.hpp:53</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="af0e270392bd5313b1d60e66e35dbfe82"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename OutUnit, typename IntType  = std::uint64_t&gt; </div>
-<div class="memtemplate">
-template&lt;typename InUnit &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static OutUnit <a class="el" href="classTimeParser.html">TimeParser</a>&lt; OutUnit, IntType &gt;::MkTime </td>
-          <td>(</td>
-          <td class="paramtype">IntType&#160;</td>
-          <td class="paramname"><em>raw_time</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A template for converting an IntType representation of a duration of InUnit units into a duration expressed as an OutUnit. </p>
-<p>For example, <a class="el" href="classTimeParser.html#af0e270392bd5313b1d60e66e35dbfe82" title="A template for converting an IntType representation of a duration of InUnit units into a duration exp...">MkTime&lt;std::chrono::seconds&gt;</a> takes in an IntType of seconds and returns a std::chrono::microseconds: applying this to the integer 1 will result in a microseconds variable representing 1,000,000 microseconds.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">raw_time</td><td>The raw time, as an integer whose units are those used by InUnit. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>An OutUnit capturing the input duration, but in terms of the units used by OutUnit. </dd></dl>
-
-<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00055">55</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> std::chrono::duration_cast&lt;OutUnit&gt;(InUnit(raw_time));</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a class="anchor" id="a68110dc8c7d2ad1a8f47a29646ad4d1c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -257,7 +214,7 @@ template&lt;typename OutUnit, typename IntType  = std::uint64_t&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Parses a time, returning it as a std::chrono duration. </p>
+<p>Parses a time. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time_str</td><td>The time string. </td></tr>
@@ -266,15 +223,15 @@ template&lt;typename OutUnit, typename IntType  = std::uint64_t&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The time, as an instance of OutUnit. </dd></dl>
 
-<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00065">65</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
+<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00046">46</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="player_8cpp_source.html#l00134">Player::Seek()</a>.</p>
-<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keyword">auto</span> seek = <a class="code" href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">Split</a>(time_str);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>.at(seek.first)(seek.second);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    }</div>
-<div class="ttc" id="classTimeParser_html_a3f7f36a669233d66e7fe1ca8405eefd5"><div class="ttname"><a href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">TimeParser::Split</a></div><div class="ttdeci">std::pair&lt; std::string, IntType &gt; Split(const std::string &amp;time_str) const </div><div class="ttdoc">Splits a time string into a pair of unit and amount. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00080">time_parser.hpp:80</a></div></div>
-<div class="ttc" id="classTimeParser_html_a98bb2b31f6ad5210139bc87ef7ad0121"><div class="ttname"><a href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">TimeParser::unit_map</a></div><div class="ttdeci">UnitMap unit_map</div><div class="ttdoc">Map from units to handling functions. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00072">time_parser.hpp:72</a></div></div>
+<p>Referenced by <a class="el" href="player_8cpp_source.html#l00142">Player::Seek()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">auto</span> seek = <a class="code" href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">Split</a>(time_str);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">unit_map</a>.at(seek.first) * seek.second;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    }</div>
+<div class="ttc" id="classTimeParser_html_a3f7f36a669233d66e7fe1ca8405eefd5"><div class="ttname"><a href="classTimeParser.html#a3f7f36a669233d66e7fe1ca8405eefd5">TimeParser::Split</a></div><div class="ttdeci">std::pair&lt; std::string, IntType &gt; Split(const std::string &amp;time_str) const </div><div class="ttdoc">Splits a time string into a pair of unit and amount. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00061">time_parser.hpp:61</a></div></div>
+<div class="ttc" id="classTimeParser_html_a98bb2b31f6ad5210139bc87ef7ad0121"><div class="ttname"><a href="classTimeParser.html#a98bb2b31f6ad5210139bc87ef7ad0121">TimeParser::unit_map</a></div><div class="ttdeci">UnitMap unit_map</div><div class="ttdoc">Map from units to handling functions. </div><div class="ttdef"><b>Definition:</b> <a href="time__parser_8hpp_source.html#l00053">time_parser.hpp:53</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -311,17 +268,26 @@ template&lt;typename OutUnit, typename IntType  = std::uint64_t&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pair of unit string and time amount, as an integer in terms of the named unit. </dd></dl>
 
-<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00080">80</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
+<p>Definition at line <a class="el" href="time__parser_8hpp_source.html#l00061">61</a> of file <a class="el" href="time__parser_8hpp_source.html">time_parser.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="time__parser_8hpp_source.html#l00065">TimeParser&lt; std::chrono::microseconds &gt;::Parse()</a>.</p>
-<div class="fragment"><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        std::istringstream is(time_str);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        IntType raw_time;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        std::string rest;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        is &gt;&gt; raw_time &gt;&gt; rest;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">return</span> std::make_pair(rest, raw_time);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    }</div>
+<p>Referenced by <a class="el" href="time__parser_8hpp_source.html#l00046">TimeParser&lt; PlayerPosition::Unit &gt;::Parse()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        std::istringstream is(time_str);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        IntType raw_time;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        std::string rest;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        is &gt;&gt; raw_time;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="comment">// Make sure we actually get a time of some form.</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">if</span> (is.fail()) {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classSeekError.html">SeekError</a>(<a class="code" href="messages_8h.html#aed3c894dfba47c4007dc39b38b5d3dbe">MSG_SEEK_FAIL</a>);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        is &gt;&gt; rest;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordflow">return</span> std::make_pair(rest, raw_time);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    }</div>
+<div class="ttc" id="messages_8h_html_aed3c894dfba47c4007dc39b38b5d3dbe"><div class="ttname"><a href="messages_8h.html#aed3c894dfba47c4007dc39b38b5d3dbe">MSG_SEEK_FAIL</a></div><div class="ttdeci">const std::string MSG_SEEK_FAIL</div><div class="ttdoc">Message shown when an attempt to seek fails. </div><div class="ttdef"><b>Definition:</b> <a href="messages_8h_source.html#l00033">messages.h:33</a></div></div>
+<div class="ttc" id="classSeekError_html"><div class="ttname"><a href="classSeekError.html">SeekError</a></div><div class="ttdoc">An Error signifying that playd can&#39;t seek in a file. </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00080">errors.hpp:80</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -334,7 +300,7 @@ template&lt;typename OutUnit, typename IntType  = std::uint64_t&gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classTimeParser.html">TimeParser</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:27:42 for URY playd by
+    <li class="footer">Generated on Wed Sep 10 2014 04:57:38 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

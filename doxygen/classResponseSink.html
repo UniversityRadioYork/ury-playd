@@ -88,7 +88,6 @@ $(document).ready(function(){initNavTree('classResponseSink.html','');});
 
 <div class="header">
   <div class="summary">
-<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classResponseSink-members.html">List of all members</a>  </div>
@@ -106,17 +105,9 @@ $(document).ready(function(){initNavTree('classResponseSink.html','');});
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classResponseSink__inherit__graph.svg" width="256" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classResponseSink__inherit__graph.svg" width="256" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
-Public Types</h2></td></tr>
-<tr class="memitem:a4a5be6c1c271b979d28388974ae86ad2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4a5be6c1c271b979d28388974ae86ad2"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classResponseSink.html#a4a5be6c1c271b979d28388974ae86ad2">Callback</a> = std::function&lt; void(<a class="el" href="classResponseSink.html">ResponseSink</a> &amp;)&gt;</td></tr>
-<tr class="memdesc:a4a5be6c1c271b979d28388974ae86ad2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A type for callbacks taking a <a class="el" href="classResponseSink.html" title="Abstract class for anything that can be sent a response. ">ResponseSink</a>. <br /></td></tr>
-<tr class="separator:a4a5be6c1c271b979d28388974ae86ad2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac2add6144c2804a6f0db34ad30046ed7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classResponseSink.html#ac2add6144c2804a6f0db34ad30046ed7">Respond</a> (<a class="el" href="io__response_8hpp.html#af5828b68a5f305a17b90321710d9b546">ResponseCode</a> code, const std::string &amp;message) const </td></tr>
@@ -136,7 +127,7 @@ Protected Member Functions</h2></td></tr>
 <div class="textblock"><p>Abstract class for anything that can be sent a response. </p>
 <p>Usually the responses come from a <a class="el" href="classResponseSource.html" title="Abstract helper class for sources of responses. ">ResponseSource</a>, but anything may send a <a class="el" href="classResponseSink.html" title="Abstract class for anything that can be sent a response. ">ResponseSink</a> a response. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classResponseSource.html" title="Abstract helper class for sources of responses. ">ResponseSource</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="io__response_8hpp_source.html#l00049">49</a> of file <a class="el" href="io__response_8hpp_source.html">io_response.hpp</a>.</p>
+<p>Definition at line <a class="el" href="io__response_8hpp_source.html#l00048">48</a> of file <a class="el" href="io__response_8hpp_source.html">io_response.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="ac2add6144c2804a6f0db34ad30046ed7"></a>
 <div class="memitem">
@@ -175,7 +166,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>References <a class="el" href="classResponseSink.html#a128a514e39f23f2bcc97fea62e9de3c5">RespondRaw()</a>, and <a class="el" href="io__response_8cpp_source.html#l00013">RESPONSES</a>.</p>
 
-<p>Referenced by <a class="el" href="player__file_8cpp_source.html#l00018">PlayerFile::Emit()</a>, <a class="el" href="player__state_8cpp_source.html#l00052">PlayerState::Emit()</a>, <a class="el" href="tokeniser_8cpp_source.html#l00113">Tokeniser::Emit()</a>, <a class="el" href="player__position_8cpp_source.html#l00067">PlayerPosition::Emit()</a>, <a class="el" href="player_8cpp_source.html#l00045">Player::PlaybackUpdate()</a>, <a class="el" href="io__response_8cpp_source.html#l00033">RespondWithError()</a>, and <a class="el" href="player_8cpp_source.html#l00058">Player::WelcomeClient()</a>.</p>
+<p>Referenced by <a class="el" href="player__file_8cpp_source.html#l00020">PlayerFile::Emit()</a>, <a class="el" href="player__state_8cpp_source.html#l00052">PlayerState::Emit()</a>, <a class="el" href="tokeniser_8cpp_source.html#l00114">Tokeniser::Emit()</a>, <a class="el" href="player__position_8cpp_source.html#l00067">PlayerPosition::Emit()</a>, <a class="el" href="player_8cpp_source.html#l00071">Player::End()</a>, <a class="el" href="io__response_8cpp_source.html#l00033">RespondWithError()</a>, and <a class="el" href="player_8cpp_source.html#l00054">Player::WelcomeClient()</a>.</p>
 <div class="fragment"><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;{</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="comment">// ResponseCodes are formatted as &quot;CODE message\n&quot;.</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="comment">// Delegate the actual sending of the response string to the concrete</span></div>
@@ -217,7 +208,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classTcpResponseSink.html#a20cbf1820d293f620d6ce030fd5aadc6">TcpResponseSink</a>, and <a class="el" href="classIoReactor.html#a4cfe12db93bda3f7b2c29436c4969006">IoReactor</a>.</p>
+<p>Implemented in <a class="el" href="classTcpResponseSink.html#a002edeea6ed1965fe86cd2b79c5a0338">TcpResponseSink</a>, and <a class="el" href="classIoReactor.html#ab65200d5f0dd4ad1d506f2b0e9306325">IoReactor</a>.</p>
 
 <p>Referenced by <a class="el" href="io__response_8cpp_source.html#l00025">Respond()</a>.</p>
 
@@ -267,7 +258,7 @@ Protected Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classResponseSink.html">ResponseSink</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:27:42 for URY playd by
+    <li class="footer">Generated on Wed Sep 10 2014 04:57:37 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>

@@ -1,8 +1,10 @@
 var hierarchy =
 [
     [ "Audio", "classAudio.html", null ],
+    [ "AudioSinkConfigurator", "classAudioSinkConfigurator.html", [
+      [ "AudioSystem", "classAudioSystem.html", null ]
+    ] ],
     [ "AudioSource", "classAudioSource.html", null ],
-    [ "AudioSystem", "classAudioSystem.html", null ],
     [ "CallbackInterface", null, [
       [ "AudioSink", "classAudioSink.html", null ]
     ] ],
@@ -11,7 +13,8 @@ var hierarchy =
     [ "Error", "classError.html", [
       [ "ConfigError", "classConfigError.html", null ],
       [ "FileError", "classFileError.html", null ],
-      [ "InternalError", "classInternalError.html", null ]
+      [ "InternalError", "classInternalError.html", null ],
+      [ "SeekError", "classSeekError.html", null ]
     ] ],
     [ "playd", "classplayd.html", null ],
     [ "Player", "classPlayer.html", null ],
@@ -27,7 +30,7 @@ var hierarchy =
     [ "RingBuffer< RepT, SampleCountT >", "classRingBuffer.html", null ],
     [ "RingBuffer< char, unsigned long >", "classRingBuffer.html", null ],
     [ "TimeParser< OutUnit, IntType >", "classTimeParser.html", null ],
-    [ "TimeParser< std::chrono::microseconds >", "classTimeParser.html", null ],
+    [ "TimeParser< PlayerPosition::Unit >", "classTimeParser.html", null ],
     [ "Tokeniser", "classTokeniser.html", null ],
     [ "WriteReq", "structWriteReq.html", null ]
 ];

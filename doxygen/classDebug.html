@@ -105,8 +105,7 @@ $(document).ready(function(){initNavTree('classDebug.html','');});
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classDebug__coll__graph.svg" width="184" height="460"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classDebug__coll__graph.svg" width="184" height="460"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -134,7 +133,7 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for telling the human what playd is doing. </p>
 
-<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00078">78</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
+<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00090">90</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a5b453c195c4cfffed2702c3330f53a64"></a>
 <div class="memitem">
@@ -159,13 +158,13 @@ Private Attributes</h2></td></tr>
 
 <p>Constructor. </p>
 
-<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00081">81</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
+<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00093">93</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
 
-<p>References <a class="el" href="errors_8hpp_source.html#l00118">oss</a>.</p>
-<div class="fragment"><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a> &lt;&lt; <span class="stringliteral">&quot;DEBUG:&quot;</span>;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    }</div>
-<div class="ttc" id="classDebug_html_a45f5726114c0078b31b9a0f70199f51e"><div class="ttname"><a href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">Debug::oss</a></div><div class="ttdeci">std::ostringstream oss</div><div class="ttdoc">Stream buffer (avoids theoretical threading issues). </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00118">errors.hpp:118</a></div></div>
+<p>References <a class="el" href="errors_8hpp_source.html#l00130">oss</a>.</p>
+<div class="fragment"><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    {</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a> &lt;&lt; <span class="stringliteral">&quot;DEBUG:&quot;</span>;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    }</div>
+<div class="ttc" id="classDebug_html_a45f5726114c0078b31b9a0f70199f51e"><div class="ttname"><a href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">Debug::oss</a></div><div class="ttdeci">std::ostringstream oss</div><div class="ttdoc">Stream buffer (avoids theoretical threading issues). </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00130">errors.hpp:130</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -193,13 +192,13 @@ Private Attributes</h2></td></tr>
 <p>Destructor. </p>
 <p>Actually shoves things to the screen. </p>
 
-<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00087">87</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
+<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00099">99</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
 
-<p>References <a class="el" href="errors_8hpp_source.html#l00118">oss</a>.</p>
-<div class="fragment"><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        std::cerr &lt;&lt; <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a>.str();</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    }</div>
-<div class="ttc" id="classDebug_html_a45f5726114c0078b31b9a0f70199f51e"><div class="ttname"><a href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">Debug::oss</a></div><div class="ttdeci">std::ostringstream oss</div><div class="ttdoc">Stream buffer (avoids theoretical threading issues). </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00118">errors.hpp:118</a></div></div>
+<p>References <a class="el" href="errors_8hpp_source.html#l00130">oss</a>.</p>
+<div class="fragment"><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    {</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        std::cerr &lt;&lt; <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a>.str();</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }</div>
+<div class="ttc" id="classDebug_html_a45f5726114c0078b31b9a0f70199f51e"><div class="ttname"><a href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">Debug::oss</a></div><div class="ttdeci">std::ostringstream oss</div><div class="ttdoc">Stream buffer (avoids theoretical threading issues). </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00130">errors.hpp:130</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -243,15 +242,15 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Chainable reference. </dd></dl>
 
-<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00099">99</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
+<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00111">111</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
 
-<p>References <a class="el" href="errors_8hpp_source.html#l00118">oss</a>.</p>
-<div class="fragment"><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    {</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a> &lt;&lt; x;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    }</div>
-<div class="ttc" id="classDebug_html_a45f5726114c0078b31b9a0f70199f51e"><div class="ttname"><a href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">Debug::oss</a></div><div class="ttdeci">std::ostringstream oss</div><div class="ttdoc">Stream buffer (avoids theoretical threading issues). </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00118">errors.hpp:118</a></div></div>
+<p>References <a class="el" href="errors_8hpp_source.html#l00130">oss</a>.</p>
+<div class="fragment"><div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    {</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a> &lt;&lt; x;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    }</div>
+<div class="ttc" id="classDebug_html_a45f5726114c0078b31b9a0f70199f51e"><div class="ttname"><a href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">Debug::oss</a></div><div class="ttdeci">std::ostringstream oss</div><div class="ttdoc">Stream buffer (avoids theoretical threading issues). </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00130">errors.hpp:130</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -286,14 +285,14 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Chainable reference. </dd></dl>
 
-<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00111">111</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
+<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00123">123</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
 
-<p>References <a class="el" href="errors_8hpp_source.html#l00118">oss</a>.</p>
-<div class="fragment"><div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a> &lt;&lt; pf;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
-<div class="ttc" id="classDebug_html_a45f5726114c0078b31b9a0f70199f51e"><div class="ttname"><a href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">Debug::oss</a></div><div class="ttdeci">std::ostringstream oss</div><div class="ttdoc">Stream buffer (avoids theoretical threading issues). </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00118">errors.hpp:118</a></div></div>
+<p>References <a class="el" href="errors_8hpp_source.html#l00130">oss</a>.</p>
+<div class="fragment"><div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    {</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <a class="code" href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">oss</a> &lt;&lt; pf;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
+<div class="ttc" id="classDebug_html_a45f5726114c0078b31b9a0f70199f51e"><div class="ttname"><a href="classDebug.html#a45f5726114c0078b31b9a0f70199f51e">Debug::oss</a></div><div class="ttdeci">std::ostringstream oss</div><div class="ttdoc">Stream buffer (avoids theoretical threading issues). </div><div class="ttdef"><b>Definition:</b> <a href="errors_8hpp_source.html#l00130">errors.hpp:130</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -318,9 +317,9 @@ template&lt;typename T &gt; </div>
 
 <p>Stream buffer (avoids theoretical threading issues). </p>
 
-<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00118">118</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
+<p>Definition at line <a class="el" href="errors_8hpp_source.html#l00130">130</a> of file <a class="el" href="errors_8hpp_source.html">errors.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="errors_8hpp_source.html#l00081">Debug()</a>, <a class="el" href="errors_8hpp_source.html#l00099">operator&lt;&lt;()</a>, and <a class="el" href="errors_8hpp_source.html#l00087">~Debug()</a>.</p>
+<p>Referenced by <a class="el" href="errors_8hpp_source.html#l00093">Debug()</a>, <a class="el" href="errors_8hpp_source.html#l00111">operator&lt;&lt;()</a>, and <a class="el" href="errors_8hpp_source.html#l00099">~Debug()</a>.</p>
 
 </div>
 </div>
@@ -333,7 +332,7 @@ template&lt;typename T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classDebug.html">Debug</a></li>
-    <li class="footer">Generated on Sun Sep 7 2014 15:27:42 for URY playd by
+    <li class="footer">Generated on Wed Sep 10 2014 04:57:37 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.7 </li>
   </ul>
