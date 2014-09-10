@@ -13,5 +13,6 @@ compiler:
   - gcc
 
 # Ubuntu 12.04's GCC doesn't support std=c++11, so we use c++0x instead.
-script: env CXX_STD=c++0x make
-
+script:
+  - env CXX_STD=c++0x make
+  - env CXX_STD=c++0x make test
