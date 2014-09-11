@@ -12,8 +12,8 @@
 
   <h1>Welcome</h1>
   <p>
-   <strong>URY playd</strong> is a minimalist audio player written in C++11.
-   It leverages
+   <strong>URY playd</strong> is a minimalist audio player written in
+   <a href="https://isocpp.org/">C++11</a>.  It uses
    <a href="http://sox.sourceforge.net/libsox.html">libsox</a>,
    <a href="http://www.portaudio.com/">PortAudio</a>, and
    <a href="https://github.com/joyent/libuv">libuv</a>
@@ -23,8 +23,31 @@
 
   <p>
    playd is part of the <strong>BAPS3</strong> project at
-   <a href="http://ury.org.uk">University Radio York</a>.
+   <a href="http://ury.org.uk">University Radio York</a>.  It is under
+   <em>active development</em>, and we can't yet guarantee it won't try to
+   strangle your cat.
   </p>
+
+  <section id="features">
+    <h2>Features</h2>
+
+    <p>
+      playd doesn't have many features, as it's intended to be a minimal player
+      core for use in bigger things.  Here are some features it <em>does</em>
+      have:
+    </p>
+
+    <ul>
+      <li>Plays any file format supported by libsox;</li>
+      <li>Selectable output device at launch-time;</li>
+      <li>Play/Stop/Seek/Eject/Load commands;</li>
+      <li>Text-based TCP/IP interface;</li>
+      <li>
+        Cross-platform: we've built it on Windows, FreeBSD, OS X, and some
+        GNU/Linux distributions.
+      </li>
+    </ul>
+  </section>
 
   <nav>
    <h1>Links</h1>
@@ -48,6 +71,20 @@
      <a href="https://github.com/UniversityRadioYork/baps3-spec">
       BAPS3 Specification
      </a>
+    </li>
+   </ul>
+
+   <h2>Similar projects</h2>
+
+   <ul>
+     <li>
+       <a href="http://www.musicpd.org">Music Player Daemon</a> has a similar,
+       minimalist philosophy, but a wider scope.
+     </li>
+     <li>
+      <a href="http://linux.die.net/man/1/aplay">aplay</a> (and similar
+      programs) are examples of lightweight audio players, but lack playd's
+      network interface.
     </li>
    </ul>
   </nav>
