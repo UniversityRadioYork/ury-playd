@@ -16,20 +16,20 @@
 #include "io_response.hpp"
 #include "tokeniser.hpp"
 
-Tokeniser::Tokeniser(CommandHandler &handler, ResponseSink &response_sink)
-    : handler(handler),
-      response_sink(response_sink),
-      escape_next_character(false),
+Tokeniser::Tokeniser()
+    : escape_next_character(false),
       quote_type(Tokeniser::QuoteType::NONE)
 {
 }
 
-void Tokeniser::Feed(const char *start, unsigned int nread)
+Tokeniser::Lines Tokeniser::Feed(const std::string &raw_string)
 {
-	for (unsigned int i = 0; i < nread; i++) {
-		unsigned char c = start[i];
+	// The list of ready lines should be cleared by any previous Feed.
+	assert(this->ready_lines.empty());
 
+	for (unsigned char c : raw_string) {
 		if (this->escape_next_character) {
+			// TODO: Make this UTF-8 safe.
 			Push(c);
 			continue;
 		}
@@ -90,6 +90,15 @@ void Tokeniser::Feed(const char *start, unsigned int nread)
 				break;
 		}
 	}
+
+	Lines lines = this->ready_lines;
+	this->ready_lines.clear();
+
+	// The ready line list must be empty, to establish the precondition
+	// in the earlier assert().
+	assert(this->ready_lines.empty());
+
+	return lines;
 }
 
 void Tokeniser::Push(unsigned char c)
@@ -121,23 +130,7 @@ void Tokeniser::Emit()
 	// line as the end of the word too.
 	EndWord();
 
-	// TODO: Should this happen inside the tokeniser?
-	// I'd've thought it should be it's own module.
-
-	Debug() << "Received command:";
-	for (const auto &word : this->words)
-		std::cerr << ' ' << '"' << word << '"';
-	std::cerr << std::endl;
-
-	bool valid = this->handler.Handle(this->words);
-	if (valid) {
-		// TODO: Emit entire command back, not just first word.
-		this->response_sink.Respond(ResponseCode::OKAY, this->words[0]);
-	} else {
-		// TODO: Better error reporting.
-		this->response_sink.Respond(ResponseCode::WHAT,
-		                            MSG_CMD_INVALID);
-	}
+	this->ready_lines.push_back(this->words);
 
 	this->words.clear();
 

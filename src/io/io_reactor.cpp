@@ -191,7 +191,7 @@ void IoReactor::End()
 
 TcpResponseSink::TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
                                  CommandHandler &handler)
-    : parent(parent), tcp(tcp), tokeniser(handler, *this)
+    : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {
 }
 
@@ -221,10 +221,34 @@ void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
 		return;
 	}
 
-	if (buf->base != nullptr) {
-		this->tokeniser.Feed(buf->base, nread);
-		delete[] buf -> base;
+	auto chars = buf->base;
+	if (chars != nullptr) {
+		auto lines = this->tokeniser.Feed(std::string(chars, nread));
+
+		for (auto line : lines) HandleCommand(line);
+
+		delete[] chars;
 	}
+}
+
+void TcpResponseSink::HandleCommand(const std::vector<std::string> &words)
+{
+	if (words.empty()) return;
+
+	Debug() << "Received command:";
+	for (const auto &word : words)
+		std::cerr << ' ' << '"' << word << '"';
+	std::cerr << std::endl;
+
+	bool valid = this->handler.Handle(words);
+	if (valid) {
+		// TODO: Emit entire command back, not just first word.
+		this->parent.Respond(ResponseCode::OKAY, words[0]);
+	} else {
+		// TODO: Better error reporting.
+		this->parent.Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
+	}
+
 }
 
 void TcpResponseSink::Close()

@@ -17,12 +17,12 @@ extern "C" {
 #include <uv.h>
 }
 
+#include "../cmd.hpp"
 #include "../player/player.hpp"
 #include "io_reactor.hpp"
 #include "io_response.hpp"
 #include "tokeniser.hpp"
 
-class CommandHandler;
 class Player;
 class TcpResponseSink;
 
@@ -160,6 +160,16 @@ private:
 
 	/// The Tokeniser to which data read on this connection should be sent.
 	Tokeniser tokeniser;
+
+	/// The CommandHandler to which finished commands should be sent.
+	CommandHandler &handler;
+
+	/**
+	 * Handles a tokenised command line.
+	 *
+	 * @param line A vector of command words representing a command line.
+	 */
+	void HandleCommand(const std::vector<std::string> &words);
 };
 
 #endif // PS_IO_REACTOR_HPP
