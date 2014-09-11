@@ -22,7 +22,7 @@ Tokeniser::Tokeniser()
 {
 }
 
-Tokeniser::Lines Tokeniser::Feed(const std::string &raw_string)
+std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 {
 	// The list of ready lines should be cleared by any previous Feed.
 	assert(this->ready_lines.empty());
@@ -91,7 +91,7 @@ Tokeniser::Lines Tokeniser::Feed(const std::string &raw_string)
 		}
 	}
 
-	Lines lines = this->ready_lines;
+	std::vector<Line> lines = this->ready_lines;
 	this->ready_lines.clear();
 
 	// The ready line list must be empty, to establish the precondition

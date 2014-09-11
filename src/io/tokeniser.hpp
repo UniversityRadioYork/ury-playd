@@ -27,9 +27,6 @@ public:
 	/// A single tokenised line.
 	typedef std::vector<std::string> Line;
 
-	/// A vector of tokenised lines.
-	typedef std::vector<Line> Lines;
-
 	/// Constructs a new Tokeniser.
 	Tokeniser();
 
@@ -40,7 +37,7 @@ public:
 	 * @return The vector of lines that have been successfully tokenised in
 	 *   this tokenising pass.  This vector may be empty.
 	 */
-	Lines Feed(const std::string &raw_string);
+	std::vector<Line> Feed(const std::string &raw_string);
 
 private:
 	/// Enumeration of quotation types.
@@ -62,7 +59,7 @@ private:
 
 	/// The current vector of completed, tokenised lines.
 	/// This is cleared at the end of every Tokeniser::Feed. 
-	Lines ready_lines;
+	std::vector<Line> ready_lines;
 
 	/// The current, incomplete word to which new characters should be
 	/// added.
