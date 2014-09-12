@@ -3,15 +3,15 @@
 
 /**
  * @file
- * Implementation of the non-virtual aspects of the IoReactor class.
+ * Implementation of the non-virtual aspects of the IoCore class.
  *
- * The implementation of IoReactor is based on [libuv][], and also makes use
+ * The implementation of IoCore is based on [libuv][], and also makes use
  * of various techniques mentioned in [the uvbook][].
  *
  * [libuv]: https://github.com/joyent/libuv
  * [the uvbook]: https://nikhilm.github.io/uvbook
  *
- * @see io/io_reactor.hpp
+ * @see io/io_core.hpp
  */
 
 #include <csignal>
@@ -26,10 +26,10 @@ extern "C" {
 #include "../errors.hpp"
 #include "../messages.h"
 #include "../player/player.hpp"
-#include "io_reactor.hpp"
+#include "io_core.hpp"
 #include "io_response.hpp"
 
-const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 5; // ms
+const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
 
 //
 // libuv callbacks
@@ -84,7 +84,7 @@ void UvListenCallback(uv_stream_t *server, int status)
 	if (status == -1) {
 		return;
 	}
-	IoReactor *reactor = static_cast<IoReactor *>(server->data);
+	IoCore *reactor = static_cast<IoCore *>(server->data);
 	reactor->NewConnection(server);
 }
 
@@ -108,10 +108,10 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 }
 
 //
-// IoReactor
+// IoCore
 //
 
-void IoReactor::NewConnection(uv_stream_t *server)
+void IoCore::NewConnection(uv_stream_t *server)
 {
 	uv_tcp_t *client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
@@ -130,12 +130,12 @@ void IoReactor::NewConnection(uv_stream_t *server)
 	}
 }
 
-void IoReactor::RemoveConnection(TcpResponseSink &conn)
+void IoCore::RemoveConnection(TcpResponseSink &conn)
 {
 	this->connections.erase(std::make_shared<TcpResponseSink>(conn));
 }
 
-IoReactor::IoReactor(Player &player, CommandHandler &handler,
+IoCore::IoCore(Player &player, CommandHandler &handler,
                      const std::string &address, const std::string &port)
     : player(player), handler(handler)
 {
@@ -143,12 +143,12 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
 	DoUpdateTimer();
 }
 
-void IoReactor::Run()
+void IoCore::Run()
 {
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
-void IoReactor::DoUpdateTimer()
+void IoCore::DoUpdateTimer()
 {
 	uv_timer_init(uv_default_loop(), &this->updater);
 	this->updater.data = static_cast<void *>(&this->player);
@@ -156,7 +156,7 @@ void IoReactor::DoUpdateTimer()
 	               PLAYER_UPDATE_PERIOD);
 }
 
-void IoReactor::InitAcceptor(const std::string &address,
+void IoCore::InitAcceptor(const std::string &address,
                              const std::string &port)
 {
 	int uport = std::stoi(port);
@@ -173,14 +173,14 @@ void IoReactor::InitAcceptor(const std::string &address,
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoReactor::RespondRaw(const std::string &string) const
+void IoCore::RespondRaw(const std::string &string) const
 {
 	for (const auto &conn : this->connections) {
 		conn->RespondRaw(string);
 	}
 }
 
-void IoReactor::End()
+void IoCore::End()
 {
 	uv_stop(uv_default_loop());
 }
@@ -189,7 +189,7 @@ void IoReactor::End()
 // TcpResponseSink
 //
 
-TcpResponseSink::TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
+TcpResponseSink::TcpResponseSink(IoCore &parent, uv_tcp_t *tcp,
                                  CommandHandler &handler)
     : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {

@@ -3,8 +3,8 @@
 
 /**
  * @file
- * Declaration of the IoReactor class.
- * @see io/io_reactor.cpp
+ * Declaration of the IoCore class.
+ * @see io/io_core.cpp
  */
 
 #ifndef PS_IO_REACTOR_HPP
@@ -19,7 +19,7 @@ extern "C" {
 
 #include "../cmd.hpp"
 #include "../player/player.hpp"
-#include "io_reactor.hpp"
+#include "io_core.hpp"
 #include "io_response.hpp"
 #include "tokeniser.hpp"
 
@@ -27,27 +27,27 @@ class Player;
 class TcpResponseSink;
 
 /**
- * The IO reactor, which services input, routes responses, and executes the
+ * The IO core, which services input, routes responses, and executes the
  * Player update routine periodically.
  */
-class IoReactor : public ResponseSink {
+class IoCore : public ResponseSink {
 public:
 	/**
-	 * Constructs an IoReactor.
+	 * Constructs an IoCore.
 	 * @param player The player to which periodic update requests shall be
 	 * sent.
 	 * @param handler The handler to which command inputs shall be sent.
-	 * @param address The address to which IoReactor will bind.
-	 * @param port The port on which IoReactor will listen for clients.
+	 * @param address The address to which IoCore will bind.
+	 * @param port The port on which IoCore will listen for clients.
 	 */
-	explicit IoReactor(Player &player, CommandHandler &handler,
-	                   const std::string &address, const std::string &port);
+	explicit IoCore(Player &player, CommandHandler &handler,
+	                const std::string &address, const std::string &port);
 
 	/// Deleted copy constructor.
-	IoReactor(const IoReactor &) = delete;
+	IoCore(const IoCore &) = delete;
 
 	/// Deleted copy-assignment.
-	IoReactor &operator=(const IoReactor &) = delete;
+	IoCore &operator=(const IoCore &) = delete;
 
 	/**
 	 * Runs the reactor.
@@ -65,7 +65,7 @@ public:
 	/**
 	 * Accepts a new connection.
 	 *
-	 * This accepts the connection, and adds it to this IoReactor's
+	 * This accepts the connection, and adds it to this IoCore's
 	 * connection pool.
 	 *
 	 * This should be called with a server that has just received a new
@@ -73,7 +73,7 @@ public:
 	 *
 	 * @param server Pointer to the libuv server accepting connections.
 	 *
-	 * @todo This isn't a great fit for the public interface of IoReactor -
+	 * @todo This isn't a great fit for the public interface of IoCore -
 	 *   separate into a ConnectionPool class?
 	 */
 	void NewConnection(uv_stream_t *server);
@@ -84,13 +84,13 @@ public:
 	 * @param sink The connection to remove.
 	 *
 	 * @todo Rename sink?
-	 * @todo This isn't a great fit for the public interface of IoReactor -
+	 * @todo This isn't a great fit for the public interface of IoCore -
 	 *   separate into a ConnectionPool class?
 	 */
 	void RemoveConnection(TcpResponseSink &sink);
 
 private:
-	/// The set of connections currently serviced by the IoReactor.
+	/// The set of connections currently serviced by the IoCore.
 	std::set<std::shared_ptr<TcpResponseSink>> connections;
 
 	/// The period between player updates.
@@ -125,14 +125,14 @@ class TcpResponseSink : public ResponseSink {
 public:
 	/**
 	 * Constructs a TcpResponseSink.
-	 * @param parent The IoReactor that is the parent of this connection.
+	 * @param parent The IoCore that is the parent of this connection.
 	 * @param tcp The underlying libuv TCP stream.
 	 * @param handler The handler to which read commands should be sent.
 	 */
-	TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
+	TcpResponseSink(IoCore &parent, uv_tcp_t *tcp,
 	                CommandHandler &handler);
 
-	// Note: This is made public so that the IoReactor can send raw data
+	// Note: This is made public so that the IoCore can send raw data
 	// to the connection.
 	void RespondRaw(const std::string &response) const;
 
@@ -152,8 +152,8 @@ public:
 	void Close();
 
 private:
-	/// The parent IoReactor on which this connection is running.
-	IoReactor &parent;
+	/// The parent IoCore on which this connection is running.
+	IoCore &parent;
 
 	/// The libuv handle for the TCP connection.
 	uv_tcp_t *tcp;

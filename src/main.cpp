@@ -12,7 +12,7 @@
 
 #include "audio/audio_system.hpp"
 #include "cmd.hpp"
-#include "io/io_reactor.hpp"
+#include "io/io_core.hpp"
 #include "io/io_response.hpp"
 #include "main.hpp"
 #include "messages.h"
@@ -111,7 +111,7 @@ Playd::Playd(int argc, char *argv[])
 	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
 	std::string port = size > 3 ? this->arguments.at(3) : "1350";
 	this->io = decltype(this->io)(
-	                new IoReactor(this->player, this->handler, addr, port));
+	                new IoCore(this->player, this->handler, addr, port));
 }
 
 int Playd::Run()

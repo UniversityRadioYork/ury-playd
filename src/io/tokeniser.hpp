@@ -20,7 +20,7 @@
  * fully-formed command lines it encounters to the command handler.
  *
  * @see CommandHandler
- * @see IoReactor
+ * @see IoCore
  */
 class Tokeniser {
 public:
@@ -58,7 +58,7 @@ private:
 	Line words;
 
 	/// The current vector of completed, tokenised lines.
-	/// This is cleared at the end of every Tokeniser::Feed. 
+	/// This is cleared at the end of every Tokeniser::Feed.
 	std::vector<Line> ready_lines;
 
 	/// The current, incomplete word to which new characters should be
