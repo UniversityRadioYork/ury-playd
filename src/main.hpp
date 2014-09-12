@@ -21,18 +21,18 @@
  *
  * This class contains all the state required by playd, with the exception
  * of that introduced by external C libraries.  It is a RAII class, so
- * constructing playd will load playd's library dependencies, and
+ * constructing Playd will load playd's library dependencies, and
  * destructing it will unload them.  It is probably not safe to create more than
- * one playd.
+ * one Playd.
  */
-class playd {
+class Playd {
 public:
 	/**
 	 * Constructs a playd, initialising its libraries.
 	 * @param argc The argument count from the main function.
 	 * @param argv The argument vector from the main function.
 	 */
-	playd(int argc, char *argv[]);
+	Playd(int argc, char *argv[]);
 
 	/**
 	 * Runs playd.
