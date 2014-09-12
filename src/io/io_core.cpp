@@ -65,7 +65,7 @@ void UvCloseCallback(uv_handle_t *handle)
 {
 	Debug() << "Closing client connection" << std::endl;
 	if (handle->data != nullptr) {
-		auto tcp = static_cast<TcpResponseSink *>(handle->data);
+		auto tcp = static_cast<Connection *>(handle->data);
 		tcp->Close();
 	}
 	delete handle;
@@ -74,7 +74,7 @@ void UvCloseCallback(uv_handle_t *handle)
 /// The callback fired when some bytes are read from a client connection.
 void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
-	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(stream->data);
+	Connection *tcp = static_cast<Connection *>(stream->data);
 	tcp->Read(stream, nread, buf);
 }
 
@@ -118,7 +118,7 @@ void IoCore::NewConnection(uv_stream_t *server)
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
 		Debug() << "New connection" << std::endl;
-		auto tcp = std::make_shared<TcpResponseSink>(*this, client,
+		auto tcp = std::make_shared<Connection>(*this, client,
 		                                             this->handler);
 		this->player.WelcomeClient(*tcp);
 		this->connections.insert(tcp);
@@ -130,9 +130,9 @@ void IoCore::NewConnection(uv_stream_t *server)
 	}
 }
 
-void IoCore::RemoveConnection(TcpResponseSink &conn)
+void IoCore::RemoveConnection(Connection &conn)
 {
-	this->connections.erase(std::make_shared<TcpResponseSink>(conn));
+	this->connections.erase(std::make_shared<Connection>(conn));
 }
 
 IoCore::IoCore(Player &player, CommandHandler &handler,
@@ -186,16 +186,16 @@ void IoCore::End()
 }
 
 //
-// TcpResponseSink
+// Connection
 //
 
-TcpResponseSink::TcpResponseSink(IoCore &parent, uv_tcp_t *tcp,
+Connection::Connection(IoCore &parent, uv_tcp_t *tcp,
                                  CommandHandler &handler)
     : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {
 }
 
-void TcpResponseSink::RespondRaw(const std::string &string) const
+void Connection::RespondRaw(const std::string &string) const
 {
 	Debug() << "Sending command:" << string << std::endl;
 	unsigned int l = string.length();
@@ -210,7 +210,7 @@ void TcpResponseSink::RespondRaw(const std::string &string) const
 	         UvRespondCallback);
 }
 
-void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
+void Connection::Read(uv_stream_t *stream, ssize_t nread,
                            const uv_buf_t *buf)
 {
 	if (nread < 0) {
@@ -231,7 +231,7 @@ void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
 	}
 }
 
-void TcpResponseSink::HandleCommand(const std::vector<std::string> &words)
+void Connection::HandleCommand(const std::vector<std::string> &words)
 {
 	if (words.empty()) return;
 
@@ -251,7 +251,7 @@ void TcpResponseSink::HandleCommand(const std::vector<std::string> &words)
 
 }
 
-void TcpResponseSink::Close()
+void Connection::Close()
 {
 	this->parent.RemoveConnection(*this);
 }

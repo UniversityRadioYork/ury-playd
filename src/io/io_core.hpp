@@ -24,7 +24,7 @@ extern "C" {
 #include "tokeniser.hpp"
 
 class Player;
-class TcpResponseSink;
+class Connection;
 
 /**
  * The IO core, which services input, routes responses, and executes the
@@ -87,11 +87,11 @@ public:
 	 * @todo This isn't a great fit for the public interface of IoCore -
 	 *   separate into a ConnectionPool class?
 	 */
-	void RemoveConnection(TcpResponseSink &sink);
+	void RemoveConnection(Connection &sink);
 
 private:
 	/// The set of connections currently serviced by the IoCore.
-	std::set<std::shared_ptr<TcpResponseSink>> connections;
+	std::set<std::shared_ptr<Connection>> connections;
 
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
@@ -117,20 +117,16 @@ private:
 	void DoUpdateTimer();
 };
 
-/**
- * A TCP connection from a client.
- * @todo Rename to Connection?
- */
-class TcpResponseSink : public ResponseSink {
+/// A TCP connection from a client.
+class Connection : public ResponseSink {
 public:
 	/**
-	 * Constructs a TcpResponseSink.
+	 * Constructs a Connection.
 	 * @param parent The IoCore that is the parent of this connection.
 	 * @param tcp The underlying libuv TCP stream.
 	 * @param handler The handler to which read commands should be sent.
 	 */
-	TcpResponseSink(IoCore &parent, uv_tcp_t *tcp,
-	                CommandHandler &handler);
+	Connection(IoCore &parent, uv_tcp_t *tcp, CommandHandler &handler);
 
 	// Note: This is made public so that the IoCore can send raw data
 	// to the connection.
