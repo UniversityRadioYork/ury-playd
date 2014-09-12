@@ -24,21 +24,20 @@
  */
 class Tokeniser {
 public:
-	/**
-	 * Constructs a new Tokeniser.
-	 * @param handler The command handler to which full commands should be
-	 *   sent.
-	 * @param response_sink The response sink to which errors and
-	 *   acknowledgements should be sent.
-	 */
-	Tokeniser(CommandHandler &handler, ResponseSink &response_sink);
+	/// A single tokenised line.
+	typedef std::vector<std::string> Line;
+
+	/// Constructs a new Tokeniser.
+	Tokeniser();
 
 	/**
-	 * Feeds the contents of a character buffer into a Tokeniser.
-	 * @param start The pointer to the start of the character buffer.
-	 * @param nread The number of elements in the character buffer.
+	 * Feeds a string into a Tokeniser.
+	 * @param raw_string Const reference to the raw string to feed.  The
+	 *   string need not contain complete lines.
+	 * @return The vector of lines that have been successfully tokenised in
+	 *   this tokenising pass.  This vector may be empty.
 	 */
-	void Feed(const char *start, unsigned int nread);
+	std::vector<Line> Feed(const std::string &raw_string);
 
 private:
 	/// Enumeration of quotation types.
@@ -48,13 +47,6 @@ private:
 		DOUBLE  ///< In double quotes ("").
 	};
 
-	/// The command handler to which complete lines should be sent.
-	CommandHandler &handler;
-
-	/// The response sink to which command acknowledgements should be sent.
-	/// This includes OKAY (successful command) and WHAT (bad command).
-	ResponseSink &response_sink;
-
 	/// Whether the next character is to be interpreted as an escape code.
 	/// This usually gets set to true when a backslash is detected.
 	bool escape_next_character;
@@ -63,7 +55,11 @@ private:
 	QuoteType quote_type;
 
 	/// The current vector of completed, tokenised words.
-	std::vector<std::string> words;
+	Line words;
+
+	/// The current vector of completed, tokenised lines.
+	/// This is cleared at the end of every Tokeniser::Feed. 
+	std::vector<Line> ready_lines;
 
 	/// The current, incomplete word to which new characters should be
 	/// added.

@@ -5,8 +5,8 @@ and [PortAudio][], developed by [University Radio York][] (URY) and
 designed to be composable into bigger systems.
 
 All code developed for `playd` is licenced under the [MIT licence][]
-(see LICENCE.txt).  Some code is taken from the [PortAudio][] project
-(see LICENCE.portaudio).
+(see LICENSE.txt).  Some code is taken from the [PortAudio][] project
+(see LICENSE.portaudio), as well as [CATCH][] (see LICENSE.catch).
 
 ## Usage
 
@@ -160,14 +160,15 @@ It's short for __play__er __d__aemon.
 Certainly!  We appreciate any and all pull requests in accordance with our
 philosophy.
 
-[clang]:                 http://clang.llvm.org/
-[gcc]:                   https://gcc.gnu.org/
+[CATCH]:                 http://catch-lib.net
+[clang]:                 http://clang.llvm.org
+[gcc]:                   https://gcc.gnu.org
 [GNU Make]:              https://www.gnu.org/software/make/
 [Homebrew]:              http://brew.sh
-[libsox]:                http://sox.sourceforge.net/
+[libsox]:                http://sox.sourceforge.net
 [libuv]:                 https://github.com/joyent/libuv
 [MIT licence]:           http://opensource.org/licenses/MIT
-[netcat]:                http://nc110.sourceforge.net/
-[PortAudio]:             http://www.portaudio.com/
+[netcat]:                http://nc110.sourceforge.net
+[PortAudio]:             http://www.portaudio.com
 [PuTTY]:                 http://www.chiark.greenend.org.uk/~sgtatham/putty/
 [University Radio York]: http://ury.org.uk
