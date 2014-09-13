@@ -3,15 +3,15 @@
 
 /**
  * @file
- * Implementation of the non-virtual aspects of the IoReactor class.
+ * Implementation of the non-virtual aspects of the IoCore class.
  *
- * The implementation of IoReactor is based on [libuv][], and also makes use
+ * The implementation of IoCore is based on [libuv][], and also makes use
  * of various techniques mentioned in [the uvbook][].
  *
  * [libuv]: https://github.com/joyent/libuv
  * [the uvbook]: https://nikhilm.github.io/uvbook
  *
- * @see io/io_reactor.hpp
+ * @see io/io_core.hpp
  */
 
 #include <csignal>
@@ -26,10 +26,10 @@ extern "C" {
 #include "../errors.hpp"
 #include "../messages.h"
 #include "../player/player.hpp"
-#include "io_reactor.hpp"
+#include "io_core.hpp"
 #include "io_response.hpp"
 
-const std::uint16_t IoReactor::PLAYER_UPDATE_PERIOD = 5; // ms
+const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
 
 //
 // libuv callbacks
@@ -65,7 +65,7 @@ void UvCloseCallback(uv_handle_t *handle)
 {
 	Debug() << "Closing client connection" << std::endl;
 	if (handle->data != nullptr) {
-		auto tcp = static_cast<TcpResponseSink *>(handle->data);
+		auto tcp = static_cast<Connection *>(handle->data);
 		tcp->Close();
 	}
 	delete handle;
@@ -74,7 +74,7 @@ void UvCloseCallback(uv_handle_t *handle)
 /// The callback fired when some bytes are read from a client connection.
 void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
-	TcpResponseSink *tcp = static_cast<TcpResponseSink *>(stream->data);
+	Connection *tcp = static_cast<Connection *>(stream->data);
 	tcp->Read(stream, nread, buf);
 }
 
@@ -84,7 +84,7 @@ void UvListenCallback(uv_stream_t *server, int status)
 	if (status == -1) {
 		return;
 	}
-	IoReactor *reactor = static_cast<IoReactor *>(server->data);
+	IoCore *reactor = static_cast<IoCore *>(server->data);
 	reactor->NewConnection(server);
 }
 
@@ -108,17 +108,17 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 }
 
 //
-// IoReactor
+// IoCore
 //
 
-void IoReactor::NewConnection(uv_stream_t *server)
+void IoCore::NewConnection(uv_stream_t *server)
 {
 	uv_tcp_t *client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
 		Debug() << "New connection" << std::endl;
-		auto tcp = std::make_shared<TcpResponseSink>(*this, client,
+		auto tcp = std::make_shared<Connection>(*this, client,
 		                                             this->handler);
 		this->player.WelcomeClient(*tcp);
 		this->connections.insert(tcp);
@@ -130,12 +130,12 @@ void IoReactor::NewConnection(uv_stream_t *server)
 	}
 }
 
-void IoReactor::RemoveConnection(TcpResponseSink &conn)
+void IoCore::RemoveConnection(Connection &conn)
 {
-	this->connections.erase(std::make_shared<TcpResponseSink>(conn));
+	this->connections.erase(std::make_shared<Connection>(conn));
 }
 
-IoReactor::IoReactor(Player &player, CommandHandler &handler,
+IoCore::IoCore(Player &player, CommandHandler &handler,
                      const std::string &address, const std::string &port)
     : player(player), handler(handler)
 {
@@ -143,12 +143,12 @@ IoReactor::IoReactor(Player &player, CommandHandler &handler,
 	DoUpdateTimer();
 }
 
-void IoReactor::Run()
+void IoCore::Run()
 {
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
-void IoReactor::DoUpdateTimer()
+void IoCore::DoUpdateTimer()
 {
 	uv_timer_init(uv_default_loop(), &this->updater);
 	this->updater.data = static_cast<void *>(&this->player);
@@ -156,7 +156,7 @@ void IoReactor::DoUpdateTimer()
 	               PLAYER_UPDATE_PERIOD);
 }
 
-void IoReactor::InitAcceptor(const std::string &address,
+void IoCore::InitAcceptor(const std::string &address,
                              const std::string &port)
 {
 	int uport = std::stoi(port);
@@ -173,29 +173,29 @@ void IoReactor::InitAcceptor(const std::string &address,
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoReactor::RespondRaw(const std::string &string) const
+void IoCore::RespondRaw(const std::string &string) const
 {
 	for (const auto &conn : this->connections) {
 		conn->RespondRaw(string);
 	}
 }
 
-void IoReactor::End()
+void IoCore::End()
 {
 	uv_stop(uv_default_loop());
 }
 
 //
-// TcpResponseSink
+// Connection
 //
 
-TcpResponseSink::TcpResponseSink(IoReactor &parent, uv_tcp_t *tcp,
+Connection::Connection(IoCore &parent, uv_tcp_t *tcp,
                                  CommandHandler &handler)
     : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {
 }
 
-void TcpResponseSink::RespondRaw(const std::string &string) const
+void Connection::RespondRaw(const std::string &string) const
 {
 	Debug() << "Sending command:" << string << std::endl;
 	unsigned int l = string.length();
@@ -210,7 +210,7 @@ void TcpResponseSink::RespondRaw(const std::string &string) const
 	         UvRespondCallback);
 }
 
-void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
+void Connection::Read(uv_stream_t *stream, ssize_t nread,
                            const uv_buf_t *buf)
 {
 	if (nread < 0) {
@@ -231,7 +231,7 @@ void TcpResponseSink::Read(uv_stream_t *stream, ssize_t nread,
 	}
 }
 
-void TcpResponseSink::HandleCommand(const std::vector<std::string> &words)
+void Connection::HandleCommand(const std::vector<std::string> &words)
 {
 	if (words.empty()) return;
 
@@ -251,7 +251,7 @@ void TcpResponseSink::HandleCommand(const std::vector<std::string> &words)
 
 }
 
-void TcpResponseSink::Close()
+void Connection::Close()
 {
 	this->parent.RemoveConnection(*this);
 }

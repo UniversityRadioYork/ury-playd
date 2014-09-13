@@ -12,7 +12,7 @@
 
 #include "audio/audio_system.hpp"
 #include "cmd.hpp"
-#include "io/io_reactor.hpp"
+#include "io/io_core.hpp"
 #include "io/io_response.hpp"
 #include "main.hpp"
 #include "messages.h"
@@ -26,17 +26,17 @@
  */
 int main(int argc, char *argv[])
 {
-	playd ps(argc, argv);
+	Playd ps(argc, argv);
 	return ps.Run();
 }
 
 //
-// playd
+// Playd
 //
 
-const AudioSource::MicrosecondPosition playd::POSITION_PERIOD(500000);
+const AudioSource::MicrosecondPosition Playd::POSITION_PERIOD(500000);
 
-int playd::GetDeviceID()
+int Playd::GetDeviceID()
 {
 	if (this->arguments.size() < 2) return -1;
 
@@ -99,7 +99,7 @@ const Player::TP::UnitMap UNITS = {
 	{ "", US_RATE }
 };
 
-playd::playd(int argc, char *argv[])
+Playd::Playd(int argc, char *argv[])
     : audio(), player(audio, time_parser), handler(player), time_parser(UNITS)
 {
 	for (int i = 0; i < argc; i++) {
@@ -111,10 +111,10 @@ playd::playd(int argc, char *argv[])
 	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
 	std::string port = size > 3 ? this->arguments.at(3) : "1350";
 	this->io = decltype(this->io)(
-	                new IoReactor(this->player, this->handler, addr, port));
+	                new IoCore(this->player, this->handler, addr, port));
 }
 
-int playd::Run()
+int Playd::Run()
 {
 	try {
 		// Don't roll this into the constructor: it'll go out of scope!

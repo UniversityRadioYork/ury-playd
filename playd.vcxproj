@@ -1,123 +1,123 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\audio\audio.cpp" />
-    <ClCompile Include="src\audio\audio_sink.cpp" />
-    <ClCompile Include="src\audio\audio_source.cpp" />
-    <ClCompile Include="src\audio\audio_system.cpp" />
-    <ClCompile Include="src\cmd.cpp" />
-    <ClCompile Include="src\contrib\pa_ringbuffer\pa_ringbuffer.c" />
-    <ClCompile Include="src\errors.cpp" />
-    <ClCompile Include="src\io\io_reactor.cpp" />
-    <ClCompile Include="src\io\io_response.cpp" />
-    <ClCompile Include="src\io\tokeniser.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\player\player.cpp" />
-    <ClCompile Include="src\player\player_file.cpp" />
-    <ClCompile Include="src\player\player_position.cpp" />
-    <ClCompile Include="src\player\player_state.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\audio\audio.hpp" />
-    <ClInclude Include="src\audio\audio_sink.hpp" />
-    <ClInclude Include="src\audio\audio_source.hpp" />
-    <ClInclude Include="src\audio\audio_system.hpp" />
-    <ClInclude Include="src\audio\ringbuffer.hpp" />
-    <ClInclude Include="src\cmd.hpp" />
-    <ClInclude Include="src\contrib\pa_ringbuffer\pa_memorybarrier.h" />
-    <ClInclude Include="src\contrib\pa_ringbuffer\pa_ringbuffer.h" />
-    <ClInclude Include="src\errors.hpp" />
-    <ClInclude Include="src\io\io_reactor.hpp" />
-    <ClInclude Include="src\io\io_response.hpp" />
-    <ClInclude Include="src\io\tokeniser.hpp" />
-    <ClInclude Include="src\main.hpp" />
-    <ClInclude Include="src\messages.h" />
-    <ClInclude Include="src\player\player.hpp" />
-    <ClInclude Include="src\player\player_file.hpp" />
-    <ClInclude Include="src\player\player_position.hpp" />
-    <ClInclude Include="src\player\player_state.hpp" />
-    <ClInclude Include="src\resource.h" />
-    <ClInclude Include="src\sample_formats.hpp" />
-    <ClInclude Include="src\time_parser.hpp" />
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectGuid>{625EC8F2-633C-4666-BC4B-25F6BECABA31}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
-    <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\mattbw\Documents\sox\sox\src;C:\Users\mattbw\Documents\GitHub\libuv\include;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Users\mattbw\Documents\sox\sox\msvc10\Debug\lib;C:\Users\mattbw\Documents\GitHub\libuv\Debug\;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winmm.lib;libflac.lib;libgsm.lib;libid3tag.lib;liblpc10.lib;libmad.lib;libmp3lame.lib;libogg.lib;libpng.lib;libsndfileg72x.lib;libsndfile-1.lib;libsndfilegsm610.lib;libsox.lib;libspeex.lib;libvorbis.lib;libwavpack.lib;libzlib.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <Link>
-      <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
-  </ItemDefinitionGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="Debug|Win32">
+			<Configuration>Debug</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|Win32">
+			<Configuration>Release</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<ItemGroup>
+		<ClCompile Include="src\audio\audio.cpp" />
+		<ClCompile Include="src\audio\audio_sink.cpp" />
+		<ClCompile Include="src\audio\audio_source.cpp" />
+		<ClCompile Include="src\audio\audio_system.cpp" />
+		<ClCompile Include="src\cmd.cpp" />
+		<ClCompile Include="src\contrib\pa_ringbuffer\pa_ringbuffer.c" />
+		<ClCompile Include="src\errors.cpp" />
+		<ClCompile Include="src\io\io_core.cpp" />
+		<ClCompile Include="src\io\io_response.cpp" />
+		<ClCompile Include="src\io\tokeniser.cpp" />
+		<ClCompile Include="src\main.cpp" />
+		<ClCompile Include="src\player\player.cpp" />
+		<ClCompile Include="src\player\player_file.cpp" />
+		<ClCompile Include="src\player\player_position.cpp" />
+		<ClCompile Include="src\player\player_state.cpp" />
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\audio\audio.hpp" />
+		<ClInclude Include="src\audio\audio_sink.hpp" />
+		<ClInclude Include="src\audio\audio_source.hpp" />
+		<ClInclude Include="src\audio\audio_system.hpp" />
+		<ClInclude Include="src\audio\ringbuffer.hpp" />
+		<ClInclude Include="src\cmd.hpp" />
+		<ClInclude Include="src\contrib\pa_ringbuffer\pa_memorybarrier.h" />
+		<ClInclude Include="src\contrib\pa_ringbuffer\pa_ringbuffer.h" />
+		<ClInclude Include="src\errors.hpp" />
+		<ClInclude Include="src\io\io_core.hpp" />
+		<ClInclude Include="src\io\io_response.hpp" />
+		<ClInclude Include="src\io\tokeniser.hpp" />
+		<ClInclude Include="src\main.hpp" />
+		<ClInclude Include="src\messages.h" />
+		<ClInclude Include="src\player\player.hpp" />
+		<ClInclude Include="src\player\player_file.hpp" />
+		<ClInclude Include="src\player\player_position.hpp" />
+		<ClInclude Include="src\player\player_state.hpp" />
+		<ClInclude Include="src\resource.h" />
+		<ClInclude Include="src\sample_formats.hpp" />
+		<ClInclude Include="src\time_parser.hpp" />
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<ProjectGuid>{625EC8F2-633C-4666-BC4B-25F6BECABA31}</ProjectGuid>
+		<Keyword>Win32Proj</Keyword>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v120</PlatformToolset>
+		<UseOfMfc>false</UseOfMfc>
+		<CharacterSet>Unicode</CharacterSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<PlatformToolset>v120</PlatformToolset>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings">
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Label="UserMacros" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<LinkIncremental>true</LinkIncremental>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<LinkIncremental>true</LinkIncremental>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<ClCompile>
+			<PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+			<WarningLevel>Level3</WarningLevel>
+			<DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+			<Optimization>Disabled</Optimization>
+			<AdditionalIncludeDirectories>C:\Users\mattbw\Documents\sox\sox\src;C:\Users\mattbw\Documents\GitHub\libuv\include;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		</ClCompile>
+		<Link>
+			<TargetMachine>MachineX86</TargetMachine>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+			<SubSystem>Console</SubSystem>
+			<AdditionalLibraryDirectories>C:\Users\mattbw\Documents\sox\sox\msvc10\Debug\lib;C:\Users\mattbw\Documents\GitHub\libuv\Debug\;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalDependencies>winmm.lib;libflac.lib;libgsm.lib;libid3tag.lib;liblpc10.lib;libmad.lib;libmp3lame.lib;libogg.lib;libpng.lib;libsndfileg72x.lib;libsndfile-1.lib;libsndfilegsm610.lib;libsox.lib;libspeex.lib;libvorbis.lib;libwavpack.lib;libzlib.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<IgnoreSpecificDefaultLibraries>
+			</IgnoreSpecificDefaultLibraries>
+		</Link>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<ClCompile>
+			<PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+			<WarningLevel>Level3</WarningLevel>
+			<DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+		</ClCompile>
+		<Link>
+			<TargetMachine>MachineX86</TargetMachine>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+			<SubSystem>Console</SubSystem>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<OptimizeReferences>true</OptimizeReferences>
+		</Link>
+	</ItemDefinitionGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets">
+	</ImportGroup>
 </Project>
