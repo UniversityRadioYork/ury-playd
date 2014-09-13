@@ -7,8 +7,8 @@
  * @see io/io_core.cpp
  */
 
-#ifndef PS_IO_REACTOR_HPP
-#define PS_IO_REACTOR_HPP
+#ifndef PS_IO_CORE_HPP
+#define PS_IO_CORE_HPP
 
 #include <ostream>
 #include <set>
@@ -168,4 +168,4 @@ private:
 	void HandleCommand(const std::vector<std::string> &words);
 };
 
-#endif // PS_IO_REACTOR_HPP
+#endif // PS_IO_CORE_HPP
