@@ -34,17 +34,13 @@
  * @see PlayerState
  */
 class Player {
-public:
-	/// The type of TimeParser the Player expects.
-	typedef TimeParser<PlayerPosition::Unit> TP;
-
 private:
 	PlayerFile file;         ///< The file subcomponent of the Player.
 	PlayerPosition position; ///< The position subcomponent of the Player.
 	PlayerState state;       ///< The state subcomponent of the Player.
 
 	/// The time parser used to parse seek commands.
-	const TP &time_parser;
+	const TimeParser &time_parser;
 
 	/// The sink to which END responses shall be sent.
 	ResponseSink *end_sink;
@@ -55,7 +51,7 @@ public:
 	 * @param audio_system The audio system object.
 	 * @param time_parser The parser used to interpret Seek commands.
 	 */
-	Player(const AudioSystem &audio_system, const TP &time_parser);
+	Player(const AudioSystem &audio_system, const TimeParser &time_parser);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;

@@ -22,7 +22,7 @@
 #include "player_state.hpp"
 #include "player.hpp"
 
-Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
+Player::Player(const AudioSystem &audio_system, const TimeParser &time_parser)
     : file(audio_system),
       position(),
       state(),

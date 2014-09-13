@@ -60,47 +60,8 @@ int Playd::GetDeviceID()
 	return -1;
 }
 
-// Conversion rates from various position units to microseconds.
-const AudioSource::MicrosecondPosition US_RATE = 1;
-const AudioSource::MicrosecondPosition MS_RATE = 1000;
-const AudioSource::MicrosecondPosition S_RATE = 1000000;
-const AudioSource::MicrosecondPosition M_RATE = 60000000;
-const AudioSource::MicrosecondPosition H_RATE = 3600000000;
-
-/**
- * UNITS defines the unit suffixes that playd understands when parsing
- * positions in seek commands.
- *
- * If no suffix is given, it is treated as the string "".  Therefore, the
- * member of UNITS with suffix "" is the default unit.
- */
-const Player::TP::UnitMap UNITS = {
-	/// Microseconds; 1us = 1us.
-	{ "us", US_RATE },
-	{ "usec", US_RATE },
-	{ "usecs", US_RATE },
-	/// Milliseconds; 1ms = 1,000us.
-	{ "ms", MS_RATE },
-	{ "msec", MS_RATE },
-	{ "msecs", MS_RATE },
-	/// Seconds; 1s = 1,000ms = 1,000,000us.
-	{ "s", S_RATE },
-	{ "sec", S_RATE },
-	{ "secs", S_RATE },
-	/// Minutes; 1m = 60s = 60,000ms = 60,000,000us.
-	{ "m", M_RATE },
-	{ "min", M_RATE },
-	{ "mins", M_RATE },
-	/// Hours; 1h = 60m = 3,600s = 3,600,000ms = 3,600,000,000us.
-	{ "h", H_RATE },
-	{ "hour", H_RATE },
-	{ "hours", H_RATE },
-	/// When no unit is provided, we assume microseconds.
-	{ "", US_RATE }
-};
-
 Playd::Playd(int argc, char *argv[])
-    : audio(), player(audio, time_parser), handler(player), time_parser(UNITS)
+    : audio(), player(audio, time_parser), handler(player), time_parser()
 {
 	for (int i = 0; i < argc; i++) {
 		this->arguments.push_back(std::string(argv[i]));

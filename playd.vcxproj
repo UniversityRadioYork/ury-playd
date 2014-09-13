@@ -26,6 +26,7 @@
 		<ClCompile Include="src\player\player_file.cpp" />
 		<ClCompile Include="src\player\player_position.cpp" />
 		<ClCompile Include="src\player\player_state.cpp" />
+		<ClCompile Include="src\time_parser.cpp" />
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="src\audio\audio.hpp" />

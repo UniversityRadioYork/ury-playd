@@ -48,8 +48,8 @@ private:
 	AudioSystem audio;                  ///< The audio subsystem.
 	Player player;                      ///< The player subsystem.
 	CommandHandler handler;             ///< The command handler.
-	Player::TP time_parser;             ///< The seek time parser.
-	std::unique_ptr<IoCore> io;      ///< The I/O handler.
+	TimeParser time_parser;             ///< The seek time parser.
+	std::unique_ptr<IoCore> io;         ///< The I/O handler.
 
 	/**
 	 * Tries to get the output device ID from program arguments.
