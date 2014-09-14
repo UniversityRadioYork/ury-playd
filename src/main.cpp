@@ -11,12 +11,14 @@
 #include <iostream>
 
 #include "audio/audio_system.hpp"
-#include "cmd.hpp"
 #include "io/io_core.hpp"
 #include "io/io_response.hpp"
-#include "main.hpp"
-#include "messages.h"
 #include "player/player.hpp"
+#include "cmd.hpp"
+#include "messages.h"
+#include "time_parser.hpp"
+
+#include "main.hpp"
 
 /**
  * The main entry point.
@@ -34,7 +36,7 @@ int main(int argc, char *argv[])
 // Playd
 //
 
-const AudioSource::MicrosecondPosition Playd::POSITION_PERIOD(500000);
+const TimeParser::MicrosecondPosition Playd::POSITION_PERIOD(500000);
 
 int Playd::GetDeviceID()
 {

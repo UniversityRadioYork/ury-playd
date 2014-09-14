@@ -19,19 +19,19 @@
  */
 class TimeParser {
 public:
-	/// Type for timestamps emitted by this TimeParser.
-	typedef std::uint64_t Time;
+	/// Type for microsecond positions emitted by this TimeParser.
+	typedef std::uint64_t MicrosecondPosition;
 
 	/**
 	 * Parses a time.
 	 * @param time_str  The time string.
 	 * @return          The parsed time.
 	 */
-	Time Parse(const std::string &time_str) const;
+	MicrosecondPosition Parse(const std::string &time_str) const;
 
 private:
 	// Conversion rates from various position units to microseconds.
-	enum class Multiplier : Time {
+	enum class Multiplier : MicrosecondPosition {
 		US = 1,  /// Microseconds in one microsecond.
 		MS = 1000,  /// Microseconds in one millisecond.
 		S = 1000000,  /// Microseconds in one second.
@@ -63,7 +63,7 @@ private:
 	 * @return          A pair of unit string and time amount, as an integer
 	 *                  in terms of the named unit.
 	 */
-	std::pair<std::string, Time> Split(const std::string &time_str) const;
+	std::pair<std::string, MicrosecondPosition> Split(const std::string &time_str) const;
 };
 
 #endif // PS_TIME_PARSER_HPP

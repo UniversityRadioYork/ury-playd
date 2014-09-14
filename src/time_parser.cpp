@@ -15,13 +15,13 @@
 #include "messages.h"
 #include "time_parser.hpp"
 
-TimeParser::Time TimeParser::Parse(const std::string &time_str) const
+TimeParser::MicrosecondPosition TimeParser::Parse(const std::string &time_str) const
 {
 	auto seek = Split(time_str);
 	std::string unit = seek.first;
-	Time num_units = seek.second;
+	MicrosecondPosition num_units = seek.second;
 
-	return static_cast<Time>(UnitMultiplier(unit)) * num_units;
+	return static_cast<MicrosecondPosition>(UnitMultiplier(unit)) * num_units;
 }
 
 TimeParser::Multiplier TimeParser::UnitMultiplier(const std::string &unit) const
@@ -43,10 +43,10 @@ bool TimeParser::IsIn(const std::string &unit, std::initializer_list<std::string
 	return std::find(list.begin(), list.end(), unit) != list.end();
 }
 
-std::pair<std::string, TimeParser::Time> TimeParser::Split(const std::string &time_str) const
+std::pair<std::string, TimeParser::MicrosecondPosition> TimeParser::Split(const std::string &time_str) const
 {
 	std::istringstream is(time_str);
-	Time raw_time;
+	MicrosecondPosition raw_time;
 	std::string rest;
 
 	is >> raw_time;

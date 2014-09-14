@@ -42,7 +42,7 @@ public:
 
 private:
 	/// The period between position announcements from the Player object.
-	static const AudioSource::MicrosecondPosition POSITION_PERIOD;
+	static const TimeParser::MicrosecondPosition POSITION_PERIOD;
 
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.

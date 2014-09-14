@@ -9,6 +9,7 @@
 
 #include "../audio/audio_system.hpp"
 #include "../io/io_response.hpp"
+#include "../time_parser.hpp"
 #include "player_file.hpp"
 #include "player_position.hpp"
 
@@ -67,12 +68,12 @@ void PlayerFile::Update()
 	this->audio->Update();
 }
 
-PlayerPosition::Unit PlayerFile::CurrentPosition()
+TimeParser::MicrosecondPosition PlayerFile::CurrentPosition()
 {
 	return this->audio->CurrentPositionMicroseconds();
 }
 
-void PlayerFile::SeekToPosition(PlayerPosition::Unit position)
+void PlayerFile::SeekToPosition(TimeParser::MicrosecondPosition position)
 {
 	this->audio->SeekToPositionMicroseconds(position);
 }
