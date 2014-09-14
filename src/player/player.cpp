@@ -19,10 +19,11 @@
 #include "../errors.hpp"
 #include "../io/io_response.hpp"
 #include "../messages.h"
+#include "../time_parser.hpp"
 #include "player_state.hpp"
 #include "player.hpp"
 
-Player::Player(const AudioSystem &audio_system, const Player::TP &time_parser)
+Player::Player(const AudioSystem &audio_system, const TimeParser &time_parser)
     : file(audio_system),
       position(),
       state(),
@@ -143,7 +144,7 @@ bool Player::Seek(const std::string &time_str)
 {
 	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) return false;
 
-	AudioSource::MicrosecondPosition position(0);
+	TimeParser::MicrosecondPosition position(0);
 
 	try {
 		position = this->time_parser.Parse(time_str);

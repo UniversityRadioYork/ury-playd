@@ -22,6 +22,7 @@ namespace portaudio {
 class Stream;
 }
 
+#include "../time_parser.hpp"
 #include "audio_source.hpp"
 
 class AudioSink;
@@ -102,14 +103,14 @@ public:
 	 * do not expect it to be highly accurate.
 	 * @return The current position, in microseconds.
 	 */
-	AudioSource::MicrosecondPosition CurrentPositionMicroseconds();
+	TimeParser::MicrosecondPosition CurrentPositionMicroseconds();
 
 	/**
 	 * Attempts to seek to the given position in microseconds.
 	 * @param microseconds The position to seek to, in microseconds.
 	 */
 	void SeekToPositionMicroseconds(
-	                AudioSource::MicrosecondPosition microseconds);
+	                TimeParser::MicrosecondPosition microseconds);
 
 private:
 	/// The source of audio data.

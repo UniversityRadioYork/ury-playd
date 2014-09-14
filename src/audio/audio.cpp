@@ -15,6 +15,7 @@
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
 #include "../messages.h"
+#include "../time_parser.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
@@ -45,14 +46,14 @@ bool Audio::IsStopped()
 	return this->sink->IsStopped();
 }
 
-AudioSource::MicrosecondPosition Audio::CurrentPositionMicroseconds()
+TimeParser::MicrosecondPosition Audio::CurrentPositionMicroseconds()
 {
 	return this->source->MicrosecondPositionFromSamples(
 	                this->sink->Position());
 }
 
 void Audio::SeekToPositionMicroseconds(
-                AudioSource::MicrosecondPosition microseconds)
+                TimeParser::MicrosecondPosition microseconds)
 {
 	auto samples = this->source->Seek(microseconds);
 	this->sink->SetPosition(samples);

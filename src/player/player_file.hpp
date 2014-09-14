@@ -14,6 +14,7 @@
 
 #include "../audio/audio_system.hpp"
 #include "../io/io_response.hpp"
+#include "../time_parser.hpp"
 #include "player_position.hpp"
 
 class Audio;
@@ -68,14 +69,14 @@ public:
 	 * Return the current position.
 	 * @return The current position in the audio, in PlayerPosition units.
 	 */
-	PlayerPosition::Unit CurrentPosition();
+	TimeParser::MicrosecondPosition CurrentPosition();
 
 	/**
 	 * Seek to a position.
 	 * @param position The position to seek to in the audio,
 	 *   in PlayerPosition units.
 	 */
-	void SeekToPosition(PlayerPosition::Unit position);
+	void SeekToPosition(TimeParser::MicrosecondPosition position);
 
 private:
 	/// The audio file.

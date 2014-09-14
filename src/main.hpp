@@ -42,14 +42,14 @@ public:
 
 private:
 	/// The period between position announcements from the Player object.
-	static const AudioSource::MicrosecondPosition POSITION_PERIOD;
+	static const TimeParser::MicrosecondPosition POSITION_PERIOD;
 
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.
 	Player player;                      ///< The player subsystem.
 	CommandHandler handler;             ///< The command handler.
-	Player::TP time_parser;             ///< The seek time parser.
-	std::unique_ptr<IoCore> io;      ///< The I/O handler.
+	TimeParser time_parser;             ///< The seek time parser.
+	std::unique_ptr<IoCore> io;         ///< The I/O handler.
 
 	/**
 	 * Tries to get the output device ID from program arguments.
