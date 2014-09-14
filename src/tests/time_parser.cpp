@@ -29,7 +29,7 @@ SCENARIO("TimeParsers successfully parse valid times", "[time-parser]") {
 			}
 		}
 
-		WHEN("the Tokeniser is fed a time in miulliseconds") {
+		WHEN("the Tokeniser is fed a time in milliseconds") {
 			TimeParser::Time time = t.Parse("1234ms");
 
 			THEN("the result is 1,000 times the input") {
