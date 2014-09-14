@@ -27,13 +27,13 @@ TimeParser::MicrosecondPosition TimeParser::Parse(const std::string &time_str) c
 TimeParser::Multiplier TimeParser::UnitMultiplier(const std::string &unit) const
 {
 	// Default to microseconds if no unit is given.
-	if (unit.empty()) return Multiplier::US;
+	if (unit.empty()) return Multiplier::MICROSECONDS;
 
-	if (unit == "us") return Multiplier::US;
-	if (unit == "ms") return Multiplier::MS;
-	if (unit == "s") return Multiplier::S;
-	if (unit == "m") return Multiplier::M;
-	if (unit == "h") return Multiplier::H;
+	if (unit == "us") return Multiplier::MICROSECONDS;
+	if (unit == "ms") return Multiplier::MILLISECONDS;
+	if (unit == "s") return Multiplier::SECONDS;
+	if (unit == "m") return Multiplier::MINUTES;
+	if (unit == "h") return Multiplier::HOURS;
 
 	throw std::out_of_range(unit);
 }

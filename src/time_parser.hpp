@@ -32,11 +32,11 @@ public:
 private:
 	// Conversion rates from various position units to microseconds.
 	enum class Multiplier : MicrosecondPosition {
-		US = 1,  /// Microseconds in one microsecond.
-		MS = 1000,  /// Microseconds in one millisecond.
-		S = 1000000,  /// Microseconds in one second.
-		M = 60000000,  /// Microseconds in one minute.
-		H = 3600000000  /// Microseconds in one hour.
+		MICROSECONDS = 1,    ///< Microseconds in one microsecond.
+		MILLISECONDS = 1000, ///< Microseconds in one millisecond.
+		SECONDS = 1000000,   ///< Microseconds in one second.
+		MINUTES = 60000000,  ///< Microseconds in one minute.
+		HOURS = 3600000000   ///< Microseconds in one hour.
 	};
 
 	/**
