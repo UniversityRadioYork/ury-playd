@@ -66,16 +66,16 @@ double AudioSource::SampleRate() const
 }
 
 std::uint64_t AudioSource::SamplePositionFromMicroseconds(
-                AudioSource::MicrosecondPosition usec) const
+                TimeParser::MicrosecondPosition position) const
 {
 	// The sample rate is expressed in terms of samples per second, so we
 	// need to convert the position to seconds then multiply by the rate.
 	// We do things in a slightly peculiar order to minimise rounding.
 
-	return (usec * SampleRate()) / 1000000;
+	return (position * SampleRate()) / 1000000;
 }
 
-AudioSource::MicrosecondPosition AudioSource::MicrosecondPositionFromSamples(
+TimeParser::MicrosecondPosition AudioSource::MicrosecondPositionFromSamples(
                 std::uint64_t samples) const
 {
 	// This is basically SamplePositionFromMicroseconds but backwards.
@@ -97,7 +97,7 @@ size_t AudioSource::BytesPerSample() const
 	return 4 * ChannelCount();
 }
 
-std::uint64_t AudioSource::Seek(AudioSource::MicrosecondPosition position)
+std::uint64_t AudioSource::Seek(TimeParser::MicrosecondPosition position)
 {
 	assert(this->context != nullptr);
 

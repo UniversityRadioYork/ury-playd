@@ -11,6 +11,7 @@
 #include <sstream>
 
 #include "../io/io_response.hpp"
+#include "../time_parser.hpp"
 #include "player.hpp"
 #include "player_position.hpp"
 
@@ -18,7 +19,7 @@
 // Player
 //
 
-void Player::SetPositionResponsePeriod(PlayerPosition::Unit period)
+void Player::SetPositionResponsePeriod(TimeParser::MicrosecondPosition period)
 {
 	this->position.SetResponsePeriod(period);
 }
@@ -46,7 +47,7 @@ PlayerPosition::PlayerPosition()
 	Reset();
 }
 
-void PlayerPosition::Update(const PlayerPosition::Unit position)
+void PlayerPosition::Update(const TimeParser::MicrosecondPosition position)
 {
 	this->current = position;
 
@@ -59,8 +60,8 @@ void PlayerPosition::Update(const PlayerPosition::Unit position)
 
 void PlayerPosition::Reset()
 {
-	this->current = Unit(0);
-	this->last = Unit(0);
+	this->current = TimeParser::MicrosecondPosition(0);
+	this->last = TimeParser::MicrosecondPosition(0);
 	this->has_reset = true;
 }
 
@@ -77,7 +78,7 @@ bool PlayerPosition::IsReadyToSend()
 	return this->has_reset || (this->last + this->period <= this->current);
 }
 
-void PlayerPosition::SetResponsePeriod(PlayerPosition::Unit period)
+void PlayerPosition::SetResponsePeriod(TimeParser::MicrosecondPosition period)
 {
 	this->period = period;
 }
