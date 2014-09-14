@@ -14,7 +14,7 @@ SCENARIO("TimeParsers successfully parse valid times", "[time-parser]") {
 		TimeParser t;
 
 		WHEN("the TimeParser is fed a unit-less time") {
-			TimeParser::Time time = t.Parse("1234");
+			TimeParser::MicrosecondPosition time = t.Parse("1234");
 
 			THEN("the result matches the input") {
 				REQUIRE(time == 1234ull);
@@ -22,7 +22,7 @@ SCENARIO("TimeParsers successfully parse valid times", "[time-parser]") {
 		}
 
 		WHEN("the Tokeniser is fed a time in microseconds") {
-			TimeParser::Time time = t.Parse("1234us");
+			TimeParser::MicrosecondPosition time = t.Parse("1234us");
 
 			THEN("the result matches the input") {
 				REQUIRE(time == 1234ull);
@@ -30,7 +30,7 @@ SCENARIO("TimeParsers successfully parse valid times", "[time-parser]") {
 		}
 
 		WHEN("the Tokeniser is fed a time in milliseconds") {
-			TimeParser::Time time = t.Parse("1234ms");
+			TimeParser::MicrosecondPosition time = t.Parse("1234ms");
 
 			THEN("the result is 1,000 times the input") {
 				REQUIRE(time == (1234ull * 1000ull));
@@ -38,7 +38,7 @@ SCENARIO("TimeParsers successfully parse valid times", "[time-parser]") {
 		}
 
 		WHEN("the Tokeniser is fed a time in seconds") {
-			TimeParser::Time time = t.Parse("1234s");
+			TimeParser::MicrosecondPosition time = t.Parse("1234s");
 
 			THEN("the result is 1,000,000 times the input") {
 				REQUIRE(time == (1234ull * 1000000ull));
@@ -46,7 +46,7 @@ SCENARIO("TimeParsers successfully parse valid times", "[time-parser]") {
 		}
 
 		WHEN("the Tokeniser is fed a time in minutes") {
-			TimeParser::Time time = t.Parse("1234m");
+			TimeParser::MicrosecondPosition time = t.Parse("1234m");
 
 			THEN("the result is 60,000,000 times the input") {
 				REQUIRE(time == (1234ull * 60000000ull));
@@ -54,7 +54,7 @@ SCENARIO("TimeParsers successfully parse valid times", "[time-parser]") {
 		}
 
 		WHEN("the Tokeniser is fed a time in hours") {
-			TimeParser::Time time = t.Parse("1234h");
+			TimeParser::MicrosecondPosition time = t.Parse("1234h");
 
 			THEN("the result is 3,600,000,000 times the input") {
 				REQUIRE(time == (1234ull * 3600000000ull));

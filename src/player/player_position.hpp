@@ -14,6 +14,7 @@
 
 #include "../audio/audio_source.hpp"
 #include "../io/io_response.hpp"
+#include "../time_parser.hpp"
 
 /**
  * Tracker and broadcaster for the Player's current position in a song.
@@ -21,19 +22,15 @@
  * @see PlayerState
  */
 class PlayerPosition : public ResponseSource {
-public:
-	/// Unit used for positions.
-	typedef AudioSource::MicrosecondPosition Unit;
-
 private:
 	/// The period between each push of the position to the response sink.
-	Unit period;
+	TimeParser::MicrosecondPosition period;
 
 	/// The current position of the player.
-	Unit current;
+	TimeParser::MicrosecondPosition current;
 
 	/// The position of the player at the last push.
-	Unit last;
+	TimeParser::MicrosecondPosition last;
 
 	/**
 	 * Whether the position was reset since the last push.
@@ -51,7 +48,7 @@ public:
 	 * @param period The period to wait between responses.
 	 * @see SetResponseSink
 	 */
-	void SetResponsePeriod(Unit period);
+	void SetResponsePeriod(TimeParser::MicrosecondPosition period);
 
 	/**
 	 * Updates the position tracker with the new position.
@@ -60,7 +57,7 @@ public:
 	 * @param position The new position, in @a PositionUnit units.
 	 * @see Reset
 	 */
-	void Update(Unit position);
+	void Update(TimeParser::MicrosecondPosition position);
 
 	/**
 	 * Resets the position tracker's position data.
