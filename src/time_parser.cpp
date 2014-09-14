@@ -29,11 +29,11 @@ TimeParser::Multiplier TimeParser::UnitMultiplier(const std::string &unit) const
 	// Default to microseconds if no unit is given.
 	if (unit.empty()) return Multiplier::US;
 
-	if (IsIn(unit, {"us", "usec", "usecs"})) return Multiplier::US;
-	if (IsIn(unit, {"ms", "msec", "msecs"})) return Multiplier::MS;
-	if (IsIn(unit, {"s", "sec", "secs"})) return Multiplier::S;
-	if (IsIn(unit, {"m", "min", "mins"})) return Multiplier::M;
-	if (IsIn(unit, {"h", "hour", "hours"})) return Multiplier::H;
+	if (unit == "us") return Multiplier::US;
+	if (unit == "ms") return Multiplier::MS;
+	if (unit == "s") return Multiplier::S;
+	if (unit == "m") return Multiplier::M;
+	if (unit == "h") return Multiplier::H;
 
 	throw std::out_of_range(unit);
 }
