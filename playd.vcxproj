@@ -91,16 +91,26 @@
 			<WarningLevel>Level3</WarningLevel>
 			<DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
 			<Optimization>Disabled</Optimization>
-			<AdditionalIncludeDirectories>C:\Users\mattbw\Documents\sox\sox\src;C:\Users\mattbw\Documents\GitHub\libuv\include;C:\mingw\msys\1.0\local\include;C:\Users\Matt\Documents\PortAudio\include;C:\Users\Matt\Documents\PortAudio\bindings\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>
+				include;
+				%(AdditionalIncludeDirectories)
+			</AdditionalIncludeDirectories>
 		</ClCompile>
 		<Link>
 			<TargetMachine>MachineX86</TargetMachine>
 			<GenerateDebugInformation>true</GenerateDebugInformation>
 			<SubSystem>Console</SubSystem>
-			<AdditionalLibraryDirectories>C:\Users\mattbw\Documents\sox\sox\msvc10\Debug\lib;C:\Users\mattbw\Documents\GitHub\libuv\Debug\;C:\mingw\msys\1.0\local\bin;C:\Users\Matt\Documents\PortAudio\Debug;C:\Users\Matt\Documents\PortAudio\bindings\cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-			<AdditionalDependencies>winmm.lib;libflac.lib;libgsm.lib;libid3tag.lib;liblpc10.lib;libmad.lib;libmp3lame.lib;libogg.lib;libpng.lib;libsndfileg72x.lib;libsndfile-1.lib;libsndfilegsm610.lib;libsox.lib;libspeex.lib;libvorbis.lib;libwavpack.lib;libzlib.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
-			<IgnoreSpecificDefaultLibraries>
-			</IgnoreSpecificDefaultLibraries>
+			<AdditionalLibraryDirectories>
+				lib;
+				%(AdditionalLibraryDirectories)
+			</AdditionalLibraryDirectories>
+			<AdditionalDependencies>
+				libsox.lib;
+				portaudio_x86.lib;
+				portaudiocpp-vc7_1-d.lib;
+				libuv.lib;
+				%(AdditionalDependencies)
+			</AdditionalDependencies>
 		</Link>
 	</ItemDefinitionGroup>
 	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

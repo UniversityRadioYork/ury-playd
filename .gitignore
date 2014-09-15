@@ -8,6 +8,10 @@ Release/
 build/
 doc/
 
+# Visual Studio build subdirectories
+include/
+lib/
+
 *.opensdf
 *.sdf
 *.suo
