@@ -10,6 +10,7 @@
 #ifndef PS_IO_RESPONSE_HPP
 #define PS_IO_RESPONSE_HPP
 
+#include <initializer_list>
 #include <map>
 #include <ostream>
 #include <string>
@@ -48,11 +49,18 @@ extern const std::string RESPONSES[];
 class ResponseSink {
 public:
 	/**
-	 * Outputs a response.
-	 * @param code The response code to emit.
-	 * @param message The response message.
+	 * Outputs a response with a single message argument.
+	 * @param code The code of the response to emit.
+	 * @param message The unescaped response message.
 	 */
 	void Respond(ResponseCode code, const std::string &message) const;
+
+	/**
+	 * Outputs a response with multiple message arguments.
+	 * @param code The code of the response to emit.
+	 * @param arguments The list of unescaped arguments to emit.
+	 */
+	void RespondArgs(ResponseCode code, const std::initializer_list<std::string> arguments) const;
 
 	/**
 	 * Emits an error as a response.
@@ -63,9 +71,17 @@ public:
 protected:
 	/**
 	 * Outputs a raw response string.
-	 * @param string The response string, of the form "CODE message".
+	 * @param string The raw, escaped response string.
 	 */
 	virtual void RespondRaw(const std::string &string) const = 0;
+
+private:
+	/**
+	 * Escapes a single response argument.
+	 * @param argument The argument to escape.
+	 * @return The escaped argument.
+	 */
+	std::string EscapeArgument(const std::string &argument) const;
 };
 
 /**
