@@ -6,6 +6,8 @@
  * Tests for response classes.
  */
 
+#include <ostream>
+#include <sstream>
 #include <string>
 
 #include "catch.hpp"
@@ -14,25 +16,23 @@
 // We need a dummy class in order to check the ResponseSink class.
 #include "io_response.hpp"
 
-std::string DummyResponseSink::LastResponse() const
-{
-	return this->last_response;
-}
+DummyResponseSink::DummyResponseSink(std::ostream &os) : os(os) {}
 
 void DummyResponseSink::RespondRaw(const std::string &response)
 {
-	this->last_response = std::string(response);
+	this->os << response;
 }
 
 SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quote]") {
 	GIVEN("A dummy ResponseSink") {
-		DummyResponseSink rs;
+		std::ostringstream os;
+		DummyResponseSink rs(os);
 
 		WHEN("the ResponseSink is fed no arguments") {
 			rs.RespondArgs(ResponseCode::OHAI, {});
 
 			THEN("the emitted response has no quoting") {
-				REQUIRE(rs.LastResponse() == "OHAI");
+				REQUIRE(os.str() == "OHAI");
 			}
 		}
 
@@ -40,7 +40,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.Respond(ResponseCode::OHAI, "ulyoath");
 
 			THEN("the emitted response's argument is not quoted") {
-				REQUIRE(rs.LastResponse() == "OHAI ulyoath");
+				REQUIRE(os.str() == "OHAI ulyoath");
 			}
 		}
 
@@ -48,7 +48,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.Respond(ResponseCode::OHAI, "chattur'gha");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == R"(OHAI 'chattur'\''gha')");
+				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha')");
 			}
 		}
 
@@ -56,7 +56,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "xel'lotath" });
 
 			THEN("the emitted response's arguments are both single-quoted") {
-				REQUIRE(rs.LastResponse() == R"(OHAI 'chattur'\''gha' 'xel'\''lotath')");
+				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' 'xel'\''lotath')");
 			}
 		}
 
@@ -64,7 +64,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "ulyoath" });
 
 			THEN("the emitted response's arguments are quoted accordingly") {
-				REQUIRE(rs.LastResponse() == R"(OHAI 'chattur'\''gha' ulyoath)");
+				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' ulyoath)");
 			}
 		}
 
@@ -72,7 +72,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.Respond(ResponseCode::FILE, R"("scare"-quotes)");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == R"(FILE '"scare"-quotes')");
+				REQUIRE(os.str() == R"(FILE '"scare"-quotes')");
 			}
 		}
 
@@ -80,7 +80,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.Respond(ResponseCode::END, "pargon pargon pargon");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == R"(END 'pargon pargon pargon')");
+				REQUIRE(os.str() == R"(END 'pargon pargon pargon')");
 			}
 		}
 
@@ -88,7 +88,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.RespondArgs(ResponseCode::END, { "a space", "new\nline", "tab\tstop" });
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == "END 'a space' 'new\nline' 'tab\tstop'");
+				REQUIRE(os.str() == "END 'a space' 'new\nline' 'tab\tstop'");
 			}
 		}
 
@@ -96,7 +96,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.Respond(ResponseCode::FILE, R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
+				REQUIRE(os.str() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
 			}
 		}
 	}

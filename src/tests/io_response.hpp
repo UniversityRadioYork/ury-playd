@@ -9,23 +9,25 @@
 #ifndef PS_TESTS_IO_RESPONSE_HPP
 #define PS_TESTS_IO_RESPONSE_HPP
 
+#include <ostream>
+
 #include "../io/io_response.hpp"
 
 // A dummy class for testing the ResponseSink abstract class methods.
 class DummyResponseSink : public ResponseSink {
 public:
 	/**
-	 * Retrieve the last response sent to this DummyResponseSink.
-	 * @return The last raw response.
+	 * Constructs a DummyResponseSink.
+	 * @param os The ostream to which responses should be sent.
 	 */
-	std::string LastResponse() const;
+	DummyResponseSink(std::ostream &os);
 
 protected:
 	virtual void RespondRaw(const std::string &string);
 
 private:
-	/// The last response sent to this DummyResponseSink.
-	std::string last_response;
+	/// Reference to the output stream.
+	std::ostream &os;
 };
 
 #endif // PS_TESTS_IO_RESPONSE_HPP
