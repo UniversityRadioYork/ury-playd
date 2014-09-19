@@ -7,7 +7,6 @@
  * @see io/io_response.hpp
  */
 
-#include <algorithm>
 #include <cctype>
 #include <initializer_list>
 #include <sstream>
