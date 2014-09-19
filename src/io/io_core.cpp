@@ -16,6 +16,7 @@
 
 #include <csignal>
 #include <cstring>
+#include <fstream>
 #include <string>
 
 extern "C" {
@@ -191,7 +192,7 @@ void IoCore::End()
 
 Connection::Connection(IoCore &parent, uv_tcp_t *tcp,
                                  CommandHandler &handler)
-    : parent(parent), tcp(tcp), tokeniser(), handler(handler)
+    : parent(parent), tcp(tcp), tokeniser(), handler(handler), authed(false)
 {
 }
 
@@ -231,9 +232,39 @@ void Connection::Read(uv_stream_t *stream, ssize_t nread,
 	}
 }
 
+/**
+ * Make sure a connection is authorised to be connected.
+ * @param words The initial command from the connection.
+ * @return If the connection is valid and allowed to stay.
+ */
+static bool CanAuth(const std::vector<std::string> &words)
+{
+	if (words.size() != 2 || words[0] != "auth") return false;
+
+	std::ifstream in("authfile.txt", std::ios::in | std::ios::binary);
+	if (!in) {
+		Debug() << "Warning, no authentication" << std::endl;
+		return true;
+	}
+
+	std::string contents;
+	std::getline(in, contents);
+	in.close();
+	return contents == words[1];
+}
+
 void Connection::HandleCommand(const std::vector<std::string> &words)
 {
 	if (words.empty()) return;
+
+	// Don't want nasty people changing stuff
+	if (!this->authed || words[0] == "auth") {
+		this->authed = CanAuth(words);
+		if (!this->authed) {
+			uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
+		}
+		return;
+	}
 
 	Debug() << "Received command:";
 	for (const auto &word : words)
