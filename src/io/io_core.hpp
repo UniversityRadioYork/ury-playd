@@ -160,6 +160,9 @@ private:
 	/// The CommandHandler to which finished commands should be sent.
 	CommandHandler &handler;
 
+	/// Has the connection authenticated correctly?
+	bool authed;
+
 	/**
 	 * Handles a tokenised command line.
 	 *
