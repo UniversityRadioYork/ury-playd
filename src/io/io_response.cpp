@@ -54,21 +54,17 @@ std::string ResponseSink::EscapeArgument(const std::string &argument) const
 	std::string escaped;
 
 	for (unsigned char c : argument) {
-		bool is_escaper = c == '\"' || c == '\'' || c == '\\';
+		bool is_escaper = c == '"' || c == '\'' || c == '\\';
 		if (isspace(c) || is_escaper) escaping = true;
 
 		// Since we use single-quote escaping, the only thing we need
 		// to escape by itself is single quotes, which are replaced by
 		// the sequence '\'' (break out of single quotes, escape a
 		// single quote, then re-enter single quotes).
-		if (c == '\'') {
-			escaped.append("\'\\'\'");
-		} else {
-			escaped.push_back(c);
-		}
+		escaped += (c == '\'') ? R"('\'')" : std::string(1, c);
 	}
 
-	if (escaping) return std::string("\'") + escaped + std::string("\'");
+	if (escaping) return "'" + escaped + "'";
 	return escaped;
 }
 
