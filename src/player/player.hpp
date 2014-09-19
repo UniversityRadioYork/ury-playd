@@ -45,6 +45,9 @@ private:
 	/// The sink to which END responses shall be sent.
 	ResponseSink *end_sink;
 
+	/// The set of features playd implements.
+	const static std::initializer_list<std::string> FEATURES;
+
 public:
 	/**
 	 * Constructs a Player.

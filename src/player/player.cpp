@@ -10,6 +10,7 @@
  */
 
 #include <cassert>
+#include <initializer_list>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -22,6 +23,14 @@
 #include "../time_parser.hpp"
 #include "player_state.hpp"
 #include "player.hpp"
+
+const std::initializer_list<std::string> Player::FEATURES {
+	"End",
+	"FileLoad",
+	"PlayStop",
+	"Seek",
+	"TimeReport"
+};
 
 Player::Player(const AudioSystem &audio_system, const TimeParser &time_parser)
     : file(audio_system),
@@ -55,7 +64,7 @@ void Player::PlaybackUpdate()
 void Player::WelcomeClient(ResponseSink &client) const
 {
 	client.Respond(ResponseCode::OHAI, MSG_OHAI);
-	client.Respond(ResponseCode::FEATURES, MSG_FEATURES);
+	client.RespondArgs(ResponseCode::FEATURES, FEATURES);
 	this->file.Emit(client);
 	this->position.Emit(client);
 	this->state.Emit(client);
@@ -72,7 +81,7 @@ void Player::SetResponseSink(ResponseSink &sink)
 void Player::End()
 {
 	if (this->end_sink != nullptr) {
-		this->end_sink->Respond(ResponseCode::END, "");
+		this->end_sink->RespondArgs(ResponseCode::END, {});
 	}
 	Stop();
 
