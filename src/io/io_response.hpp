@@ -53,27 +53,27 @@ public:
 	 * @param code The code of the response to emit.
 	 * @param message The unescaped response message.
 	 */
-	void Respond(ResponseCode code, const std::string &message);
+	void Respond(ResponseCode code, const std::string &message) const;
 
 	/**
 	 * Outputs a response with multiple message arguments.
 	 * @param code The code of the response to emit.
 	 * @param arguments The list of unescaped arguments to emit.
 	 */
-	void RespondArgs(ResponseCode code, const std::initializer_list<std::string> arguments);
+	void RespondArgs(ResponseCode code, const std::initializer_list<std::string> arguments) const;
 
 	/**
 	 * Emits an error as a response.
 	 * @param error The error to convert to a response.
 	 */
-	void RespondWithError(const Error &error);
+	void RespondWithError(const Error &error) const;
 
 protected:
 	/**
 	 * Outputs a raw response string.
 	 * @param string The raw, escaped response string.
 	 */
-	virtual void RespondRaw(const std::string &string) = 0;
+	virtual void RespondRaw(const std::string &string) const = 0;
 
 private:
 	/**

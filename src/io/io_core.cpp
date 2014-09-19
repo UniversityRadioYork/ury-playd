@@ -173,7 +173,7 @@ void IoCore::InitAcceptor(const std::string &address,
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoCore::RespondRaw(const std::string &string)
+void IoCore::RespondRaw(const std::string &string) const
 {
 	for (const auto &conn : this->connections) {
 		conn->RespondRaw(string);
@@ -195,7 +195,7 @@ Connection::Connection(IoCore &parent, uv_tcp_t *tcp,
 {
 }
 
-void Connection::RespondRaw(const std::string &string)
+void Connection::RespondRaw(const std::string &string) const
 {
 	Debug() << "Sending command:" << string << std::endl;
 	unsigned int l = string.length();
