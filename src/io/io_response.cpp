@@ -27,12 +27,12 @@ const std::string RESPONSES[] = {
 	/* ResponseCode::END      */ "END"
 };
 
-void ResponseSink::Respond(ResponseCode code, const std::string &message) const
+void ResponseSink::Respond(ResponseCode code, const std::string &message)
 {
 	RespondArgs(code, { message });
 }
 
-void ResponseSink::RespondArgs(ResponseCode code, const std::initializer_list<std::string> arguments) const
+void ResponseSink::RespondArgs(ResponseCode code, const std::initializer_list<std::string> arguments)
 {
 	std::ostringstream os;
 	os << RESPONSES[static_cast<int>(code)];
@@ -43,7 +43,7 @@ void ResponseSink::RespondArgs(ResponseCode code, const std::initializer_list<st
 	RespondRaw(os.str());
 }
 
-void ResponseSink::RespondWithError(const Error &error) const
+void ResponseSink::RespondWithError(const Error &error)
 {
 	Respond(ResponseCode::FAIL, error.Message());
 }
