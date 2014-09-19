@@ -45,34 +45,34 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 		}
 
 		WHEN("the ResponseSink is fed a single argument with single quotes") {
-			rs.Respond(ResponseCode::OHAI, "chattur\'gha");
+			rs.Respond(ResponseCode::OHAI, "chattur'gha");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == "OHAI \'chattur\'\\\'\'gha\'");
+				REQUIRE(rs.LastResponse() == R"(OHAI 'chattur'\''gha')");
 			}
 		}
 
 		WHEN("the ResponseSink is fed two arguments, both with single quotes") {
-			rs.RespondArgs(ResponseCode::OHAI, { "chattur\'gha", "xel\'lotath" });
+			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "xel'lotath" });
 
 			THEN("the emitted response's arguments are both single-quoted") {
-				REQUIRE(rs.LastResponse() == "OHAI \'chattur\'\\\'\'gha\' \'xel\'\\\'\'lotath\'");
+				REQUIRE(rs.LastResponse() == R"(OHAI 'chattur'\''gha' 'xel'\''lotath')");
 			}
 		}
 
 		WHEN("the ResponseSink is fed two arguments, one quoted, one unquoted") {
-			rs.RespondArgs(ResponseCode::OHAI, { "chattur\'gha", "ulyoath" });
+			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "ulyoath" });
 
 			THEN("the emitted response's arguments are quoted accordingly") {
-				REQUIRE(rs.LastResponse() == "OHAI \'chattur\'\\\'\'gha\' ulyoath");
+				REQUIRE(rs.LastResponse() == R"(OHAI 'chattur'\''gha' ulyoath)");
 			}
 		}
 
 		WHEN("the ResponseSink is fed a single argument with double quotes") {
-			rs.Respond(ResponseCode::FILE, "\"scare\"-quotes");
+			rs.Respond(ResponseCode::FILE, R"("scare"-quotes)");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == "FILE \'\"scare\"-quotes\'");
+				REQUIRE(rs.LastResponse() == R"(FILE '"scare"-quotes')");
 			}
 		}
 
@@ -80,7 +80,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.Respond(ResponseCode::END, "pargon pargon pargon");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == "END \'pargon pargon pargon\'");
+				REQUIRE(rs.LastResponse() == R"(END 'pargon pargon pargon')");
 			}
 		}
 
@@ -88,15 +88,15 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quo
 			rs.RespondArgs(ResponseCode::END, { "a space", "new\nline", "tab\tstop" });
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == "END \'a space\' \'new\nline\' \'tab\tstop\'");
+				REQUIRE(rs.LastResponse() == "END 'a space' 'new\nline' 'tab\tstop'");
 			}
 		}
 
 		WHEN("the ResponseSink is fed a representative example with backslashes and spaces") {
-			rs.Respond(ResponseCode::FILE, "C:\\Users\\Test\\Music\\Bound 4 Da Reload (Casualty).mp3");
+			rs.Respond(ResponseCode::FILE, R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(rs.LastResponse() == "FILE \'C:\\Users\\Test\\Music\\Bound 4 Da Reload (Casualty).mp3\'");
+				REQUIRE(rs.LastResponse() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
 			}
 		}
 	}
