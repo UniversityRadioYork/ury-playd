@@ -31,6 +31,9 @@ void PlayerFile::Load(const std::string &path)
 		Eject();
 	}
 	this->audio = decltype(this->audio)(this->audio_system.Load(path));
+
+	// Let clients know the file has changed.
+	Push();
 }
 
 void PlayerFile::Eject()
