@@ -83,11 +83,10 @@ public:
 	 *
 	 * @param sink The connection to remove.
 	 *
-	 * @todo Rename sink?
 	 * @todo This isn't a great fit for the public interface of IoCore -
 	 *   separate into a ConnectionPool class?
 	 */
-	void RemoveConnection(Connection &sink);
+	void RemoveConnection(Connection &conn);
 
 private:
 	/// The set of connections currently serviced by the IoCore.
