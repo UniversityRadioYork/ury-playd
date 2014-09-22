@@ -36,6 +36,7 @@ public:
 	 *   string need not contain complete lines.
 	 * @return The vector of lines that have been successfully tokenised in
 	 *   this tokenising pass.  This vector may be empty.
+	 * @note Escaping a multi-byte UTF-8 character is undefined behaviour.
 	 */
 	std::vector<Line> Feed(const std::string &raw_string);
 

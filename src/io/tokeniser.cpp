@@ -28,7 +28,6 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 
 	for (unsigned char c : raw_string) {
 		if (this->escape_next_character) {
-			// TODO: Make this UTF-8 safe.
 			Push(c);
 			continue;
 		}
