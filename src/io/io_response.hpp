@@ -83,15 +83,6 @@ protected:
 
 private:
 	/**
-	 * Creates an output stream ready for response arguments.
-	 * The response command is automatically emitted to the returned stream.
-	 * @param code The code of the response to emit.
-	 * @return An ostringstream, ready to accept the body of the response.
-	 *   Each argument should be prefixed by some whitespace.
-	 */
-	std::ostringstream StringStream(ResponseCode code) const;
-
-	/**
 	 * Escapes a single response argument.
 	 * @param argument The argument to escape.
 	 * @return The escaped argument.

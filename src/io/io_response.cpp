@@ -33,7 +33,8 @@ void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 
 void ResponseSink::RespondArgs(ResponseCode code, const std::vector<std::string> &arguments) const
 {
-	std::ostringstream os = StringStream(code);
+	std::ostringstream os;
+	os << RESPONSES[static_cast<int>(code)];
 	for (auto argument : arguments) os << " " << EscapeArgument(argument);
 	RespondRaw(os.str());
 }
@@ -41,13 +42,6 @@ void ResponseSink::RespondArgs(ResponseCode code, const std::vector<std::string>
 void ResponseSink::RespondWithError(const Error &error) const
 {
 	Respond(ResponseCode::FAIL, error.Message());
-}
-
-std::ostringstream ResponseSink::StringStream(ResponseCode code) const
-{
-	std::ostringstream os;
-	os << RESPONSES[static_cast<int>(code)];
-	return os;
 }
 
 std::string ResponseSink::EscapeArgument(const std::string &argument) const
