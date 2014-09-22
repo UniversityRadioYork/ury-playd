@@ -119,7 +119,7 @@ void IoCore::NewConnection(uv_stream_t *server)
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
 		Debug() << "New connection" << std::endl;
 		auto tcp = std::make_shared<Connection>(*this, client,
-		                                             this->handler);
+		                                        this->handler);
 		this->player.WelcomeClient(*tcp);
 		this->connections.insert(tcp);
 		client->data = static_cast<void *>(tcp.get());
@@ -136,7 +136,7 @@ void IoCore::RemoveConnection(Connection &conn)
 }
 
 IoCore::IoCore(Player &player, CommandHandler &handler,
-                     const std::string &address, const std::string &port)
+               const std::string &address, const std::string &port)
     : player(player), handler(handler)
 {
 	InitAcceptor(address, port);
@@ -156,8 +156,7 @@ void IoCore::DoUpdateTimer()
 	               PLAYER_UPDATE_PERIOD);
 }
 
-void IoCore::InitAcceptor(const std::string &address,
-                             const std::string &port)
+void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 {
 	int uport = std::stoi(port);
 
@@ -189,8 +188,7 @@ void IoCore::End()
 // Connection
 //
 
-Connection::Connection(IoCore &parent, uv_tcp_t *tcp,
-                                 CommandHandler &handler)
+Connection::Connection(IoCore &parent, uv_tcp_t *tcp, CommandHandler &handler)
     : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {
 }
@@ -210,8 +208,7 @@ void Connection::RespondRaw(const std::string &string) const
 	         UvRespondCallback);
 }
 
-void Connection::Read(uv_stream_t *stream, ssize_t nread,
-                           const uv_buf_t *buf)
+void Connection::Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	if (nread < 0) {
 		if (nread == UV_EOF) {
@@ -236,8 +233,7 @@ void Connection::HandleCommand(const std::vector<std::string> &words)
 	if (words.empty()) return;
 
 	Debug() << "Received command:";
-	for (const auto &word : words)
-		std::cerr << ' ' << '"' << word << '"';
+	for (const auto &word : words) std::cerr << ' ' << '"' << word << '"';
 	std::cerr << std::endl;
 
 	bool valid = this->handler.Handle(words);
@@ -247,7 +243,6 @@ void Connection::HandleCommand(const std::vector<std::string> &words)
 		// TODO: Better error reporting.
 		this->parent.Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
 	}
-
 }
 
 void Connection::Close()

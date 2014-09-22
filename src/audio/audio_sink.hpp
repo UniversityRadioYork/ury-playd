@@ -54,7 +54,8 @@ public:
 class AudioSink : portaudio::CallbackInterface {
 public:
 	/// Type of results emitted during the play callback step.
-	typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
+	typedef std::pair<PaStreamCallbackResult, unsigned long>
+	                PlayCallbackStepResult;
 
 	/// Type of positions measured in samples.
 	typedef std::uint64_t SamplePosition;

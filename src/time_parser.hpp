@@ -55,7 +55,8 @@ private:
 	 * @param list The list of unit suffixes.
 	 * @return True if @a unit is in @a list; false otherwise.
 	 */
-	bool IsIn(const std::string &unit, std::initializer_list<std::string> list) const;
+	bool IsIn(const std::string &unit,
+	          std::initializer_list<std::string> list) const;
 
 	/**
 	 * Splits a time string into a pair of unit and amount.
@@ -63,7 +64,8 @@ private:
 	 * @return          A pair of unit string and time amount, as an integer
 	 *                  in terms of the named unit.
 	 */
-	std::pair<std::string, MicrosecondPosition> Split(const std::string &time_str) const;
+	std::pair<std::string, MicrosecondPosition> Split(
+	                const std::string &time_str) const;
 };
 
 #endif // PS_TIME_PARSER_HPP

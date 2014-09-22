@@ -31,7 +31,8 @@ void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 	RespondArgs(code, std::vector<std::string>(1, message));
 }
 
-void ResponseSink::RespondArgs(ResponseCode code, const std::vector<std::string> &arguments) const
+void ResponseSink::RespondArgs(ResponseCode code,
+                               const std::vector<std::string> &arguments) const
 {
 	std::ostringstream os;
 	os << RESPONSES[static_cast<int>(code)];

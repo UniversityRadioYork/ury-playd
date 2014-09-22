@@ -66,7 +66,8 @@ public:
 	 * @see Respond
 	 * @see RespondIter
 	 */
-	void RespondArgs(ResponseCode code, const std::vector<std::string> &arguments) const;
+	void RespondArgs(ResponseCode code,
+	                 const std::vector<std::string> &arguments) const;
 
 	/**
 	 * Emits an error as a response.

@@ -17,8 +17,7 @@
 #include "tokeniser.hpp"
 
 Tokeniser::Tokeniser()
-    : escape_next_character(false),
-      quote_type(Tokeniser::QuoteType::NONE)
+    : escape_next_character(false), quote_type(Tokeniser::QuoteType::NONE)
 {
 }
 
