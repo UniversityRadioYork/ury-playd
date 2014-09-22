@@ -16,3 +16,15 @@ compiler:
 script:
   - env CXX_STD=c++0x make
   - env CXX_STD=c++0x make test
+
+
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#ury"
+    template:
+      - "%{repository_name} %{branch} | %{commit_message} (%{commit}, %{author}) | %{result} | %{build_url}"
+    on_success: change
+    on_failure: change
+    use_notice: true
+    skip_join: true

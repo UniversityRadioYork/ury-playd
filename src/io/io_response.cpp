@@ -7,6 +7,10 @@
  * @see io/io_response.hpp
  */
 
+#include <cctype>
+#include <initializer_list>
+#include <sstream>
+
 #include "../errors.hpp"
 #include "io_response.hpp"
 
@@ -24,15 +28,40 @@ const std::string RESPONSES[] = {
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 {
-	// ResponseCodes are formatted as "CODE message\n".
-	// Delegate the actual sending of the response string to the concrete
-	// implementation.
-	RespondRaw(RESPONSES[static_cast<int>(code)] + " " + message);
+	RespondArgs(code, std::vector<std::string>(1, message));
+}
+
+void ResponseSink::RespondArgs(ResponseCode code, const std::vector<std::string> &arguments) const
+{
+	std::ostringstream os;
+	os << RESPONSES[static_cast<int>(code)];
+	for (auto argument : arguments) os << " " << EscapeArgument(argument);
+	RespondRaw(os.str());
 }
 
 void ResponseSink::RespondWithError(const Error &error) const
 {
 	Respond(ResponseCode::FAIL, error.Message());
+}
+
+std::string ResponseSink::EscapeArgument(const std::string &argument) const
+{
+	bool escaping = false;
+	std::string escaped;
+
+	for (unsigned char c : argument) {
+		bool is_escaper = c == '"' || c == '\'' || c == '\\';
+		if (isspace(c) || is_escaper) escaping = true;
+
+		// Since we use single-quote escaping, the only thing we need
+		// to escape by itself is single quotes, which are replaced by
+		// the sequence '\'' (break out of single quotes, escape a
+		// single quote, then re-enter single quotes).
+		escaped += (c == '\'') ? R"('\'')" : std::string(1, c);
+	}
+
+	if (escaping) return "'" + escaped + "'";
+	return escaped;
 }
 
 //

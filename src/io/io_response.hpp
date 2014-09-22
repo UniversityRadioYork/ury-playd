@@ -13,6 +13,7 @@
 #include <map>
 #include <ostream>
 #include <string>
+#include <vector>
 
 #include "../errors.hpp"
 
@@ -48,11 +49,24 @@ extern const std::string RESPONSES[];
 class ResponseSink {
 public:
 	/**
-	 * Outputs a response.
-	 * @param code The response code to emit.
-	 * @param message The response message.
+	 * Outputs a response with a single message argument.
+	 * @param code The code of the response to emit.
+	 * @param message The unescaped response message.
+	 * @see RespondArgs
+	 * @see RespondIter
 	 */
 	void Respond(ResponseCode code, const std::string &message) const;
+
+	/**
+	 * Outputs a response with multiple message arguments.
+	 * Prefer this when the number of arguments is known at compile-time,
+	 * and RespondIter otherwise.
+	 * @param code The code of the response to emit.
+	 * @param arguments The vector of unescaped arguments to emit.
+	 * @see Respond
+	 * @see RespondIter
+	 */
+	void RespondArgs(ResponseCode code, const std::vector<std::string> &arguments) const;
 
 	/**
 	 * Emits an error as a response.
@@ -63,9 +77,17 @@ public:
 protected:
 	/**
 	 * Outputs a raw response string.
-	 * @param string The response string, of the form "CODE message".
+	 * @param string The raw, escaped response string.
 	 */
 	virtual void RespondRaw(const std::string &string) const = 0;
+
+private:
+	/**
+	 * Escapes a single response argument.
+	 * @param argument The argument to escape.
+	 * @return The escaped argument.
+	 */
+	std::string EscapeArgument(const std::string &argument) const;
 };
 
 /**

@@ -242,8 +242,7 @@ void Connection::HandleCommand(const std::vector<std::string> &words)
 
 	bool valid = this->handler.Handle(words);
 	if (valid) {
-		// TODO: Emit entire command back, not just first word.
-		this->parent.Respond(ResponseCode::OKAY, words[0]);
+		this->parent.RespondArgs(ResponseCode::OKAY, words);
 	} else {
 		// TODO: Better error reporting.
 		this->parent.Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
