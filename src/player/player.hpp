@@ -14,11 +14,11 @@
 #define PS_PLAYER_HPP
 
 #include <cstdint>
-#include <initializer_list>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "../audio/audio.hpp"
 #include "../io/io_response.hpp"
@@ -46,7 +46,7 @@ private:
 	ResponseSink *end_sink;
 
 	/// The set of features playd implements.
-	const static std::initializer_list<std::string> FEATURES;
+	const static std::vector<std::string> FEATURES;
 
 public:
 	/**

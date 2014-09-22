@@ -28,23 +28,26 @@ const std::string RESPONSES[] = {
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 {
-	RespondArgs(code, { message });
+	RespondArgs(code, std::vector<std::string>(1, message));
 }
 
-void ResponseSink::RespondArgs(ResponseCode code, const std::initializer_list<std::string> arguments) const
+void ResponseSink::RespondArgs(ResponseCode code, const std::vector<std::string> &arguments) const
 {
-	std::ostringstream os;
-	os << RESPONSES[static_cast<int>(code)];
+	std::ostringstream os = StringStream(code);
 	for (auto argument : arguments) os << " " << EscapeArgument(argument);
-
-	// Delegate the actual sending of the response string to the concrete
-	// implementation.
 	RespondRaw(os.str());
 }
 
 void ResponseSink::RespondWithError(const Error &error) const
 {
 	Respond(ResponseCode::FAIL, error.Message());
+}
+
+std::ostringstream ResponseSink::StringStream(ResponseCode code) const
+{
+	std::ostringstream os;
+	os << RESPONSES[static_cast<int>(code)];
+	return os;
 }
 
 std::string ResponseSink::EscapeArgument(const std::string &argument) const

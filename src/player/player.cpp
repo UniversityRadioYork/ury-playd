@@ -10,10 +10,10 @@
  */
 
 #include <cassert>
-#include <initializer_list>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "../audio/audio_system.hpp"
 #include "../audio/audio.hpp"
@@ -24,7 +24,7 @@
 #include "player_state.hpp"
 #include "player.hpp"
 
-const std::initializer_list<std::string> Player::FEATURES {
+const std::vector<std::string> Player::FEATURES {
 	"End",
 	"FileLoad",
 	"PlayStop",

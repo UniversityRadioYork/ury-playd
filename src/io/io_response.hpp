@@ -10,10 +10,10 @@
 #ifndef PS_IO_RESPONSE_HPP
 #define PS_IO_RESPONSE_HPP
 
-#include <initializer_list>
 #include <map>
 #include <ostream>
 #include <string>
+#include <vector>
 
 #include "../errors.hpp"
 
@@ -52,15 +52,21 @@ public:
 	 * Outputs a response with a single message argument.
 	 * @param code The code of the response to emit.
 	 * @param message The unescaped response message.
+	 * @see RespondArgs
+	 * @see RespondIter
 	 */
 	void Respond(ResponseCode code, const std::string &message) const;
 
 	/**
 	 * Outputs a response with multiple message arguments.
+	 * Prefer this when the number of arguments is known at compile-time,
+	 * and RespondIter otherwise.
 	 * @param code The code of the response to emit.
-	 * @param arguments The list of unescaped arguments to emit.
+	 * @param arguments The vector of unescaped arguments to emit.
+	 * @see Respond
+	 * @see RespondIter
 	 */
-	void RespondArgs(ResponseCode code, const std::initializer_list<std::string> arguments) const;
+	void RespondArgs(ResponseCode code, const std::vector<std::string> &arguments) const;
 
 	/**
 	 * Emits an error as a response.
@@ -76,6 +82,15 @@ protected:
 	virtual void RespondRaw(const std::string &string) const = 0;
 
 private:
+	/**
+	 * Creates an output stream ready for response arguments.
+	 * The response command is automatically emitted to the returned stream.
+	 * @param code The code of the response to emit.
+	 * @return An ostringstream, ready to accept the body of the response.
+	 *   Each argument should be prefixed by some whitespace.
+	 */
+	std::ostringstream StringStream(ResponseCode code) const;
+
 	/**
 	 * Escapes a single response argument.
 	 * @param argument The argument to escape.
