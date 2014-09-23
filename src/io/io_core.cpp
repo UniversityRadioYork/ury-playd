@@ -180,6 +180,9 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 
 void IoCore::RespondRaw(const std::string &string) const
 {
+	if (this->connections.size() != 0) {
+		Debug() << "Sending command:" << string << std::endl;
+	}
 	for (const auto &conn : this->connections) {
 		conn->RespondRaw(string);
 	}
@@ -201,7 +204,6 @@ Connection::Connection(IoCore &parent, uv_tcp_t *tcp, CommandHandler &handler)
 
 void Connection::RespondRaw(const std::string &string) const
 {
-	Debug() << "Sending command:" << string << std::endl;
 	unsigned int l = string.length();
 	const char *s = string.c_str();
 
