@@ -53,14 +53,14 @@ public:
 	 * Runs the reactor.
 	 * It will block until terminated.
 	 */
-	void Run();
+	static void Run();
 
 	/**
 	 * Ends the reactor.
 	 * This should be called by the parent object when the player is
 	 * quitting.
 	 */
-	void End();
+	static void End();
 
 	/**
 	 * Accepts a new connection.

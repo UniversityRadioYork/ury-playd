@@ -93,7 +93,7 @@ void UvListenCallback(uv_stream_t *server, int status)
 void UvRespondCallback(uv_write_t *req, int)
 {
 	// TODO: Handle the int status?
-	WriteReq *wr = (WriteReq *)req;
+	WriteReq *wr = reinterpret_cast<WriteReq *>(req);
 	delete[] wr -> buf.base;
 	delete wr;
 }
@@ -149,7 +149,7 @@ IoCore::IoCore(Player &player, CommandHandler &handler,
 	DoUpdateTimer();
 }
 
-void IoCore::Run()
+/* static */ void IoCore::Run()
 {
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
@@ -188,7 +188,7 @@ void IoCore::RespondRaw(const std::string &string) const
 	}
 }
 
-void IoCore::End()
+/* static */ void IoCore::End()
 {
 	uv_stop(uv_default_loop());
 }

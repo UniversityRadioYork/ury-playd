@@ -45,7 +45,8 @@ void ResponseSink::RespondWithError(const Error &error) const
 	Respond(ResponseCode::FAIL, error.Message());
 }
 
-std::string ResponseSink::EscapeArgument(const std::string &argument) const
+/* static */ std::string ResponseSink::EscapeArgument(
+                const std::string &argument)
 {
 	bool escaping = false;
 	std::string escaped;

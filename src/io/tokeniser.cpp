@@ -92,10 +92,6 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 	std::vector<Line> lines = this->ready_lines;
 	this->ready_lines.clear();
 
-	// The ready line list must be empty, to establish the precondition
-	// in the earlier assert().
-	assert(this->ready_lines.empty());
-
 	return lines;
 }
 
@@ -136,5 +132,4 @@ void Tokeniser::Emit()
 	assert(this->quote_type == QuoteType::NONE);
 	assert(!this->escape_next_character);
 	assert(this->current_word.empty());
-	assert(this->words.empty());
 }

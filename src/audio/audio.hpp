@@ -87,7 +87,7 @@ public:
 	 * samples in the frame have been fed to the ringbuffer.
 	 * @return True if the frame is finished; false otherwise.
 	 */
-	bool FrameFinished();
+	bool FrameFinished() const;
 
 	/**
 	 * Returns whether the audio file has ended.
@@ -95,7 +95,7 @@ public:
 	 * have samples waiting to send to the audio library.
 	 * @return True if there is no audio left to decode; false otherwise.
 	 */
-	bool FileEnded();
+	bool FileEnded() const;
 
 	/**
 	 * Gets the current played position in the song, in microseconds.

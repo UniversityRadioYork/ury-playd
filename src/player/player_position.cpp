@@ -73,7 +73,7 @@ void PlayerPosition::Emit(ResponseSink &target) const
 	target.Respond(ResponseCode::TIME, os.str());
 }
 
-bool PlayerPosition::IsReadyToSend()
+bool PlayerPosition::IsReadyToSend() const
 {
 	return this->has_reset || (this->last + this->period <= this->current);
 }

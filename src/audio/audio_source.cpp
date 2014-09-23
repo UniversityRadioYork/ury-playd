@@ -161,7 +161,7 @@ AudioSource::DecodeResult AudioSource::Decode()
 /**
  * @return The sample format of the data returned by this decoder.
  */
-SampleFormat AudioSource::OutputSampleFormat() const
+/* static */ SampleFormat AudioSource::OutputSampleFormat()
 {
 	// 'The function sox_read reads len samples in to buf using the format
 	// handler specified by ft. All data read is converted to 32-bit signed

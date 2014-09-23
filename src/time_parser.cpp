@@ -15,8 +15,8 @@
 #include "messages.h"
 #include "time_parser.hpp"
 
-TimeParser::MicrosecondPosition TimeParser::Parse(
-                const std::string &time_str) const
+/* static */ TimeParser::MicrosecondPosition TimeParser::Parse(
+                const std::string &time_str)
 {
 	auto seek = Split(time_str);
 	std::string unit = seek.first;
@@ -26,7 +26,8 @@ TimeParser::MicrosecondPosition TimeParser::Parse(
 	       num_units;
 }
 
-TimeParser::Multiplier TimeParser::UnitMultiplier(const std::string &unit) const
+/* static */ TimeParser::Multiplier TimeParser::UnitMultiplier(
+                const std::string &unit)
 {
 	// Default to microseconds if no unit is given.
 	if (unit.empty()) return Multiplier::MICROSECONDS;
@@ -40,14 +41,8 @@ TimeParser::Multiplier TimeParser::UnitMultiplier(const std::string &unit) const
 	throw std::out_of_range(unit);
 }
 
-bool TimeParser::IsIn(const std::string &unit,
-                      std::initializer_list<std::string> list) const
-{
-	return std::find(list.begin(), list.end(), unit) != list.end();
-}
-
-std::pair<std::string, TimeParser::MicrosecondPosition> TimeParser::Split(
-                const std::string &time_str) const
+/* static */ std::pair<std::string, TimeParser::MicrosecondPosition>
+TimeParser::Split(const std::string &time_str)
 {
 	std::istringstream is(time_str);
 	MicrosecondPosition raw_time;
