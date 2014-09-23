@@ -14,6 +14,7 @@
  * @see io/io_core.hpp
  */
 
+#include <algorithm>
 #include <csignal>
 #include <cstring>
 #include <string>
@@ -118,11 +119,12 @@ void IoCore::NewConnection(uv_stream_t *server)
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
 		Debug() << "New connection" << std::endl;
-		auto tcp = std::make_shared<Connection>(*this, client,
-		                                        this->handler);
-		this->player.WelcomeClient(*tcp);
-		this->connections.insert(tcp);
-		client->data = static_cast<void *>(tcp.get());
+		this->connections.emplace_back(
+		                new Connection(*this, client, this->handler));
+
+		this->player.WelcomeClient(*this->connections.back());
+		client->data = static_cast<void *>(
+		                this->connections.back().get());
 
 		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 	} else {
@@ -132,7 +134,11 @@ void IoCore::NewConnection(uv_stream_t *server)
 
 void IoCore::RemoveConnection(Connection &conn)
 {
-	this->connections.erase(std::make_shared<Connection>(conn));
+	this->connections.erase(std::remove_if(
+	                this->connections.begin(), this->connections.end(),
+	                [&](const std::unique_ptr<Connection> &p) {
+		                return p.get() == &conn;
+		        }));
 }
 
 IoCore::IoCore(Player &player, CommandHandler &handler,

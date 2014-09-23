@@ -90,7 +90,7 @@ public:
 
 private:
 	/// The set of connections currently serviced by the IoCore.
-	std::set<std::shared_ptr<Connection>> connections;
+	std::vector<std::unique_ptr<Connection>> connections;
 
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
