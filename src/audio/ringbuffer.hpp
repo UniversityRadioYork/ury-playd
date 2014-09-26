@@ -171,7 +171,7 @@ private:
 	 * @param count The size/count in PortAudio form.
 	 * @return The size/count after casting to SampleCountT.
 	 */
-	SampleCountT CountCast(ring_buffer_size_t count) const
+	static SampleCountT CountCast(ring_buffer_size_t count)
 	{
 		return static_cast<SampleCountT>(count);
 	}

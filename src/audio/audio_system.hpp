@@ -71,14 +71,14 @@ public:
 	 * AudioSystem.
 	 * @return List of output devices, as strings.
 	 */
-	std::vector<AudioSystem::Device> GetDevicesInfo();
+	static std::vector<AudioSystem::Device> GetDevicesInfo();
 
 	/**
 	 * Can a sound device output sound?
 	 * @param id Device ID.
 	 * @return If the device can handle outputting sound.
 	 */
-	bool IsOutputDevice(int id);
+	static bool IsOutputDevice(int id);
 
 	virtual portaudio::Stream *Configure(
 	                const AudioSource &source,
@@ -92,15 +92,15 @@ private:
 	 * @param id_string The device ID, as a string.
 	 * @return The device.
 	 */
-	const portaudio::Device &PaDeviceFrom(
-	                const std::string &id_string) const;
+	static const portaudio::Device &PaDeviceFrom(
+	                const std::string &id_string);
 
 	/**
 	 * Converts a sample format identifier from playd to PortAudio.
 	 * @param fmt The playd sample format identifier.
 	 * @return The PortAudio equivalent of the given SampleFormat.
 	 */
-	portaudio::SampleDataFormat PaSampleFormatFrom(SampleFormat fmt) const;
+	static portaudio::SampleDataFormat PaSampleFormatFrom(SampleFormat fmt);
 };
 
 #endif // PS_AUDIO_SYSTEM_HPP

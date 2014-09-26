@@ -24,13 +24,8 @@
 #include "player_state.hpp"
 #include "player.hpp"
 
-const std::vector<std::string> Player::FEATURES {
-	"End",
-	"FileLoad",
-	"PlayStop",
-	"Seek",
-	"TimeReport"
-};
+const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
+	                                         "Seek", "TimeReport" };
 
 Player::Player(const AudioSystem &audio_system, const TimeParser &time_parser)
     : file(audio_system),

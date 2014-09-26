@@ -9,9 +9,8 @@
 
 #include "errors.hpp"
 
-Error::Error(const std::string &message)
+Error::Error(const std::string &message) : message(message)
 {
-	this->message = std::string(message);
 }
 
 const std::string &Error::Message() const

@@ -53,14 +53,14 @@ public:
 	 * Runs the reactor.
 	 * It will block until terminated.
 	 */
-	void Run();
+	static void Run();
 
 	/**
 	 * Ends the reactor.
 	 * This should be called by the parent object when the player is
 	 * quitting.
 	 */
-	void End();
+	static void End();
 
 	/**
 	 * Accepts a new connection.
@@ -83,15 +83,14 @@ public:
 	 *
 	 * @param sink The connection to remove.
 	 *
-	 * @todo Rename sink?
 	 * @todo This isn't a great fit for the public interface of IoCore -
 	 *   separate into a ConnectionPool class?
 	 */
-	void RemoveConnection(Connection &sink);
+	void RemoveConnection(Connection &conn);
 
 private:
 	/// The set of connections currently serviced by the IoCore.
-	std::set<std::shared_ptr<Connection>> connections;
+	std::vector<std::unique_ptr<Connection>> connections;
 
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;

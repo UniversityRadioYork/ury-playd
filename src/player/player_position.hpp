@@ -80,7 +80,7 @@ private:
 	 * @return True if enough time has elapsed for a signal to be sent;
 	 *   false otherwise.
 	 */
-	bool IsReadyToSend();
+	bool IsReadyToSend() const;
 
 	/**
 	 * Sends a position signal to the outside environment, if ready.

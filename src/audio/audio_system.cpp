@@ -52,7 +52,7 @@ AudioSystem::~AudioSystem()
 	sox_format_quit();
 }
 
-std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()
+/* static */ std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()
 {
 	auto &pa = portaudio::System::instance();
 	std::vector<AudioSystem::Device> list;
@@ -66,7 +66,7 @@ std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()
 	return list;
 }
 
-bool AudioSystem::IsOutputDevice(int id)
+/* static */ bool AudioSystem::IsOutputDevice(int id)
 {
 	auto &pa = portaudio::System::instance();
 	if (id < 0 || id >= pa.deviceCount()) return false;
@@ -109,8 +109,8 @@ portaudio::Stream *AudioSystem::Configure(
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
 
-const portaudio::Device &AudioSystem::PaDeviceFrom(
-                const std::string &id_string) const
+/* static */ const portaudio::Device &AudioSystem::PaDeviceFrom(
+                const std::string &id_string)
 {
 	auto &pa = portaudio::System::instance();
 
@@ -134,8 +134,8 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
 };
 
-portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(
-                SampleFormat fmt) const
+/* static */ portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(
+                SampleFormat fmt)
 {
 	try {
 		return pa_from_sf.at(fmt);

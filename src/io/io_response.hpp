@@ -66,7 +66,8 @@ public:
 	 * @see Respond
 	 * @see RespondIter
 	 */
-	void RespondArgs(ResponseCode code, const std::vector<std::string> &arguments) const;
+	void RespondArgs(ResponseCode code,
+	                 const std::vector<std::string> &arguments) const;
 
 	/**
 	 * Emits an error as a response.
@@ -87,7 +88,7 @@ private:
 	 * @param argument The argument to escape.
 	 * @return The escaped argument.
 	 */
-	std::string EscapeArgument(const std::string &argument) const;
+	static std::string EscapeArgument(const std::string &argument);
 };
 
 /**
@@ -104,6 +105,7 @@ private:
  */
 class ResponseSource {
 public:
+	ResponseSource() = default;
 	/**
 	 * Emits a response to a given ResponseSink.
 	 * @param sink The ResponseSink to which this ResponseSource's current

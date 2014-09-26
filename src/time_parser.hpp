@@ -27,7 +27,7 @@ public:
 	 * @param time_str  The time string.
 	 * @return          The parsed time.
 	 */
-	MicrosecondPosition Parse(const std::string &time_str) const;
+	static MicrosecondPosition Parse(const std::string &time_str);
 
 private:
 	// Conversion rates from various position units to microseconds.
@@ -47,15 +47,7 @@ private:
 	 * @return The unit multiplier.
 	 * @throws std::out_of_range if the unit is not recognised.
 	 */
-	Multiplier UnitMultiplier(const std::string &unit) const;
-
-	/**
-	 * Determines whether a unit suffix is in a list of unit suffixes.
-	 * @param unit The unit suffix to check against @a list.
-	 * @param list The list of unit suffixes.
-	 * @return True if @a unit is in @a list; false otherwise.
-	 */
-	bool IsIn(const std::string &unit, std::initializer_list<std::string> list) const;
+	static Multiplier UnitMultiplier(const std::string &unit);
 
 	/**
 	 * Splits a time string into a pair of unit and amount.
@@ -63,7 +55,8 @@ private:
 	 * @return          A pair of unit string and time amount, as an integer
 	 *                  in terms of the named unit.
 	 */
-	std::pair<std::string, MicrosecondPosition> Split(const std::string &time_str) const;
+	static std::pair<std::string, MicrosecondPosition> Split(
+	                const std::string &time_str);
 };
 
 #endif // PS_TIME_PARSER_HPP

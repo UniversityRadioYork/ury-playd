@@ -90,7 +90,7 @@ public:
 	 * Returns the output sample format.
 	 * @return The output sample format, as a SampleFormat.
 	 */
-	SampleFormat OutputSampleFormat() const;
+	static SampleFormat OutputSampleFormat();
 
 	/**
 	 * Returns the number of samples this decoder's buffer can store.

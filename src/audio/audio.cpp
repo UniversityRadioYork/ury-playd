@@ -122,12 +122,12 @@ bool Audio::DecodeIfFrameEmpty()
 	return more_frames_available;
 }
 
-bool Audio::FileEnded()
+bool Audio::FileEnded() const
 {
 	return this->file_ended;
 }
 
-bool Audio::FrameFinished()
+bool Audio::FrameFinished() const
 {
 	return this->frame.end() <= this->frame_iterator;
 }

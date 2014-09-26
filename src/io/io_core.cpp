@@ -14,6 +14,7 @@
  * @see io/io_core.hpp
  */
 
+#include <algorithm>
 #include <csignal>
 #include <cstring>
 #include <string>
@@ -92,7 +93,7 @@ void UvListenCallback(uv_stream_t *server, int status)
 void UvRespondCallback(uv_write_t *req, int)
 {
 	// TODO: Handle the int status?
-	WriteReq *wr = (WriteReq *)req;
+	WriteReq *wr = reinterpret_cast<WriteReq *>(req);
 	delete[] wr -> buf.base;
 	delete wr;
 }
@@ -118,11 +119,12 @@ void IoCore::NewConnection(uv_stream_t *server)
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
 		Debug() << "New connection" << std::endl;
-		auto tcp = std::make_shared<Connection>(*this, client,
-		                                             this->handler);
-		this->player.WelcomeClient(*tcp);
-		this->connections.insert(tcp);
-		client->data = static_cast<void *>(tcp.get());
+		this->connections.emplace_back(
+		                new Connection(*this, client, this->handler));
+
+		this->player.WelcomeClient(*this->connections.back());
+		client->data = static_cast<void *>(
+		                this->connections.back().get());
 
 		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 	} else {
@@ -132,18 +134,22 @@ void IoCore::NewConnection(uv_stream_t *server)
 
 void IoCore::RemoveConnection(Connection &conn)
 {
-	this->connections.erase(std::make_shared<Connection>(conn));
+	this->connections.erase(std::remove_if(
+	                this->connections.begin(), this->connections.end(),
+	                [&](const std::unique_ptr<Connection> &p) {
+		                return p.get() == &conn;
+		        }));
 }
 
 IoCore::IoCore(Player &player, CommandHandler &handler,
-                     const std::string &address, const std::string &port)
+               const std::string &address, const std::string &port)
     : player(player), handler(handler)
 {
 	InitAcceptor(address, port);
 	DoUpdateTimer();
 }
 
-void IoCore::Run()
+/* static */ void IoCore::Run()
 {
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
@@ -156,8 +162,7 @@ void IoCore::DoUpdateTimer()
 	               PLAYER_UPDATE_PERIOD);
 }
 
-void IoCore::InitAcceptor(const std::string &address,
-                             const std::string &port)
+void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 {
 	int uport = std::stoi(port);
 
@@ -175,12 +180,15 @@ void IoCore::InitAcceptor(const std::string &address,
 
 void IoCore::RespondRaw(const std::string &string) const
 {
+	if (this->connections.size() != 0) {
+		Debug() << "Sending command:" << string << std::endl;
+	}
 	for (const auto &conn : this->connections) {
 		conn->RespondRaw(string);
 	}
 }
 
-void IoCore::End()
+/* static */ void IoCore::End()
 {
 	uv_stop(uv_default_loop());
 }
@@ -189,15 +197,13 @@ void IoCore::End()
 // Connection
 //
 
-Connection::Connection(IoCore &parent, uv_tcp_t *tcp,
-                                 CommandHandler &handler)
+Connection::Connection(IoCore &parent, uv_tcp_t *tcp, CommandHandler &handler)
     : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {
 }
 
 void Connection::RespondRaw(const std::string &string) const
 {
-	Debug() << "Sending command:" << string << std::endl;
 	unsigned int l = string.length();
 	const char *s = string.c_str();
 
@@ -210,8 +216,7 @@ void Connection::RespondRaw(const std::string &string) const
 	         UvRespondCallback);
 }
 
-void Connection::Read(uv_stream_t *stream, ssize_t nread,
-                           const uv_buf_t *buf)
+void Connection::Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	if (nread < 0) {
 		if (nread == UV_EOF) {
@@ -236,8 +241,7 @@ void Connection::HandleCommand(const std::vector<std::string> &words)
 	if (words.empty()) return;
 
 	Debug() << "Received command:";
-	for (const auto &word : words)
-		std::cerr << ' ' << '"' << word << '"';
+	for (const auto &word : words) std::cerr << ' ' << '"' << word << '"';
 	std::cerr << std::endl;
 
 	bool valid = this->handler.Handle(words);
@@ -247,7 +251,6 @@ void Connection::HandleCommand(const std::vector<std::string> &words)
 		// TODO: Better error reporting.
 		this->parent.Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
 	}
-
 }
 
 void Connection::Close()
