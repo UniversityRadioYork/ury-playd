@@ -6,7 +6,7 @@ before_install:
 
 # Ubuntu 12.04 doesn't have a libuv package, so we install it from source.
 before_script:
-  - ./make-libuv.sh
+  - ./make_libuv.sh
 
 compiler:
   - clang
