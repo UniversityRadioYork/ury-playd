@@ -116,7 +116,7 @@ LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##
 
-.PHONY: clean mkdir install run gdbrun format gh-pages doc libuv
+.PHONY: clean mkdir install run gdbrun format gh-pages doc
 
 all: mkdir $(BIN) man
 
@@ -210,7 +210,3 @@ gdbrun: $(BIN)
 format: $(TO_FORMAT)
 	@echo FORMAT $^
 	@$(FORMAT) $^
-
-# Installs libuv from source.
-libuv:
-	./make_libuv.sh
