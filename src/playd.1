@@ -108,11 +108,10 @@ This example, hopefully, covers all command-line usage of
 .An "Matt Windsor" Aq matt.windsor@ury.org.uk
 .An "Charles Pigott" Aq charles.pigott@ury.org.uk
 .Sh BUGS
-Yes.  See https://github.com/UniversityRadioYork/ury-playd/issues for
-the
-.Nm
-issue tracker.
-.Sh WONTFIX
 .An Undefined behaviour if you try to escape (\*q\e\*q) a multi-byte UTF-8
-character. We decided it was too much effort to try to work around that, short
-of writing a whole UTF-8 string class.
+character. This is intentional, for reasons of code simplicity. See the
+.URL "http://universityradioyork.github.io/baps3-spec/comms/internal/protocol.html#limitations" "specification"
+for more details.
+.An See the
+.URL "https://github.com/UniversityRadioYork/ury-playd/issues" "issue tracker"
+for any other open issues.
