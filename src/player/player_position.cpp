@@ -39,11 +39,9 @@ void Player::ResetPosition()
 // PlayerPosition
 //
 
-PlayerPosition::PlayerPosition()
+// Default to broadcasting the position every time it is changed.
+PlayerPosition::PlayerPosition() : ResponseSource(), period(0)
 {
-	// Default to broadcasting the position every time it is changed.
-	this->period = decltype(this->period)(0);
-
 	Reset();
 }
 

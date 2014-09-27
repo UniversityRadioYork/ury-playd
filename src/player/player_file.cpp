@@ -14,7 +14,7 @@
 #include "player_position.hpp"
 
 PlayerFile::PlayerFile(const AudioSystem &audio_system)
-    : audio(nullptr), audio_system(audio_system)
+    : ResponseSource(), audio(nullptr), audio_system(audio_system)
 {
 }
 
