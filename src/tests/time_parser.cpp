@@ -73,7 +73,8 @@ SCENARIO("TimeParsers raise exceptions on invalid times", "[time-parser]") {
 				REQUIRE_THROWS_AS(t.Parse("s"), SeekError);
 			}
 		}
-		AND_WHEN("the Tokeniser is fed a quantity with an incorrect unit") {
+
+		WHEN("the Tokeniser is fed a quantity with an incorrect unit") {
 			THEN("a std::out_of_range exception is thrown") {
 				REQUIRE_THROWS_AS(t.Parse("1234z"), std::out_of_range);
 			}

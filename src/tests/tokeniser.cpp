@@ -134,7 +134,7 @@ SCENARIO("Tokenisers can handle double-quoted strings", "[tokeniser-double]") {
 SCENARIO("Tokenisers can handle mixed-quoted strings", "[tokeniser-mixed]") {
 	// This is a slightly strange concept, but is based on what happens in POSIX
 	// shell.
-	
+
 	GIVEN("A fresh Tokeniser") {
 		Tokeniser t;
 
