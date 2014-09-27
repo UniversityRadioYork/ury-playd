@@ -14,38 +14,197 @@ SCENARIO("Tokenisers can handle complete, unquoted commands", "[tokeniser]") {
 		Tokeniser t;
 
 		WHEN("the Tokeniser is fed a nullary command") {
-			auto words = t.Feed("stop\n");
+			auto lines = t.Feed("stop\n");
 
 			THEN("one line is returned") {
-				REQUIRE(words.size() == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN("the line contains one word") {
-				REQUIRE(words[0].size() == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
 			THEN("the word is the nullary command") {
-				REQUIRE(words[0][0] == "stop");
+				REQUIRE(lines[0][0] == "stop");
 			}
 		}
 
 		WHEN("the Tokeniser is fed a unary command") {
-			auto words = t.Feed("seek 10s\n");
+			auto lines = t.Feed("seek 10s\n");
 
 			THEN("one line is returned") {
-				REQUIRE(words.size() == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN("the line contains two words") {
-				REQUIRE(words[0].size() == 2);
+				REQUIRE(lines[0].size() == 2);
 			}
 
 			THEN("the first word is the command") {
-				REQUIRE(words[0][0] == "seek");
+				REQUIRE(lines[0][0] == "seek");
 			}
 
 			THEN("the second word is the argument") {
-				REQUIRE(words[0][1] == "10s");
+				REQUIRE(lines[0][1] == "10s");
+			}
+		}
+	}
+}
+
+SCENARIO("Tokenisers can handle single-quoted strings", "[tokeniser-single]") {
+	GIVEN("A fresh Tokeniser") {
+		Tokeniser t;
+
+		WHEN("the Tokeniser is fed a single-quoted string with no special characters") {
+			auto lines = t.Feed("'normal_string'\n");
+
+			THEN("one line is returned") {
+				REQUIRE(lines.size() == 1);
+			}
+
+			THEN("the line contains only one word") {
+				REQUIRE(lines[0].size() == 1);
+			}
+
+			THEN("the word contains the bytes enclosed in the single quotes") {
+				REQUIRE(lines[0][0] == "normal_string");
+			}
+		}
+
+		WHEN("the Tokeniser is fed a single-quoted string with spaces") {
+			auto lines = t.Feed("'not three words'\n");
+
+			THEN("one line is returned") {
+				REQUIRE(lines.size() == 1);
+			}
+
+			THEN("the line contains only one word") {
+				REQUIRE(lines[0].size() == 1);
+			}
+
+			THEN("the word contains the bytes enclosed in the single quotes") {
+				REQUIRE(lines[0][0] == "not three words");
+			}
+		}
+
+		// Backslashes are tested in [tokeniser-escape].
+	}
+}
+
+SCENARIO("Tokenisers can handle double-quoted strings", "[tokeniser-double]") {
+	GIVEN("A fresh Tokeniser") {
+		Tokeniser t;
+
+		WHEN("the Tokeniser is fed a double-quoted string with no special characters") {
+			auto lines = t.Feed("\"normal_string\"\n");
+
+			THEN("one line is returned") {
+				REQUIRE(lines.size() == 1);
+			}
+
+			THEN("the line contains only one word") {
+				REQUIRE(lines[0].size() == 1);
+			}
+
+			THEN("the word contains the bytes enclosed in the double quotes") {
+				REQUIRE(lines[0][0] == "normal_string");
+			}
+		}
+
+		WHEN("the Tokeniser is fed a double-quoted string with spaces") {
+			auto lines = t.Feed("\"not three words\"\n");
+
+			THEN("one line is returned") {
+				REQUIRE(lines.size() == 1);
+			}
+
+			THEN("the line contains only one word") {
+				REQUIRE(lines[0].size() == 1);
+			}
+
+			THEN("the word contains the bytes enclosed in the double quotes") {
+				REQUIRE(lines[0][0] == "not three words");
+			}
+		}
+
+		// Backslashes are tested in [tokeniser-escape].
+	}
+}
+
+SCENARIO("Tokenisers can handle mixed-quoted strings", "[tokeniser-mixed]") {
+	// This is a slightly strange concept, but is based on what happens in POSIX
+	// shell.
+	
+	GIVEN("A fresh Tokeniser") {
+		Tokeniser t;
+
+		WHEN("the Tokeniser is fed a word with a mixture of different quote styles") {
+			auto lines = t.Feed("This' is'\\ perfectly\"\\ valid \"syntax!\n");
+
+			THEN("one line is returned") {
+				REQUIRE(lines.size() == 1);
+			}
+
+			THEN("the line contains only one word") {
+				REQUIRE(lines[0].size() == 1);
+			}
+
+			THEN("the word contains the concatenation of each") {
+				REQUIRE(lines[0][0] == "This is perfectly valid syntax!");
+			}
+		}
+	}
+}
+
+SCENARIO("Tokenisers can backslash-escape bytes", "[tokeniser-escape]") {
+	GIVEN("A fresh Tokeniser") {
+		Tokeniser t;
+
+		WHEN("the Tokeniser is fed a backslashed space in unquoted mode") {
+			auto lines = t.Feed("backslashed\\ space\n");
+
+			THEN("one line is returned") {
+				REQUIRE(lines.size() == 1);
+			}
+
+			THEN("the line contains only one word") {
+				REQUIRE(lines[0].size() == 1);
+			}
+
+			THEN("the line contains the space, but no backslash") {
+				REQUIRE(lines[0][0] == "backslashed space");
+			}
+		}
+
+		WHEN("the Tokeniser is fed a backslashed space in double-quoted mode") {
+			auto lines = t.Feed("\"backslashed\\ space\"\n");
+
+			THEN("one line is returned") {
+				REQUIRE(lines.size() == 1);
+			}
+
+			THEN("the line contains only one word") {
+				REQUIRE(lines[0].size() == 1);
+			}
+
+			THEN("the line contains the space, but no backslash or quotes") {
+				REQUIRE(lines[0][0] == "backslashed space");
+			}
+		}
+
+		WHEN("the Tokeniser is fed a backslashed space in single-quoted mode") {
+			auto lines = t.Feed("'backslashed\\ space'\n");
+
+			THEN("one line is returned") {
+				REQUIRE(lines.size() == 1);
+			}
+
+			THEN("the line contains only one word") {
+				REQUIRE(lines[0].size() == 1);
+			}
+
+			THEN("the line contains the space AND backslash, but no quotes") {
+				REQUIRE(lines[0][0] == "backslashed\\ space");
 			}
 		}
 	}
