@@ -3,6 +3,7 @@ language: cpp
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libsox-dev portaudio19-dev
+  - sudo pip install cpp-coveralls
 
 # Ubuntu 12.04 doesn't have a libuv package, so we install it from source.
 before_script:
@@ -14,9 +15,11 @@ compiler:
 
 # Ubuntu 12.04's GCC doesn't support std=c++11, so we use c++0x instead.
 script:
-  - env CXX_STD=c++0x make
-  - env CXX_STD=c++0x make test
+  - env CXX_STD=c++0x make coverage
 
+# coveralls doesn't like gcc (segfaults)
+after_success:
+  - if [ "$CXX" == "clang++-3.4" ]; then coveralls -b .; fi
 
 notifications:
   irc:
