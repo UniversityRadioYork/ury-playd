@@ -51,7 +51,7 @@ SCENARIO("Tokenisers can handle complete, unquoted commands", "[tokeniser]") {
 	}
 }
 
-SCENARIO("Tokenisers can handle single-quoted strings", "[tokeniser-single]") {
+SCENARIO("Tokenisers can handle single-quoted strings", "[tokeniser]") {
 	GIVEN("A fresh Tokeniser") {
 		Tokeniser t;
 
@@ -87,11 +87,11 @@ SCENARIO("Tokenisers can handle single-quoted strings", "[tokeniser-single]") {
 			}
 		}
 
-		// Backslashes are tested in [tokeniser-escape].
+		// Backslashes are tested in their own scenario below.
 	}
 }
 
-SCENARIO("Tokenisers can handle double-quoted strings", "[tokeniser-double]") {
+SCENARIO("Tokenisers can handle double-quoted strings", "[tokeniser]") {
 	GIVEN("A fresh Tokeniser") {
 		Tokeniser t;
 
@@ -127,11 +127,11 @@ SCENARIO("Tokenisers can handle double-quoted strings", "[tokeniser-double]") {
 			}
 		}
 
-		// Backslashes are tested in [tokeniser-escape].
+		// Backslashes are tested in their own scenario below.
 	}
 }
 
-SCENARIO("Tokenisers can handle mixed-quoted strings", "[tokeniser-mixed]") {
+SCENARIO("Tokenisers can handle mixed-quoted strings", "[tokeniser]") {
 	// This is a slightly strange concept, but is based on what happens in POSIX
 	// shell.
 
@@ -156,7 +156,7 @@ SCENARIO("Tokenisers can handle mixed-quoted strings", "[tokeniser-mixed]") {
 	}
 }
 
-SCENARIO("Tokenisers can backslash-escape bytes", "[tokeniser-escape]") {
+SCENARIO("Tokenisers can backslash-escape bytes", "[tokeniser]") {
 	GIVEN("A fresh Tokeniser") {
 		Tokeniser t;
 

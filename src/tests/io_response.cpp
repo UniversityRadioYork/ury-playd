@@ -23,7 +23,7 @@ void DummyResponseSink::RespondRaw(const std::string &response) const
 	this->os << response;
 }
 
-SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[rs-quote]") {
+SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[response-sink]") {
 	GIVEN("A dummy ResponseSink") {
 		std::ostringstream os;
 		DummyResponseSink rs(os);
