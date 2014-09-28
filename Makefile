@@ -116,7 +116,7 @@ LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##
 
-.PHONY: clean mkdir install format gh-pages doc
+.PHONY: clean mkdir install format gh-pages doc coverage
 
 all: mkdir $(BIN) man
 
@@ -202,3 +202,7 @@ install: $(BIN) $(MAN_GZ)
 format: $(TO_FORMAT)
 	@echo FORMAT $^
 	@$(FORMAT) $^
+
+coverage: CXXFLAGS += -fprofile-arcs -ftest-coverage
+coverage: LDFLAGS += -fprofile-arcs -ftest-coverage
+coverage: mkdir test

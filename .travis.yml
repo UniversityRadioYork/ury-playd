@@ -1,8 +1,18 @@
 language: cpp
 
 before_install:
+  - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+  - if [ "$CXX" == "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
   - sudo apt-get update -qq
+
+install:
+  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
+  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4" CC="clang-3.4"; fi
+
   - sudo apt-get install -y libsox-dev portaudio19-dev
+  - sudo pip install cpp-coveralls
 
 # Ubuntu 12.04 doesn't have a libuv package, so we install it from source.
 before_script:
@@ -12,11 +22,12 @@ compiler:
   - clang
   - gcc
 
-# Ubuntu 12.04's GCC doesn't support std=c++11, so we use c++0x instead.
 script:
-  - env CXX_STD=c++0x make
-  - env CXX_STD=c++0x make test
+  - make coverage
 
+# coveralls doesn't like gcc (segfaults)
+after_success:
+  - if [ "$CXX" == "clang++-3.4" ]; then coveralls -b . --exclude src/tests --exclude src/contrib; fi
 
 notifications:
   irc:
