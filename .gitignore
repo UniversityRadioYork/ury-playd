@@ -22,8 +22,9 @@ cov-int/
 build-log.txt
 playd.tgz
 
-# Vim
+# Editor temporary files
 *.sw?
+*.lock~
 
 # Sublime Text
 *.sublime-project
