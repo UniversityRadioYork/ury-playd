@@ -95,46 +95,47 @@ void Player::End()
 
 CommandResult Player::Eject()
 {
-	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
-		this->file.Eject();
-		SetState(PlayerState::State::EJECTED);
-		return true;
-	}
-	return false;
+	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES))
+		return false;
+
+	this->file.Eject();
+	SetState(PlayerState::State::EJECTED);
+	return true;
 }
 
 CommandResult Player::Load(const std::string &path)
 {
-	bool valid = !path.empty();
-	if (valid) {
-		try {
-			this->file.Load(path);
-			ResetPosition();
-			SetState(PlayerState::State::STOPPED);
-		}
-		catch (FileError &) {
-			// File errors aren't fatal, so catch them here.
-			Eject();
-			valid = false;
-		}
-		catch (Error &) {
-			// Ensure a load failure doesn't leave a corrupted track
-			// loaded.
-			Eject();
-			throw;
-		}
+	if (path.empty())
+		return false;
+
+	try {
+		this->file.Load(path);
+		ResetPosition();
+		SetState(PlayerState::State::STOPPED);
 	}
-	return valid;
+	catch (FileError &) {
+		// File errors aren't fatal, so catch them here.
+		Eject();
+		return false;
+	}
+	catch (Error &) {
+		// Ensure a load failure doesn't leave a corrupted track
+		// loaded.
+		Eject();
+		throw;
+	}
+	
+	return true;
 }
 
 CommandResult Player::Play()
 {
-	if (CurrentStateIn({ PlayerState::State::STOPPED })) {
-		this->file.Start();
-		SetState(PlayerState::State::PLAYING);
-		return true;
-	}
-	return false;
+	if (!CurrentStateIn({ PlayerState::State::STOPPED }))
+		return false;
+
+	this->file.Start();
+	SetState(PlayerState::State::PLAYING);
+	return true;
 }
 
 CommandResult Player::Quit()
@@ -183,10 +184,10 @@ CommandResult Player::Seek(const std::string &time_str)
 
 CommandResult Player::Stop()
 {
-	if (CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES)) {
-		this->file.Stop();
-		SetState(PlayerState::State::STOPPED);
-		return true;
-	}
-	return false;
+	if (!CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES))
+		return false;
+
+	this->file.Stop();
+	SetState(PlayerState::State::STOPPED);
+	return true;
 }
