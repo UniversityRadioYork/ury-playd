@@ -17,6 +17,7 @@
 
 #include "../audio/audio_system.hpp"
 #include "../audio/audio.hpp"
+#include "../cmd_result.hpp"
 #include "../errors.hpp"
 #include "../io/io_response.hpp"
 #include "../messages.h"
@@ -92,7 +93,7 @@ void Player::End()
 // Commands
 //
 
-bool Player::Eject()
+CommandResult Player::Eject()
 {
 	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
 		this->file.Eject();
@@ -102,7 +103,7 @@ bool Player::Eject()
 	return false;
 }
 
-bool Player::Load(const std::string &path)
+CommandResult Player::Load(const std::string &path)
 {
 	bool valid = !path.empty();
 	if (valid) {
@@ -126,7 +127,7 @@ bool Player::Load(const std::string &path)
 	return valid;
 }
 
-bool Player::Play()
+CommandResult Player::Play()
 {
 	if (CurrentStateIn({ PlayerState::State::STOPPED })) {
 		this->file.Start();
@@ -136,7 +137,7 @@ bool Player::Play()
 	return false;
 }
 
-bool Player::Quit()
+CommandResult Player::Quit()
 {
 	Eject();
 	SetState(PlayerState::State::QUITTING);
@@ -144,7 +145,7 @@ bool Player::Quit()
 	return true; // Always a valid command.
 }
 
-bool Player::Seek(const std::string &time_str)
+CommandResult Player::Seek(const std::string &time_str)
 {
 	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) return false;
 
@@ -180,7 +181,7 @@ bool Player::Seek(const std::string &time_str)
 	return true;
 }
 
-bool Player::Stop()
+CommandResult Player::Stop()
 {
 	if (CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES)) {
 		this->file.Stop();

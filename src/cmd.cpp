@@ -19,7 +19,7 @@ CommandHandler::CommandHandler(Player &player) : player(player)
 {
 }
 
-bool CommandHandler::Handle(const CommandHandler::WordList &words)
+CommandResult CommandHandler::Handle(const CommandHandler::WordList &words)
 {
 	if (words.size() == 1) {
 		return RunNullary(words[0]);
@@ -29,7 +29,7 @@ bool CommandHandler::Handle(const CommandHandler::WordList &words)
 	return false;
 }
 
-bool CommandHandler::RunNullary(const std::string &cmd)
+CommandResult CommandHandler::RunNullary(const std::string &cmd)
 {
 	if ("play" == cmd) return this->player.Play();
 	if ("stop" == cmd) return this->player.Stop();
@@ -38,7 +38,7 @@ bool CommandHandler::RunNullary(const std::string &cmd)
 	return false;
 }
 
-bool CommandHandler::RunUnary(const std::string &cmd, const std::string &arg)
+CommandResult CommandHandler::RunUnary(const std::string &cmd, const std::string &arg)
 {
 	if ("load" == cmd) return this->player.Load(arg);
 	if ("seek" == cmd) return this->player.Seek(arg);

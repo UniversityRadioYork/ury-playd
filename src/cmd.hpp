@@ -14,11 +14,13 @@
 #include <memory>
 #include <vector>
 
+#include "cmd_result.hpp"
 #include "player/player.hpp"
 
 #ifdef IGNORE
 #undef IGNORE
 #endif
+
 
 /**
  * The playd command handler.

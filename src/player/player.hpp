@@ -22,6 +22,7 @@
 
 #include "../audio/audio.hpp"
 #include "../io/io_response.hpp"
+#include "../cmd_result.hpp"
 #include "../time_parser.hpp"
 
 #include "player_file.hpp"
@@ -69,23 +70,27 @@ public:
 	 */
 	bool IsRunning() const;
 
+	//
+	// Begin player commands:
+	//
+
 	/**
 	 * Ejects the current loaded song, if any.
 	 * @return Whether the ejection succeeded.
 	 */
-	bool Eject();
+	CommandResult Eject();
 
 	/**
 	 * Plays the current loaded song, if any.
 	 * @return Whether the starting of playback succeeded.
 	 */
-	bool Play();
+	CommandResult Play();
 
 	/**
 	 * Quits playd.
 	 * @return Whether the quit succeeded.
 	 */
-	bool Quit();
+	CommandResult Quit();
 
 	/**
 	 * Stops the currently playing track, if any.
@@ -93,14 +98,14 @@ public:
 	 * to its start, issue a seek command afterwards.
 	 * @return Whether the stop succeeded.
 	 */
-	bool Stop();
+	CommandResult Stop();
 
 	/**
 	 * Loads a track.
 	 * @param path The absolute path to a track to load.
 	 * @return Whether the load succeeded.
 	 */
-	bool Load(const std::string &path);
+	CommandResult Load(const std::string &path);
 
 	/**
 	 * Seeks to a given position in the current track.
@@ -110,7 +115,11 @@ public:
 	 *   microseconds are assumed.
 	 * @return Whether the seek succeeded.
 	 */
-	bool Seek(const std::string &time_str);
+	CommandResult Seek(const std::string &time_str);
+
+	//
+	// End player commands.
+	//
 
 	/**
 	 * A human-readable string representation of the current state.
