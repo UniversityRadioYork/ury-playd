@@ -17,6 +17,7 @@
 
 #include "../audio/audio_system.hpp"
 #include "../audio/audio.hpp"
+#include "../cmd_result.hpp"
 #include "../errors.hpp"
 #include "../io/io_response.hpp"
 #include "../messages.h"
@@ -92,61 +93,66 @@ void Player::End()
 // Commands
 //
 
-bool Player::Eject()
+CommandResult Player::Eject()
 {
-	if (CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
-		this->file.Eject();
-		SetState(PlayerState::State::EJECTED);
-		return true;
-	}
-	return false;
+	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES))
+		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
+
+	this->file.Eject();
+	SetState(PlayerState::State::EJECTED);
+
+	return CommandResult::Success();
 }
 
-bool Player::Load(const std::string &path)
+CommandResult Player::Load(const std::string &path)
 {
-	bool valid = !path.empty();
-	if (valid) {
-		try {
-			this->file.Load(path);
-			ResetPosition();
-			SetState(PlayerState::State::STOPPED);
-		}
-		catch (FileError &) {
-			// File errors aren't fatal, so catch them here.
-			Eject();
-			valid = false;
-		}
-		catch (Error &) {
-			// Ensure a load failure doesn't leave a corrupted track
-			// loaded.
-			Eject();
-			throw;
-		}
+	if (path.empty())
+		return CommandResult::Invalid(MSG_LOAD_EMPTY_PATH);
+
+	try {
+		this->file.Load(path);
+		ResetPosition();
+		SetState(PlayerState::State::STOPPED);
 	}
-	return valid;
+	catch (FileError &e) {
+		// File errors aren't fatal, so catch them here.
+		Eject();
+		return CommandResult::Failure(e.Message());
+	}
+	catch (Error &) {
+		// Ensure a load failure doesn't leave a corrupted track
+		// loaded.
+		Eject();
+		throw;
+	}
+	
+	return CommandResult::Success();
 }
 
-bool Player::Play()
+CommandResult Player::Play()
 {
-	if (CurrentStateIn({ PlayerState::State::STOPPED })) {
-		this->file.Start();
-		SetState(PlayerState::State::PLAYING);
-		return true;
-	}
-	return false;
+	if (!CurrentStateIn({ PlayerState::State::STOPPED }))
+		return CommandResult::Invalid(MSG_CMD_NEEDS_STOPPED);
+
+	this->file.Start();
+	SetState(PlayerState::State::PLAYING);
+
+	return CommandResult::Success();
 }
 
-bool Player::Quit()
+CommandResult Player::Quit()
 {
 	Eject();
 	SetState(PlayerState::State::QUITTING);
 
-	return true; // Always a valid command.
+	// Quitting is always a valid command.
+	return CommandResult::Success();
 }
 
-bool Player::Seek(const std::string &time_str)
+CommandResult Player::Seek(const std::string &time_str)
 {
-	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) return false;
+	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES))
+		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
 
 	TimeParser::MicrosecondPosition position(0);
 
@@ -154,12 +160,10 @@ bool Player::Seek(const std::string &time_str)
 		position = this->time_parser.Parse(time_str);
 	}
 	catch (std::out_of_range) {
-		Debug() << "Invalid time units" << std::endl;
-		return false;
+		return CommandResult::Invalid(MSG_SEEK_INVALID_UNIT);
 	}
 	catch (SeekError) {
-		Debug() << "No time given" << std::endl;
-		return false;
+		return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 	}
 
 	try {
@@ -171,21 +175,23 @@ bool Player::Seek(const std::string &time_str)
 		// Make it look to the client as if the seek ran off the end of
 		// the file.
 		End();
-		return true;
+		return CommandResult::Success();
 	}
 
+	// Clean out the position tracker, as the position has abruptly changed.
 	this->ResetPosition();
 	this->UpdatePosition();
 
-	return true;
+	return CommandResult::Success();
 }
 
-bool Player::Stop()
+CommandResult Player::Stop()
 {
-	if (CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES)) {
-		this->file.Stop();
-		SetState(PlayerState::State::STOPPED);
-		return true;
-	}
-	return false;
+	if (!CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES))
+		return CommandResult::Invalid(MSG_CMD_NEEDS_PLAYING);
+
+	this->file.Stop();
+	SetState(PlayerState::State::STOPPED);
+
+	return CommandResult::Success();
 }
