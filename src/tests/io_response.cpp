@@ -55,8 +55,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 		WHEN("the ResponseSink is fed two arguments, one quoted, one unquoted") {
 			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "ulyoath" });
 
-			THEN("the emitted response's arguments are quoted accordingly")
-			{
+			THEN("the emitted response's arguments are quoted accordingly") {
 				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' ulyoath)");
 			}
 		}
