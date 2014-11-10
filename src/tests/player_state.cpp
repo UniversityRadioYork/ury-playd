@@ -9,9 +9,7 @@
 #include "catch.hpp"
 
 #include "../player/player_state.hpp"
-
-// We re-use the DummyResponder from the io_response tests here.
-#include "io_response.hpp"
+#include "dummy_io_responder.hpp"
 
 SCENARIO("PlayerState begins in a valid state", "[player-state]")
 {
