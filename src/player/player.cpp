@@ -96,27 +96,28 @@ void Player::End()
 CommandResult Player::Eject()
 {
 	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES))
-		return false;
+		return CommandResult::Invalid("nothing loaded");
 
 	this->file.Eject();
 	SetState(PlayerState::State::EJECTED);
-	return true;
+
+	return CommandResult::Success();
 }
 
 CommandResult Player::Load(const std::string &path)
 {
 	if (path.empty())
-		return false;
+		return CommandResult::Invalid("path empty");
 
 	try {
 		this->file.Load(path);
 		ResetPosition();
 		SetState(PlayerState::State::STOPPED);
 	}
-	catch (FileError &) {
+	catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
 		Eject();
-		return false;
+		return CommandResult::Failure(e.Message());
 	}
 	catch (Error &) {
 		// Ensure a load failure doesn't leave a corrupted track
@@ -125,17 +126,18 @@ CommandResult Player::Load(const std::string &path)
 		throw;
 	}
 	
-	return true;
+	return CommandResult::Success();
 }
 
 CommandResult Player::Play()
 {
 	if (!CurrentStateIn({ PlayerState::State::STOPPED }))
-		return false;
+		return CommandResult::Invalid("must be STOPPED");
 
 	this->file.Start();
 	SetState(PlayerState::State::PLAYING);
-	return true;
+
+	return CommandResult::Success();
 }
 
 CommandResult Player::Quit()
@@ -143,12 +145,14 @@ CommandResult Player::Quit()
 	Eject();
 	SetState(PlayerState::State::QUITTING);
 
-	return true; // Always a valid command.
+	// Quitting is always a valid command.
+	return CommandResult::Success();
 }
 
 CommandResult Player::Seek(const std::string &time_str)
 {
-	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) return false;
+	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES))
+		return CommandResult::Failure("nothing loaded");
 
 	TimeParser::MicrosecondPosition position(0);
 
@@ -156,12 +160,10 @@ CommandResult Player::Seek(const std::string &time_str)
 		position = this->time_parser.Parse(time_str);
 	}
 	catch (std::out_of_range) {
-		Debug() << "Invalid time units" << std::endl;
-		return false;
+		return CommandResult::Invalid("invalid time unit");
 	}
 	catch (SeekError) {
-		Debug() << "No time given" << std::endl;
-		return false;
+		return CommandResult::Invalid("invalid time value");
 	}
 
 	try {
@@ -173,21 +175,23 @@ CommandResult Player::Seek(const std::string &time_str)
 		// Make it look to the client as if the seek ran off the end of
 		// the file.
 		End();
-		return true;
+		return CommandResult::Success();
 	}
 
+	// Clean out the position tracker, as the position has abruptly changed.
 	this->ResetPosition();
 	this->UpdatePosition();
 
-	return true;
+	return CommandResult::Success();
 }
 
 CommandResult Player::Stop()
 {
 	if (!CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES))
-		return false;
+		return CommandResult::Invalid("nothing playing");
 
 	this->file.Stop();
 	SetState(PlayerState::State::STOPPED);
-	return true;
+
+	return CommandResult::Success();
 }
