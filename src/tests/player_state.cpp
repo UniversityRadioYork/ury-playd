@@ -9,9 +9,7 @@
 #include "catch.hpp"
 
 #include "../player/player_state.hpp"
-
-// We re-use the DummyResponder from the io_response tests here.
-#include "io_response.hpp"
+#include "dummy_response_sink.hpp"
 
 SCENARIO("PlayerState begins in a valid state", "[player-state]") {
 	GIVEN("a fresh PlayerState") {
@@ -67,28 +65,33 @@ SCENARIO("PlayerState correctly returns whether or not it is running", "[player-
 			}
 		}
 
-		// There are so few states in playd that we might as well exhaustively test.
+		// There are so few states in playd that we might as well
+		// exhaustively test.
 		WHEN("the current state is not QUITTING") {
 			AND_WHEN("the current state is STARTING") {
 				ps.Set(PlayerState::State::STARTING);
+
 				THEN("the player is running") {
 					REQUIRE(ps.IsRunning());
 				}
 			}
 			AND_WHEN("the current state is EJECTED") {
 				ps.Set(PlayerState::State::EJECTED);
+
 				THEN("the player is running") {
 					REQUIRE(ps.IsRunning());
 				}
 			}
 			AND_WHEN("the current state is STOPPED") {
 				ps.Set(PlayerState::State::STOPPED);
+
 				THEN("the player is running") {
 					REQUIRE(ps.IsRunning());
 				}
 			}
 			AND_WHEN("the current state is PLAYING") {
 				ps.Set(PlayerState::State::PLAYING);
+
 				THEN("the player is running") {
 					REQUIRE(ps.IsRunning());
 				}
@@ -96,4 +99,3 @@ SCENARIO("PlayerState correctly returns whether or not it is running", "[player-
 		}
 	}
 }
-

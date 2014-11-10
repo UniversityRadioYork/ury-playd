@@ -12,16 +12,8 @@
 
 #include "catch.hpp"
 #include "../io/io_response.hpp"
+#include "dummy_response_sink.hpp"
 
-// We need a dummy class in order to check the ResponseSink class.
-#include "io_response.hpp"
-
-DummyResponseSink::DummyResponseSink(std::ostream &os) : os(os) {}
-
-void DummyResponseSink::RespondRaw(const std::string &response) const
-{
-	this->os << response;
-}
 
 SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[response-sink]") {
 	GIVEN("A dummy ResponseSink") {

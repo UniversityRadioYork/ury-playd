@@ -127,7 +127,8 @@ void IoCore::NewConnection(uv_stream_t *server)
 		                this->connections.back().get());
 
 		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
-	} else {
+	}
+	else {
 		uv_close((uv_handle_t *)client, UvCloseCallback);
 	}
 }
@@ -244,13 +245,8 @@ void Connection::HandleCommand(const std::vector<std::string> &words)
 	for (const auto &word : words) std::cerr << ' ' << '"' << word << '"';
 	std::cerr << std::endl;
 
-	bool valid = this->handler.Handle(words);
-	if (valid) {
-		this->parent.RespondArgs(ResponseCode::OKAY, words);
-	} else {
-		// TODO: Better error reporting.
-		this->parent.Respond(ResponseCode::WHAT, MSG_CMD_INVALID);
-	}
+	CommandResult res = this->handler.Handle(words);
+	res.Emit(this->parent, words);
 }
 
 void Connection::Close()

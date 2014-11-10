@@ -31,4 +31,3 @@ private:
 };
 
 #endif // PS_TESTS_IO_RESPONSE_HPP
-
