@@ -13,8 +13,7 @@
 #include "dummy_response_sink.hpp"
 
 
-SCENARIO("CommandResult's convenience constructors create correct CommandResults",
-         "[command-result]") {
+SCENARIO("CommandResult's convenience constructors create correct CommandResults", "[command-result]") {
 	GIVEN("A CommandResult created via CommandResult::Success()") {
 		CommandResult c = CommandResult::Success();
 		
