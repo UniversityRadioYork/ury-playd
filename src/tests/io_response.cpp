@@ -37,8 +37,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes",
 			}
 		}
 
-		WHEN("the ResponseSink is fed a single argument with single "
-		     "quotes") {
+		WHEN("the ResponseSink is fed a single argument with single quotes") {
 			rs.Respond(ResponseCode::OHAI, "chattur'gha");
 
 			THEN("the emitted response's argument is single-quoted") {
@@ -46,8 +45,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes",
 			}
 		}
 
-		WHEN("the ResponseSink is fed two arguments, both with single "
-		     "quotes") {
+		WHEN("the ResponseSink is fed two arguments, both with single quotes") {
 			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "xel'lotath" });
 
 			THEN("the emitted response's arguments are both single-quoted") {
@@ -88,8 +86,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes",
 			}
 		}
 
-		WHEN("the ResponseSink is fed a representative example with backslashes and spaces")
-		{
+		WHEN("the ResponseSink is fed a representative example with backslashes and spaces") {
 			rs.Respond(ResponseCode::FILE, R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
 
 			THEN("the emitted response's argument is single-quoted") {
