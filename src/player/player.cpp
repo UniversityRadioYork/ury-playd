@@ -96,7 +96,7 @@ void Player::End()
 CommandResult Player::Eject()
 {
 	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES))
-		return CommandResult::Invalid("nothing loaded");
+		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
 
 	this->file.Eject();
 	SetState(PlayerState::State::EJECTED);
@@ -107,7 +107,7 @@ CommandResult Player::Eject()
 CommandResult Player::Load(const std::string &path)
 {
 	if (path.empty())
-		return CommandResult::Invalid("path empty");
+		return CommandResult::Invalid(MSG_LOAD_EMPTY_PATH);
 
 	try {
 		this->file.Load(path);
@@ -132,7 +132,7 @@ CommandResult Player::Load(const std::string &path)
 CommandResult Player::Play()
 {
 	if (!CurrentStateIn({ PlayerState::State::STOPPED }))
-		return CommandResult::Invalid("must be STOPPED");
+		return CommandResult::Invalid(MSG_CMD_NEEDS_STOPPED);
 
 	this->file.Start();
 	SetState(PlayerState::State::PLAYING);
@@ -152,7 +152,7 @@ CommandResult Player::Quit()
 CommandResult Player::Seek(const std::string &time_str)
 {
 	if (!CurrentStateIn(PlayerState::AUDIO_LOADED_STATES))
-		return CommandResult::Failure("nothing loaded");
+		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
 
 	TimeParser::MicrosecondPosition position(0);
 
@@ -160,10 +160,10 @@ CommandResult Player::Seek(const std::string &time_str)
 		position = this->time_parser.Parse(time_str);
 	}
 	catch (std::out_of_range) {
-		return CommandResult::Invalid("invalid time unit");
+		return CommandResult::Invalid(MSG_SEEK_INVALID_UNIT);
 	}
 	catch (SeekError) {
-		return CommandResult::Invalid("invalid time value");
+		return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 	}
 
 	try {
@@ -188,7 +188,7 @@ CommandResult Player::Seek(const std::string &time_str)
 CommandResult Player::Stop()
 {
 	if (!CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES))
-		return CommandResult::Invalid("nothing playing");
+		return CommandResult::Invalid(MSG_CMD_NEEDS_PLAYING);
 
 	this->file.Stop();
 	SetState(PlayerState::State::STOPPED);
