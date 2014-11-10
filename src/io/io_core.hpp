@@ -26,6 +26,105 @@ extern "C" {
 class Player;
 class Connection;
 
+
+/// A pool of TCP connections.
+class ConnectionPool : public ResponseSink {
+public:
+	/**
+	 * Constructs a ConnectionPool.
+	 * @param player The player that forms welcome responses for new clients.
+	 * @param handler The handler to which read commands should be sent.
+	 */
+	ConnectionPool(Player &player, CommandHandler &handler);
+
+	/**
+	 * Accepts a new connection.
+	 *
+	 * This accepts the connection, and adds it to this IoCore's
+	 * connection pool.
+	 *
+	 * This should be called with a server that has just received a new
+	 * connection.
+	 *
+	 * @param server Pointer to the libuv server accepting connections.
+	 */
+	void Accept(uv_stream_t *server);
+
+	/**
+	 * Removes a connection.
+	 * @param conn The connection to remove.
+	 */
+	void Remove(Connection &conn);
+
+	/**
+	 * Broadcasts a message to all connections.
+	 * @param message The message to send to all connections.
+	 */
+	void Broadcast(const std::string &message) const;
+
+private:
+	Player &player;          ///< The player.
+	CommandHandler &handler; ///< The command handler.
+
+	/// The set of connections inside this ConnectionPool.
+	std::vector<std::unique_ptr<Connection>> connections;
+
+	void RespondRaw(const std::string &string) const;
+};
+
+
+/// A TCP connection from a client.
+class Connection : public ResponseSink {
+public:
+	/**
+	 * Constructs a Connection.
+	 * @param parent The connection pool to which this Connection belongs.
+	 * @param tcp The underlying libuv TCP stream.
+	 * @param handler The handler to which read commands should be sent.
+	 */
+	Connection(ConnectionPool &parent, uv_tcp_t *tcp, CommandHandler &handler);
+
+	// Note: This is made public so that the IoCore can send raw data
+	// to the connection.
+	void RespondRaw(const std::string &response) const;
+
+	/**
+	 * Processes a data read on this connection.
+	 *
+	 * @param stream The libuv TCP/IP stream providing the data.
+	 * @param nread The number of bytes read.
+	 * @param buf The buffer containing the read data.
+	 */
+	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
+
+	/**
+	 * Closes this connection.
+	 * @todo Roll into the destructor/use RAII?
+	 */
+	void Close();
+
+private:
+	/// The pool on which this connection is running.
+	ConnectionPool &parent;
+
+	/// The libuv handle for the TCP connection.
+	uv_tcp_t *tcp;
+
+	/// The Tokeniser to which data read on this connection should be sent.
+	Tokeniser tokeniser;
+
+	/// The CommandHandler to which finished commands should be sent.
+	CommandHandler &handler;
+
+	/**
+	 * Handles a tokenised command line.
+	 *
+	 * @param line A vector of command words representing a command line.
+	 */
+	void HandleCommand(const std::vector<std::string> &words);
+};
+
+
 /**
  * The IO core, which services input, routes responses, and executes the
  * Player update routine periodically.
@@ -62,44 +161,14 @@ public:
 	 */
 	static void End();
 
-	/**
-	 * Accepts a new connection.
-	 *
-	 * This accepts the connection, and adds it to this IoCore's
-	 * connection pool.
-	 *
-	 * This should be called with a server that has just received a new
-	 * connection.
-	 *
-	 * @param server Pointer to the libuv server accepting connections.
-	 *
-	 * @todo This isn't a great fit for the public interface of IoCore -
-	 *   separate into a ConnectionPool class?
-	 */
-	void NewConnection(uv_stream_t *server);
-
-	/**
-	 * Removes a connection.
-	 *
-	 * @param sink The connection to remove.
-	 *
-	 * @todo This isn't a great fit for the public interface of IoCore -
-	 *   separate into a ConnectionPool class?
-	 */
-	void RemoveConnection(Connection &conn);
-
 private:
-	/// The set of connections currently serviced by the IoCore.
-	std::vector<std::unique_ptr<Connection>> connections;
-
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
 
-	uv_tcp_t server;    ///< The libuv handle for the TCP server.
-	uv_timer_t updater; ///< The libuv handle for the update timer.
-
-	Player &player;          ///< The player.
-	CommandHandler &handler; ///< The command handler.
+	uv_tcp_t server;     ///< The libuv handle for the TCP server.
+	uv_timer_t updater;  ///< The libuv handle for the update timer.
+	Player &player;      ///< The player.
+	ConnectionPool pool; ///< The pool of client Connections.
 
 	void RespondRaw(const std::string &string) const;
 
@@ -116,55 +185,5 @@ private:
 	void DoUpdateTimer();
 };
 
-/// A TCP connection from a client.
-class Connection : public ResponseSink {
-public:
-	/**
-	 * Constructs a Connection.
-	 * @param parent The IoCore that is the parent of this connection.
-	 * @param tcp The underlying libuv TCP stream.
-	 * @param handler The handler to which read commands should be sent.
-	 */
-	Connection(IoCore &parent, uv_tcp_t *tcp, CommandHandler &handler);
-
-	// Note: This is made public so that the IoCore can send raw data
-	// to the connection.
-	void RespondRaw(const std::string &response) const;
-
-	/**
-	 * Processes a data read on this connection.
-	 *
-	 * @param stream The libuv TCP/IP stream providing the data.
-	 * @param nread The number of bytes read.
-	 * @param buf The buffer containing the read data.
-	 */
-	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
-
-	/**
-	 * Closes this connection.
-	 * @todo Roll into the destructor/use RAII?
-	 */
-	void Close();
-
-private:
-	/// The parent IoCore on which this connection is running.
-	IoCore &parent;
-
-	/// The libuv handle for the TCP connection.
-	uv_tcp_t *tcp;
-
-	/// The Tokeniser to which data read on this connection should be sent.
-	Tokeniser tokeniser;
-
-	/// The CommandHandler to which finished commands should be sent.
-	CommandHandler &handler;
-
-	/**
-	 * Handles a tokenised command line.
-	 *
-	 * @param line A vector of command words representing a command line.
-	 */
-	void HandleCommand(const std::vector<std::string> &words);
-};
 
 #endif // PS_IO_CORE_HPP

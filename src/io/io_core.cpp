@@ -85,8 +85,8 @@ void UvListenCallback(uv_stream_t *server, int status)
 	if (status == -1) {
 		return;
 	}
-	IoCore *reactor = static_cast<IoCore *>(server->data);
-	reactor->NewConnection(server);
+	ConnectionPool *pool = static_cast<ConnectionPool *>(server->data);
+	pool->Accept(server);
 }
 
 /// The callback fired when a response has been sent to a client.
@@ -109,10 +109,15 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 }
 
 //
-// IoCore
+// ConnectionPool
 //
 
-void IoCore::NewConnection(uv_stream_t *server)
+ConnectionPool::ConnectionPool(Player &player, CommandHandler &handler)
+    : player(player), handler(handler), connections()
+{
+}
+
+void ConnectionPool::Accept(uv_stream_t *server)
 {
 	uv_tcp_t *client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
@@ -133,7 +138,7 @@ void IoCore::NewConnection(uv_stream_t *server)
 	}
 }
 
-void IoCore::RemoveConnection(Connection &conn)
+void ConnectionPool::Remove(Connection &conn)
 {
 	this->connections.erase(std::remove_if(
 	                this->connections.begin(), this->connections.end(),
@@ -142,9 +147,29 @@ void IoCore::RemoveConnection(Connection &conn)
 		        }));
 }
 
+void ConnectionPool::Broadcast(const std::string &message) const
+{
+	if (this->connections.size() != 0) {
+		Debug() << "Sending command:" << message << std::endl;
+	}
+	for (const auto &conn : this->connections) {
+		conn->RespondRaw(message);
+	}
+}
+
+void ConnectionPool::RespondRaw(const std::string &string) const
+{
+	Broadcast(string);
+}
+
+
+//
+// IoCore
+//
+
 IoCore::IoCore(Player &player, CommandHandler &handler,
                const std::string &address, const std::string &port)
-    : player(player), handler(handler)
+    : player(player), pool(player, handler)
 {
 	InitAcceptor(address, port);
 	DoUpdateTimer();
@@ -168,7 +193,7 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	int uport = std::stoi(port);
 
 	uv_tcp_init(uv_default_loop(), &this->server);
-	this->server.data = static_cast<void *>(this);
+	this->server.data = static_cast<void *>(&this->pool);
 
 	struct sockaddr_in bind_addr;
 	uv_ip4_addr(address.c_str(), uport, &bind_addr);
@@ -181,12 +206,7 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 
 void IoCore::RespondRaw(const std::string &string) const
 {
-	if (this->connections.size() != 0) {
-		Debug() << "Sending command:" << string << std::endl;
-	}
-	for (const auto &conn : this->connections) {
-		conn->RespondRaw(string);
-	}
+	this->pool.Broadcast(string);
 }
 
 /* static */ void IoCore::End()
@@ -194,11 +214,12 @@ void IoCore::RespondRaw(const std::string &string) const
 	uv_stop(uv_default_loop());
 }
 
+
 //
 // Connection
 //
 
-Connection::Connection(IoCore &parent, uv_tcp_t *tcp, CommandHandler &handler)
+Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp, CommandHandler &handler)
     : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {
 }
@@ -223,7 +244,6 @@ void Connection::Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 		if (nread == UV_EOF) {
 			uv_close((uv_handle_t *)stream, UvCloseCallback);
 		}
-
 		return;
 	}
 
@@ -251,5 +271,5 @@ void Connection::HandleCommand(const std::vector<std::string> &words)
 
 void Connection::Close()
 {
-	this->parent.RemoveConnection(*this);
+	this->parent.Remove(*this);
 }
