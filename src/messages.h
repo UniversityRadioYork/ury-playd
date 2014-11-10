@@ -4,7 +4,7 @@
 /**
  * @file
  * Constant human-readable messages used within playd.
- * TODO: sort these properly?
+ * @todo sort these properly?
  */
 
 #ifndef PS_MESSAGES_H
