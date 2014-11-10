@@ -15,8 +15,7 @@
 #include "dummy_response_sink.hpp"
 
 
-SCENARIO("ResponseSinks correctly escape arguments with singLe quotes",
-         "[response-sink]") {
+SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[response-sink]") {
 	GIVEN("A dummy ResponseSink") {
 		std::ostringstream os;
 		DummyResponseSink rs(os);

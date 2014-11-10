@@ -54,8 +54,7 @@ SCENARIO("PlayerState pushes state changes to its registered response sink", "[p
 	}
 }
 
-SCENARIO("PlayerState correctly returns whether or not it is running", "[player-state]")
-{
+SCENARIO("PlayerState correctly returns whether or not it is running", "[player-state]") {
 	GIVEN("a fresh PlayerState") {
 		PlayerState ps;
 

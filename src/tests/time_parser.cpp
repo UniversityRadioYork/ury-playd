@@ -64,8 +64,7 @@ SCENARIO("TimeParsers successfully parse valid times", "[time-parser]") {
 	}
 }
 
-SCENARIO("TimeParsers raise exceptions on invalid times", "[time-parser]")
-{
+SCENARIO("TimeParsers raise exceptions on invalid times", "[time-parser]") {
 	GIVEN("A fresh TimeParser") {
 		TimeParser t;
 
