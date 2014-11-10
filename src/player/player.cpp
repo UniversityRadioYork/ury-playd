@@ -52,7 +52,8 @@ void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
 		End();
-	} else {
+	}
+	else {
 		UpdatePosition();
 	}
 }
@@ -106,8 +107,7 @@ CommandResult Player::Eject()
 
 CommandResult Player::Load(const std::string &path)
 {
-	if (path.empty())
-		return CommandResult::Invalid(MSG_LOAD_EMPTY_PATH);
+	if (path.empty()) return CommandResult::Invalid(MSG_LOAD_EMPTY_PATH);
 
 	try {
 		this->file.Load(path);
@@ -125,7 +125,7 @@ CommandResult Player::Load(const std::string &path)
 		Eject();
 		throw;
 	}
-	
+
 	return CommandResult::Success();
 }
 

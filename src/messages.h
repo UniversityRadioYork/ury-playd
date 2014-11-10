@@ -87,4 +87,3 @@ const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer[unit]";
 const std::string MSG_LOAD_EMPTY_PATH = "Empty file path given";
 
 #endif // PS_MESSAGES_H
-
