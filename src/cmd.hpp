@@ -52,7 +52,6 @@ private:
 	 * @param cmd The command word.
 	 * @return True if the command was successfully found and executed;
 	 *   false otherwise.
-	 * @todo Richer command results.
 	 */
 	CommandResult RunNullary(const std::string &cmd);
 
@@ -62,7 +61,6 @@ private:
 	 * @param arg The argument to the command.
 	 * @return True if the command was successfully found and executed;
 	 *   false otherwise.
-	 * @todo Richer command results.
 	 */
 	CommandResult RunUnary(const std::string &cmd, const std::string &arg);
 };
