@@ -9,10 +9,9 @@
 
 #include <string>
 #include <vector>
- 
+
 #include "io/io_response.hpp"
 #include "cmd_result.hpp"
-
 
 CommandResult CommandResult::Success()
 {
@@ -36,21 +35,21 @@ CommandResult::CommandResult(CommandResult::Type type, const std::string &msg)
 
 bool CommandResult::IsSuccess()
 {
-	return this->type == Type::SUCCESS; 
+	return this->type == Type::SUCCESS;
 }
 
 void CommandResult::Emit(const ResponseSink &sink,
                          const std::vector<std::string> &cmd)
 {
-	switch(this->type) {
-	case Type::SUCCESS:
-		sink.RespondArgs(ResponseCode::OKAY, cmd);
-		break;
-	case Type::INVALID:
-		sink.Respond(ResponseCode::WHAT, this->msg);
-		break;
-	case Type::FAILURE:
-		sink.Respond(ResponseCode::FAIL, this->msg);
-		break;
-	}	
+	switch (this->type) {
+		case Type::SUCCESS:
+			sink.RespondArgs(ResponseCode::OKAY, cmd);
+			break;
+		case Type::INVALID:
+			sink.Respond(ResponseCode::WHAT, this->msg);
+			break;
+		case Type::FAILURE:
+			sink.Respond(ResponseCode::FAIL, this->msg);
+			break;
+	}
 }

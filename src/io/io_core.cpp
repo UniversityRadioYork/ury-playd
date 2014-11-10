@@ -127,7 +127,8 @@ void IoCore::NewConnection(uv_stream_t *server)
 		                this->connections.back().get());
 
 		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
-	} else {
+	}
+	else {
 		uv_close((uv_handle_t *)client, UvCloseCallback);
 	}
 }

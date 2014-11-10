@@ -21,7 +21,6 @@
 #undef IGNORE
 #endif
 
-
 /**
  * The playd command handler.
  */

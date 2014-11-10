@@ -22,8 +22,7 @@ CommandHandler::CommandHandler(Player &player) : player(player)
 
 CommandResult CommandHandler::Handle(const CommandHandler::WordList &words)
 {
-	if (words.size() == 1)
-		return RunNullary(words[0]);
+	if (words.size() == 1) return RunNullary(words[0]);
 
 	if (words.size() == 2 && !words[1].empty())
 		return RunUnary(words[0], words[1]);
@@ -41,7 +40,8 @@ CommandResult CommandHandler::RunNullary(const std::string &cmd)
 	return CommandResult::Invalid(MSG_CMD_INVALID);
 }
 
-CommandResult CommandHandler::RunUnary(const std::string &cmd, const std::string &arg)
+CommandResult CommandHandler::RunUnary(const std::string &cmd,
+                                       const std::string &arg)
 {
 	if ("load" == cmd) return this->player.Load(arg);
 	if ("seek" == cmd) return this->player.Seek(arg);

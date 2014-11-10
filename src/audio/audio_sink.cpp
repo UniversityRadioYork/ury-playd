@@ -166,7 +166,8 @@ PlayCallbackStepResult AudioSink::PlayCallbackFailure(
 		Debug() << "Buffer underflow" << std::endl;
 		memset(out, 0, this->bytes_per_sample * frames_per_buf);
 		result = std::make_pair(paContinue, frames_per_buf);
-	} else {
+	}
+	else {
 		// End of input is ok, it means the stream can finish.
 		result = std::make_pair(paComplete, in.second);
 	}

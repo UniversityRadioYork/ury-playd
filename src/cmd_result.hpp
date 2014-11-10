@@ -16,7 +16,6 @@
 #include <vector>
 #include "io/io_response.hpp"
 
-
 /**
  * A result from a command.
  *
@@ -28,9 +27,9 @@ class CommandResult {
 public:
 	/// Enumeration of possible types of CommandResult.
 	enum class Type : std::uint8_t {
-		SUCCESS,	///< The command was successful.
-		INVALID,	///< The command request was not well-formed.
-		FAILURE		///< The command request was valid, but failed.
+		SUCCESS, ///< The command was successful.
+		INVALID, ///< The command request was not well-formed.
+		FAILURE  ///< The command request was valid, but failed.
 	};
 
 	/**
@@ -61,30 +60,30 @@ public:
 	 *   The message will be copied into the CommandResult.
 	 */
 	CommandResult(Type type, const std::string &msg);
-	
+
 	/**
 	 * Determines whether this CommandResult was successful.
 	 * @return True if the result was a success; false otherwise.
 	 */
 	bool IsSuccess();
-	
+
 	/**
 	 * Sends a response to a ResponseSink about this CommandResult.
 	 *
 	 * If the CommandResult was a success, then the response is 'OKAY cmd',
-	 * where 'cmd' is the parameter named as such.  Otherwise, the response is
-	 * 'X msg', where 'msg' is the result message and 'X' is whichever response
-	 * code is most appropriate for the failure.
+	 * where 'cmd' is the parameter named as such.  Otherwise, the response
+	 * is 'X msg', where 'msg' is the result message and 'X' is whichever
+	 * response code is most appropriate for the failure.
 	 *
 	 * @param sink The ResponseSink to which the response will be sent.
 	 * @param cmd The original command that created this CommandResult.
 	 */
-	void Emit(const ResponseSink &sink, const std::vector<std::string> &cmd);
-	
+	void Emit(const ResponseSink &sink,
+	          const std::vector<std::string> &cmd);
+
 private:
-	Type type;		///< The command result's type.
-	std::string msg;	///< The command result's message.
+	Type type;       ///< The command result's type.
+	std::string msg; ///< The command result's message.
 };
 
 #endif // PS_CMD_RESULT
-
