@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 
+#include "cmd_result.hpp"
 #include "player/player.hpp"
 
 #ifdef IGNORE
@@ -40,7 +41,7 @@ public:
 	 * @param words A reference to the list of words in the command.
 	 * @return Whether the command succeeded.
 	 */
-	bool Handle(const WordList &words);
+	CommandResult Handle(const WordList &words);
 
 private:
 	/// Reference to the Player on which commands run.
@@ -51,9 +52,8 @@ private:
 	 * @param cmd The command word.
 	 * @return True if the command was successfully found and executed;
 	 *   false otherwise.
-	 * @todo Richer command results.
 	 */
-	bool RunNullary(const std::string &cmd);
+	CommandResult RunNullary(const std::string &cmd);
 
 	/**
 	 * Runs a unary (1-argument) command.
@@ -61,9 +61,8 @@ private:
 	 * @param arg The argument to the command.
 	 * @return True if the command was successfully found and executed;
 	 *   false otherwise.
-	 * @todo Richer command results.
 	 */
-	bool RunUnary(const std::string &cmd, const std::string &arg);
+	CommandResult RunUnary(const std::string &cmd, const std::string &arg);
 };
 
 #endif // PS_CMD_HPP
