@@ -53,18 +53,14 @@ public:
 	 * @param code The code of the response to emit.
 	 * @param message The unescaped response message.
 	 * @see RespondArgs
-	 * @see RespondIter
 	 */
 	void Respond(ResponseCode code, const std::string &message) const;
 
 	/**
 	 * Outputs a response with multiple message arguments.
-	 * Prefer this when the number of arguments is known at compile-time,
-	 * and RespondIter otherwise.
 	 * @param code The code of the response to emit.
 	 * @param arguments The vector of unescaped arguments to emit.
 	 * @see Respond
-	 * @see RespondIter
 	 */
 	void RespondArgs(ResponseCode code,
 	                 const std::vector<std::string> &arguments) const;
