@@ -44,20 +44,20 @@ const int Playd::INVALID_ID = -1;
 
 int Playd::GetDeviceID()
 {
+	// Did the user provide an ID at all?
 	if (this->arguments.size() < 2) return INVALID_ID;
 
-	// Only accept valid numbers.
+	// Only accept valid numbers (stoi will throw for invalid ones).
 	int id;
 	try {
 		id = std::stoi(this->arguments[1]);
 	}
 	catch (...) {
-		/* Only std::invalid_argument and std::out_of_range are thrown
-		 * here. */
+		// Only std::{invalid_argument, std::out_of_range} are thrown here.
 		return INVALID_ID;
 	}
 
-	// Only allow valid (output) devices.
+	// Only allow valid, outputtable devices; reject input-only devices.
 	if (!this->audio.IsOutputDevice(id)) return INVALID_ID;
 
 	return id;
@@ -81,7 +81,6 @@ Playd::Playd(int argc, char *argv[])
 int Playd::Run()
 {
 	try {
-		// Don't roll this into the constructor: it'll go out of scope!
 		int id = this->GetDeviceID();
 		if (id == INVALID_ID) {
 			// Show the user the valid device IDs they can use.
