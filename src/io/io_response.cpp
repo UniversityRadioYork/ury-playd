@@ -15,15 +15,15 @@
 #include "io_response.hpp"
 
 const std::string RESPONSES[] = {
-	/* ResponseCode::OKAY     */ "OKAY",
-	/* ResponseCode::WHAT     */ "WHAT",
-	/* ResponseCode::FAIL     */ "FAIL",
-	/* ResponseCode::OHAI     */ "OHAI",
-	/* ResponseCode::STATE    */ "STATE",
-	/* ResponseCode::TIME     */ "TIME",
-	/* ResponseCode::FILE     */ "FILE",
-	/* ResponseCode::FEATURES */ "FEATURES",
-	/* ResponseCode::END      */ "END"
+	"OKAY",     // ResponseCode::OKAY
+	"WHAT",     // ResponseCode::WHAT
+	"FAIL",     // ResponseCode::FAIL
+	"OHAI",     // ResponseCode::OHAI
+	"STATE",    // ResponseCode::STATE
+	"TIME",     // ResponseCode::TIME
+	"FILE",     // ResponseCode::FILE
+	"FEATURES", // ResponseCode::FEATURES
+	"END"       // ResponseCode::END
 };
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message) const
@@ -72,7 +72,5 @@ void ResponseSource::SetResponseSink(ResponseSink &responder)
 
 void ResponseSource::Push() const
 {
-	if (this->push_sink != nullptr) {
-		Emit(*this->push_sink);
-	}
+	if (this->push_sink != nullptr) Emit(*this->push_sink);
 }
