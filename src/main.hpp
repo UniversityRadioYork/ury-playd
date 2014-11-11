@@ -59,19 +59,6 @@ private:
 	 * @return The device ID, INVALID_ID if invalid selection (or none).
 	 */
 	int GetDeviceID();
-
-	/**
-	 * Lists on stdout all sound devices to which the audio output may
-	 * connect.
-	 * This is mainly for the benefit of the end user.
-	 */
-	void ListOutputDevices();
-
-	/**
-	 * Registers the playd command set on the given Player.
-	 * @param p The Player on which the commands will act.
-	 */
-	void RegisterCommands(Player *p);
 };
 
 #endif // PS_MAIN_HPP
