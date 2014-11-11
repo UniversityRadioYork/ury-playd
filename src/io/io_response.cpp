@@ -40,11 +40,6 @@ void ResponseSink::RespondArgs(ResponseCode code,
 	RespondRaw(os.str());
 }
 
-void ResponseSink::RespondWithError(const Error &error) const
-{
-	Respond(ResponseCode::FAIL, error.Message());
-}
-
 /* static */ std::string ResponseSink::EscapeArgument(
                 const std::string &argument)
 {

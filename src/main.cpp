@@ -98,7 +98,7 @@ int Playd::Run()
 		this->io->Run();
 	}
 	catch (Error &error) {
-		io->RespondWithError(error);
+		io->Respond(ResponseCode::FAIL, error.Message());
 		Debug() << "Unhandled exception caught, going away now."
 		        << std::endl;
 		return EXIT_FAILURE;

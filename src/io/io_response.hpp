@@ -69,12 +69,6 @@ public:
 	void RespondArgs(ResponseCode code,
 	                 const std::vector<std::string> &arguments) const;
 
-	/**
-	 * Emits an error as a response.
-	 * @param error The error to convert to a response.
-	 */
-	void RespondWithError(const Error &error) const;
-
 protected:
 	/**
 	 * Outputs a raw response string.
