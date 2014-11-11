@@ -38,11 +38,15 @@ int main(int argc, char *argv[])
 
 const TimeParser::MicrosecondPosition Playd::POSITION_PERIOD(500000);
 
+/// ID returned by GetDeviceID when no device ID could be found.
+const int Playd::INVALID_ID = -1;
+
+
 int Playd::GetDeviceID()
 {
-	if (this->arguments.size() < 2) return -1;
+	if (this->arguments.size() < 2) return INVALID_ID;
 
-	/* Only accept valid numbers. */
+	// Only accept valid numbers.
 	int id;
 	try {
 		id = std::stoi(this->arguments[1]);
@@ -50,16 +54,13 @@ int Playd::GetDeviceID()
 	catch (...) {
 		/* Only std::invalid_argument and std::out_of_range are thrown
 		 * here. */
-		return -1;
+		return INVALID_ID;
 	}
 
-	/* Only allow valid (output) devices. */
-	auto device_list = this->audio.GetDevicesInfo();
-	if (this->audio.IsOutputDevice(id)) {
-		return id;
-	}
+	// Only allow valid (output) devices.
+	if (!this->audio.IsOutputDevice(id)) return INVALID_ID;
 
-	return -1;
+	return id;
 }
 
 Playd::Playd(int argc, char *argv[])
@@ -82,8 +83,8 @@ int Playd::Run()
 	try {
 		// Don't roll this into the constructor: it'll go out of scope!
 		int id = this->GetDeviceID();
-		if (id == -1) {
-			/* Oops, user entered an invalid sound device. */
+		if (id == INVALID_ID) {
+			// Show the user the valid device IDs they can use.
 			auto device_list = this->audio.GetDevicesInfo();
 			for (const auto &device : device_list) {
 				std::cout << device.first << ": "

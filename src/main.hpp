@@ -44,6 +44,9 @@ private:
 	/// The period between position announcements from the Player object.
 	static const TimeParser::MicrosecondPosition POSITION_PERIOD;
 
+	/// The ID returned by GetDeviceID if something goes wrong.
+	static const int INVALID_ID;
+
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.
 	Player player;                      ///< The player subsystem.
@@ -53,7 +56,7 @@ private:
 
 	/**
 	 * Tries to get the output device ID from program arguments.
-	 * @return The device ID, -1 if invalid selection (or none).
+	 * @return The device ID, INVALID_ID if invalid selection (or none).
 	 */
 	int GetDeviceID();
 
