@@ -53,7 +53,7 @@ int Playd::GetDeviceID()
 		id = std::stoi(this->arguments[1]);
 	}
 	catch (...) {
-		// Only std::{invalid_argument, std::out_of_range} are thrown here.
+		// Only std::{invalid_argument,out_of_range} are thrown here.
 		return INVALID_ID;
 	}
 
