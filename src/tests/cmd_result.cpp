@@ -34,7 +34,7 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 				c.Emit(d, cmd);
 				
 				THEN("the response is OKAY followed by the command words") {
-					REQUIRE(os.str() == "OKAY OHAI 'testy test'");
+					REQUIRE(os.str() == "OKAY OHAI 'testy test'\n");
 				}	
 			}
 		}
@@ -60,7 +60,7 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 				c.Emit(d, cmd);
 				
 				THEN("the response is WHAT followed by the failure message") {
-					REQUIRE(os.str() == "WHAT 'PEBCAK error'");
+					REQUIRE(os.str() == "WHAT 'PEBCAK error'\n");
 				}	
 			}
 		}
@@ -87,7 +87,7 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 				c.Emit(d, cmd);
 				
 				THEN("the response is FAIL followed by the failure message") {
-					REQUIRE(os.str() == "FAIL 'lp0 on fire'");
+					REQUIRE(os.str() == "FAIL 'lp0 on fire'\n");
 				}	
 			}
 		}

@@ -36,7 +36,7 @@ SCENARIO("PlayerState pushes state changes to its registered response sink", "[p
 			ps.Set(PlayerState::State::PLAYING);
 
 			THEN("the response sink receives a STATE response") {
-				REQUIRE(os.str() == "STATE Playing");
+				REQUIRE(os.str() == "STATE Playing\n");
 			}
 		}
 	}
