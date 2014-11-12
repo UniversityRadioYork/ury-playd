@@ -36,12 +36,6 @@ int main(int argc, char *argv[])
 // Playd
 //
 
-const TimeParser::MicrosecondPosition Playd::POSITION_PERIOD(500000);
-
-/// ID returned by GetDeviceID when no device ID could be found.
-const int Playd::INVALID_ID = -1;
-
-
 int Playd::GetDeviceID()
 {
 	// Did the user provide an ID at all?

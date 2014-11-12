@@ -41,11 +41,14 @@ public:
 	int Run();
 
 private:
-	/// The period between position announcements from the Player object.
-	static const TimeParser::MicrosecondPosition POSITION_PERIOD;
+	/**
+	 * The period between position announcements from the Player object.
+	 * This is given in microseconds, so eg. 500000 = 0.5sec = 2Hz.
+	 */
+	static const TimeParser::MicrosecondPosition POSITION_PERIOD = 500000;
 
 	/// The ID returned by GetDeviceID if something goes wrong.
-	static const int INVALID_ID;
+	static const int INVALID_ID = -1;
 
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.
