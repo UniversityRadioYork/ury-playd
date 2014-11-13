@@ -105,10 +105,12 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 {
 	Player *player = static_cast<Player *>(handle->data);
 	bool running = player->Update();
-	if (!running) {
-		uv_stop(uv_default_loop());
-	}
+
+	// If the player is ready to terminate, we need to kill the event loop
+	// in order to disconnect clients and stop the updating.
+	if (!running) IoCore::End();
 }
+
 
 //
 // ConnectionPool
