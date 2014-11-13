@@ -19,9 +19,6 @@
 /// Message shown when a client connects to playd.
 const std::string MSG_OHAI = "playd";
 
-/// Message shown when a client disconnects from playd.
-const std::string MSG_TTFN = "Sleep now";
-
 
 //
 // Command failure messages
@@ -53,18 +50,6 @@ const std::string MSG_CMD_NEEDS_STOPPED = "Command requires a stopped file";
 // Decoder failures
 //
 
-/// Message shown when the AudioSource fails to decode a file.
-const std::string MSG_DECODE_FAIL = "Decoding failure";
-
-/// Message shown when the AudioSource fails to find an audio stream.
-const std::string MSG_DECODE_NOAUDIO = "This doesn't seem to be an audio file";
-
-/// Message shown when the AudioSource fails to initialise a stream.
-const std::string MSG_DECODE_NOSTREAM = "Couldn't acquire stream";
-
-/// Message shown when the AudioSource fails to initialise a codec.
-const std::string MSG_DECODE_NOCODEC = "Couldn't acquire codec";
-
 /// Message shown when a bad sample rate is found.
 const std::string MSG_DECODE_BADRATE = "Unsupported or invalid sample rate";
 
@@ -75,9 +60,6 @@ const std::string MSG_DECODE_BADRATE = "Unsupported or invalid sample rate";
 
 /// Message shown when an incorrect device ID is provided.
 const std::string MSG_DEV_BADID = "Incorrect device ID";
-
-/// Message shown when no device ID is provided.
-const std::string MSG_DEV_NOID = "Expected a device ID as an argument";
 
 
 //
