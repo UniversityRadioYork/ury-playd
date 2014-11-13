@@ -67,7 +67,9 @@ void UvCloseCallback(uv_handle_t *handle)
 	Debug() << "Closing client connection" << std::endl;
 	if (handle->data != nullptr) {
 		auto tcp = static_cast<Connection *>(handle->data);
-		tcp->Close();
+		tcp->Depool();
+		// Note: tcp will likely be a dangling pointer now.
+		// Its connection pool has ownership!
 	}
 	delete handle;
 }
@@ -269,7 +271,7 @@ void Connection::HandleCommand(const std::vector<std::string> &words)
 	res.Emit(this->parent, words);
 }
 
-void Connection::Close()
+void Connection::Depool()
 {
 	this->parent.Remove(*this);
 }

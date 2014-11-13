@@ -98,10 +98,11 @@ public:
 	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
 
 	/**
-	 * Closes this connection.
-	 * @todo Roll into the destructor/use RAII?
+	 * Removes this connection from its connection pool.
+	 * Since the pool may contain a shared reference to this connection,
+	 * calling this can result in the connection being destructed.
 	 */
-	void Close();
+	void Depool();
 
 private:
 	/// The pool on which this connection is running.
