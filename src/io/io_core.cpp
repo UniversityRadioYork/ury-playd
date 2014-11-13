@@ -78,7 +78,7 @@ void UvCloseCallback(uv_handle_t *handle)
 void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	Connection *tcp = static_cast<Connection *>(stream->data);
-	tcp->Read(stream, nread, buf);
+	tcp->Read(nread, buf);
 }
 
 /// The callback fired when a new client connection is acquired by the listener.
@@ -238,15 +238,15 @@ void Connection::RespondRaw(const std::string &string) const
 	memcpy(req->buf.base, s, l);
 	req->buf.base[l] = '\n';
 
-	uv_write((uv_write_t *)req, (uv_stream_t *)tcp, &req->buf, 1,
+	uv_write((uv_write_t *)req, (uv_stream_t *)this->tcp, &req->buf, 1,
 	         UvRespondCallback);
 }
 
-void Connection::Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
+void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 {
 	if (nread < 0) {
 		if (nread == UV_EOF) {
-			uv_close((uv_handle_t *)stream, UvCloseCallback);
+			uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
 		}
 		return;
 	}

@@ -90,12 +90,10 @@ public:
 
 	/**
 	 * Processes a data read on this connection.
-	 *
-	 * @param stream The libuv TCP/IP stream providing the data.
 	 * @param nread The number of bytes read.
 	 * @param buf The buffer containing the read data.
 	 */
-	void Read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf);
+	void Read(ssize_t nread, const uv_buf_t *buf);
 
 	/**
 	 * Removes this connection from its connection pool.
