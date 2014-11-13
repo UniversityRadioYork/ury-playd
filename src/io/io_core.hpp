@@ -94,7 +94,7 @@ public:
 	Connection(const Connection &) = delete;
 
 	/// Connection cannot be copy-assigned.
-	Connection &operator=(const Connection &) =delete;
+	Connection &operator=(const Connection &) = delete;
 
 	// Note: This is made public so that the IoCore can send raw data
 	// to the connection.

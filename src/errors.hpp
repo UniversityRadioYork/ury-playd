@@ -47,7 +47,7 @@ public:
 	 * Constructs an ConfigError.
 	 * @param message The human-readable message of the error.
 	 */
-	ConfigError(const std::string &message) : Error(message){};
+	ConfigError(const std::string &message) : Error(message) {};
 };
 
 /**
@@ -59,7 +59,7 @@ public:
 	 * Constructs an InternalError.
 	 * @param message The human-readable message of the error.
 	 */
-	InternalError(const std::string &message) : Error(message){};
+	InternalError(const std::string &message) : Error(message) {};
 };
 
 /**
@@ -71,7 +71,7 @@ public:
 	 * Constructs a FileError.
 	 * @param message The human-readable message of the error.
 	 */
-	FileError(const std::string &message) : Error(message){};
+	FileError(const std::string &message) : Error(message) {};
 };
 
 /**
@@ -83,7 +83,7 @@ public:
 	 * Constructs a SeekError.
 	 * @param message The human-readable message of the error.
 	 */
-	SeekError(const std::string &message) : Error(message){};
+	SeekError(const std::string &message) : Error(message) {};
 };
 
 /**
@@ -95,7 +95,7 @@ public:
 	 * Constructs a NetError.
 	 * @param message The human-readable message of the error.
 	 */
-	NetError(const std::string &message) : Error(message){};
+	NetError(const std::string &message) : Error(message) {};
 };
 
 /** Class for telling the human what playd is doing. */
