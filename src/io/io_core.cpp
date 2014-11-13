@@ -84,9 +84,8 @@ void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 /// The callback fired when a new client connection is acquired by the listener.
 void UvListenCallback(uv_stream_t *server, int status)
 {
-	if (status == -1) {
-		return;
-	}
+	if (status == -1) return;
+
 	ConnectionPool *pool = static_cast<ConnectionPool *>(server->data);
 	pool->Accept(server);
 }
@@ -153,12 +152,10 @@ void ConnectionPool::Remove(Connection &conn)
 
 void ConnectionPool::Broadcast(const std::string &message) const
 {
-	if (this->connections.size() != 0) {
-		Debug() << "Sending command:" << message << std::endl;
-	}
-	for (const auto &conn : this->connections) {
-		conn->RespondRaw(message);
-	}
+	if (this->connections.empty()) return;
+
+	Debug() << "Sending command:" << message << std::endl;
+	for (const auto &conn : this->connections) conn->RespondRaw(message);
 }
 
 void ConnectionPool::RespondRaw(const std::string &string) const
@@ -244,21 +241,24 @@ void Connection::RespondRaw(const std::string &string) const
 
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 {
-	if (nread < 0) {
-		if (nread == UV_EOF) {
-			uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
-		}
+	// Did the connection hang up?  If so, clean it up.
+	if (nread == UV_EOF) {
+		uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
 		return;
 	}
 
+	// Did we hit any other read errors?  Ignore them.
+	if (nread < 0) return;
+
 	auto chars = buf->base;
-	if (chars != nullptr) {
-		auto lines = this->tokeniser.Feed(std::string(chars, nread));
 
-		for (auto line : lines) HandleCommand(line);
+	// Make sure we actually have some data to read!
+	if (chars == nullptr) return;
 
-		delete[] chars;
-	}
+	// Everything looks okay for reading.
+	auto lines = this->tokeniser.Feed(std::string(chars, nread));
+	for (auto line : lines) HandleCommand(line);
+	delete[] chars;
 }
 
 void Connection::HandleCommand(const std::vector<std::string> &words)
