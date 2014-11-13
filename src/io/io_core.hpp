@@ -84,6 +84,18 @@ public:
 	 */
 	Connection(ConnectionPool &parent, uv_tcp_t *tcp, CommandHandler &handler);
 
+	/**
+	 * Destructs a Connection.
+	 * This causes libuv to close and free the libuv TCP stream.
+	 */
+	~Connection();
+
+	/// Connection cannot be copied.
+	Connection(const Connection &) = delete;
+
+	/// Connection cannot be copy-assigned.
+	Connection &operator=(const Connection &) =delete;
+
 	// Note: This is made public so that the IoCore can send raw data
 	// to the connection.
 	void RespondRaw(const std::string &response) const;

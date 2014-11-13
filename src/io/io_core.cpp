@@ -64,13 +64,6 @@ void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 /// The callback fired when a client connection closes.
 void UvCloseCallback(uv_handle_t *handle)
 {
-	Debug() << "Closing client connection" << std::endl;
-	if (handle->data != nullptr) {
-		auto tcp = static_cast<Connection *>(handle->data);
-		tcp->Depool();
-		// Note: tcp will likely be a dangling pointer now.
-		// Its connection pool has ownership!
-	}
 	delete handle;
 }
 
@@ -225,6 +218,12 @@ Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp, CommandHandler &ha
 {
 }
 
+Connection::~Connection()
+{
+	Debug() << "Closing and destroying client connection" << std::endl;
+	uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
+}
+
 void Connection::RespondRaw(const std::string &string) const
 {
 	unsigned int l = string.length();
@@ -241,9 +240,10 @@ void Connection::RespondRaw(const std::string &string) const
 
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 {
-	// Did the connection hang up?  If so, clean it up.
+	// Did the connection hang up?  If so, de-pool it.
+	// De-pooling the connection will usually lead to the connection being destroyed.
 	if (nread == UV_EOF) {
-		uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
+		Depool();
 		return;
 	}
 
