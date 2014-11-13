@@ -198,11 +198,8 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 
 	int r = uv_listen((uv_stream_t *)&this->server, 128, UvListenCallback);
 	if (r) {
-		std::ostringstream os;
-		os << "Could not listen at " << address << " on " << port << ": ";
-		os << uv_err_name(r);
-
-		throw NetError(os.str());
+		throw NetError("Could not listen on " + address + ":" + port +
+		               " (" + std::string(uv_err_name(r)) + ")");
 	}
 
 	Debug() << "Listening at" << address << "on" << port << std::endl;
