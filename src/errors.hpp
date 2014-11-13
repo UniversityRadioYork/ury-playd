@@ -86,6 +86,18 @@ public:
 	SeekError(const std::string &message) : Error(message){};
 };
 
+/**
+ * A network error.
+ */
+class NetError : public Error {
+public:
+	/**
+	 * Constructs a NetError.
+	 * @param message The human-readable message of the error.
+	 */
+	NetError(const std::string &message) : Error(message){};
+};
+
 /** Class for telling the human what playd is doing. */
 class Debug {
 public:

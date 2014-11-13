@@ -63,38 +63,44 @@ Playd::Playd(int argc, char *argv[])
 	for (int i = 0; i < argc; i++) {
 		this->arguments.push_back(std::string(argv[i]));
 	}
-
-	auto size = this->arguments.size();
-
-	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
-	std::string port = size > 3 ? this->arguments.at(3) : "1350";
-	this->io = decltype(this->io)(
-	                new IoCore(this->player, this->handler, addr, port));
 }
 
 int Playd::Run()
 {
+	auto size = this->arguments.size();
+	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
+	std::string port = size > 3 ? this->arguments.at(3) : "1350";
 	try {
-		int id = this->GetDeviceID();
-		if (id == INVALID_ID) {
-			// Show the user the valid device IDs they can use.
-			auto device_list = this->audio.GetDevicesInfo();
-			for (const auto &device : device_list) {
-				std::cout << device.first << ": "
-				          << device.second << std::endl;
-			}
-			return EXIT_FAILURE;
-		}
-		this->audio.SetDeviceID(id);
+		this->io = decltype(this->io)(
+	                new IoCore(this->player, this->handler, addr, port));
+	} catch (NetError &e) {
+		std::cerr << "Network error: " << e.Message() << std::endl;
+		std::cerr << "Is " << addr << ":" << port << " available?" << std::endl;
+		return EXIT_FAILURE;
+	}
 
-		this->player.SetPositionResponsePeriod(POSITION_PERIOD);
-		this->player.SetResponseSink(*this->io);
+	int id = this->GetDeviceID();
+	if (id == INVALID_ID) {
+		// Show the user the valid device IDs they can use.
+		auto device_list = this->audio.GetDevicesInfo();
+		for (const auto &device : device_list) {
+			std::cout << device.first << ": "
+			          << device.second << std::endl;
+		}
+		return EXIT_FAILURE;
+	}
+	this->audio.SetDeviceID(id);
+
+	this->player.SetPositionResponsePeriod(POSITION_PERIOD);
+	this->player.SetResponseSink(*this->io);
+
+	try {
 		this->io->Run();
 	}
 	catch (Error &error) {
-		io->Respond(ResponseCode::FAIL, error.Message());
-		Debug() << "Unhandled exception caught, going away now."
-		        << std::endl;
+		std::cerr << "Unhandled exception in main loop: "
+		          << error.Message()
+		          << std::endl;
 		return EXIT_FAILURE;
 	}
 

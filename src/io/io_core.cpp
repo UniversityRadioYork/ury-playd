@@ -84,9 +84,12 @@ void UvListenCallback(uv_stream_t *server, int status)
 }
 
 /// The callback fired when a response has been sent to a client.
-void UvRespondCallback(uv_write_t *req, int)
+void UvRespondCallback(uv_write_t *req, int status)
 {
-	// TODO: Handle the int status?
+	if (status) {
+		Debug() << "UvRespondCallback: got status:" << status << std::endl;
+	}
+
 	WriteReq *wr = reinterpret_cast<WriteReq *>(req);
 	delete[] wr -> buf.base;
 	delete wr;
@@ -193,8 +196,15 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	uv_ip4_addr(address.c_str(), uport, &bind_addr);
 	uv_tcp_bind(&this->server, (const sockaddr *)&bind_addr, 0);
 
-	// TODO: Handle errors from uv_listen.
-	uv_listen((uv_stream_t *)&this->server, 128, UvListenCallback);
+	int r = uv_listen((uv_stream_t *)&this->server, 128, UvListenCallback);
+	if (r) {
+		std::ostringstream os;
+		os << "Could not listen at " << address << " on " << port << ": ";
+		os << uv_err_name(r);
+
+		throw NetError(os.str());
+	}
+
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
