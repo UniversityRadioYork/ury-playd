@@ -77,7 +77,7 @@ void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 /// The callback fired when a new client connection is acquired by the listener.
 void UvListenCallback(uv_stream_t *server, int status)
 {
-	if (status == -1) return;
+	if (status < 0) return;
 
 	ConnectionPool *pool = static_cast<ConnectionPool *>(server->data);
 	pool->Accept(server);
@@ -122,7 +122,6 @@ void ConnectionPool::Accept(uv_stream_t *server)
 	uv_tcp_init(uv_default_loop(), client);
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
-		Debug() << "New connection" << std::endl;
 		this->connections.emplace_back(
 		                new Connection(*this, client, this->handler));
 
@@ -223,11 +222,12 @@ void IoCore::RespondRaw(const std::string &string) const
 Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp, CommandHandler &handler)
     : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {
+	Debug() << "Opening connection from" << Name() << std::endl;
 }
 
 Connection::~Connection()
 {
-	Debug() << "Closing and destroying client connection" << std::endl;
+	Debug() << "Closing connection from" << Name() << std::endl;
 	uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
 }
 
@@ -245,6 +245,34 @@ void Connection::RespondRaw(const std::string &string) const
 	         UvRespondCallback);
 }
 
+std::string Connection::Name()
+{
+	// Warning: fairly low-level Berkeley sockets code ahead!
+	// (Thankfully, libuv makes sure the appropriate headers are included.)
+
+	// Using this instead of struct sockaddr is advised by the libuv docs,
+	// for IPv6 compatibility.
+	struct sockaddr_storage s;
+	int namelen;
+
+	if (uv_tcp_getpeername(this->tcp,
+	                       (struct sockaddr *) &s,
+	                       &namelen) < 0) return "(error)";
+
+	// Now, split the sockaddr into host and service.
+	char host[NI_MAXHOST];
+	char serv[NI_MAXSERV];
+
+	// We use NI_NUMERICSERV to ensure a port number comes out.
+	// Otherwise, we could get a (likely erroneous) string description of what
+	// the network stack *thinks* the port is used for.
+	if (getnameinfo((struct sockaddr *) &s,
+	                namelen, host, sizeof(host), serv, sizeof(serv),
+	                NI_NUMERICSERV)) return "(error)";
+
+	return std::string(host) + ":" + std::string(serv);
+}
+
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 {
 	// Did the connection hang up?  If so, de-pool it.
@@ -254,8 +282,13 @@ void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 		return;
 	}
 
-	// Did we hit any other read errors?  Ignore them.
-	if (nread < 0) return;
+	// Did we hit any other read errors?  Also de-pool, but log the error.
+	if (nread < 0) {
+		Debug() << "Error on" << Name() << "-" << uv_err_name(nread)
+                        << std::endl;
+		Depool();
+		return;
+	}
 
 	auto chars = buf->base;
 

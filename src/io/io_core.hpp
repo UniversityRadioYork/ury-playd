@@ -114,6 +114,13 @@ public:
 	 */
 	void Depool();
 
+	/**
+	 * Retrieves a name for this connection.
+	 * This will be of the form "HOST:PORT", unless errors occur.
+	 * @return The Connection's name.
+	 */
+	std::string Name();
+
 private:
 	/// The pool on which this connection is running.
 	ConnectionPool &parent;
