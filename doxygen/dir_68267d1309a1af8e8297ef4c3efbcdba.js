@@ -7,6 +7,10 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "cmd.hpp", "cmd_8hpp.html", [
       [ "CommandHandler", "classCommandHandler.html", "classCommandHandler" ]
     ] ],
+    [ "cmd_result.cpp", "cmd__result_8cpp.html", null ],
+    [ "cmd_result.hpp", "cmd__result_8hpp.html", [
+      [ "CommandResult", "classCommandResult.html", "classCommandResult" ]
+    ] ],
     [ "errors.cpp", "errors_8cpp.html", null ],
     [ "errors.hpp", "errors_8hpp.html", [
       [ "Error", "classError.html", "classError" ],
@@ -14,15 +18,17 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
       [ "InternalError", "classInternalError.html", "classInternalError" ],
       [ "FileError", "classFileError.html", "classFileError" ],
       [ "SeekError", "classSeekError.html", "classSeekError" ],
+      [ "NetError", "classNetError.html", "classNetError" ],
       [ "Debug", "classDebug.html", "classDebug" ]
     ] ],
     [ "main.cpp", "main_8cpp.html", "main_8cpp" ],
     [ "main.hpp", "main_8hpp.html", [
-      [ "playd", "classplayd.html", "classplayd" ]
+      [ "Playd", "classPlayd.html", "classPlayd" ]
     ] ],
     [ "messages.h", "messages_8h.html", "messages_8h" ],
     [ "resource.h", "resource_8h_source.html", null ],
     [ "sample_formats.hpp", "sample__formats_8hpp.html", "sample__formats_8hpp" ],
+    [ "time_parser.cpp", "time__parser_8cpp.html", null ],
     [ "time_parser.hpp", "time__parser_8hpp.html", [
       [ "TimeParser", "classTimeParser.html", "classTimeParser" ]
     ] ]

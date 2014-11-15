@@ -1,14 +1,26 @@
 <map id="src/time_parser.hpp" name="src/time_parser.hpp">
-<area shape="rect" id="node2" href="$player_8hpp.html" title="Declaration of the Player class, and associated types. " alt="" coords="472,80,627,107"/>
-<area shape="rect" id="node9" href="$main_8hpp.html" title="Declaration of the playd class. " alt="" coords="565,379,667,405"/>
-<area shape="rect" id="node3" href="$cmd_8hpp.html" title="Declaration of the CommandHandler class. " alt="" coords="299,155,397,181"/>
-<area shape="rect" id="node5" href="$io__reactor_8cpp.html" title="Implementation of the non&#45;virtual aspects of the IoReactor class. " alt="" coords="45,379,195,405"/>
-<area shape="rect" id="node7" href="$io__reactor_8hpp.html" title="Declaration of the IoReactor class. " alt="" coords="314,304,465,331"/>
-<area shape="rect" id="node8" href="$main_8cpp.html" title="Main entry point and implementation of the playd class. " alt="" coords="428,453,529,480"/>
-<area shape="rect" id="node11" href="$player_8cpp.html" title="Main implementation file for the Player class. " alt="" coords="473,155,626,181"/>
-<area shape="rect" id="node12" href="$player__position_8cpp.html" title="Implementation of the PlayerPosition class, and related Player methods. " alt="" coords="649,155,860,181"/>
-<area shape="rect" id="node13" href="$player__state_8cpp.html" title="Implementation of the PlayerState class, and related Player methods. " alt="" coords="884,155,1076,181"/>
-<area shape="rect" id="node4" href="$cmd_8cpp.html" title="Implementation of the CommandHandler class. " alt="" coords="373,229,470,256"/>
-<area shape="rect" id="node6" href="$tokeniser_8hpp.html" title="Declaration of the Tokeniser class. " alt="" coords="203,229,349,256"/>
-<area shape="rect" id="node10" href="$tokeniser_8cpp.html" title="Definition of the Tokeniser class. " alt="" coords="145,304,289,331"/>
+<area shape="rect" id="node2" href="$audio_8cpp.html" title="Implementation of the Audio class. " alt="" coords="296,229,443,256"/>
+<area shape="rect" id="node3" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="195,155,341,181"/>
+<area shape="rect" id="node6" href="$player__file_8hpp.html" title="Declaration of the PlayerFile class, and associated types. " alt="" coords="978,304,1158,331"/>
+<area shape="rect" id="node7" href="$player_8hpp.html" title="Declaration of the Player class, and associated types. " alt="" coords="837,379,992,405"/>
+<area shape="rect" id="node12" href="$main_8cpp.html" title="Main entry point and implementation of the playd class. " alt="" coords="923,752,1027,779"/>
+<area shape="rect" id="node13" href="$main_8hpp.html" title="Declaration of the playd class. " alt="" coords="405,677,510,704"/>
+<area shape="rect" id="node16" href="$player_8cpp.html" title="Main implementation file for the Player class. " alt="" coords="117,453,270,480"/>
+<area shape="rect" id="node17" href="$player__position_8cpp.html" title="Implementation of the PlayerPosition class, and related Player methods. " alt="" coords="1221,453,1432,480"/>
+<area shape="rect" id="node19" href="$player__file_8cpp.html" title="Implementation of the PlayerFile class, and associated types. " alt="" coords="1120,379,1299,405"/>
+<area shape="rect" id="node20" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="628,80,825,107"/>
+<area shape="rect" id="node24" href="$player__position_8hpp.html" title="Declaration of the PlayerPosition class. " alt="" coords="1071,229,1283,256"/>
+<area shape="rect" id="node25" href="$time__parser_8cpp.html" title="Implementation of the TimeParser class. " alt="" coords="1507,80,1655,107"/>
+<area shape="rect" id="node4" href="$audio__system_8cpp.html" title="Implementation of the AudioSystem class. " alt="" coords="245,304,445,331"/>
+<area shape="rect" id="node5" href="$audio__system_8hpp.html" title="Declaration of the AudioSystem class. " alt="" coords="518,229,719,256"/>
+<area shape="rect" id="node8" href="$cmd_8hpp.html" title="Declaration of the CommandHandler class. " alt="" coords="843,453,944,480"/>
+<area shape="rect" id="node10" href="$io__core_8cpp.html" title="Implementation of the non&#45;virtual aspects of the IoCore class. " alt="" coords="963,677,1096,704"/>
+<area shape="rect" id="node11" href="$io__core_8hpp.html" title="Declaration of the IoCore class. " alt="" coords="643,603,778,629"/>
+<area shape="rect" id="node18" href="$player__state_8cpp.html" title="Implementation of the PlayerState class, and related Player methods. " alt="" coords="624,453,819,480"/>
+<area shape="rect" id="node9" href="$cmd_8cpp.html" title="Implementation of the CommandHandler class. " alt="" coords="843,528,943,555"/>
+<area shape="rect" id="node14" href="$tokeniser_8hpp.html" title="Declaration of the Tokeniser class. " alt="" coords="672,528,819,555"/>
+<area shape="rect" id="node15" href="$tokeniser_8cpp.html" title="Definition of the Tokeniser class. " alt="" coords="838,603,983,629"/>
+<area shape="rect" id="node21" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="637,155,816,181"/>
+<area shape="rect" id="node22" href="$audio__sink_8cpp.html" title="Implementation of the AudioSink class. " alt="" coords="744,229,923,256"/>
+<area shape="rect" id="node23" href="$audio__source_8cpp.html" title="Implementation of the AudioSource class. " alt="" coords="417,155,613,181"/>
 </map>

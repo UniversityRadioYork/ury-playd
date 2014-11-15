@@ -8,8 +8,9 @@ var searchData=
   ['decodestate',['DecodeState',['../classAudioSource.html#a9a2f5de44325c84e69a7af1331aa159d',1,'AudioSource']]],
   ['decodevector',['DecodeVector',['../classAudioSource.html#a7e2b55a267000a2e30cd05ed6086d1b5',1,'AudioSource']]],
   ['decoding',['DECODING',['../classAudioSource.html#a9a2f5de44325c84e69a7af1331aa159da9b75f3acd3c3480965b0f5ee466e7f25',1,'AudioSource']]],
+  ['depool',['Depool',['../classConnection.html#aa88df7c404991a9883ceb8e1fd990c8f',1,'Connection']]],
   ['device',['Device',['../classAudioSystem.html#a41c546b18bdc96b15ae75f58e0d51d08',1,'AudioSystem']]],
   ['device_5fid',['device_id',['../classAudioSystem.html#a3071e6d8643b3d0275ba63820e6e0072',1,'AudioSystem']]],
   ['double',['DOUBLE',['../classTokeniser.html#a71d622e60fae9d6c36c96ba69a4f62e4afd3e4ece78a7d422280d5ed379482229',1,'Tokeniser']]],
-  ['doupdatetimer',['DoUpdateTimer',['../classIoReactor.html#a8a586b8e9545e79db8dc9bca3657388f',1,'IoReactor']]]
+  ['doupdatetimer',['DoUpdateTimer',['../classIoCore.html#a1c3c778ac0b8bc285706305833f4f82b',1,'IoCore']]]
 ];

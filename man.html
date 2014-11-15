@@ -1,5 +1,5 @@
-<!-- Creator     : groff version 1.19.2 -->
-<!-- CreationDate: Wed Sep 10 04:56:53 2014 -->
+<!-- Creator     : groff version 1.22.2 -->
+<!-- CreationDate: Sat Nov 15 20:16:08 2014 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -8,9 +8,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <meta name="Content-Style" content="text/css">
 <style type="text/css">
-       p     { margin-top: 0; margin-bottom: 0; }
-       pre   { margin-top: 0; margin-bottom: 0; }
-       table { margin-top: 0; margin-bottom: 0; }
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
 </style>
 <title></title>
 </head>
@@ -19,22 +20,19 @@
 <hr>
 
 
-<p valign="top">PLAYD(1) FreeBSD General Commands Manual
-PLAYD(1)</p>
+<p>PLAYD(1) BSD General Commands Manual PLAYD(1)</p>
 
-<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+<p style="margin-top: 1em"><b>NAME</b></p>
 
 <p style="margin-left:6%;"><b>playd</b> &mdash; basic
 TCP/IP-driven audio player</p>
 
-
-<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+<p style="margin-top: 1em"><b>SYNOPSIS</b></p>
 
 <p style="margin-left:14%;"><b>playd</b> [<i>device-id</i>]
 [<i>address</i>] [<i>port</i>]</p>
 
-
-<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+<p style="margin-top: 1em"><b>DESCRIPTION</b></p>
 
 <p style="margin-left:6%;"><b>playd</b> is a very simple
 audio playback program, intended to be driven by other, more
@@ -54,8 +52,7 @@ for the <i>device-id</i> argument. Otherwise, it is launched
 according to the provided arguments, the meaning of which is
 as follows:</p>
 
-
-<p style="margin-top: 1em" valign="top"><i>device-id</i></p>
+<p style="margin-top: 1em"><i>device-id</i></p>
 
 <p style="margin-left:21%; margin-top: 1em">The ID of the
 device onto which <b>playd</b> will output audio. This must
@@ -63,7 +60,7 @@ be one of the values provided when <b>playd</b> is executed
 with zero arguments. Additionally, it must refer to a device
 capable of audio output.</p>
 
-<p style="margin-top: 1em" valign="top"><i>address</i></p>
+<p style="margin-top: 1em"><i>address</i></p>
 
 <p style="margin-left:21%; margin-top: 1em">If provided,
 this specifies the TCP/IP address to which <b>playd</b> will
@@ -72,7 +69,7 @@ include 127.0.0.1 (connections from localhost only) and
 0.0.0.0 (connections from anywhere). The default is
 127.0.0.1.</p>
 
-<p style="margin-top: 1em" valign="top"><i>port</i></p>
+<p style="margin-top: 1em"><i>port</i></p>
 
 <p style="margin-left:21%; margin-top: 1em">If provided,
 this specifies the TCP/IP port on which <b>playd</b> will
@@ -94,8 +91,7 @@ difficult to speak with it from a terminal on the local
 machine. We recommend the use of a program such as nc(1) to
 bridge this gap in functionality.</p>
 
-
-<p style="margin-top: 1em" valign="top"><b>EXAMPLES</b></p>
+<p style="margin-top: 1em"><b>EXAMPLES</b></p>
 
 <p style="margin-left:6%;">The command</p>
 
@@ -143,21 +139,24 @@ command such as:</p>
 hopefully, covers all command-line usage of
 <b>playd</b>.</p>
 
-<p style="margin-top: 1em" valign="top"><b>AUTHORS</b></p>
+<p style="margin-top: 1em"><b>AUTHORS</b></p>
 
 <p style="margin-left:6%;">Matt Windsor
 &lt;matt.windsor@ury.org.uk&gt; <br>
 Charles Pigott &lt;charles.pigott@ury.org.uk&gt;</p>
 
-<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+<p style="margin-top: 1em"><b>BUGS</b></p>
 
-<p style="margin-left:6%;">Yes. See
-https://github.com/UniversityRadioYork/ury-playd/issues for
-the <b>playd</b> issue tracker.</p>
+<p style="margin-left:6%;">Undefined behaviour if you try
+to escape (&quot;\&quot;) a multi-byte UTF-8 character. This
+is intentional, for reasons of code simplicity. See the
+<a href="http://universityradioyork.github.io/baps3-spec/comms/internal/protocol.html#limitations">specification</a>
+for more details. See the
+<a href="https://github.com/UniversityRadioYork/ury-playd/issues">issue tracker</a>
+for any other open issues.</p>
 
-
-<p style="margin-left:6%; margin-top: 1em">FreeBSD&nbsp;10.0
-July&nbsp;26, 2014 FreeBSD&nbsp;10.0</p>
+<p style="margin-left:6%; margin-top: 1em">BSD
+July&nbsp;26, 2014 BSD</p>
 <hr>
 </body>
 </html>

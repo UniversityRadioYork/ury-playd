@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['arguments',['arguments',['../classplayd.html#a58d45d86bd51dea16f476aae648ff63c',1,'playd']]],
-  ['audio',['Audio',['../classAudio.html',1,'Audio'],['../classAudio.html#a05b36040e9d4ea4327de7c04f2e9d6ba',1,'Audio::Audio()'],['../classplayd.html#a2c7193680bd18f1e9b3f63f2234485de',1,'playd::audio()'],['../classPlayerFile.html#a649de02845f72a9d326b5942596ecd6b',1,'PlayerFile::audio()']]],
+  ['accept',['Accept',['../classConnectionPool.html#aefd42d38a58f227594e91461c372e82a',1,'ConnectionPool']]],
+  ['arguments',['arguments',['../classPlayd.html#a234ac9b44d2486f318234f10fb446d1e',1,'Playd']]],
+  ['audio',['Audio',['../classAudio.html',1,'Audio'],['../classAudio.html#a05b36040e9d4ea4327de7c04f2e9d6ba',1,'Audio::Audio()'],['../classPlayd.html#ac7f0b74fd666b6ff3429d2526fefa963',1,'Playd::audio()'],['../classPlayerFile.html#a649de02845f72a9d326b5942596ecd6b',1,'PlayerFile::audio()']]],
   ['audio_2ecpp',['audio.cpp',['../audio_8cpp.html',1,'']]],
   ['audio_2ehpp',['audio.hpp',['../audio_8hpp.html',1,'']]],
   ['audio_5floaded_5fstates',['AUDIO_LOADED_STATES',['../classPlayerState.html#a850bf90685a377001cfc46808cf017a4',1,'PlayerState']]],

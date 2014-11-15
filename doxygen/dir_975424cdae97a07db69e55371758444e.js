@@ -1,6 +1,6 @@
 var dir_975424cdae97a07db69e55371758444e =
 [
-    [ "player.cpp", "player_8cpp.html", null ],
+    [ "player.cpp", "player_8cpp.html", "player_8cpp" ],
     [ "player.hpp", "player_8hpp.html", [
       [ "Player", "classPlayer.html", "classPlayer" ]
     ] ],

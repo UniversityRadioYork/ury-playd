@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['quitting',['QUITTING',['../classPlayerState.html#ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230',1,'PlayerState']]]
+  ['none',['NONE',['../classTokeniser.html#a71d622e60fae9d6c36c96ba69a4f62e4ab50339a10e1de285ac99d4c3990b8693',1,'Tokeniser']]]
 ];

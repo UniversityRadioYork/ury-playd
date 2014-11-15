@@ -46,7 +46,7 @@ if (edges && edges.length) {
         </defs>
 
 <script type="text/javascript">
-var viewWidth = 1098;
+var viewWidth = 1125;
 var viewHeight = 252;
 var sectionId = 'dynsection-1';
 </script>
@@ -54,227 +54,227 @@ var sectionId = 'dynsection-1';
 <svg id="graph" class="graph">
 <g id="viewport">
 <title>PlayerFile</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-247.5 1094,-247.5 1094,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-247.5 1121,-247.5 1121,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node"><title>Node1</title>
-<polygon fill="#bfbfbf" stroke="black" points="1027,-85 1027,-104 1090,-104 1090,-85 1027,-85"/>
-<text text-anchor="middle" x="1058.5" y="-92" font-family="Helvetica,sans-Serif" font-size="10.00">PlayerFile</text>
+<polygon fill="#bfbfbf" stroke="black" points="1056,-85 1056,-104 1117,-104 1117,-85 1056,-85"/>
+<text text-anchor="middle" x="1086.5" y="-92" font-family="Helvetica,sans-Serif" font-size="10.00">PlayerFile</text>
 </g>
 <!-- Node2 -->
 <g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="classResponseSource.html" target="_top" xlink:title="Abstract helper class for sources of responses. ">
-<polygon fill="white" stroke="black" points="809.5,-123 809.5,-142 907.5,-142 907.5,-123 809.5,-123"/>
-<text text-anchor="middle" x="858.5" y="-130" font-family="Helvetica,sans-Serif" font-size="10.00">ResponseSource</text>
+<polygon fill="white" stroke="black" points="833,-123 833,-142 929,-142 929,-123 833,-123"/>
+<text text-anchor="middle" x="881" y="-130" font-family="Helvetica,sans-Serif" font-size="10.00">ResponseSource</text>
 </a>
 </g>
 </g>
 <!-- Node2&#45;&gt;Node1 -->
 <g id="edge1" class="edge"><title>Node2&#45;&gt;Node1</title>
-<path fill="none" stroke="midnightblue" d="M917.615,-125.586C945.448,-121.76 979.143,-116.374 1009,-109.5 1015.61,-107.977 1022.64,-106.014 1029.22,-104.012"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="917.09,-122.125 907.644,-126.925 918.021,-129.063 917.09,-122.125"/>
+<path fill="none" stroke="midnightblue" d="M939.307,-126.273C968.975,-122.491 1005.66,-116.94 1038,-109.5 1044.49,-108.007 1051.37,-106.055 1057.82,-104.055"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="938.616,-122.832 929.124,-127.538 939.479,-129.779 938.616,-122.832"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="classResponseSink.html" target="_top" xlink:title="Abstract class for anything that can be sent a response. ">
-<polygon fill="white" stroke="black" points="603.5,-123 603.5,-142 688.5,-142 688.5,-123 603.5,-123"/>
-<text text-anchor="middle" x="646" y="-130" font-family="Helvetica,sans-Serif" font-size="10.00">ResponseSink</text>
+<polygon fill="white" stroke="black" points="622,-123 622,-142 705,-142 705,-123 622,-123"/>
+<text text-anchor="middle" x="663.5" y="-130" font-family="Helvetica,sans-Serif" font-size="10.00">ResponseSink</text>
 </a>
 </g>
 </g>
 <!-- Node3&#45;&gt;Node2 -->
 <g id="edge2" class="edge"><title>Node3&#45;&gt;Node2</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M698.729,-132.5C732.515,-132.5 776.328,-132.5 809.368,-132.5"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="698.588,-129 688.588,-132.5 698.588,-136 698.588,-129"/>
-<text text-anchor="middle" x="750.5" y="-135.5" font-family="Helvetica,sans-Serif" font-size="10.00"> push_sink</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M715.215,-132.5C750.825,-132.5 798.111,-132.5 832.895,-132.5"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="715.034,-129 705.034,-132.5 715.034,-136 715.034,-129"/>
+<text text-anchor="middle" x="768.5" y="-135.5" font-family="Helvetica,sans-Serif" font-size="10.00"> push_sink</text>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node"><title>Node4</title>
-<polygon fill="white" stroke="#bfbfbf" points="794,-85 794,-104 923,-104 923,-85 794,-85"/>
-<text text-anchor="middle" x="858.5" y="-92" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; Audio &gt;</text>
+<polygon fill="white" stroke="#bfbfbf" points="812,-85 812,-104 950,-104 950,-85 812,-85"/>
+<text text-anchor="middle" x="881" y="-92" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; Audio &gt;</text>
 </g>
 <!-- Node4&#45;&gt;Node1 -->
 <g id="edge3" class="edge"><title>Node4&#45;&gt;Node1</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M933.577,-94.5C965.891,-94.5 1001.99,-94.5 1026.86,-94.5"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="933.238,-91.0001 923.238,-94.5 933.238,-98.0001 933.238,-91.0001"/>
-<text text-anchor="middle" x="975" y="-97.5" font-family="Helvetica,sans-Serif" font-size="10.00"> audio</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M960.301,-94.5C993.775,-94.5 1030.83,-94.5 1055.88,-94.5"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="960.046,-91.0001 950.045,-94.5 960.045,-98.0001 960.046,-91.0001"/>
+<text text-anchor="middle" x="1003" y="-97.5" font-family="Helvetica,sans-Serif" font-size="10.00"> audio</text>
 </g>
 <!-- Node5 -->
 <g id="node5" class="node"><title>Node5</title>
 <g id="a_node5"><a xlink:href="classAudio.html" target="_top" xlink:title="An audio file. ">
-<polygon fill="white" stroke="black" points="624.5,-85 624.5,-104 667.5,-104 667.5,-85 624.5,-85"/>
-<text text-anchor="middle" x="646" y="-92" font-family="Helvetica,sans-Serif" font-size="10.00">Audio</text>
+<polygon fill="white" stroke="black" points="641.5,-85 641.5,-104 685.5,-104 685.5,-85 641.5,-85"/>
+<text text-anchor="middle" x="663.5" y="-92" font-family="Helvetica,sans-Serif" font-size="10.00">Audio</text>
 </a>
 </g>
 </g>
 <!-- Node5&#45;&gt;Node4 -->
 <g id="edge4" class="edge"><title>Node5&#45;&gt;Node4</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M677.926,-94.5C708.233,-94.5 755.332,-94.5 793.691,-94.5"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="677.567,-91.0001 667.567,-94.5 677.567,-98.0001 677.567,-91.0001"/>
-<text text-anchor="middle" x="750.5" y="-97.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ptr</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M695.916,-94.5C726.19,-94.5 772.991,-94.5 811.826,-94.5"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="695.555,-91.0001 685.555,-94.5 695.555,-98.0001 695.555,-91.0001"/>
+<text text-anchor="middle" x="768.5" y="-97.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ptr</text>
 </g>
 <!-- Node6 -->
 <g id="node6" class="node"><title>Node6</title>
-<polygon fill="white" stroke="#bfbfbf" points="358.5,-129 358.5,-148 507.5,-148 507.5,-129 358.5,-129"/>
-<text text-anchor="middle" x="433" y="-136" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; AudioSink &gt;</text>
+<polygon fill="white" stroke="#bfbfbf" points="365,-129 365,-148 523,-148 523,-129 365,-129"/>
+<text text-anchor="middle" x="444" y="-136" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; AudioSink &gt;</text>
 </g>
 <!-- Node6&#45;&gt;Node5 -->
 <g id="edge5" class="edge"><title>Node6&#45;&gt;Node5</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M491.838,-126.946C515.196,-122.231 542.397,-116.678 567,-111.5 586.53,-107.39 608.768,-102.524 624.489,-99.0543"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="490.853,-123.574 481.741,-128.98 492.235,-130.436 490.853,-123.574"/>
-<text text-anchor="middle" x="549.5" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00"> sink</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M505.411,-127.057C529.837,-122.355 558.285,-116.781 584,-111.5 603.396,-107.516 625.427,-102.722 641.203,-99.2412"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="504.722,-123.626 495.561,-128.949 506.042,-130.5 504.722,-123.626"/>
+<text text-anchor="middle" x="566" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00"> sink</text>
 </g>
 <!-- Node7 -->
 <g id="node7" class="node"><title>Node7</title>
 <g id="a_node7"><a xlink:href="classAudioSink.html" target="_top" xlink:title="An output stream for an Audio file. ">
-<polygon fill="white" stroke="black" points="230.5,-155 230.5,-174 293.5,-174 293.5,-155 230.5,-155"/>
-<text text-anchor="middle" x="262" y="-162" font-family="Helvetica,sans-Serif" font-size="10.00">AudioSink</text>
+<polygon fill="white" stroke="black" points="234.5,-155 234.5,-174 298.5,-174 298.5,-155 234.5,-155"/>
+<text text-anchor="middle" x="266.5" y="-162" font-family="Helvetica,sans-Serif" font-size="10.00">AudioSink</text>
 </a>
 </g>
 </g>
 <!-- Node7&#45;&gt;Node6 -->
 <g id="edge6" class="edge"><title>Node7&#45;&gt;Node6</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M303.576,-158.258C323.498,-155.193 347.932,-151.434 370.12,-148.02"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="302.956,-154.812 293.605,-159.792 304.021,-161.73 302.956,-154.812"/>
-<text text-anchor="middle" x="326" y="-158.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ptr</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M308.982,-158.355C329.813,-155.268 355.517,-151.461 378.824,-148.008"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="308.255,-154.924 298.876,-159.852 309.281,-161.848 308.255,-154.924"/>
+<text text-anchor="middle" x="331.5" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ptr</text>
 </g>
 <!-- Node8 -->
 <g id="node8" class="node"><title>Node8</title>
-<polygon fill="white" stroke="#bfbfbf" points="0,-224 0,-243 147,-243 147,-224 0,-224"/>
-<text text-anchor="middle" x="73.5" y="-231" font-family="Helvetica,sans-Serif" font-size="10.00">portaudio::CallbackInterface</text>
+<polygon fill="white" stroke="#bfbfbf" points="0,-224 0,-243 150,-243 150,-224 0,-224"/>
+<text text-anchor="middle" x="75" y="-231" font-family="Helvetica,sans-Serif" font-size="10.00">portaudio::CallbackInterface</text>
 </g>
 <!-- Node8&#45;&gt;Node7 -->
 <g id="edge7" class="edge"><title>Node8&#45;&gt;Node7</title>
-<path fill="none" stroke="#8b1a1a" d="M123.648,-221.336C131.496,-219.188 139.499,-216.875 147,-214.5 173.681,-206.053 180.377,-203.756 206,-192.5 218.753,-186.898 232.737,-179.765 243.413,-174.101"/>
-<polygon fill="#8b1a1a" stroke="#8b1a1a" points="122.594,-217.995 113.838,-223.96 124.403,-224.757 122.594,-217.995"/>
+<path fill="none" stroke="#8b1a1a" d="M125.893,-221.418C133.99,-219.248 142.256,-216.907 150,-214.5 177.123,-206.069 183.944,-203.805 210,-192.5 222.871,-186.916 236.982,-179.783 247.754,-174.114"/>
+<polygon fill="#8b1a1a" stroke="#8b1a1a" points="124.933,-218.051 116.147,-223.972 126.707,-224.823 124.933,-218.051"/>
 </g>
 <!-- Node9 -->
 <g id="node9" class="node"><title>Node9</title>
 <g id="a_node9"><a xlink:href="classRingBuffer.html" target="_top" xlink:title="RingBuffer\&lt; char, unsigned\l long \&gt;">
-<polygon fill="white" stroke="black" points="1.5,-174.5 1.5,-204.5 145.5,-204.5 145.5,-174.5 1.5,-174.5"/>
+<polygon fill="white" stroke="black" points="1.5,-174.5 1.5,-204.5 148.5,-204.5 148.5,-174.5 1.5,-174.5"/>
 <text text-anchor="start" x="9.5" y="-192.5" font-family="Helvetica,sans-Serif" font-size="10.00">RingBuffer&lt; char, unsigned</text>
-<text text-anchor="middle" x="73.5" y="-181.5" font-family="Helvetica,sans-Serif" font-size="10.00"> long &gt;</text>
+<text text-anchor="middle" x="75" y="-181.5" font-family="Helvetica,sans-Serif" font-size="10.00"> long &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node9&#45;&gt;Node7 -->
 <g id="edge8" class="edge"><title>Node9&#45;&gt;Node7</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M155.576,-178.632C181.979,-175.093 209.706,-171.376 230.095,-168.643"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="154.986,-175.18 145.54,-179.977 155.916,-182.118 154.986,-175.18"/>
-<text text-anchor="middle" x="185.5" y="-180.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ring_buf</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M158.897,-178.564C185.651,-175.034 213.686,-171.336 234.288,-168.618"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="158.18,-175.128 148.724,-179.906 159.096,-182.068 158.18,-175.128"/>
+<text text-anchor="middle" x="189" y="-180.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ring_buf</text>
 </g>
 <!-- Node10 -->
 <g id="node10" class="node"><title>Node10</title>
-<polygon fill="white" stroke="#bfbfbf" points="4.5,-125.5 4.5,-155.5 142.5,-155.5 142.5,-125.5 4.5,-125.5"/>
-<text text-anchor="start" x="12.5" y="-143.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; portaudio</text>
-<text text-anchor="middle" x="73.5" y="-132.5" font-family="Helvetica,sans-Serif" font-size="10.00">::Stream &gt;</text>
+<polygon fill="white" stroke="#bfbfbf" points="2,-125.5 2,-155.5 148,-155.5 148,-125.5 2,-125.5"/>
+<text text-anchor="start" x="10" y="-143.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; portaudio</text>
+<text text-anchor="middle" x="75" y="-132.5" font-family="Helvetica,sans-Serif" font-size="10.00">::Stream &gt;</text>
 </g>
 <!-- Node10&#45;&gt;Node7 -->
 <g id="edge9" class="edge"><title>Node10&#45;&gt;Node7</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M152.95,-149.741C170.422,-151.884 188.85,-154.21 206,-156.5 213.938,-157.56 222.511,-158.774 230.471,-159.93"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="153.14,-146.238 142.79,-148.502 152.292,-153.187 153.14,-146.238"/>
-<text text-anchor="middle" x="185.5" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00"> stream</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M158.024,-149.973C175.205,-152.048 193.204,-154.287 210,-156.5 217.914,-157.543 226.453,-158.738 234.404,-159.882"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="158.363,-146.489 148.017,-148.773 157.529,-153.439 158.363,-146.489"/>
+<text text-anchor="middle" x="189" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00"> stream</text>
 </g>
 <!-- Node11 -->
 <g id="node11" class="node"><title>Node11</title>
-<polygon fill="white" stroke="#bfbfbf" points="352,-88 352,-107 514,-107 514,-88 352,-88"/>
-<text text-anchor="middle" x="433" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; AudioSource &gt;</text>
+<polygon fill="white" stroke="#bfbfbf" points="358,-88 358,-107 530,-107 530,-88 358,-88"/>
+<text text-anchor="middle" x="444" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; AudioSource &gt;</text>
 </g>
 <!-- Node11&#45;&gt;Node5 -->
 <g id="edge10" class="edge"><title>Node11&#45;&gt;Node5</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M524.449,-96.214C561.537,-95.6867 601.158,-95.1233 624.469,-94.7919"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="524.02,-92.7196 514.071,-96.3616 524.12,-99.7189 524.02,-92.7196"/>
-<text text-anchor="middle" x="549.5" y="-99.5" font-family="Helvetica,sans-Serif" font-size="10.00"> source</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M540.075,-96.1886C577.808,-95.6682 617.773,-95.1169 641.409,-94.7909"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="539.976,-92.6895 530.026,-96.3272 540.073,-99.6889 539.976,-92.6895"/>
+<text text-anchor="middle" x="566" y="-99.5" font-family="Helvetica,sans-Serif" font-size="10.00"> source</text>
 </g>
 <!-- Node12 -->
 <g id="node12" class="node"><title>Node12</title>
 <g id="a_node12"><a xlink:href="classAudioSource.html" target="_top" xlink:title="An object responsible for decoding an audio file. ">
-<polygon fill="white" stroke="black" points="224,-87 224,-106 300,-106 300,-87 224,-87"/>
-<text text-anchor="middle" x="262" y="-94" font-family="Helvetica,sans-Serif" font-size="10.00">AudioSource</text>
+<polygon fill="white" stroke="black" points="228,-87 228,-106 305,-106 305,-87 228,-87"/>
+<text text-anchor="middle" x="266.5" y="-94" font-family="Helvetica,sans-Serif" font-size="10.00">AudioSource</text>
 </a>
 </g>
 </g>
 <!-- Node12&#45;&gt;Node11 -->
 <g id="edge11" class="edge"><title>Node12&#45;&gt;Node11</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M310.117,-96.7788C323.053,-96.8553 337.452,-96.9405 351.692,-97.0248"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="310.108,-93.2788 300.088,-96.7195 310.067,-100.279 310.108,-93.2788"/>
-<text text-anchor="middle" x="326" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ptr</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M315.353,-96.7727C328.521,-96.8477 343.213,-96.9314 357.81,-97.0146"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="315.169,-93.2717 305.149,-96.7145 315.129,-100.272 315.169,-93.2717"/>
+<text text-anchor="middle" x="331.5" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ptr</text>
 </g>
 <!-- Node13 -->
 <g id="node13" class="node"><title>Node13</title>
-<polygon fill="white" stroke="#bfbfbf" points="16.5,-87 16.5,-106 130.5,-106 130.5,-87 16.5,-87"/>
-<text text-anchor="middle" x="73.5" y="-94" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; uint8_t &gt;</text>
+<polygon fill="white" stroke="#bfbfbf" points="13.5,-87 13.5,-106 136.5,-106 136.5,-87 13.5,-87"/>
+<text text-anchor="middle" x="75" y="-94" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; uint8_t &gt;</text>
 </g>
 <!-- Node13&#45;&gt;Node12 -->
 <g id="edge12" class="edge"><title>Node13&#45;&gt;Node12</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M140.799,-96.5C168.672,-96.5 200.061,-96.5 223.771,-96.5"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="140.709,-93.0001 130.709,-96.5 140.709,-100 140.709,-93.0001"/>
-<text text-anchor="middle" x="185.5" y="-99.5" font-family="Helvetica,sans-Serif" font-size="10.00"> buffer</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M146.75,-96.5C174.324,-96.5 204.802,-96.5 227.976,-96.5"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="146.741,-93.0001 136.741,-96.5 146.741,-100 146.741,-93.0001"/>
+<text text-anchor="middle" x="189" y="-99.5" font-family="Helvetica,sans-Serif" font-size="10.00"> buffer</text>
 </g>
 <!-- Node14 -->
 <g id="node14" class="node"><title>Node14</title>
-<polygon fill="white" stroke="#bfbfbf" points="366.5,-50 366.5,-69 499.5,-69 499.5,-50 366.5,-50"/>
-<text text-anchor="middle" x="433" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; std::uint8_t &gt;</text>
+<polygon fill="white" stroke="#bfbfbf" points="372,-50 372,-69 516,-69 516,-50 372,-50"/>
+<text text-anchor="middle" x="444" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; std::uint8_t &gt;</text>
 </g>
 <!-- Node14&#45;&gt;Node5 -->
 <g id="edge13" class="edge"><title>Node14&#45;&gt;Node5</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M501.695,-70.6813C522.632,-74.1438 545.77,-77.975 567,-81.5 586.502,-84.7381 608.744,-88.4466 624.473,-91.0718"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="502.049,-67.1924 491.612,-69.0141 500.907,-74.0986 502.049,-67.1924"/>
-<text text-anchor="middle" x="549.5" y="-84.5" font-family="Helvetica,sans-Serif" font-size="10.00"> frame</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M516.08,-70.6499C537.878,-74.0961 561.93,-77.926 584,-81.5 603.364,-84.6357 625.399,-88.2926 641.183,-90.9276"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="516.334,-67.1467 505.91,-69.044 515.242,-74.061 516.334,-67.1467"/>
+<text text-anchor="middle" x="566" y="-84.5" font-family="Helvetica,sans-Serif" font-size="10.00"> frame</text>
 </g>
 <!-- Node15 -->
 <g id="node15" class="node"><title>Node15</title>
 <g id="a_node15"><a xlink:href="classAudioSystem.html" target="_top" xlink:title="An AudioSystem represents the entire audio stack used by playd. ">
-<polygon fill="white" stroke="black" points="820,-47 820,-66 897,-66 897,-47 820,-47"/>
-<text text-anchor="middle" x="858.5" y="-54" font-family="Helvetica,sans-Serif" font-size="10.00">AudioSystem</text>
+<polygon fill="white" stroke="black" points="841,-47 841,-66 921,-66 921,-47 841,-47"/>
+<text text-anchor="middle" x="881" y="-54" font-family="Helvetica,sans-Serif" font-size="10.00">AudioSystem</text>
 </a>
 </g>
 </g>
 <!-- Node15&#45;&gt;Node1 -->
 <g id="edge14" class="edge"><title>Node15&#45;&gt;Node1</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M907.31,-62.0312C936.824,-65.8954 975.349,-71.7522 1009,-79.5 1015.61,-81.0227 1022.64,-82.9864 1029.22,-84.9882"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="907.632,-58.544 897.269,-60.7476 906.745,-65.4875 907.632,-58.544"/>
-<text text-anchor="middle" x="975" y="-82.5" font-family="Helvetica,sans-Serif" font-size="10.00"> audio_system</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M931.194,-61.7139C962.091,-65.49 1002.64,-71.366 1038,-79.5 1044.49,-80.993 1051.37,-82.9449 1057.82,-84.9446"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="931.451,-58.2199 921.107,-60.5136 930.624,-65.1708 931.451,-58.2199"/>
+<text text-anchor="middle" x="1003" y="-82.5" font-family="Helvetica,sans-Serif" font-size="10.00"> audio_system</text>
 </g>
 <!-- Node16 -->
 <g id="node16" class="node"><title>Node16</title>
 <g id="a_node16"><a xlink:href="classAudioSinkConfigurator.html" target="_top" xlink:title="Interface for objects that can configure a PortAudio stream from an AudioSource. ">
-<polygon fill="white" stroke="black" points="585,-47 585,-66 707,-66 707,-47 585,-47"/>
-<text text-anchor="middle" x="646" y="-54" font-family="Helvetica,sans-Serif" font-size="10.00">AudioSinkConfigurator</text>
+<polygon fill="white" stroke="black" points="602,-47 602,-66 725,-66 725,-47 602,-47"/>
+<text text-anchor="middle" x="663.5" y="-54" font-family="Helvetica,sans-Serif" font-size="10.00">AudioSinkConfigurator</text>
 </a>
 </g>
 </g>
 <!-- Node16&#45;&gt;Node15 -->
 <g id="edge15" class="edge"><title>Node16&#45;&gt;Node15</title>
-<path fill="none" stroke="midnightblue" d="M717.473,-56.5C751.728,-56.5 791.52,-56.5 819.911,-56.5"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="717.039,-53.0001 707.039,-56.5 717.039,-60.0001 717.039,-53.0001"/>
+<path fill="none" stroke="midnightblue" d="M735.309,-56.5C770.422,-56.5 811.489,-56.5 840.883,-56.5"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="735.102,-53.0001 725.102,-56.5 735.102,-60.0001 735.102,-53.0001"/>
 </g>
 <!-- Node17 -->
 <g id="node17" class="node"><title>Node17</title>
 <g id="a_node17"><a xlink:title="STL class. ">
-<polygon fill="white" stroke="#bfbfbf" points="615,-8 615,-27 677,-27 677,-8 615,-8"/>
-<text text-anchor="middle" x="646" y="-15" font-family="Helvetica,sans-Serif" font-size="10.00">std::string</text>
+<polygon fill="white" stroke="#bfbfbf" points="631,-8 631,-27 696,-27 696,-8 631,-8"/>
+<text text-anchor="middle" x="663.5" y="-15" font-family="Helvetica,sans-Serif" font-size="10.00">std::string</text>
 </a>
 </g>
 </g>
 <!-- Node17&#45;&gt;Node15 -->
 <g id="edge16" class="edge"><title>Node17&#45;&gt;Node15</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M687.421,-24.9889C725.674,-32.0762 782.642,-42.6308 819.929,-49.5392"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="687.63,-21.4681 677.16,-23.0877 686.355,-28.351 687.63,-21.4681"/>
-<text text-anchor="middle" x="750.5" y="-43.5" font-family="Helvetica,sans-Serif" font-size="10.00"> device_id</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M706.25,-25.0556C745.141,-32.094 802.692,-42.5093 840.756,-49.3978"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="706.761,-21.5914 696.298,-23.2546 705.515,-28.4795 706.761,-21.5914"/>
+<text text-anchor="middle" x="768.5" y="-43.5" font-family="Helvetica,sans-Serif" font-size="10.00"> device_id</text>
 </g>
 <!-- Node18 -->
 <g id="node18" class="node"><title>Node18</title>
 <g id="a_node18"><a xlink:title="STL class. ">
-<polygon fill="white" stroke="#bfbfbf" points="384,-0.5 384,-30.5 482,-30.5 482,-0.5 384,-0.5"/>
-<text text-anchor="start" x="392" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_string&lt;</text>
-<text text-anchor="middle" x="433" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00"> char &gt;</text>
+<polygon fill="white" stroke="#bfbfbf" points="392.5,-0.5 392.5,-30.5 495.5,-30.5 495.5,-0.5 392.5,-0.5"/>
+<text text-anchor="start" x="400.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_string&lt;</text>
+<text text-anchor="middle" x="444" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00"> char &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node18&#45;&gt;Node17 -->
 <g id="edge17" class="edge"><title>Node18&#45;&gt;Node17</title>
-<path fill="none" stroke="midnightblue" d="M492.258,-16.0522C532.052,-16.4294 583.148,-16.9137 614.986,-17.2155"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="492.176,-12.5514 482.143,-15.9563 492.11,-19.5511 492.176,-12.5514"/>
+<path fill="none" stroke="midnightblue" d="M505.794,-16.059C546.441,-16.4328 598.264,-16.9093 630.926,-17.2097"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="505.751,-12.5586 495.72,-15.9664 505.687,-19.5583 505.751,-12.5586"/>
 </g>
 </g>
 </svg>

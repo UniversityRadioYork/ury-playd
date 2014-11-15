@@ -1,12 +1,11 @@
 var classAudioSink =
 [
-    [ "PlayCallbackStepResult", "classAudioSink.html#a978157f4cb9119fce0351d564d2aa94b", null ],
     [ "SamplePosition", "classAudioSink.html#a2a149948a41e15d702abc1d4ba130590", null ],
     [ "TransferIterator", "classAudioSink.html#a2542f59d9096c308c2074c8cab7bead7", null ],
     [ "AudioSink", "classAudioSink.html#ac4b34ebdfc02cf6fcb4a4c2784eac270", null ],
     [ "InputReady", "classAudioSink.html#a9b3dbe861acd4bb7ac1903730a0a01f3", null ],
     [ "IsStopped", "classAudioSink.html#adfa8006db0d1cbe161f15232cb32a324", null ],
-    [ "paCallbackFun", "classAudioSink.html#ae2ded36639f94a427a693beac9aa066c", null ],
+    [ "paCallbackFun", "classAudioSink.html#ad3534ea4210aa83b42706c0361fd3e8d", null ],
     [ "PlayCallbackFailure", "classAudioSink.html#a6e1b9254b242231ba8168e5e27d602ff", null ],
     [ "PlayCallbackStep", "classAudioSink.html#a450ad1c0c64ddcc9b9a40d325983cbd9", null ],
     [ "PlayCallbackSuccess", "classAudioSink.html#a2194fd0629b52c550c9eb326f8ae10cc", null ],

@@ -1,5 +1,5 @@
 <map id="ResponseSource" name="ResponseSource">
-<area shape="rect" id="node2" href="$classPlayerFile.html" title="The subcomponent of a Player that stores the audio file. " alt="" coords="5,80,89,107"/>
-<area shape="rect" id="node3" href="$classPlayerPosition.html" title="Tracker and broadcaster for the Player&#39;s current position in a song. " alt="" coords="114,80,226,107"/>
-<area shape="rect" id="node4" href="$classPlayerState.html" title="An object holding and representing the current state of a Player. " alt="" coords="251,80,345,107"/>
+<area shape="rect" id="node2" href="$classPlayerFile.html" title="The subcomponent of a Player that stores the audio file. " alt="" coords="5,80,87,107"/>
+<area shape="rect" id="node3" href="$classPlayerPosition.html" title="Tracker and broadcaster for the Player&#39;s current position in a song. " alt="" coords="111,80,221,107"/>
+<area shape="rect" id="node4" href="$classPlayerState.html" title="An object holding and representing the current state of a Player. " alt="" coords="246,80,342,107"/>
 </map>

@@ -9,7 +9,7 @@ var classPlayerState =
       [ "QUITTING", "classPlayerState.html#ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230", null ]
     ] ],
     [ "PlayerState", "classPlayerState.html#a6d3de3f57e9db4ec34e5a7403fc03868", null ],
-    [ "Emit", "classPlayerState.html#a14a470003b8e080ad1186f10506fbe64", null ],
+    [ "Emit", "classPlayerState.html#aa93a9879688bfbd3d89ac102c079cbfd", null ],
     [ "In", "classPlayerState.html#aa2c0e603dd57dcc37759d716596ffa33", null ],
     [ "IsRunning", "classPlayerState.html#aeb19817b9da2f6765b990983f87e1527", null ],
     [ "Set", "classPlayerState.html#a822999cf7d4cf72ba77f218906bb8aaa", null ],

@@ -4,7 +4,6 @@ var NAVTREE =
     [ "Command Reference", "md_README_8commands.html", null ],
     [ "URY playd", "md_README.html", null ],
     [ "Visual Studio Build Notes", "md_README_8VisualStudio.html", null ],
-    [ "Todo List", "todo.html", null ],
     [ "Classes", null, [
       [ "Class List", "annotated.html", "annotated" ],
       [ "Class Index", "classes.html", null ],
@@ -14,8 +13,7 @@ var NAVTREE =
         [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
-        [ "Enumerations", "functions_enum.html", null ],
-        [ "Enumerator", "functions_eval.html", null ]
+        [ "Enumerations", "functions_enum.html", null ]
       ] ]
     ] ],
     [ "Files", null, [
@@ -26,7 +24,7 @@ var NAVTREE =
         [ "Variables", "globals_vars.html", null ],
         [ "Typedefs", "globals_type.html", null ],
         [ "Enumerations", "globals_enum.html", null ],
-        [ "Enumerator", "globals_eval.html", null ]
+        [ "Macros", "globals_defs.html", null ]
       ] ]
     ] ]
   ] ]
@@ -35,7 +33,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classTokeniser.html#a5ae6a740655de2f1cbc5f6723dd56439"
+"classRingBuffer.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

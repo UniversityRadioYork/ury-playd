@@ -1,12 +1,12 @@
 <map id="PlayerFile" name="PlayerFile">
-<area shape="rect" id="node2" href="$classResponseSource.html" title="Abstract helper class for sources of responses. " alt="" coords="1085,140,1215,167"/>
-<area shape="rect" id="node3" href="$classResponseSink.html" title="Abstract class for anything that can be sent a response. " alt="" coords="810,140,923,167"/>
-<area shape="rect" id="node5" href="$classAudio.html" title="An audio file. " alt="" coords="838,191,895,217"/>
-<area shape="rect" id="node7" href="$classAudioSink.html" title="An output stream for an Audio file. " alt="" coords="313,97,397,124"/>
-<area shape="rect" id="node9" href="$classRingBuffer.html" title="RingBuffer\&lt; char, unsigned\l long \&gt;" alt="" coords="7,57,199,98"/>
-<area shape="rect" id="node12" href="$classAudioSource.html" title="An object responsible for decoding an audio file. " alt="" coords="304,188,405,215"/>
-<area shape="rect" id="node15" href="$classAudioSystem.html" title="An AudioSystem represents the entire audio stack used by playd. " alt="" coords="1099,241,1201,268"/>
-<area shape="rect" id="node16" href="$classAudioSinkConfigurator.html" title="Interface for objects that can configure a PortAudio stream from an AudioSource. " alt="" coords="785,241,948,268"/>
-<area shape="rect" id="node17" title="STL class. " alt="" coords="825,293,908,320"/>
-<area shape="rect" id="node18" title="STL class. " alt="" coords="517,289,648,330"/>
+<area shape="rect" id="node2" href="$classResponseSource.html" title="Abstract helper class for sources of responses. " alt="" coords="1116,140,1244,167"/>
+<area shape="rect" id="node3" href="$classResponseSink.html" title="Abstract class for anything that can be sent a response. " alt="" coords="835,140,945,167"/>
+<area shape="rect" id="node5" href="$classAudio.html" title="An audio file. " alt="" coords="861,191,919,217"/>
+<area shape="rect" id="node7" href="$classAudioSink.html" title="An output stream for an Audio file. " alt="" coords="318,97,403,124"/>
+<area shape="rect" id="node9" href="$classRingBuffer.html" title="RingBuffer\&lt; char, unsigned\l long \&gt;" alt="" coords="7,57,203,98"/>
+<area shape="rect" id="node12" href="$classAudioSource.html" title="An object responsible for decoding an audio file. " alt="" coords="309,188,412,215"/>
+<area shape="rect" id="node15" href="$classAudioSystem.html" title="An AudioSystem represents the entire audio stack used by playd. " alt="" coords="1127,241,1233,268"/>
+<area shape="rect" id="node16" href="$classAudioSinkConfigurator.html" title="Interface for objects that can configure a PortAudio stream from an AudioSource. " alt="" coords="808,241,972,268"/>
+<area shape="rect" id="node17" title="STL class. " alt="" coords="847,293,933,320"/>
+<area shape="rect" id="node18" title="STL class. " alt="" coords="529,289,666,330"/>
 </map>

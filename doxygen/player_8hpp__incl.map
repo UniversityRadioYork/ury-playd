@@ -1,15 +1,16 @@
 <map id="src/player/player.hpp" name="src/player/player.hpp">
-<area shape="rect" id="node8" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="439,229,569,256"/>
-<area shape="rect" id="node19" href="$io__response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="1547,229,1699,256"/>
-<area shape="rect" id="node21" href="$time__parser_8hpp.html" title="The TimeParser template class. " alt="" coords="1825,304,1959,331"/>
-<area shape="rect" id="node23" href="$player__file_8hpp.html" title="Declaration of the PlayerFile class, and associated types. " alt="" coords="1020,80,1135,107"/>
-<area shape="rect" id="node31" href="$player__position_8hpp.html" title="Declaration of the PlayerPosition class. " alt="" coords="817,155,962,181"/>
-<area shape="rect" id="node33" href="$player__state_8hpp.html" title="Declaration of the PlayerState class, and associated types. " alt="" coords="1598,80,1725,107"/>
-<area shape="rect" id="node12" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="725,304,859,331"/>
-<area shape="rect" id="node15" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="1675,386,1773,413"/>
-<area shape="rect" id="node18" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="699,386,858,413"/>
-<area shape="rect" id="node22" href="$messages_8h.html" title="Constant human&#45;readable messages used within playd. " alt="" coords="1554,386,1651,413"/>
-<area shape="rect" id="node24" href="$audio__system_8hpp.html" title="Declaration of the AudioSystem class. " alt="" coords="986,155,1169,181"/>
-<area shape="rect" id="node27" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="873,229,989,256"/>
-<area shape="rect" id="node28" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="985,304,1093,331"/>
+<area shape="rect" id="node8" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="748,229,884,256"/>
+<area shape="rect" id="node11" href="$time__parser_8hpp.html" title="Declaration of the TimeParser class. " alt="" coords="45,386,184,413"/>
+<area shape="rect" id="node19" href="$io__response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="2000,304,2154,331"/>
+<area shape="rect" id="node21" href="$cmd__result_8hpp.html" title="Declaration of the CommandResult class. " alt="" coords="1854,229,1988,256"/>
+<area shape="rect" id="node22" href="$player__file_8hpp.html" title="Declaration of the PlayerFile class, and associated types. " alt="" coords="545,80,660,107"/>
+<area shape="rect" id="node31" href="$player__position_8hpp.html" title="Declaration of the PlayerPosition class. " alt="" coords="261,229,408,256"/>
+<area shape="rect" id="node33" href="$player__state_8hpp.html" title="Declaration of the PlayerState class, and associated types. " alt="" coords="2063,229,2192,256"/>
+<area shape="rect" id="node12" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="419,304,554,331"/>
+<area shape="rect" id="node15" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="1316,386,1416,413"/>
+<area shape="rect" id="node18" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="208,386,375,413"/>
+<area shape="rect" id="node23" href="$audio__system_8hpp.html" title="Declaration of the AudioSystem class. " alt="" coords="944,155,1135,181"/>
+<area shape="rect" id="node26" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="1196,229,1313,256"/>
+<area shape="rect" id="node27" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="1763,304,1874,331"/>
+<area shape="rect" id="node30" href="$messages_8h.html" title="Constant human&#45;readable messages used within playd. " alt="" coords="1776,386,1888,413"/>
 </map>
