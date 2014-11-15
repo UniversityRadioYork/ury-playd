@@ -82,7 +82,7 @@ public:
 
 	virtual portaudio::Stream *Configure(
 	                const AudioSource &source,
-	                portaudio::CallbackInterface &cb) const;
+	                portaudio::CallbackInterface &cb) const override;
 
 private:
 	std::string device_id; ///< The current device ID.

@@ -176,7 +176,7 @@ private:
 	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
 	                  unsigned long numFrames,
 	                  const PaStreamCallbackTimeInfo *timeInfo,
-	                  PaStreamCallbackFlags statusFlags);
+	                  PaStreamCallbackFlags statusFlags) override;
 
 	/**
 	 * Performs one step in the callback.

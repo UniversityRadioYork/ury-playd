@@ -72,7 +72,7 @@ public:
 	 * @param sink The ResponseSink to which a TIME response shall be
 	 *   sent.
 	 */
-	void Emit(ResponseSink &sink) const;
+	void Emit(ResponseSink &sink) const override;
 
 private:
 	/**

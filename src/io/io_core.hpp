@@ -69,7 +69,7 @@ private:
 	/// The set of connections inside this ConnectionPool.
 	std::vector<std::unique_ptr<Connection>> connections;
 
-	void RespondRaw(const std::string &string) const;
+	void RespondRaw(const std::string &string) const override;
 };
 
 
@@ -98,7 +98,7 @@ public:
 
 	// Note: This is made public so that the IoCore can send raw data
 	// to the connection.
-	void RespondRaw(const std::string &response) const;
+	void RespondRaw(const std::string &response) const override;
 
 	/**
 	 * Processes a data read on this connection.
@@ -188,7 +188,7 @@ private:
 	Player &player;      ///< The player.
 	ConnectionPool pool; ///< The pool of client Connections.
 
-	void RespondRaw(const std::string &string) const;
+	void RespondRaw(const std::string &string) const override;
 
 	/**
 	 * Initialises a TCP acceptor on the given address and port.
