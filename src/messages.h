@@ -17,7 +17,10 @@
 //
 
 /// Message shown when a client connects to playd.
-const std::string MSG_OHAI = "playd";
+#ifndef PD_VERSION
+#define PD_VERSION "0.0.0"
+#endif
+const std::string MSG_OHAI = "playd " PD_VERSION;
 
 
 //
