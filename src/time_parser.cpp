@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -18,11 +18,12 @@
 /* static */ TimeParser::MicrosecondPosition TimeParser::Parse(
                 const std::string &time_str)
 {
-	auto seek = Split(time_str);
+	auto seek = TimeParser::Split(time_str);
 	std::string unit = seek.first;
 	MicrosecondPosition num_units = seek.second;
 
-	return static_cast<MicrosecondPosition>(UnitMultiplier(unit)) *
+	return static_cast<MicrosecondPosition>(
+	                       TimeParser::UnitMultiplier(unit)) *
 	       num_units;
 }
 

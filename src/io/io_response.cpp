@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -15,20 +15,20 @@
 #include "io_response.hpp"
 
 const std::string RESPONSES[] = {
-	/* ResponseCode::OKAY     */ "OKAY",
-	/* ResponseCode::WHAT     */ "WHAT",
-	/* ResponseCode::FAIL     */ "FAIL",
-	/* ResponseCode::OHAI     */ "OHAI",
-	/* ResponseCode::STATE    */ "STATE",
-	/* ResponseCode::TIME     */ "TIME",
-	/* ResponseCode::FILE     */ "FILE",
-	/* ResponseCode::FEATURES */ "FEATURES",
-	/* ResponseCode::END      */ "END"
+	"OKAY",     // ResponseCode::OKAY
+	"WHAT",     // ResponseCode::WHAT
+	"FAIL",     // ResponseCode::FAIL
+	"OHAI",     // ResponseCode::OHAI
+	"STATE",    // ResponseCode::STATE
+	"TIME",     // ResponseCode::TIME
+	"FILE",     // ResponseCode::FILE
+	"FEATURES", // ResponseCode::FEATURES
+	"END"       // ResponseCode::END
 };
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 {
-	RespondArgs(code, std::vector<std::string>(1, message));
+	this->RespondArgs(code, std::vector<std::string>(1, message));
 }
 
 void ResponseSink::RespondArgs(ResponseCode code,
@@ -36,13 +36,10 @@ void ResponseSink::RespondArgs(ResponseCode code,
 {
 	std::ostringstream os;
 	os << RESPONSES[static_cast<int>(code)];
-	for (auto argument : arguments) os << " " << EscapeArgument(argument);
-	RespondRaw(os.str());
-}
-
-void ResponseSink::RespondWithError(const Error &error) const
-{
-	Respond(ResponseCode::FAIL, error.Message());
+	for (auto argument : arguments) {
+		os << " " << this->EscapeArgument(argument);
+	}
+	this->RespondRaw(os.str());
 }
 
 /* static */ std::string ResponseSink::EscapeArgument(
@@ -77,7 +74,5 @@ void ResponseSource::SetResponseSink(ResponseSink &responder)
 
 void ResponseSource::Push() const
 {
-	if (this->push_sink != nullptr) {
-		Emit(*this->push_sink);
-	}
+	if (this->push_sink != nullptr) this->Emit(*this->push_sink);
 }

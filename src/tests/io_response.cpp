@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -24,7 +24,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.RespondArgs(ResponseCode::OHAI, {});
 
 			THEN("the emitted response has no quoting") {
-				REQUIRE(os.str() == "OHAI");
+				REQUIRE(os.str() == "OHAI\n");
 			}
 		}
 
@@ -32,7 +32,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.Respond(ResponseCode::OHAI, "ulyoath");
 
 			THEN("the emitted response's argument is not quoted") {
-				REQUIRE(os.str() == "OHAI ulyoath");
+				REQUIRE(os.str() == "OHAI ulyoath\n");
 			}
 		}
 
@@ -40,7 +40,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.Respond(ResponseCode::OHAI, "chattur'gha");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha')");
+				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha')" "\n");
 			}
 		}
 
@@ -48,7 +48,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "xel'lotath" });
 
 			THEN("the emitted response's arguments are both single-quoted") {
-				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' 'xel'\''lotath')");
+				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' 'xel'\''lotath')" "\n");
 			}
 		}
 
@@ -56,7 +56,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "ulyoath" });
 
 			THEN("the emitted response's arguments are quoted accordingly") {
-				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' ulyoath)");
+				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' ulyoath)" "\n");
 			}
 		}
 
@@ -64,7 +64,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.Respond(ResponseCode::FILE, R"("scare"-quotes)");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == R"(FILE '"scare"-quotes')");
+				REQUIRE(os.str() == R"(FILE '"scare"-quotes')" "\n");
 			}
 		}
 
@@ -72,7 +72,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.Respond(ResponseCode::END, "pargon pargon pargon");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == R"(END 'pargon pargon pargon')");
+				REQUIRE(os.str() == R"(END 'pargon pargon pargon')" "\n");
 			}
 		}
 
@@ -80,7 +80,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.RespondArgs(ResponseCode::END, { "a space", "new\nline", "tab\tstop" });
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == "END 'a space' 'new\nline' 'tab\tstop'");
+				REQUIRE(os.str() == "END 'a space' 'new\nline' 'tab\tstop'\n");
 			}
 		}
 
@@ -88,7 +88,7 @@ SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[respon
 			rs.Respond(ResponseCode::FILE, R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
 
 			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
+				REQUIRE(os.str() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')" "\n");
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
 * @file
@@ -53,7 +53,7 @@ public:
 	 * @param sink The ResponseSink to which the current state shall be
 	 *   emitted.
 	 */
-	void Emit(ResponseSink &sink) const;
+	void Emit(ResponseSink &sink) const override;
 
 	/**
 	 * Checks whether the current state is in a given list of states.

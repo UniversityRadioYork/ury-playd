@@ -109,6 +109,9 @@ OWN_HEADERS     = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.hpp))
 OWN_CHEADERS    = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.h))
 TO_FORMAT       = $(OWN_SOURCES) $(OWN_CSOURCES) $(OWN_HEADERS) $(OWN_CHEADERS)
 
+# Version stuff
+CFLAGS += -D PD_VERSION=\"$(shell git describe --tags --always)\"
+
 # Now set up the flags needed for playd.
 CFLAGS   += -c $(WARNS) $(PKG_CFLAGS) -g -std=$(C_STD)
 CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS) -g -std=$(CXX_STD)

@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -36,7 +36,7 @@ SCENARIO("PlayerState pushes state changes to its registered response sink", "[p
 			ps.Set(PlayerState::State::PLAYING);
 
 			THEN("the response sink receives a STATE response") {
-				REQUIRE(os.str() == "STATE Playing");
+				REQUIRE(os.str() == "STATE Playing\n");
 			}
 		}
 	}

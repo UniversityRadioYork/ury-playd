@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -72,7 +72,7 @@ public:
 	 * @param sink The ResponseSink to which a TIME response shall be
 	 *   sent.
 	 */
-	void Emit(ResponseSink &sink) const;
+	void Emit(ResponseSink &sink) const override;
 
 private:
 	/**

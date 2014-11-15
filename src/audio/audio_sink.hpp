@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -176,7 +176,7 @@ private:
 	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
 	                  unsigned long numFrames,
 	                  const PaStreamCallbackTimeInfo *timeInfo,
-	                  PaStreamCallbackFlags statusFlags);
+	                  PaStreamCallbackFlags statusFlags) override;
 
 	/**
 	 * Performs one step in the callback.

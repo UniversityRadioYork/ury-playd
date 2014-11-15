@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -51,7 +51,7 @@ public:
 	/**
 	 * Destructs an AudioSystem, uninitialising its libraries.
 	 */
-	~AudioSystem();
+	virtual ~AudioSystem();
 
 	/**
 	 * Loads a file, creating an Audio for it.
@@ -82,7 +82,7 @@ public:
 
 	virtual portaudio::Stream *Configure(
 	                const AudioSource &source,
-	                portaudio::CallbackInterface &cb) const;
+	                portaudio::CallbackInterface &cb) const override;
 
 private:
 	std::string device_id; ///< The current device ID.

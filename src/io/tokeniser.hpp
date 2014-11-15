@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -50,7 +50,7 @@ private:
 
 	/// Whether the next character is to be interpreted as an escape code.
 	/// This usually gets set to true when a backslash is detected.
-	bool escape_next_character;
+	bool escape_next;
 
 	/// The type of quotation currently being used in this Tokeniser.
 	QuoteType quote_type;
@@ -74,9 +74,7 @@ private:
 
 	/**
 	 * Pushes a raw character onto the end of the current word.
-	 *
-	 * This also clears the escape_next_character flag.
-	 *
+	 * This also clears the escape_next flag.
 	 * @param c The character to push onto the current word.
 	 */
 	void Push(unsigned char c);

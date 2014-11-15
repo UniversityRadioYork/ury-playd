@@ -17,6 +17,6 @@ DummyResponseSink::DummyResponseSink(std::ostream &os) : os(os)
 
 void DummyResponseSink::RespondRaw(const std::string &response) const
 {
-	this->os << response;
+	this->os << response << std::endl;
 }
 

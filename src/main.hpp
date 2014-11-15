@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -41,8 +41,14 @@ public:
 	int Run();
 
 private:
-	/// The period between position announcements from the Player object.
-	static const TimeParser::MicrosecondPosition POSITION_PERIOD;
+	/**
+	 * The period between position announcements from the Player object.
+	 * This is given in microseconds, so eg. 500000 = 0.5sec = 2Hz.
+	 */
+	static const TimeParser::MicrosecondPosition POSITION_PERIOD = 500000;
+
+	/// The ID returned by GetDeviceID if something goes wrong.
+	static const int INVALID_ID = -1;
 
 	std::vector<std::string> arguments; ///< The argument vector.
 	AudioSystem audio;                  ///< The audio subsystem.
@@ -53,22 +59,9 @@ private:
 
 	/**
 	 * Tries to get the output device ID from program arguments.
-	 * @return The device ID, -1 if invalid selection (or none).
+	 * @return The device ID, INVALID_ID if invalid selection (or none).
 	 */
 	int GetDeviceID();
-
-	/**
-	 * Lists on stdout all sound devices to which the audio output may
-	 * connect.
-	 * This is mainly for the benefit of the end user.
-	 */
-	void ListOutputDevices();
-
-	/**
-	 * Registers the playd command set on the given Player.
-	 * @param p The Player on which the commands will act.
-	 */
-	void RegisterCommands(Player *p);
 };
 
 #endif // PS_MAIN_HPP

@@ -16,8 +16,7 @@ the `lib` and `include` subdirectories respectively.
 
 The `lib` directory should include:
 
-* `libsox.lib`, from building libuv _as a shared library_ (see below for a
-  somewhat hacky way to do this with MSVC);
+* `libsox.lib`, from building libuv _as a shared library_ (see below);
 * `libuv.lib`, from building libuv as below;
 * `portaudio_x86.lib`, from building PortAudio from `cmake` as below;
 * `portaudiocpp-vc7_1-d.lib`, from building the PortAudio C++ bindings as
@@ -52,6 +51,16 @@ This _must_ be built as a shared library (`vcbuild.bat shared`).  Otherwise,
 this should work fine.
 
 ## SoX
+
+One of the authors, at the time of writing, maintain a [fork] of SoX with a
+VS2013 solution set up for building a dynamic DLL and import library.  This
+also contains any patches that we've applied to SoX to get it working for us. 
+
+Note that SoX itself requires several libraries to be placed in the directory
+one level above its root directory to compile; see the Visual Studio project's
+includes for details.
+
+### Stable SoX
 
 Some persuasion of the dated sources recommended by the SoX build instructions
 is necessary to get them to build with modern Visual Studio.  The following
@@ -88,3 +97,5 @@ is necessary to get them to build with modern Visual Studio.  The following
 
 This is needed to make LibSoX build a `.lib` file for dynamic linking.  An
 example is given in the source bundle as `libsox.def`.
+
+[fork]: https://github.com/CaptainHayashi/sox

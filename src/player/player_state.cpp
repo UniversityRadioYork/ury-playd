@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -79,5 +79,5 @@ const std::map<PlayerState::State, std::string> PlayerState::STRINGS = {
 void PlayerState::Set(PlayerState::State state)
 {
 	this->current = state;
-	Push();
+	this->Push();
 }

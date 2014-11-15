@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -77,11 +77,10 @@ void AudioSink::SetPosition(AudioSink::SamplePosition samples)
 void AudioSink::Transfer(AudioSink::TransferIterator &start,
                          const AudioSink::TransferIterator &end)
 {
-	// No point transferring 0 bytes.
-	if (start == end) {
-		return;
-	}
 	assert(start < end);
+
+	// No point transferring 0 bytes.
+	if (start == end) return;
 
 	unsigned long bytes = std::distance(start, end);
 	// There should be a whole number of samples being transferred.
@@ -93,10 +92,8 @@ void AudioSink::Transfer(AudioSink::TransferIterator &start,
 	// Only transfer as many samples as the ring buffer can take.
 	// Don't bother trying to write 0 samples!
 	auto count = std::min(samples, this->ring_buf.WriteCapacity());
-	if (count == 0) {
-		return;
-	}
 	assert(0 < count);
+	if (count == 0) return;
 
 	auto start_ptr = reinterpret_cast<char *>(&*start);
 	unsigned long written_count = this->ring_buf.Write(start_ptr, count);
@@ -160,14 +157,13 @@ PlayCallbackStepResult AudioSink::PlayCallbackFailure(
 {
 	decltype(in) result;
 
-	if (InputReady()) {
+	if (this->InputReady()) {
 		// There's been some sort of genuine issue.
 		// Make up some silence to plug the gap.
 		Debug() << "Buffer underflow" << std::endl;
 		memset(out, 0, this->bytes_per_sample * frames_per_buf);
 		result = std::make_pair(paContinue, frames_per_buf);
-	}
-	else {
+	} else {
 		// End of input is ok, it means the stream can finish.
 		result = std::make_pair(paComplete, in.second);
 	}

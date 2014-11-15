@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -47,7 +47,9 @@ public:
 	 * Constructs an ConfigError.
 	 * @param message The human-readable message of the error.
 	 */
-	ConfigError(const std::string &message) : Error(message){};
+	ConfigError(const std::string &message) : Error(message)
+	{
+	}
 };
 
 /**
@@ -59,7 +61,9 @@ public:
 	 * Constructs an InternalError.
 	 * @param message The human-readable message of the error.
 	 */
-	InternalError(const std::string &message) : Error(message){};
+	InternalError(const std::string &message) : Error(message)
+	{
+	}
 };
 
 /**
@@ -71,7 +75,9 @@ public:
 	 * Constructs a FileError.
 	 * @param message The human-readable message of the error.
 	 */
-	FileError(const std::string &message) : Error(message){};
+	FileError(const std::string &message) : Error(message)
+	{
+	}
 };
 
 /**
@@ -83,7 +89,23 @@ public:
 	 * Constructs a SeekError.
 	 * @param message The human-readable message of the error.
 	 */
-	SeekError(const std::string &message) : Error(message){};
+	SeekError(const std::string &message) : Error(message)
+	{
+	}
+};
+
+/**
+ * A network error.
+ */
+class NetError : public Error {
+public:
+	/**
+	 * Constructs a NetError.
+	 * @param message The human-readable message of the error.
+	 */
+	NetError(const std::string &message) : Error(message)
+	{
+	}
 };
 
 /** Class for telling the human what playd is doing. */

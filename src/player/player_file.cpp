@@ -1,5 +1,5 @@
 // This file is part of playd.
-// playd is licenced under the MIT license: see LICENSE.txt.
+// playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
  * @file
@@ -27,21 +27,18 @@ void PlayerFile::Emit(ResponseSink &sink) const
 
 void PlayerFile::Load(const std::string &path)
 {
-	if (this->audio != nullptr) {
-		Eject();
-	}
+	if (this->audio != nullptr) this->Eject();
+
 	this->audio = decltype(this->audio)(this->audio_system.Load(path));
 
 	// Let clients know the file has changed.
-	Push();
+	this->Push();
 }
 
 void PlayerFile::Eject()
 {
 	// Don't bother actually ejecting if there isn't anything to eject.
-	if (this->audio == nullptr) {
-		return;
-	}
+	if (this->audio == nullptr) return;
 
 	this->audio->Stop();
 	this->audio = nullptr;
