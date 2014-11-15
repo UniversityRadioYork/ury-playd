@@ -27,7 +27,7 @@ void PlayerFile::Emit(ResponseSink &sink) const
 
 void PlayerFile::Load(const std::string &path)
 {
-	if (this->audio != nullptr)	this->Eject();
+	if (this->audio != nullptr) this->Eject();
 
 	this->audio = decltype(this->audio)(this->audio_system.Load(path));
 

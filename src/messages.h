@@ -11,7 +11,6 @@
 
 #include <string>
 
-
 //
 // Client communications
 //
@@ -21,7 +20,6 @@
 #define PD_VERSION "0.0.0"
 #endif
 const std::string MSG_OHAI = "playd " PD_VERSION;
-
 
 //
 // Command failure messages
@@ -48,7 +46,6 @@ const std::string MSG_CMD_NEEDS_PLAYING = "Command requires a playing file";
  */
 const std::string MSG_CMD_NEEDS_STOPPED = "Command requires a stopped file";
 
-
 //
 // Decoder failures
 //
@@ -56,14 +53,12 @@ const std::string MSG_CMD_NEEDS_STOPPED = "Command requires a stopped file";
 /// Message shown when a bad sample rate is found.
 const std::string MSG_DECODE_BADRATE = "Unsupported or invalid sample rate";
 
-
 //
 // Device ID failures
 //
 
 /// Message shown when an incorrect device ID is provided.
 const std::string MSG_DEV_BADID = "Incorrect device ID";
-
 
 //
 // Load failures
@@ -82,7 +77,6 @@ const std::string MSG_OUTPUT_RINGWRITE = "Ring buffer write error";
 /// Message shown when there is an error initialising the ring buffer.
 const std::string MSG_OUTPUT_RINGINIT = "Ring buffer init error";
 
-
 //
 // Seek failures
 //
@@ -95,6 +89,5 @@ const std::string MSG_SEEK_INVALID_UNIT = "Invalid time unit: try us, s, m, h";
 
 /// Message shown when a seek command has an invalid time value.
 const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer[unit]";
-
 
 #endif // PS_MESSAGES_H

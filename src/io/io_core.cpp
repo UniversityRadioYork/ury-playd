@@ -87,7 +87,8 @@ void UvListenCallback(uv_stream_t *server, int status)
 void UvRespondCallback(uv_write_t *req, int status)
 {
 	if (status) {
-		Debug() << "UvRespondCallback: got status:" << status << std::endl;
+		Debug() << "UvRespondCallback: got status:" << status
+		        << std::endl;
 	}
 
 	WriteReq *wr = reinterpret_cast<WriteReq *>(req);
@@ -105,7 +106,6 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 	// in order to disconnect clients and stop the updating.
 	if (!running) IoCore::End();
 }
-
 
 //
 // ConnectionPool
@@ -130,8 +130,7 @@ void ConnectionPool::Accept(uv_stream_t *server)
 		                this->connections.back().get());
 
 		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
-	}
-	else {
+	} else {
 		uv_close((uv_handle_t *)client, UvCloseCallback);
 	}
 }
@@ -157,7 +156,6 @@ void ConnectionPool::RespondRaw(const std::string &string) const
 {
 	this->Broadcast(string);
 }
-
 
 //
 // IoCore
@@ -214,12 +212,12 @@ void IoCore::RespondRaw(const std::string &string) const
 	uv_stop(uv_default_loop());
 }
 
-
 //
 // Connection
 //
 
-Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp, CommandHandler &handler)
+Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp,
+                       CommandHandler &handler)
     : parent(parent), tcp(tcp), tokeniser(), handler(handler)
 {
 	Debug() << "Opening connection from" << Name() << std::endl;
@@ -255,20 +253,22 @@ std::string Connection::Name()
 	struct sockaddr_storage s;
 	int namelen;
 
-	if (uv_tcp_getpeername(this->tcp,
-	                       (struct sockaddr *) &s,
-	                       &namelen) < 0) return "(error)";
+	if (uv_tcp_getpeername(this->tcp, (struct sockaddr *)&s, &namelen) < 0) {
+		return "(error)";
+	}
 
 	// Now, split the sockaddr into host and service.
 	char host[NI_MAXHOST];
 	char serv[NI_MAXSERV];
 
 	// We use NI_NUMERICSERV to ensure a port number comes out.
-	// Otherwise, we could get a (likely erroneous) string description of what
+	// Otherwise, we could get a (likely erroneous) string description of
+	// what
 	// the network stack *thinks* the port is used for.
-	if (getnameinfo((struct sockaddr *) &s,
-	                namelen, host, sizeof(host), serv, sizeof(serv),
-	                NI_NUMERICSERV)) return "(error)";
+	if (getnameinfo((struct sockaddr *)&s, namelen, host, sizeof(host),
+	                serv, sizeof(serv), NI_NUMERICSERV)) {
+		return "(error)";
+	}
 
 	return std::string(host) + ":" + std::string(serv);
 }
@@ -276,7 +276,8 @@ std::string Connection::Name()
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 {
 	// Did the connection hang up?  If so, de-pool it.
-	// De-pooling the connection will usually lead to the connection being destroyed.
+	// De-pooling the connection will usually lead to the connection being
+	// destroyed.
 	if (nread == UV_EOF) {
 		this->Depool();
 		return;
@@ -285,7 +286,7 @@ void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 	// Did we hit any other read errors?  Also de-pool, but log the error.
 	if (nread < 0) {
 		Debug() << "Error on" << Name() << "-" << uv_err_name(nread)
-                        << std::endl;
+		        << std::endl;
 		this->Depool();
 		return;
 	}

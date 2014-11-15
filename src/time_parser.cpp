@@ -22,7 +22,8 @@
 	std::string unit = seek.first;
 	MicrosecondPosition num_units = seek.second;
 
-	return static_cast<MicrosecondPosition>(TimeParser::UnitMultiplier(unit)) *
+	return static_cast<MicrosecondPosition>(
+	                       TimeParser::UnitMultiplier(unit)) *
 	       num_units;
 }
 

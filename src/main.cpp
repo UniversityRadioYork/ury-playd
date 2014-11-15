@@ -71,11 +71,13 @@ int Playd::Run()
 	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
 	std::string port = size > 3 ? this->arguments.at(3) : "1350";
 	try {
-		this->io = decltype(this->io)(
-	                new IoCore(this->player, this->handler, addr, port));
-	} catch (NetError &e) {
+		this->io = decltype(this->io)(new IoCore(
+		                this->player, this->handler, addr, port));
+	}
+	catch (NetError &e) {
 		std::cerr << "Network error: " << e.Message() << std::endl;
-		std::cerr << "Is " << addr << ":" << port << " available?" << std::endl;
+		std::cerr << "Is " << addr << ":" << port << " available?"
+		          << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -84,8 +86,8 @@ int Playd::Run()
 		// Show the user the valid device IDs they can use.
 		auto device_list = this->audio.GetDevicesInfo();
 		for (const auto &device : device_list) {
-			std::cout << device.first << ": "
-			          << device.second << std::endl;
+			std::cout << device.first << ": " << device.second
+			          << std::endl;
 		}
 		return EXIT_FAILURE;
 	}
@@ -99,8 +101,7 @@ int Playd::Run()
 	}
 	catch (Error &error) {
 		std::cerr << "Unhandled exception in main loop: "
-		          << error.Message()
-		          << std::endl;
+		          << error.Message() << std::endl;
 		return EXIT_FAILURE;
 	}
 

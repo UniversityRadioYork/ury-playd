@@ -36,7 +36,9 @@ void ResponseSink::RespondArgs(ResponseCode code,
 {
 	std::ostringstream os;
 	os << RESPONSES[static_cast<int>(code)];
-	for (auto argument : arguments) os << " " << this->EscapeArgument(argument);
+	for (auto argument : arguments) {
+		os << " " << this->EscapeArgument(argument);
+	}
 	this->RespondRaw(os.str());
 }
 

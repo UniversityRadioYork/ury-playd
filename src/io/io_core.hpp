@@ -26,13 +26,13 @@ extern "C" {
 class Player;
 class Connection;
 
-
 /// A pool of TCP connections.
 class ConnectionPool : public ResponseSink {
 public:
 	/**
 	 * Constructs a ConnectionPool.
-	 * @param player The player that forms welcome responses for new clients.
+	 * @param player The player that forms welcome responses for new
+	 * clients.
 	 * @param handler The handler to which read commands should be sent.
 	 */
 	ConnectionPool(Player &player, CommandHandler &handler);
@@ -72,7 +72,6 @@ private:
 	void RespondRaw(const std::string &string) const override;
 };
 
-
 /// A TCP connection from a client.
 class Connection : public ResponseSink {
 public:
@@ -82,7 +81,8 @@ public:
 	 * @param tcp The underlying libuv TCP stream.
 	 * @param handler The handler to which read commands should be sent.
 	 */
-	Connection(ConnectionPool &parent, uv_tcp_t *tcp, CommandHandler &handler);
+	Connection(ConnectionPool &parent, uv_tcp_t *tcp,
+	           CommandHandler &handler);
 
 	/**
 	 * Destructs a Connection.
@@ -140,7 +140,6 @@ private:
 	 */
 	void HandleCommand(const std::vector<std::string> &words);
 };
-
 
 /**
  * The IO core, which services input, routes responses, and executes the
@@ -201,6 +200,5 @@ private:
 	/// Sets up a periodic timer to run the playd update loop.
 	void DoUpdateTimer();
 };
-
 
 #endif // PS_IO_CORE_HPP

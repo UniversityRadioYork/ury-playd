@@ -144,15 +144,15 @@ AudioSource::DecodeResult AudioSource::Decode()
 
 	if (read == 0) {
 		this->decode_state = DecodeState::END_OF_FILE;
-	}
-	else {
+	} else {
 		this->decode_state = DecodeState::DECODING;
 
 		// Copy only the bit of the buffer occupied by decoded data
 		// See BytesPerSample() for an explanation of the
 		// ChannelCount() division.
 		auto front = this->buffer.begin();
-		auto read_bytes = (this->BytesPerSample() * read) / this->ChannelCount();
+		auto read_bytes = (this->BytesPerSample() * read) /
+		                  this->ChannelCount();
 		decoded = DecodeVector(front, front + read_bytes);
 	}
 
