@@ -136,8 +136,7 @@ private:
 
 	/**
 	 * Handles a tokenised command line.
-	 *
-	 * @param line A vector of command words representing a command line.
+	 * @param words A vector of command words representing a command line.
 	 */
 	void HandleCommand(const std::vector<std::string> &words);
 };

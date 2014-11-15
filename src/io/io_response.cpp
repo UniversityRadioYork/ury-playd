@@ -28,7 +28,7 @@ const std::string RESPONSES[] = {
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 {
-	RespondArgs(code, std::vector<std::string>(1, message));
+	this->RespondArgs(code, std::vector<std::string>(1, message));
 }
 
 void ResponseSink::RespondArgs(ResponseCode code,
@@ -36,8 +36,8 @@ void ResponseSink::RespondArgs(ResponseCode code,
 {
 	std::ostringstream os;
 	os << RESPONSES[static_cast<int>(code)];
-	for (auto argument : arguments) os << " " << EscapeArgument(argument);
-	RespondRaw(os.str());
+	for (auto argument : arguments) os << " " << this->EscapeArgument(argument);
+	this->RespondRaw(os.str());
 }
 
 /* static */ std::string ResponseSink::EscapeArgument(
@@ -72,5 +72,5 @@ void ResponseSource::SetResponseSink(ResponseSink &responder)
 
 void ResponseSource::Push() const
 {
-	if (this->push_sink != nullptr) Emit(*this->push_sink);
+	if (this->push_sink != nullptr) this->Emit(*this->push_sink);
 }

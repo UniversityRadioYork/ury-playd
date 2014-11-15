@@ -155,7 +155,7 @@ void ConnectionPool::Broadcast(const std::string &message) const
 
 void ConnectionPool::RespondRaw(const std::string &string) const
 {
-	Broadcast(string);
+	this->Broadcast(string);
 }
 
 
@@ -167,8 +167,8 @@ IoCore::IoCore(Player &player, CommandHandler &handler,
                const std::string &address, const std::string &port)
     : player(player), pool(player, handler)
 {
-	InitAcceptor(address, port);
-	DoUpdateTimer();
+	this->InitAcceptor(address, port);
+	this->DoUpdateTimer();
 }
 
 /* static */ void IoCore::Run()
@@ -278,7 +278,7 @@ void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 	// Did the connection hang up?  If so, de-pool it.
 	// De-pooling the connection will usually lead to the connection being destroyed.
 	if (nread == UV_EOF) {
-		Depool();
+		this->Depool();
 		return;
 	}
 
@@ -286,7 +286,7 @@ void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 	if (nread < 0) {
 		Debug() << "Error on" << Name() << "-" << uv_err_name(nread)
                         << std::endl;
-		Depool();
+		this->Depool();
 		return;
 	}
 

@@ -51,7 +51,7 @@ public:
 	/**
 	 * Destructs an AudioSystem, uninitialising its libraries.
 	 */
-	~AudioSystem();
+	virtual ~AudioSystem();
 
 	/**
 	 * Loads a file, creating an Audio for it.

@@ -79,5 +79,5 @@ const std::map<PlayerState::State, std::string> PlayerState::STRINGS = {
 void PlayerState::Set(PlayerState::State state)
 {
 	this->current = state;
-	Push();
+	this->Push();
 }

@@ -42,15 +42,15 @@ void Player::ResetPosition()
 // Default to broadcasting the position every time it is changed.
 PlayerPosition::PlayerPosition() : ResponseSource(), period(0)
 {
-	Reset();
+	this->Reset();
 }
 
 void PlayerPosition::Update(const TimeParser::MicrosecondPosition position)
 {
 	this->current = position;
 
-	if (IsReadyToSend()) {
-		Push();
+	if (this->IsReadyToSend()) {
+		this->Push();
 		this->last = this->current;
 		this->has_reset = 0;
 	}
@@ -65,10 +65,7 @@ void PlayerPosition::Reset()
 
 void PlayerPosition::Emit(ResponseSink &target) const
 {
-	std::ostringstream os;
-	os << this->current;
-
-	target.Respond(ResponseCode::TIME, os.str());
+	target.Respond(ResponseCode::TIME, std::to_string(this->current));
 }
 
 bool PlayerPosition::IsReadyToSend() const

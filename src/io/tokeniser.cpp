@@ -17,7 +17,7 @@
 #include "tokeniser.hpp"
 
 Tokeniser::Tokeniser()
-    : escape_next_character(false), quote_type(Tokeniser::QuoteType::NONE)
+    : escape_next(false), quote_type(Tokeniser::QuoteType::NONE)
 {
 }
 
@@ -27,8 +27,8 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 	assert(this->ready_lines.empty());
 
 	for (unsigned char c : raw_string) {
-		if (this->escape_next_character) {
-			Push(c);
+		if (this->escape_next) {
+			this->Push(c);
 			continue;
 		}
 
@@ -38,7 +38,7 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 					this->quote_type = QuoteType::NONE;
 				}
 				else {
-					Push(c);
+					this->Push(c);
 				}
 				break;
 
@@ -50,12 +50,12 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 						break;
 
 					case '\\':
-						this->escape_next_character =
+						this->escape_next =
 						                true;
 						break;
 
 					default:
-						Push(c);
+						this->Push(c);
 						break;
 				}
 				break;
@@ -63,7 +63,7 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 			case QuoteType::NONE:
 				switch (c) {
 					case '\n':
-						Emit();
+						this->Emit();
 						break;
 
 					case '\'':
@@ -77,13 +77,13 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 						break;
 
 					case '\\':
-						this->escape_next_character =
+						this->escape_next =
 						                true;
 						break;
 
 					default:
-						isspace(c) ? EndWord()
-						           : Push(c);
+						isspace(c) ? this->EndWord()
+						           : this->Push(c);
 						break;
 				}
 				break;
@@ -98,10 +98,10 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 
 void Tokeniser::Push(unsigned char c)
 {
-	assert(this->escape_next_character ||
+	assert(this->escape_next ||
 	       !(this->quote_type == QuoteType::NONE && isspace(c)));
 	this->current_word.push_back(c);
-	this->escape_next_character = false;
+	this->escape_next = false;
 	assert(!this->current_word.empty());
 }
 
@@ -119,11 +119,11 @@ void Tokeniser::Emit()
 {
 	// Since we assume these, we don't need to set them later.
 	assert(this->quote_type == QuoteType::NONE);
-	assert(!this->escape_next_character);
+	assert(!this->escape_next);
 
 	// We might still be in a word, in which case we treat the end of a
 	// line as the end of the word too.
-	EndWord();
+	this->EndWord();
 
 	this->ready_lines.push_back(this->words);
 
@@ -131,6 +131,6 @@ void Tokeniser::Emit()
 
 	// The state should now be clean and ready for another command.
 	assert(this->quote_type == QuoteType::NONE);
-	assert(!this->escape_next_character);
+	assert(!this->escape_next);
 	assert(this->current_word.empty());
 }

@@ -22,7 +22,7 @@
 
 Audio::Audio(AudioSource *source, AudioSink *sink) : source(source), sink(sink)
 {
-	ClearFrame();
+	this->ClearFrame();
 }
 
 std::string Audio::Path() const
@@ -57,7 +57,7 @@ void Audio::SeekToPositionMicroseconds(
 {
 	auto samples = this->source->Seek(microseconds);
 	this->sink->SetPosition(samples);
-	ClearFrame();
+	this->ClearFrame();
 }
 
 void Audio::ClearFrame()
@@ -69,10 +69,10 @@ void Audio::ClearFrame()
 
 bool Audio::Update()
 {
-	bool more_frames_available = DecodeIfFrameEmpty();
+	bool more_frames_available = this->DecodeIfFrameEmpty();
 
-	if (!FrameFinished()) {
-		TransferFrame();
+	if (!this->FrameFinished()) {
+		this->TransferFrame();
 	}
 
 	this->sink->SetInputReady(more_frames_available);
@@ -88,9 +88,9 @@ void Audio::TransferFrame()
 
 	// We empty the frame once we're done with it.  This
 	// maintains FrameFinished(), as an empty frame is a finished one.
-	if (FrameFinished()) {
-		ClearFrame();
-		assert(FrameFinished());
+	if (this->FrameFinished()) {
+		this->ClearFrame();
+		assert(this->FrameFinished());
 	}
 
 	// The frame iterator should be somewhere between the beginning and
@@ -105,11 +105,11 @@ bool Audio::DecodeIfFrameEmpty()
 	// Either the current frame is in progress, or has been emptied.
 	// AdvanceFrameIterator() establishes this assertion by emptying a
 	// frame as soon as it finishes.
-	assert(this->frame.empty() || !FrameFinished());
+	assert(this->frame.empty() || !this->FrameFinished());
 
 	bool more_frames_available = true;
 
-	if (FrameFinished()) {
+	if (this->FrameFinished()) {
 		AudioSource::DecodeResult result = this->source->Decode();
 
 		this->frame = result.second;

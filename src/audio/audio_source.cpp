@@ -33,12 +33,12 @@ const size_t AudioSource::BUFFER_SIZE = 16384;
 AudioSource::AudioSource(const std::string &path)
     : buffer(BUFFER_SIZE), context(nullptr)
 {
-	Open(path);
+	this->Open(path);
 }
 
 AudioSource::~AudioSource()
 {
-	Close();
+	this->Close();
 }
 
 std::string AudioSource::Path() const
@@ -72,7 +72,7 @@ std::uint64_t AudioSource::SamplePositionFromMicroseconds(
 	// need to convert the position to seconds then multiply by the rate.
 	// We do things in a slightly peculiar order to minimise rounding.
 
-	return (position * SampleRate()) / 1000000;
+	return (position * this->SampleRate()) / 1000000;
 }
 
 TimeParser::MicrosecondPosition AudioSource::MicrosecondPositionFromSamples(
@@ -80,7 +80,7 @@ TimeParser::MicrosecondPosition AudioSource::MicrosecondPositionFromSamples(
 {
 	// This is basically SamplePositionFromMicroseconds but backwards.
 
-	return (samples * 1000000) / SampleRate();
+	return (samples * 1000000) / this->SampleRate();
 }
 
 size_t AudioSource::BytesPerSample() const
@@ -94,24 +94,24 @@ size_t AudioSource::BytesPerSample() const
 	// regards each channel as having its own separate sample, so we need
 	// to multiply and divide sample counts by the channel count when
 	// talking to SoX.
-	return 4 * ChannelCount();
+	return 4 * this->ChannelCount();
 }
 
 std::uint64_t AudioSource::Seek(TimeParser::MicrosecondPosition position)
 {
 	assert(this->context != nullptr);
 
-	auto samples = SamplePositionFromMicroseconds(position);
+	auto samples = this->SamplePositionFromMicroseconds(position);
 
 	// See BytesPerSample() for an explanation of this ChannelCount().
-	auto sox_samples = samples * ChannelCount();
+	auto sox_samples = samples * this->ChannelCount();
 
 	// libsox doesn't seem to like seeking into an ended file, so close
 	// and re-open it first.
 	if (this->decode_state == DecodeState::END_OF_FILE) {
-		std::string path = Path();
-		Close();
-		Open(path);
+		std::string path = this->Path();
+		this->Close();
+		this->Open(path);
 	}
 
 	// Have we tried to seek past the end of the file?
@@ -137,7 +137,7 @@ AudioSource::DecodeResult AudioSource::Decode()
 	auto buf = reinterpret_cast<sox_sample_t *>(&this->buffer.front());
 
 	// See BytesPerSample() for an explanation of this ChannelCount().
-	auto sox_capacity = BufferSampleCapacity() * ChannelCount();
+	auto sox_capacity = this->BufferSampleCapacity() * this->ChannelCount();
 	size_t read = sox_read(this->context, buf, sox_capacity);
 
 	DecodeVector decoded;
@@ -152,7 +152,7 @@ AudioSource::DecodeResult AudioSource::Decode()
 		// See BytesPerSample() for an explanation of the
 		// ChannelCount() division.
 		auto front = this->buffer.begin();
-		auto read_bytes = (BytesPerSample() * read) / ChannelCount();
+		auto read_bytes = (this->BytesPerSample() * read) / this->ChannelCount();
 		decoded = DecodeVector(front, front + read_bytes);
 	}
 
@@ -172,13 +172,11 @@ AudioSource::DecodeResult AudioSource::Decode()
 
 void AudioSource::Open(const std::string &path)
 {
-	Close();
+	this->Close();
 
 	this->context = sox_open_read(path.c_str(), nullptr, nullptr, nullptr);
 	if (this->context == nullptr) {
-		std::ostringstream os;
-		os << "couldn't open " << path;
-		throw FileError(os.str());
+		throw FileError("couldn't open" + path);
 	}
 }
 
