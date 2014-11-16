@@ -1,0 +1,49 @@
+@import url(//fonts.googleapis.com/css?family=Merriweather:400,700,400italic|Merriweather+Sans:700|Roboto+Slab:700);
+
+html {
+	background-color: #fafafa;
+}
+
+body {
+	color: rgba(0, 0, 0, 0.85);
+	font-family: 'Merriweather', serif;
+	font-size: 14pt;
+}
+
+header {
+	border-bottom: 3pt solid #c5cae9;
+	padding-bottom: 1rem;
+	text-align: center;
+}
+header h1 {
+	color: #1a237e;
+	font-family: 'Roboto Slab', serif;
+	font-size: 3rem;
+	margin: 0;
+}
+header p {
+	color: #5c6bc0;
+	font-style: italic;
+	margin: 0;
+	margin-top: 6pt;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Merriweather Sans', sans-serif;
+}
+
+main {
+	margin: 0 auto;
+	width: 66%;
+}
+
+a:link {
+	color: #5677fc;
+}
+a:active {
+	color: #e51c23;
+}
+a:visited {
+	color: #673ab7;
+}
+
