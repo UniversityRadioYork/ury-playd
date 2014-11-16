@@ -25,7 +25,7 @@ PKG_CONFIG ?= pkg-config
 FORMAT     ?= clang-format -i
 DOXYGEN    ?= doxygen
 GIT        ?= git
-GROFF_HTML ?= mandoc -Thtml
+GROFF_HTML ?= mandoc -Thtml -Ostyle=man.css
 # If `mandoc` is not available, `groff -Thtml -mdoc` may work.
 
 # The C standard used to compile playd.
