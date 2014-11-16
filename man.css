@@ -44,3 +44,10 @@ a:visited {
 	color: #673ab7;
 }
 
+/* Make authors appear on one line. */
+.author {
+	white-space:pre;
+}
+.author:not(:first-of-type):before {
+	content: "\A";
+}
