@@ -97,7 +97,7 @@ Using the Makefile is straightforward:
 All dependencies are available in [homebrew] - it is highly recommended that
 you use it!
 
-### FreeBSD (10+)
+#### FreeBSD (10+)
 
 FreeBSD 10 and above come with `clang` 3.3 as standard, which should be able to
 compile `playd`.  `gcc` is available through the FreeBSD Ports Collection
