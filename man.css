@@ -13,6 +13,14 @@ body {
 table.head {
 	border-bottom: 3pt solid #c5cae9;
 	padding-bottom: 1rem;
+}
+
+table.foot {
+	border-top: 3pt solid #c5cae9;
+	padding-top: 1rem;
+}
+
+table.head, table.foot {
 	color: #1a237e;
 	font-family: 'Roboto Slab', serif;
 	margin: 0;
@@ -22,7 +30,7 @@ h1, h2, h3, h4, h5, h6 {
 	font-family: 'Merriweather Sans', sans-serif;
 }
 
-section {
+.section {
 	margin: 0 auto;
 	width: 66%;
 }
