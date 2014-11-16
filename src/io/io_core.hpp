@@ -26,13 +26,23 @@ extern "C" {
 class Player;
 class Connection;
 
-/// A pool of TCP connections.
+/**
+ * A pool of TCP connections.
+ *
+ * A ConnectionPool contains, and holds ownership over, a set of
+ * Connection objects.  Each Connection is created indirectly by asking
+ * the pool to Accept() a connection from the libuv TCP server.
+ *
+ * The ConnectionPool can broadcast messages to each pooled Connection,
+ * using the Broadcast() method, and Remove() a Connection at any time,
+ * effectively destroying it.
+ */
 class ConnectionPool : public ResponseSink {
 public:
 	/**
 	 * Constructs a ConnectionPool.
 	 * @param player The player that forms welcome responses for new
-	 * clients.
+	 *   clients.
 	 * @param handler The handler to which read commands should be sent.
 	 */
 	ConnectionPool(Player &player, CommandHandler &handler);
@@ -52,6 +62,8 @@ public:
 
 	/**
 	 * Removes a connection.
+	 * As the ConnectionPool owns the Connection, it will be
+	 * destroyed by this operation.
 	 * @param conn The connection to remove.
 	 */
 	void Remove(Connection &conn);
@@ -72,7 +84,13 @@ private:
 	void RespondRaw(const std::string &string) const override;
 };
 
-/// A TCP connection from a client.
+/**
+ * A TCP connection from a client.
+ *
+ * This class wraps a libuv TCP stream representing a client connection,
+ * allowing it to be sent responses (directly, or via a ConnectionPool
+ * Broadcast()), removed from its ConnectionPool, and queried for its name.
+ */
 class Connection : public ResponseSink {
 public:
 	/**
