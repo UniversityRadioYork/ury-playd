@@ -18,11 +18,12 @@ table.head {
 table.foot {
 	border-top: 3pt solid #c5cae9;
 	padding-top: 1rem;
+	padding-bottom: 1rem;
 }
 
 table.head, table.foot {
-	color: #1a237e;
-	font-family: 'Roboto Slab', serif;
+	color: #5c6bc0;
+	font-style: italic;
 	margin: 0;
 }
 
