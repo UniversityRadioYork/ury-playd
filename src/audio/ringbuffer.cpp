@@ -16,7 +16,6 @@ extern "C" {
 #include "../messages.h"
 #include "ringbuffer.hpp"
 
-
 RingBuffer::RingBuffer(int power, int size)
 {
 	assert(0 < power);

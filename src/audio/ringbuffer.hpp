@@ -13,7 +13,6 @@ extern "C" {
 #include "../contrib/pa_ringbuffer/pa_ringbuffer.h"
 }
 
-
 /**
  * A ring buffer.
  * This ring buffer is based on the PortAudio ring buffer, provided in the
