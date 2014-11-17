@@ -1,12 +1,10 @@
 # URY playd
 
-URY playd (`playd` for short) is a minimal C++ audio player using [libsox][]
-and [PortAudio][], developed by [University Radio York][] (URY) and
-designed to be composable into bigger systems.
+URY playd (or just `playd`; short for _player daemon_) is a C++ audio
+player developed by [University Radio York].  It's designed to be
+minimal, hackable, and composable into bigger systems (such as our
+ongoing BAPS3 project to build a new radio playout system).
 
-All code developed for `playd` is licenced under the [MIT licence][]
-(see LICENSE.txt).  Some code is taken from the [PortAudio][] project
-(see LICENSE.portaudio), as well as [CATCH][] (see LICENSE.catch).
 
 ## Usage
 
@@ -23,36 +21,37 @@ All code developed for `playd` is licenced under the [MIT licence][]
 * `eject` — Unloads the current file;
 * `play` — Starts playback;
 * `stop` — Stops (pauses) playback;
-* `seek 1m` — Seeks one minute into the current file.  Units supported include
-  `h`, `m`, `s`, `ms`, `us` (micros), with `us` assumed if no unit is given.
+* `seek 1000` — Seeks to 1,000 microseconds after the start of the current file.
 * `quit` — Closes `playd`.
 
 ### Sending commands manually
 
 To connect directly to `playd` and issue commands to it, you can use
-[netcat][]:
+[netcat]:
 
     # If you specified [ADDRESS] or [PORT], replace localhost and 1350 respectively.
     $ nc localhost 1350
 
-
-On Windows, using [PuTTY][] in _raw mode_ (__not__ Telnet mode)
-with _Implicit CR in every LF_ switched on in the _Terminal_ options should
+On Windows, using [PuTTY] in _raw mode_ (__not__ Telnet mode) with
+_Implicit CR in every LF_ switched on in the _Terminal_ options should
 work.
 
 __Do _not_ use a Telnet client (or PuTTY in telnet mode)!__  `playd` will
 do weird things in the presence of Telnet-isms.
 
+
 ## Features
 
-* Plays anything [libsox][] can play (in practice, more esoteric formats might
-  not work)
+* Plays virtually anything [libsox] can play (notably, MP3s, OGGs, and FLACs)
 * Seek (microseconds, seconds, minutes etc)
 * Frequently announces the current position
 * TCP/IP interface with text protocol
 * Deliberately not much else
 
+
 ## Philosophy
+
+`playd` is developed using the following guidelines:
 
 * Do one thing and do it well
 * Be hackable
@@ -60,14 +59,15 @@ do weird things in the presence of Telnet-isms.
 * Favour simplicity over features
 * Let other programs handle the shinies
 
+
 ## Compilation
 
 ### Requirements
 
-* [libsox][] (1.14.1)
-* [libuv][] (0.11.29)
-* [PortAudio][] (19_20140130)
-* A C++11 compiler (recent versions of [clang][], [gcc][], and Visual Studio
+* [libsox] (1.14.1)
+* [libuv] (0.11.29)
+* [PortAudio] (19_20140130)
+* A C++11 compiler (recent versions of [clang], [gcc], and Visual Studio
   work)
 
 Certain operating systems may need additional dependencies; see the OS-specific
@@ -78,7 +78,7 @@ build instructions below.
 `playd` comes with a GNU-compatible Makefile that can be used both to
 make and install.
 
-To use the Makefile, you'll need [GNU Make][] and `pkg-config` (or equivalent),
+To use the Makefile, you'll need [GNU Make] and `pkg-config` (or equivalent),
 and pkg-config packages for PortAudio, libsox and libuv.  We've tested building
 playd on Gentoo, FreeBSD 10, and OS X, but other POSIX-style operating systems
 should work.
@@ -94,10 +94,10 @@ Using the Makefile is straightforward:
 
 #### OS X
 
-All dependencies are available in [homebrew][] - it is highly recommended that
+All dependencies are available in [homebrew] - it is highly recommended that
 you use it!
 
-### FreeBSD (10+)
+#### FreeBSD (10+)
 
 FreeBSD 10 and above come with `clang` 3.3 as standard, which should be able to
 compile `playd`.  `gcc` is available through the FreeBSD Ports Collection
@@ -144,21 +144,19 @@ PortAudio source distribution for building the C++ bindings
 (`\bindings\cpp\build\vc7_1\static_library.vcproj`) should work.  If not, then
 use the bundled bindings.
 
-## Q&A
 
-### Why does this exist?
+## Contributing
 
-It was originally written as an experiment when coming up with a new playout
-system for [University Radio York][].
-
-### Why is it named `playd`?
-
-It's short for __play__er __d__aemon.
-
-### Can I contribute?
-
-Certainly!  We appreciate any and all pull requests in accordance with our
+We appreciate any and all pull requests made in accordance with our
 philosophy.
+
+
+## Legal
+
+All original code is licenced under the [MIT licence] (see LICENSE.txt).
+Some code is taken from the [PortAudio] project (see LICENSE.portaudio),
+as well as [CATCH] (see LICENSE.catch).
+
 
 [CATCH]:                 http://catch-lib.net
 [clang]:                 http://clang.llvm.org

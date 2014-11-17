@@ -49,6 +49,9 @@ void ResponseSink::RespondArgs(ResponseCode code,
 	std::string escaped;
 
 	for (unsigned char c : argument) {
+		// These are the characters (including all whitespace, via
+		// isspace())  whose presence means we need to single-quote
+		// escape the argument.
 		bool is_escaper = c == '"' || c == '\'' || c == '\\';
 		if (isspace(c) || is_escaper) escaping = true;
 
@@ -59,6 +62,8 @@ void ResponseSink::RespondArgs(ResponseCode code,
 		escaped += (c == '\'') ? R"('\'')" : std::string(1, c);
 	}
 
+	// Only single-quote escape if necessary.
+	// Otherwise, it wastes two characters!
 	if (escaping) return "'" + escaped + "'";
 	return escaped;
 }
@@ -74,5 +79,7 @@ void ResponseSource::SetResponseSink(ResponseSink &responder)
 
 void ResponseSource::Push() const
 {
+	// Having no push_sink is entirely normal, and implies that the
+	// ResponseSource's responses are to be ignored.
 	if (this->push_sink != nullptr) this->Emit(*this->push_sink);
 }

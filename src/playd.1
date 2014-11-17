@@ -1,15 +1,32 @@
-.Dd July 26, 2014
+.\"--
+.\" This file is part of playd.
+.\" playd is licensed under the MIT licence: see LICENSE.txt.
+.\"--
+.\"
+.\" playd man page.
+.\" This man page uses the 'mdoc' macro set; see `man mdoc` for details.
+.\"
+.Dd November 16, 2014
 .Dt PLAYD 1
 .Os
+.\"
+.\"======
 .Sh NAME
+.\"======
 .Nm playd
 .Nd basic TCP/IP-driven audio player
+.\"
+.\"==========
 .Sh SYNOPSIS
+.\"==========
 .Nm
 .Op Ar device-id
 .Op Ar address
 .Op Ar port
+.\"
+.\"=============
 .Sh DESCRIPTION
+.\"=============
 .Nm
 is a very simple audio playback program, intended to be driven by other, more
 complex software.  Think of it as
@@ -48,21 +65,153 @@ If provided, this specifies the TCP/IP port on which
 .Nm
 will listen for client connections.  The default is 1350.
 .El
+.\"----------
 .Ss Protocol
+.\"----------
 .Nm
-speaks a text-based protocol which is simple to understand but, for reasons of
-brevity (and the fact that the protocol is not yet finalised and may quickly
-outpace this man page in development), is not documented here.  Refer to
-https://github.com/UniversityRadioYork/ury-playd/wiki/playd-API
-for the latest protocol documentation.
+speaks a simple, text-based protocol based heavily on POSIX-style shell
+languages:
+.Bl -dash -offset indent -compact
+.It
+Every request or response consists of one or more whitespace-delimited
+.Em words ,
+followed by a line feed.
+.It
+The first word is the
+.Em command word
+and denotes the specific request or response in question.
+.It
+A command word in
+.Em all lowercase
+denotes a request; a command word in
+.Em ALL CAPS
+is a response.
+.Nm
+is case-sensitive.
+.It
+Words may contain backslashes, which
+.Em escape
+the next character, reproducing it verbatim.  This can be used to permit
+whitespace characters, which would otherwise end the word.
+.It
+In addition, words may be
+.Em quoted
+in either
+.Em double quotes ,
+in which backslash escaping is respected, or
+.Em single quotes ,
+in which it is ignored.
+.El
+.\"-----------------------------
 .Ss Controlling from a terminal
+.\"-----------------------------
 Since
 .Nm
 only speaks TCP/IP (by design), it can be difficult to speak with it from a
 terminal on the local machine.  We recommend the use of a program such as
 .Xr nc 1
 to bridge this gap in functionality.
+.\"
+.\"==========
+.Sh COMMANDS
+.\"==========
+.Nm
+understands the following requests:
+.Bl -tag -width "eject" -offset indent
+.It eject
+Unloads the current file, stopping playback if the file is playing.
+.It load Ar path
+Loads the file at
+.Ar path .
+.Ar path
+.Em must
+be an absolute path;
+.Nm
+performs no expansion or relative path searching.
+.It play
+Starts, or resumes, playback of the current file.
+.It seek Ar position
+Seeks to
+.Ar position
+microseconds after the start of the file.  A file can always be seeked.
+Seeking past a file's end is equivalent to seeking to the end directly.
+.It stop
+Stops playback of the current file, keeping the current position.
+.It quit
+Quits
+.Nm .
+.El
+
+In response to requests or other events,
+.Nm
+may produce the following:
+.\"
+.Bl -tag -width "END" -offset indent
+.\"
+.It END
+The loaded file has reached its end of its own accord (not via a stop
+command).
+.\"
+.It FAIL Ar reason
+.Nm
+failed to execute a command.  A human-readable
+.Ar reason
+is provided.
+.\"
+.It FEATURES Ar feature1 Op Ar feature2...
+The set of BAPS3 feature flags
+.Nm
+implements.  This identifies the features
+.Nm
+provides to external clients.
+.\"
+.It FILE Ar path
+The loaded file has changed to the file at
+.Ar path .
+.\"
+.It OHAI Ar greeting
+Sent at connection time;
+.Ar greeting
+identifies the playd server and version number.
+.\"
+.It OKAY Ar request
+.Nm
+just finished processing
+.Ar request .
+.\"
+.It STATE Ar state
+The playback state has changed to
+.Ar state .
+This may be one of the following:
+.Bl -tag -width "Quitting" -offset indent
+.It Ejected
+No file is currently loaded.
+.It Playing
+A file is loaded and playing.
+.It Quitting
+.Nm
+is preparing to shut down.
+.It Stopped
+A file is loaded, but is not playing.
+.El
+.\"
+.It TIME Ar position
+.Nm
+periodically announces the current position in the file using TIME.
+The
+.Ar position
+is in microseconds from the start of the file.
+.\"
+.It WHAT Ar message
+.Nm
+did not understand a command.  A human-readable
+.Ar message
+is provided.
+.El
+.\"
+.\"==========
 .Sh EXAMPLES
+.\"==========
 The command
 
 .Dl % playd
@@ -102,16 +251,44 @@ from the local terminal, one can use a command such as:
 
 .Dl % nc 127.0.0.1 1350
 
-This example, hopefully, covers all command-line usage of
+An example session with
+.Nm
+may look like the following:
+.Bd -literal -offset indent
+-> OHAI 'playd v0.1.1'
+-> FEATURES End FileLoad PlayStop Seek TimeReport
+-> TIME 0
+-> STATE Ejected
+<- load '/usr/home/foo/awesome-mix.mp3'
+-> OKAY load '/usr/home/foo/awesome-mix.mp3'
+-> FILE '/usr/home/foo/awesome-mix.mp3'
+-> STATE Stopped
+<- play
+-> OKAY play
+-> STATE Playing
+(file plays to end)
+-> END
+-> STATE Stopped
+-> TIME 0
+-> eject
+<- OKAY eject
+-> STATE Ejected
+(disconnect)
+.Ed
+
+This hopefully covers all command-line usage of
 .Nm .
+.\"
+.\"=========
 .Sh AUTHORS
-.An "Matt Windsor" Aq matt.windsor@ury.org.uk
+.\"=========
+.\" These are in alphabetical surname order.
 .An "Charles Pigott" Aq charles.pigott@ury.org.uk
+.An "Sam Willcocks" Aq sam.w@ury.org.uk
+.An "Matt Windsor" Aq matt.windsor@ury.org.uk
+.\"
+.\"======
 .Sh BUGS
+.\"======
 .An Undefined behaviour if you try to escape (\*q\e\*q) a multi-byte UTF-8
-character. This is intentional, for reasons of code simplicity. See the
-.URL "http://universityradioyork.github.io/baps3-spec/comms/internal/protocol.html#limitations" "specification"
-for more details.
-.An See the
-.URL "https://github.com/UniversityRadioYork/ury-playd/issues" "issue tracker"
-for any other open issues.
+character. This is intentional, for reasons of code simplicity.

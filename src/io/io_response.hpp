@@ -17,6 +17,7 @@
 
 #include "../errors.hpp"
 
+
 /**
  * Four-character response codes.
  * @note If you're adding new responses here, update RESPONSES.
@@ -42,8 +43,13 @@ extern const std::string RESPONSES[];
 
 /**
  * Abstract class for anything that can be sent a response.
+ *
+ * This class automatically provides the Respond() and RespondArgs() methods,
+ * given an implementation on the subclass of RespondRaw().
+ *
  * Usually the responses come from a ResponseSource, but anything may send a
  * ResponseSink a response.
+ *
  * @see ResponseSource
  */
 class ResponseSink {
@@ -86,7 +92,9 @@ private:
  *
  * A ResponseSource can both 'push' responses to a registered ResponseSink and
  * be 'polled' from outside to dump its current response to an external
- * ResponseSink.  For example, PlayerPosition 'pushes' its position every few
+ * ResponseSink.
+ *
+ * For example, PlayerPosition 'pushes' its position every few
  * milliseconds to the outside world, to keep the client aware of the time,
  * but is also 'polled' on a new client connection so that the client
  * immediately gets the current position on connect.
