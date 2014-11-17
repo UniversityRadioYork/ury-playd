@@ -7,11 +7,14 @@
  * @see player/player_file.hpp
  */
 
+#include <cassert>
+
 #include "../audio/audio_system.hpp"
 #include "../io/io_response.hpp"
 #include "../time_parser.hpp"
 #include "player_file.hpp"
 #include "player_position.hpp"
+
 
 PlayerFile::PlayerFile(const AudioSystem &audio_system)
     : ResponseSource(), audio(nullptr), audio_system(audio_system)

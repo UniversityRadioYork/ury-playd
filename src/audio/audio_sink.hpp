@@ -145,7 +145,7 @@ private:
 	AudioSource::SampleByteCount bytes_per_sample;
 
 	/// The ring buffer used to transfer samples to the playing callback.
-	RingBuffer<char, unsigned long> ring_buf;
+	RingBuffer ring_buf;
 
 	/// The PortAudio stream to which this AudioSink outputs.
 	std::unique_ptr<portaudio::Stream> stream;

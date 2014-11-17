@@ -9,14 +9,9 @@
 #ifndef PS_RINGBUFFER_HPP
 #define PS_RINGBUFFER_HPP
 
-#include <cassert>
-
 extern "C" {
 #include "../contrib/pa_ringbuffer/pa_ringbuffer.h"
 }
-
-#include "../errors.hpp"
-#include "../messages.h"
 
 /**
  * A ring buffer.
@@ -26,7 +21,6 @@ extern "C" {
  * hoop jumping to integrate and could do with being replaced with a native
  * solution.
  */
-template <typename RepT, typename SampleCountT>
 class RingBuffer {
 public:
 	/**
@@ -39,35 +33,10 @@ public:
 	 *   buffer.
 	 * @param size The size of one element in the ring buffer.
 	 */
-	RingBuffer(int power, int size)
-	{
-		assert(0 < power);
-		assert(0 < size);
-
-		this->rb = new PaUtilRingBuffer;
-		this->buffer = new char[(1 << power) * size];
-
-		int init_result = PaUtil_InitializeRingBuffer(
-		                this->rb, size,
-		                static_cast<ring_buffer_size_t>(1 << power),
-		                this->buffer);
-		if (init_result != 0) {
-			throw new InternalError(MSG_OUTPUT_RINGINIT);
-		}
-
-		assert(this->rb != nullptr);
-		assert(this->buffer != nullptr);
-	}
+	RingBuffer(int power, int size);
 
 	/// Destructs a PaRingBuffer.
-	~RingBuffer()
-	{
-		assert(this->rb != nullptr);
-		delete this->rb;
-
-		assert(this->buffer != nullptr);
-		delete[] this->buffer;
-	}
+	~RingBuffer();
 
 	/// Deleted copy constructor.
 	RingBuffer(const RingBuffer &) = delete;
@@ -80,20 +49,14 @@ public:
 	 * @return The number of samples this ring buffer has space to store.
 	 * @see Write
 	 */
-	SampleCountT WriteCapacity() const
-	{
-		return CountCast(PaUtil_GetRingBufferWriteAvailable(this->rb));
-	}
+	unsigned long WriteCapacity() const;
 
 	/**
 	 * The current read capacity.
 	 * @return The number of samples available in this ring buffer.
 	 * @see Read
 	 */
-	SampleCountT ReadCapacity() const
-	{
-		return CountCast(PaUtil_GetRingBufferReadAvailable(this->rb));
-	}
+	unsigned long ReadCapacity() const;
 
 	/**
 	 * Writes samples from an array into the ring buffer.
@@ -117,15 +80,7 @@ public:
 	 * @return The number of samples written, which should not exceed count.
 	 * @see WriteCapacity
 	 */
-	SampleCountT Write(RepT *start, SampleCountT count)
-	{
-		assert(0 < count);
-		assert(count <= WriteCapacity());
-
-		return CountCast(PaUtil_WriteRingBuffer(
-		                this->rb, start,
-		                static_cast<ring_buffer_size_t>(count)));
-	}
+	unsigned long Write(char *start, unsigned long count);
 
 	/**
 	 * Reads samples from the ring buffer into an array.
@@ -146,21 +101,10 @@ public:
 	 * @return The number of samples read, which should not exceed count.
 	 * @see ReadCapacity
 	 */
-	SampleCountT Read(RepT *start, SampleCountT count)
-	{
-		assert(0 < count);
-		assert(count <= ReadCapacity());
-
-		return CountCast(PaUtil_ReadRingBuffer(
-		                this->rb, start,
-		                static_cast<ring_buffer_size_t>(count)));
-	}
+	unsigned long Read(char *start, unsigned long count);
 
 	/// Empties the ring buffer.
-	void Flush()
-	{
-		PaUtil_FlushRingBuffer(this->rb);
-	}
+	void Flush();
 
 private:
 	char *buffer;         ///< The array used by the ringbuffer.
@@ -169,12 +113,9 @@ private:
 	/**
 	 * Converts a ring buffer size into an external size.
 	 * @param count The size/count in PortAudio form.
-	 * @return The size/count after casting to SampleCountT.
+	 * @return The size/count after casting to unsigned long.
 	 */
-	static SampleCountT CountCast(ring_buffer_size_t count)
-	{
-		return static_cast<SampleCountT>(count);
-	}
+	static unsigned long CountCast(ring_buffer_size_t count);
 };
 
 #endif // PS_RINGBUFFER_HPP
