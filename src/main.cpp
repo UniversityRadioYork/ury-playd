@@ -61,7 +61,7 @@ Playd::Playd(int argc, char *argv[])
     : audio(), player(audio, time_parser), handler(player), time_parser()
 {
 	for (int i = 0; i < argc; i++) {
-		this->arguments.push_back(std::string(argv[i]));
+		this->arguments.emplace_back(argv[i]);
 	}
 }
 
@@ -70,6 +70,7 @@ int Playd::Run()
 	auto size = this->arguments.size();
 	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
 	std::string port = size > 3 ? this->arguments.at(3) : "1350";
+
 	try {
 		this->io = decltype(this->io)(new IoCore(
 		                this->player, this->handler, addr, port));
