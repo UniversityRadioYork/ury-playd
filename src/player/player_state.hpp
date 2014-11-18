@@ -36,7 +36,7 @@ public:
 		QUITTING  ///< The player is about to terminate.
 	};
 
-	/// A list of states, used for IfIn.
+	/// A list of states, used for In.
 	typedef std::initializer_list<State> List;
 
 	/// List of states in which the player is playing something.
