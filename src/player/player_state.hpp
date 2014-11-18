@@ -79,7 +79,8 @@ public:
 
 private:
 	/// A mapping between states and their human-readable names.
-	const static std::map<State, std::string> STRINGS;
+	/// Implemented as an array indexed by the int equivalent of the state enum.
+	const static std::string STRINGS[];
 
 	/// The current state.
 	State current;
