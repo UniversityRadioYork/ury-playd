@@ -6,8 +6,8 @@
  * Constant human-readable messages used within playd.
  */
 
-#ifndef PS_MESSAGES_H
-#define PS_MESSAGES_H
+#ifndef PLAYD_MESSAGES_H
+#define PLAYD_MESSAGES_H
 
 #include <string>
 
