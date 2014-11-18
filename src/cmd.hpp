@@ -7,8 +7,8 @@
  * @see cmd.cpp
  */
 
-#ifndef PS_CMD_HPP
-#define PS_CMD_HPP
+#ifndef PLAYD_CMD_HPP
+#define PLAYD_CMD_HPP
 
 #include <map>
 #include <memory>
@@ -65,4 +65,4 @@ private:
 	CommandResult RunUnary(const std::string &cmd, const std::string &arg);
 };
 
-#endif // PS_CMD_HPP
+#endif // PLAYD_CMD_HPP

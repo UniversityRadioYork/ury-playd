@@ -7,8 +7,8 @@
  * @see audio/audio_system.cpp
  */
 
-#ifndef PS_AUDIO_SYSTEM_HPP
-#define PS_AUDIO_SYSTEM_HPP
+#ifndef PLAYD_AUDIO_SYSTEM_HPP
+#define PLAYD_AUDIO_SYSTEM_HPP
 
 #include <string>
 #include <utility>
@@ -103,4 +103,4 @@ private:
 	static portaudio::SampleDataFormat PaSampleFormatFrom(SampleFormat fmt);
 };
 
-#endif // PS_AUDIO_SYSTEM_HPP
+#endif // PLAYD_AUDIO_SYSTEM_HPP

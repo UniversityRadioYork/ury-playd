@@ -7,8 +7,8 @@
  * @see io/io_response.cpp
  */
 
-#ifndef PS_IO_RESPONSE_HPP
-#define PS_IO_RESPONSE_HPP
+#ifndef PLAYD_IO_RESPONSE_HPP
+#define PLAYD_IO_RESPONSE_HPP
 
 #include <map>
 #include <ostream>
@@ -134,4 +134,4 @@ private:
 	ResponseSink *push_sink;
 };
 
-#endif // PS_IO_RESPONSE_HPP
+#endif // PLAYD_IO_RESPONSE_HPP

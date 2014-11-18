@@ -7,8 +7,8 @@
  * @see audio/audio.cpp
  */
 
-#ifndef PS_AUDIO_HPP
-#define PS_AUDIO_HPP
+#ifndef PLAYD_AUDIO_HPP
+#define PLAYD_AUDIO_HPP
 
 #include <cstdint>
 #include <memory>
@@ -142,4 +142,4 @@ private:
 	void TransferFrame();
 };
 
-#endif // PS_AUDIO_HPP
+#endif // PLAYD_AUDIO_HPP

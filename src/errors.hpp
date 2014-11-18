@@ -7,8 +7,8 @@
  * @see errors.cpp
  */
 
-#ifndef PS_ERRORS_HPP
-#define PS_ERRORS_HPP
+#ifndef PLAYD_ERRORS_HPP
+#define PLAYD_ERRORS_HPP
 
 #include <iostream>
 #include <sstream>
@@ -153,4 +153,4 @@ private:
 	                        /// issues).
 };
 
-#endif // PS_ERRORS_HPP
+#endif // PLAYD_ERRORS_HPP

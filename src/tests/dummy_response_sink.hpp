@@ -6,8 +6,8 @@
  * Dummy classes for response class tests.
  */
 
-#ifndef PS_TESTS_IO_RESPONSE_HPP
-#define PS_TESTS_IO_RESPONSE_HPP
+#ifndef PLAYD_TESTS_IO_RESPONSE_HPP
+#define PLAYD_TESTS_IO_RESPONSE_HPP
 
 #include <ostream>
 
@@ -30,4 +30,4 @@ private:
 	std::ostream &os;
 };
 
-#endif // PS_TESTS_IO_RESPONSE_HPP
+#endif // PLAYD_TESTS_IO_RESPONSE_HPP
