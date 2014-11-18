@@ -7,8 +7,8 @@
  * @see io/io_core.cpp
  */
 
-#ifndef PS_IO_CORE_HPP
-#define PS_IO_CORE_HPP
+#ifndef PLAYD_IO_CORE_HPP
+#define PLAYD_IO_CORE_HPP
 
 #include <ostream>
 #include <set>
@@ -219,4 +219,4 @@ private:
 	void DoUpdateTimer();
 };
 
-#endif // PS_IO_CORE_HPP
+#endif // PLAYD_IO_CORE_HPP

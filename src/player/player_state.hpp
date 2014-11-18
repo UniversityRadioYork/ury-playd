@@ -7,8 +7,8 @@
 * @see player/player_state.cpp
 */
 
-#ifndef PS_PLAYER_STATE_HPP
-#define PS_PLAYER_STATE_HPP
+#ifndef PLAYD_PLAYER_STATE_HPP
+#define PLAYD_PLAYER_STATE_HPP
 
 #include <cstdint>
 #include <initializer_list>
@@ -85,4 +85,4 @@ private:
 	State current;
 };
 
-#endif // PS_PLAYER_STATE_HPP
+#endif // PLAYD_PLAYER_STATE_HPP

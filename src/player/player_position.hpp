@@ -7,8 +7,8 @@
  * @see player/player_position.cpp
  */
 
-#ifndef PS_PLAYER_POSITION_HPP
-#define PS_PLAYER_POSITION_HPP
+#ifndef PLAYD_PLAYER_POSITION_HPP
+#define PLAYD_PLAYER_POSITION_HPP
 
 #include <set>
 
@@ -90,4 +90,4 @@ private:
 	void Send();
 };
 
-#endif // PS_PLAYER_POSITION_HPP
+#endif // PLAYD_PLAYER_POSITION_HPP
