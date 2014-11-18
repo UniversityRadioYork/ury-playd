@@ -36,12 +36,6 @@ enum class ResponseCode {
 };
 
 /**
- * A map from ResponseCode codes to their string equivalents.
- * @see ResponseCode
- */
-extern const std::string RESPONSES[];
-
-/**
  * Abstract class for anything that can be sent a response.
  *
  * This class automatically provides the Respond() and RespondArgs() methods,
@@ -79,6 +73,12 @@ protected:
 	virtual void RespondRaw(const std::string &string) const = 0;
 
 private:
+	/**
+	 * A map from ResponseCode codes to their string equivalents.
+	 * @see ResponseCode
+	 */
+	static const std::string STRINGS[];
+
 	/**
 	 * Escapes a single response argument.
 	 * @param argument The argument to escape.

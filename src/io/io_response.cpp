@@ -14,7 +14,7 @@
 #include "../errors.hpp"
 #include "io_response.hpp"
 
-const std::string RESPONSES[] = {
+const std::string ResponseSink::STRINGS[] = {
 	"OKAY",     // ResponseCode::OKAY
 	"WHAT",     // ResponseCode::WHAT
 	"FAIL",     // ResponseCode::FAIL
@@ -35,7 +35,7 @@ void ResponseSink::RespondArgs(ResponseCode code,
                                const std::vector<std::string> &arguments) const
 {
 	std::ostringstream os;
-	os << RESPONSES[static_cast<int>(code)];
+	os << ResponseSink::STRINGS[static_cast<int>(code)];
 	for (auto argument : arguments) {
 		os << " " << this->EscapeArgument(argument);
 	}
