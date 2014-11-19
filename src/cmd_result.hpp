@@ -8,8 +8,8 @@
  * @see cmd.cpp
  */
 
-#ifndef PS_CMD_RESULT
-#define PS_CMD_RESULT
+#ifndef PLAYD_CMD_RESULT
+#define PLAYD_CMD_RESULT
 
 #include <cstdint>
 #include <string>
@@ -86,4 +86,4 @@ private:
 	std::string msg; ///< The command result's message.
 };
 
-#endif // PS_CMD_RESULT
+#endif // PLAYD_CMD_RESULT

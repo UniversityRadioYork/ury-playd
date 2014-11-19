@@ -7,9 +7,10 @@
 * @see player/player_state.cpp
 */
 
-#ifndef PS_PLAYER_STATE_HPP
-#define PS_PLAYER_STATE_HPP
+#ifndef PLAYD_PLAYER_STATE_HPP
+#define PLAYD_PLAYER_STATE_HPP
 
+#include <array>
 #include <cstdint>
 #include <initializer_list>
 
@@ -27,6 +28,8 @@ public:
 	 * The player is effectively a finite-state machine whose behaviour
 	 * at any given time is dictated by the current state, which is
 	 * represented by an instance of State.
+	 * @see STATE_STRINGS
+	 * @see STATE_COUNT
 	 */
 	enum class State : std::uint8_t {
 		STARTING, ///< The player has just initialised.
@@ -36,7 +39,13 @@ public:
 		QUITTING  ///< The player is about to terminate.
 	};
 
-	/// A list of states, used for IfIn.
+	/**
+	 * Number of player states.
+	 * @see State
+	 */
+	const static std::uint8_t STATE_COUNT = 5;
+
+	/// A list of states, used for In.
 	typedef std::initializer_list<State> List;
 
 	/// List of states in which the player is playing something.
@@ -79,10 +88,12 @@ public:
 
 private:
 	/// A mapping between states and their human-readable names.
-	const static std::map<State, std::string> STRINGS;
+	/// Implemented as an array indexed by the int equivalent of the state
+	/// enum.
+	const static std::array<std::string, STATE_COUNT> STATE_STRINGS;
 
 	/// The current state.
 	State current;
 };
 
-#endif // PS_PLAYER_STATE_HPP
+#endif // PLAYD_PLAYER_STATE_HPP

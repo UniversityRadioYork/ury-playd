@@ -9,6 +9,8 @@
  */
 
 #include <algorithm>
+#include <array>
+#include <cassert>
 
 #include "../io/io_response.hpp"
 #include "player_state.hpp"
@@ -51,8 +53,10 @@ PlayerState::PlayerState() : ResponseSource(), current(State::EJECTED)
 
 void PlayerState::Emit(ResponseSink &responder) const
 {
+	auto c = static_cast<uint8_t>(this->current);
+	assert(c < PlayerState::STATE_COUNT);
 	responder.Respond(ResponseCode::STATE,
-	                  PlayerState::STRINGS.at(this->current));
+	                  PlayerState::STATE_STRINGS.at(c));
 }
 
 bool PlayerState::In(PlayerState::List states) const
@@ -66,18 +70,17 @@ bool PlayerState::IsRunning() const
 	return this->current != State::QUITTING;
 }
 
-// Private
-
-const std::map<PlayerState::State, std::string> PlayerState::STRINGS = {
-	{ State::STARTING, "Starting" },
-	{ State::EJECTED, "Ejected" },
-	{ State::STOPPED, "Stopped" },
-	{ State::PLAYING, "Playing" },
-	{ State::QUITTING, "Quitting" }
-};
-
 void PlayerState::Set(PlayerState::State state)
 {
 	this->current = state;
 	this->Push();
 }
+
+const std::array<std::string, PlayerState::STATE_COUNT>
+                PlayerState::STATE_STRINGS = { {
+		        "Starting", // State::STARTING
+		        "Ejected",  // State::EJECTED
+		        "Stopped",  // State::STOPPED
+		        "Playing",  // State::PLAYING
+		        "Quitting", // State::QUITTING
+		} };

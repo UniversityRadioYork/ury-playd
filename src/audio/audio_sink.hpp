@@ -7,8 +7,8 @@
  * @see audio/audio.cpp
  */
 
-#ifndef PS_AUDIO_SINK_HPP
-#define PS_AUDIO_SINK_HPP
+#ifndef PLAYD_AUDIO_SINK_HPP
+#define PLAYD_AUDIO_SINK_HPP
 
 #include <cstdint>
 #include <memory>
@@ -239,4 +239,4 @@ private:
 	                                  unsigned long buffered_count);
 };
 
-#endif // PS_AUDIO_SINK_HPP
+#endif // PLAYD_AUDIO_SINK_HPP

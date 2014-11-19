@@ -10,8 +10,8 @@
  * @see player/player_state.cpp
  */
 
-#ifndef PS_PLAYER_HPP
-#define PS_PLAYER_HPP
+#ifndef PLAYD_PLAYER_HPP
+#define PLAYD_PLAYER_HPP
 
 #include <cstdint>
 #include <map>
@@ -199,4 +199,4 @@ private:
 	void End();
 };
 
-#endif // PS_PLAYER_HPP
+#endif // PLAYD_PLAYER_HPP

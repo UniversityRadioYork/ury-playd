@@ -7,8 +7,8 @@
  * @see main.cpp
  */
 
-#ifndef PS_MAIN_HPP
-#define PS_MAIN_HPP
+#ifndef PLAYD_MAIN_HPP
+#define PLAYD_MAIN_HPP
 
 #include "audio/audio_system.hpp"
 #include "cmd.hpp"
@@ -64,4 +64,4 @@ private:
 	int GetDeviceID();
 };
 
-#endif // PS_MAIN_HPP
+#endif // PLAYD_MAIN_HPP

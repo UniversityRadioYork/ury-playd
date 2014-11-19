@@ -7,24 +7,15 @@
  * @see io/io_response.hpp
  */
 
+#include <array>
+#include <cassert>
 #include <cctype>
+#include <cstdint>
 #include <initializer_list>
 #include <sstream>
 
 #include "../errors.hpp"
 #include "io_response.hpp"
-
-const std::string RESPONSES[] = {
-	"OKAY",     // ResponseCode::OKAY
-	"WHAT",     // ResponseCode::WHAT
-	"FAIL",     // ResponseCode::FAIL
-	"OHAI",     // ResponseCode::OHAI
-	"STATE",    // ResponseCode::STATE
-	"TIME",     // ResponseCode::TIME
-	"FILE",     // ResponseCode::FILE
-	"FEATURES", // ResponseCode::FEATURES
-	"END"       // ResponseCode::END
-};
 
 void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 {
@@ -34,8 +25,11 @@ void ResponseSink::Respond(ResponseCode code, const std::string &message) const
 void ResponseSink::RespondArgs(ResponseCode code,
                                const std::vector<std::string> &arguments) const
 {
+	auto c = static_cast<std::uint8_t>(code);
+	assert(c < RCODE_COUNT);
+
 	std::ostringstream os;
-	os << RESPONSES[static_cast<int>(code)];
+	os << ResponseSink::RCODE_STRINGS.at(c);
 	for (auto argument : arguments) {
 		os << " " << this->EscapeArgument(argument);
 	}
@@ -67,6 +61,18 @@ void ResponseSink::RespondArgs(ResponseCode code,
 	if (escaping) return "'" + escaped + "'";
 	return escaped;
 }
+
+const std::array<std::string, RCODE_COUNT> ResponseSink::RCODE_STRINGS = { {
+	"OKAY",     // ResponseCode::OKAY
+	"WHAT",     // ResponseCode::WHAT
+	"FAIL",     // ResponseCode::FAIL
+	"OHAI",     // ResponseCode::OHAI
+	"STATE",    // ResponseCode::STATE
+	"TIME",     // ResponseCode::TIME
+	"FILE",     // ResponseCode::FILE
+	"FEATURES", // ResponseCode::FEATURES
+	"END"       // ResponseCode::END
+} };
 
 //
 // ResponseSource

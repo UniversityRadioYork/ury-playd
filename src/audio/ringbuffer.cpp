@@ -24,11 +24,10 @@ RingBuffer::RingBuffer(int power, int size)
 	this->rb = new PaUtilRingBuffer;
 	this->buffer = new char[(1 << power) * size];
 
-	int init_result = PaUtil_InitializeRingBuffer(
-		                this->rb, size,
-		                static_cast<ring_buffer_size_t>(1 << power),
-		                this->buffer);
-	if (init_result != 0) {
+	if (PaUtil_InitializeRingBuffer(
+	                    this->rb, size,
+	                    static_cast<ring_buffer_size_t>(1 << power),
+	                    this->buffer) != 0) {
 		throw new InternalError(MSG_OUTPUT_RINGINIT);
 	}
 

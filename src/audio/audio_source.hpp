@@ -7,8 +7,8 @@
  * @see audio/audio_source.cpp
  */
 
-#ifndef PS_AUDIO_SOURCE_HPP
-#define PS_AUDIO_SOURCE_HPP
+#ifndef PLAYD_AUDIO_SOURCE_HPP
+#define PLAYD_AUDIO_SOURCE_HPP
 
 #include <array>
 #include <cstdint>
@@ -153,4 +153,4 @@ private:
 	void Close();
 };
 
-#endif // PS_AUDIO_SOURCE_HPP
+#endif // PLAYD_AUDIO_SOURCE_HPP

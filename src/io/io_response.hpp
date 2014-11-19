@@ -7,9 +7,11 @@
  * @see io/io_response.cpp
  */
 
-#ifndef PS_IO_RESPONSE_HPP
-#define PS_IO_RESPONSE_HPP
+#ifndef PLAYD_IO_RESPONSE_HPP
+#define PLAYD_IO_RESPONSE_HPP
 
+#include <array>
+#include <cstdint>
 #include <map>
 #include <ostream>
 #include <string>
@@ -17,13 +19,14 @@
 
 #include "../errors.hpp"
 
-
 /**
  * Four-character response codes.
- * @note If you're adding new responses here, update RESPONSES.
- * @see RESPONSES
+ * @note If you're adding new responses here, update RCODE_COUNT and
+ *   ResponseSink::RCODE_STRINGS.
+ * @see RCODE_COUNT
+ * @see ResponseSink::RCODE_STRINGS.
  */
-enum class ResponseCode {
+enum class ResponseCode : std::uint8_t {
 	OKAY,     ///< Request was valid and produced an answer.
 	WHAT,     ///< Request was invalid/user error.
 	FAIL,     ///< Error, pointing blame at environment.
@@ -36,10 +39,10 @@ enum class ResponseCode {
 };
 
 /**
- * A map from ResponseCode codes to their string equivalents.
+ * Number of ResponseCodes.
  * @see ResponseCode
  */
-extern const std::string RESPONSES[];
+const std::uint8_t RCODE_COUNT = 9;
 
 /**
  * Abstract class for anything that can be sent a response.
@@ -79,6 +82,12 @@ protected:
 	virtual void RespondRaw(const std::string &string) const = 0;
 
 private:
+	/**
+	 * A map from ResponseCode codes to their string equivalents.
+	 * @see ResponseCode
+	 */
+	static const std::array<std::string, RCODE_COUNT> RCODE_STRINGS;
+
 	/**
 	 * Escapes a single response argument.
 	 * @param argument The argument to escape.
@@ -134,4 +143,4 @@ private:
 	ResponseSink *push_sink;
 };
 
-#endif // PS_IO_RESPONSE_HPP
+#endif // PLAYD_IO_RESPONSE_HPP

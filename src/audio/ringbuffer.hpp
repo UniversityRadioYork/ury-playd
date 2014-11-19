@@ -6,8 +6,8 @@
  * The RingBuffer class template.
  */
 
-#ifndef PS_RINGBUFFER_HPP
-#define PS_RINGBUFFER_HPP
+#ifndef PLAYD_RINGBUFFER_HPP
+#define PLAYD_RINGBUFFER_HPP
 
 extern "C" {
 #include "../contrib/pa_ringbuffer/pa_ringbuffer.h"
@@ -118,4 +118,4 @@ private:
 	static unsigned long CountCast(ring_buffer_size_t count);
 };
 
-#endif // PS_RINGBUFFER_HPP
+#endif // PLAYD_RINGBUFFER_HPP

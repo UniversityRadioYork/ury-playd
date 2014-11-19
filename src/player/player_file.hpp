@@ -7,8 +7,8 @@
  * @see player/player_file.cpp
  */
 
-#ifndef PS_PLAYER_FILE_HPP
-#define PS_PLAYER_FILE_HPP
+#ifndef PLAYD_PLAYER_FILE_HPP
+#define PLAYD_PLAYER_FILE_HPP
 
 #include <memory>
 
@@ -86,4 +86,4 @@ private:
 	const AudioSystem &audio_system;
 };
 
-#endif // PS_PLAYER_FILE_HPP
+#endif // PLAYD_PLAYER_FILE_HPP

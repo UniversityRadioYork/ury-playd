@@ -144,7 +144,8 @@ AudioSource::DecodeResult AudioSource::Decode()
 
 	if (read == 0) {
 		this->decode_state = DecodeState::END_OF_FILE;
-	} else {
+	}
+	else {
 		this->decode_state = DecodeState::DECODING;
 
 		// Copy only the bit of the buffer occupied by decoded data
