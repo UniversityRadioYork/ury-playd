@@ -52,7 +52,8 @@ void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
 		this->End();
-	} else {
+	}
+	else {
 		this->UpdatePosition();
 	}
 }

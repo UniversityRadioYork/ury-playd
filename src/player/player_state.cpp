@@ -55,7 +55,8 @@ void PlayerState::Emit(ResponseSink &responder) const
 {
 	auto c = static_cast<uint8_t>(this->current);
 	assert(c < PlayerState::STATE_COUNT);
-	responder.Respond(ResponseCode::STATE, PlayerState::STATE_STRINGS.at(c));
+	responder.Respond(ResponseCode::STATE,
+	                  PlayerState::STATE_STRINGS.at(c));
 }
 
 bool PlayerState::In(PlayerState::List states) const
@@ -75,10 +76,11 @@ void PlayerState::Set(PlayerState::State state)
 	this->Push();
 }
 
-const std::array<std::string, PlayerState::STATE_COUNT> PlayerState::STATE_STRINGS = {{
-	"Starting", // State::STARTING
-	"Ejected",  // State::EJECTED
-	"Stopped",  // State::STOPPED
-	"Playing",  // State::PLAYING
-	"Quitting", // State::QUITTING
-}};
+const std::array<std::string, PlayerState::STATE_COUNT>
+                PlayerState::STATE_STRINGS = { {
+		        "Starting", // State::STARTING
+		        "Ejected",  // State::EJECTED
+		        "Stopped",  // State::STOPPED
+		        "Playing",  // State::PLAYING
+		        "Quitting", // State::QUITTING
+		} };

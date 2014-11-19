@@ -19,7 +19,6 @@
 
 #include "../errors.hpp"
 
-
 /**
  * Four-character response codes.
  * @note If you're adding new responses here, update RCODE_COUNT and
@@ -44,7 +43,6 @@ enum class ResponseCode : std::uint8_t {
  * @see ResponseCode
  */
 const std::uint8_t RCODE_COUNT = 9;
-
 
 /**
  * Abstract class for anything that can be sent a response.

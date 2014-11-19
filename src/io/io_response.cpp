@@ -62,7 +62,7 @@ void ResponseSink::RespondArgs(ResponseCode code,
 	return escaped;
 }
 
-const std::array<std::string, RCODE_COUNT> ResponseSink::RCODE_STRINGS = {{
+const std::array<std::string, RCODE_COUNT> ResponseSink::RCODE_STRINGS = { {
 	"OKAY",     // ResponseCode::OKAY
 	"WHAT",     // ResponseCode::WHAT
 	"FAIL",     // ResponseCode::FAIL
@@ -72,7 +72,7 @@ const std::array<std::string, RCODE_COUNT> ResponseSink::RCODE_STRINGS = {{
 	"FILE",     // ResponseCode::FILE
 	"FEATURES", // ResponseCode::FEATURES
 	"END"       // ResponseCode::END
-}};
+} };
 
 //
 // ResponseSource
