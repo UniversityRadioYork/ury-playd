@@ -90,4 +90,4 @@ const std::string MSG_SEEK_INVALID_UNIT = "Invalid time unit: try us, s, m, h";
 /// Message shown when a seek command has an invalid time value.
 const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer[unit]";
 
-#endif // PS_MESSAGES_H
+#endif // PLAYD_MESSAGES_H
