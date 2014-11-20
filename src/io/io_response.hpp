@@ -20,10 +20,10 @@
 
 /**
  * Four-character response codes.
- * @note If you're adding new responses here, update RESPONSES.
- * @see RESPONSES
+ * @note If you're adding new responses here, update ResponseSink::STRINGS.
+ * @see ResponseSink::STRINGS
  */
-enum class ResponseCode {
+enum class ResponseCode : std::uint8_t {
 	OKAY,     ///< Request was valid and produced an answer.
 	WHAT,     ///< Request was invalid/user error.
 	FAIL,     ///< Error, pointing blame at environment.
