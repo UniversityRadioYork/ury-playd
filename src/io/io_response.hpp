@@ -17,7 +17,6 @@
 
 #include "../errors.hpp"
 
-
 /**
  * Four-character response codes.
  * @note If you're adding new responses here, update ResponseSink::STRINGS.

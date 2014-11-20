@@ -68,13 +68,15 @@ Playd::Playd(int argc, char *argv[])
 int Playd::Run()
 {
 	// Fill in some default arguments.
-	// Note that we don't have a default device ID; if the user doesn't supply an ID, we treat it as if they had supplied an invalid one.
+	// Note that we don't have a default device ID; if the user doesn't
+	// supply an ID, we treat it as if they had supplied an invalid one.
 	auto size = this->arguments.size();
 	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
 	std::string port = size > 3 ? this->arguments.at(3) : "1350";
 
 	// Now set up the device ID.
-	// Do this now, so that an invalid ID is caught before we start trying to acquire the network socket.
+	// Do this now, so that an invalid ID is caught before we start trying
+	// to acquire the network socket.
 	int id = this->GetDeviceID();
 	if (id == INVALID_ID) {
 		// Show the user the valid device IDs they can use.
@@ -86,7 +88,6 @@ int Playd::Run()
 		return EXIT_FAILURE;
 	}
 	this->audio.SetDeviceID(id);
-
 
 	// Now set up all the IO (network socket and event loop).
 	try {

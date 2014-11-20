@@ -82,7 +82,8 @@ public:
 private:
 	/**
 	 * A mapping between states and their human-readable names.
-	 * Implemented as an array indexed by the int equivalent of the state enum.
+	 * Implemented as an array indexed by the int equivalent of the state
+	 * enum.
 	 * @see PlayerState::State
 	 */
 	const static std::string STRINGS[];

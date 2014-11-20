@@ -69,11 +69,11 @@ bool PlayerState::IsRunning() const
 // Private
 
 const std::string PlayerState::STRINGS[] = {
-	"Starting",	// State::STARTING
-	"Ejected",	// State::EJECTED
-	"Stopped",	// State::STOPPED
-	"Playing",	// State::PLAYING
-	"Quitting",	// State::QUITTING
+	"Starting", // State::STARTING
+	"Ejected",  // State::EJECTED
+	"Stopped",  // State::STOPPED
+	"Playing",  // State::PLAYING
+	"Quitting", // State::QUITTING
 };
 
 void PlayerState::Set(PlayerState::State state)
