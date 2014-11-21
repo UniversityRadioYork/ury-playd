@@ -25,7 +25,8 @@
  * destructing it will unload them.  It is probably not safe to create more than
  * one Playd.
  */
-class Playd {
+class Playd
+{
 public:
 	/**
 	 * Constructs a playd, initialising its libraries.

@@ -21,7 +21,8 @@ extern "C" {
  * hoop jumping to integrate and could do with being replaced with a native
  * solution.
  */
-class RingBuffer {
+class RingBuffer
+{
 public:
 	/**
 	 * Constructs a RingBuffer.

@@ -16,7 +16,8 @@
 /**
  * A playd exception.
  */
-class Error {
+class Error
+{
 public:
 	/**
 	 * Constructs an Error.
@@ -41,7 +42,8 @@ private:
 /**
  * An Error signifying that playd has been improperly configured.
  */
-class ConfigError : public Error {
+class ConfigError : public Error
+{
 public:
 	/**
 	 * Constructs an ConfigError.
@@ -55,7 +57,8 @@ public:
 /**
  * An Error signifying that playd has hit an internal snag.
  */
-class InternalError : public Error {
+class InternalError : public Error
+{
 public:
 	/**
 	 * Constructs an InternalError.
@@ -69,7 +72,8 @@ public:
 /**
  * An Error signifying that playd can't read a file.
  */
-class FileError : public Error {
+class FileError : public Error
+{
 public:
 	/**
 	 * Constructs a FileError.
@@ -83,7 +87,8 @@ public:
 /**
  * An Error signifying that playd can't seek in a file.
  */
-class SeekError : public Error {
+class SeekError : public Error
+{
 public:
 	/**
 	 * Constructs a SeekError.
@@ -97,7 +102,8 @@ public:
 /**
  * A network error.
  */
-class NetError : public Error {
+class NetError : public Error
+{
 public:
 	/**
 	 * Constructs a NetError.
@@ -109,7 +115,8 @@ public:
 };
 
 /** Class for telling the human what playd is doing. */
-class Debug {
+class Debug
+{
 public:
 	/** Constructor. */
 	inline Debug()

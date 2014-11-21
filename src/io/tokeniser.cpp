@@ -36,8 +36,7 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 			case QuoteType::SINGLE:
 				if (c == '\'') {
 					this->quote_type = QuoteType::NONE;
-				}
-				else {
+				} else {
 					this->Push(c);
 				}
 				break;
@@ -66,13 +65,13 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 						break;
 
 					case '\'':
-						this->quote_type = QuoteType::
-						                SINGLE;
+						this->quote_type =
+						                QuoteType::SINGLE;
 						break;
 
 					case '\"':
-						this->quote_type = QuoteType::
-						                DOUBLE;
+						this->quote_type =
+						                QuoteType::DOUBLE;
 						break;
 
 					case '\\':

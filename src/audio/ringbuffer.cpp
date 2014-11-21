@@ -60,8 +60,7 @@ unsigned long RingBuffer::Write(char *start, unsigned long count)
 	assert(count <= WriteCapacity());
 
 	return CountCast(PaUtil_WriteRingBuffer(
-	                this->rb, start,
-	                static_cast<ring_buffer_size_t>(count)));
+	                this->rb, start, static_cast<ring_buffer_size_t>(count)));
 }
 
 unsigned long RingBuffer::Read(char *start, unsigned long count)
@@ -70,8 +69,7 @@ unsigned long RingBuffer::Read(char *start, unsigned long count)
 	assert(count <= ReadCapacity());
 
 	return CountCast(PaUtil_ReadRingBuffer(
-	                this->rb, start,
-	                static_cast<ring_buffer_size_t>(count)));
+	                this->rb, start, static_cast<ring_buffer_size_t>(count)));
 }
 
 void RingBuffer::Flush()

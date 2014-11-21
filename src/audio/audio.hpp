@@ -18,7 +18,8 @@
 
 #include "portaudio.h"
 #include "portaudiocpp/CallbackInterface.hxx"
-namespace portaudio {
+namespace portaudio
+{
 class Stream;
 }
 
@@ -34,7 +35,8 @@ class AudioSink;
  * stream.  It contains a source of audio data and a sink to which it should
  * be sent.
  */
-class Audio {
+class Audio
+{
 public:
 	/**
 	 * Constructs an Audio from a source and a sink.

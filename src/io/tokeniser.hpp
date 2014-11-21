@@ -22,7 +22,8 @@
  * @see CommandHandler
  * @see IoCore
  */
-class Tokeniser {
+class Tokeniser
+{
 public:
 	/// A single tokenised line.
 	typedef std::vector<std::string> Line;

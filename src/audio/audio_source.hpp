@@ -28,7 +28,8 @@
  * the ffmpeg state associated with one file.  It can be polled to decode
  * frames of audio data, which are returned as byte vectors.
  */
-class AudioSource {
+class AudioSource
+{
 public:
 	/// An enumeration of possible states the decoder can be in.
 	enum class DecodeState : std::uint8_t {

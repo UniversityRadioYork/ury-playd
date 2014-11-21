@@ -45,7 +45,8 @@ enum class ResponseCode : std::uint8_t {
  *
  * @see ResponseSource
  */
-class ResponseSink {
+class ResponseSink
+{
 public:
 	/**
 	 * Outputs a response with a single message argument.
@@ -100,7 +101,8 @@ private:
  *
  * @see ResponseSink
  */
-class ResponseSource {
+class ResponseSource
+{
 public:
 	ResponseSource() = default;
 	/**

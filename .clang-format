@@ -1,14 +1,15 @@
 ---
 BasedOnStyle: Google
 
-AllowShortBlocksOnASingleLine:    false
-AllowShortFunctionsOnASingleLine: None
-BreakBeforeBraces:                Stroustrup
-Cpp11BracedListStyle:             false
-Language:                         Cpp
-PointerAlignment:                 Right
-Standard:                         Cpp11
-UseTab:                           ForIndentation
+AllowShortBlocksOnASingleLine:       false
+AllowShortFunctionsOnASingleLine:    None
+AllowShortIfStatementsOnASingleLine: true
+BreakBeforeBraces:                   Linux
+Cpp11BracedListStyle:                false
+Language:                            Cpp
+PointerAlignment:                    Right
+Standard:                            Cpp11
+UseTab:                              ForIndentation
 
 AccessModifierOffset:         -8
 ColumnLimit:                  80
@@ -16,3 +17,4 @@ SpacesBeforeTrailingComments:  1
 IndentWidth:                   8
 TabWidth:                      8
 ContinuationIndentWidth:      16
+PenaltyExcessCharacter:       20

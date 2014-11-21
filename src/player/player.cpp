@@ -52,8 +52,7 @@ void Player::PlaybackUpdate()
 {
 	if (this->file.IsStopped()) {
 		this->End();
-	}
-	else {
+	} else {
 		this->UpdatePosition();
 	}
 }
@@ -114,13 +113,11 @@ CommandResult Player::Load(const std::string &path)
 		this->file.Load(path);
 		this->ResetPosition();
 		this->SetState(PlayerState::State::STOPPED);
-	}
-	catch (FileError &e) {
+	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
 		this->Eject();
 		return CommandResult::Failure(e.Message());
-	}
-	catch (Error &) {
+	} catch (Error &) {
 		// Ensure a load failure doesn't leave a corrupted track
 		// loaded.
 		this->Eject();
@@ -161,18 +158,15 @@ CommandResult Player::Seek(const std::string &time_str)
 
 	try {
 		position = this->time_parser.Parse(time_str);
-	}
-	catch (std::out_of_range) {
+	} catch (std::out_of_range) {
 		return CommandResult::Invalid(MSG_SEEK_INVALID_UNIT);
-	}
-	catch (SeekError) {
+	} catch (SeekError) {
 		return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 	}
 
 	try {
 		this->file.SeekToPosition(position);
-	}
-	catch (SeekError) {
+	} catch (SeekError) {
 		Debug() << "Seek failure" << std::endl;
 
 		// Make it look to the client as if the seek ran off the end of

@@ -21,7 +21,8 @@
  * @see Player
  * @see PlayerState
  */
-class PlayerPosition : public ResponseSource {
+class PlayerPosition : public ResponseSource
+{
 private:
 	/// The period between each push of the position to the response sink.
 	TimeParser::MicrosecondPosition period;

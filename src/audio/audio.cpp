@@ -52,8 +52,7 @@ TimeParser::MicrosecondPosition Audio::CurrentPositionMicroseconds()
 	                this->sink->Position());
 }
 
-void Audio::SeekToPositionMicroseconds(
-                TimeParser::MicrosecondPosition microseconds)
+void Audio::SeekToPositionMicroseconds(TimeParser::MicrosecondPosition microseconds)
 {
 	auto samples = this->source->Seek(microseconds);
 	this->sink->SetPosition(samples);

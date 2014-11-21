@@ -24,7 +24,8 @@
 /**
  * The playd command handler.
  */
-class CommandHandler {
+class CommandHandler
+{
 public:
 	/// The type of lists of command words.
 	typedef std::vector<std::string> WordList;

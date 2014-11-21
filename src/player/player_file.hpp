@@ -23,7 +23,8 @@ class Audio;
  * The subcomponent of a Player that stores the audio file.
  * @see Player
  */
-class PlayerFile : public ResponseSource {
+class PlayerFile : public ResponseSource
+{
 public:
 	/**
 	 * Constructs a new PlayerFile.

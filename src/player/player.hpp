@@ -34,7 +34,8 @@
  * @see PlayerPosition
  * @see PlayerState
  */
-class Player {
+class Player
+{
 private:
 	PlayerFile file;         ///< The file subcomponent of the Player.
 	PlayerPosition position; ///< The position subcomponent of the Player.

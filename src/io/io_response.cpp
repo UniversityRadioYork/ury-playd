@@ -42,8 +42,7 @@ void ResponseSink::RespondArgs(ResponseCode code,
 	this->RespondRaw(os.str());
 }
 
-/* static */ std::string ResponseSink::EscapeArgument(
-                const std::string &argument)
+/* static */ std::string ResponseSink::EscapeArgument(const std::string &argument)
 {
 	bool escaping = false;
 	std::string escaped;

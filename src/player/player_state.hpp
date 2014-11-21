@@ -20,7 +20,8 @@
  * @see Player
  * @see PlayerPosition
  */
-class PlayerState : public ResponseSource {
+class PlayerState : public ResponseSource
+{
 public:
 	/**
 	 * Enumeration of states that the player can be in.

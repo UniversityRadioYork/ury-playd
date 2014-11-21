@@ -45,8 +45,7 @@ int Playd::GetDeviceID()
 	int id;
 	try {
 		id = std::stoi(this->arguments[1]);
-	}
-	catch (...) {
+	} catch (...) {
 		// Only std::{invalid_argument,out_of_range} are thrown here.
 		return this->INVALID_ID;
 	}
@@ -93,8 +92,7 @@ int Playd::Run()
 	try {
 		this->io = decltype(this->io)(new IoCore(
 		                this->player, this->handler, addr, port));
-	}
-	catch (NetError &e) {
+	} catch (NetError &e) {
 		std::cerr << "Network error: " << e.Message() << std::endl;
 		std::cerr << "Is " << addr << ":" << port << " available?"
 		          << std::endl;
@@ -106,8 +104,7 @@ int Playd::Run()
 
 	try {
 		this->io->Run();
-	}
-	catch (Error &error) {
+	} catch (Error &error) {
 		std::cerr << "Unhandled exception in main loop: "
 		          << error.Message() << std::endl;
 		return EXIT_FAILURE;

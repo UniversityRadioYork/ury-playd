@@ -17,7 +17,8 @@
  * a flat integer representing the number of OutUnit units that time string
  * represents.
  */
-class TimeParser {
+class TimeParser
+{
 public:
 	/// Type for microsecond positions emitted by this TimeParser.
 	typedef std::uint64_t MicrosecondPosition;

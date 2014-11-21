@@ -151,9 +151,9 @@ PlayCallbackStepResult AudioSink::PlayCallbackSuccess(
 	return std::make_pair(paContinue, in.second + samples_read);
 }
 
-PlayCallbackStepResult AudioSink::PlayCallbackFailure(
-                char *out, unsigned long, unsigned long frames_per_buf,
-                PlayCallbackStepResult in)
+PlayCallbackStepResult AudioSink::PlayCallbackFailure(char *out, unsigned long,
+                                                      unsigned long frames_per_buf,
+                                                      PlayCallbackStepResult in)
 {
 	decltype(in) result;
 

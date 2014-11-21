@@ -37,7 +37,8 @@ class Connection;
  * using the Broadcast() method, and Remove() a Connection at any time,
  * effectively destroying it.
  */
-class ConnectionPool : public ResponseSink {
+class ConnectionPool : public ResponseSink
+{
 public:
 	/**
 	 * Constructs a ConnectionPool.
@@ -91,7 +92,8 @@ private:
  * allowing it to be sent responses (directly, or via a ConnectionPool
  * Broadcast()), removed from its ConnectionPool, and queried for its name.
  */
-class Connection : public ResponseSink {
+class Connection : public ResponseSink
+{
 public:
 	/**
 	 * Constructs a Connection.
@@ -163,7 +165,8 @@ private:
  * The IO core, which services input, routes responses, and executes the
  * Player update routine periodically.
  */
-class IoCore : public ResponseSink {
+class IoCore : public ResponseSink
+{
 public:
 	/**
 	 * Constructs an IoCore.
