@@ -7,8 +7,8 @@
  * @see io/tokeniser.cpp
  */
 
-#ifndef PS_TOKENISER_HPP
-#define PS_TOKENISER_HPP
+#ifndef PLAYD_TOKENISER_HPP
+#define PLAYD_TOKENISER_HPP
 
 #include "../cmd.hpp"
 #include "io_response.hpp"
@@ -22,7 +22,8 @@
  * @see CommandHandler
  * @see IoCore
  */
-class Tokeniser {
+class Tokeniser
+{
 public:
 	/// A single tokenised line.
 	typedef std::vector<std::string> Line;
@@ -80,4 +81,4 @@ private:
 	void Push(unsigned char c);
 };
 
-#endif // PS_TOKENISER_HPP
+#endif // PLAYD_TOKENISER_HPP

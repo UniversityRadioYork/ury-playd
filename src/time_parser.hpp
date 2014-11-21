@@ -7,8 +7,8 @@
  * @see time_parser.cpp
  */
 
-#ifndef PS_TIME_PARSER_HPP
-#define PS_TIME_PARSER_HPP
+#ifndef PLAYD_TIME_PARSER_HPP
+#define PLAYD_TIME_PARSER_HPP
 
 #include <cstdint>
 
@@ -17,7 +17,8 @@
  * a flat integer representing the number of OutUnit units that time string
  * represents.
  */
-class TimeParser {
+class TimeParser
+{
 public:
 	/// Type for microsecond positions emitted by this TimeParser.
 	typedef std::uint64_t MicrosecondPosition;
@@ -59,4 +60,4 @@ private:
 	                const std::string &time_str);
 };
 
-#endif // PS_TIME_PARSER_HPP
+#endif // PLAYD_TIME_PARSER_HPP

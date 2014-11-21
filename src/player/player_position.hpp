@@ -7,8 +7,8 @@
  * @see player/player_position.cpp
  */
 
-#ifndef PS_PLAYER_POSITION_HPP
-#define PS_PLAYER_POSITION_HPP
+#ifndef PLAYD_PLAYER_POSITION_HPP
+#define PLAYD_PLAYER_POSITION_HPP
 
 #include <set>
 
@@ -21,7 +21,8 @@
  * @see Player
  * @see PlayerState
  */
-class PlayerPosition : public ResponseSource {
+class PlayerPosition : public ResponseSource
+{
 private:
 	/// The period between each push of the position to the response sink.
 	TimeParser::MicrosecondPosition period;
@@ -90,4 +91,4 @@ private:
 	void Send();
 };
 
-#endif // PS_PLAYER_POSITION_HPP
+#endif // PLAYD_PLAYER_POSITION_HPP

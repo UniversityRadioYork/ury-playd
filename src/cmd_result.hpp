@@ -8,8 +8,8 @@
  * @see cmd.cpp
  */
 
-#ifndef PS_CMD_RESULT
-#define PS_CMD_RESULT
+#ifndef PLAYD_CMD_RESULT
+#define PLAYD_CMD_RESULT
 
 #include <cstdint>
 #include <string>
@@ -23,7 +23,8 @@
  * failure message).  The success (or not) of a command may be checked with
  * CommandResult::IsSuccess.
  */
-class CommandResult {
+class CommandResult
+{
 public:
 	/// Enumeration of possible types of CommandResult.
 	enum class Type : std::uint8_t {
@@ -78,12 +79,11 @@ public:
 	 * @param sink The ResponseSink to which the response will be sent.
 	 * @param cmd The original command that created this CommandResult.
 	 */
-	void Emit(const ResponseSink &sink,
-	          const std::vector<std::string> &cmd);
+	void Emit(const ResponseSink &sink, const std::vector<std::string> &cmd);
 
 private:
 	Type type;       ///< The command result's type.
 	std::string msg; ///< The command result's message.
 };
 
-#endif // PS_CMD_RESULT
+#endif // PLAYD_CMD_RESULT

@@ -7,8 +7,8 @@
  * @see audio/audio_source.cpp
  */
 
-#ifndef PS_AUDIO_SOURCE_HPP
-#define PS_AUDIO_SOURCE_HPP
+#ifndef PLAYD_AUDIO_SOURCE_HPP
+#define PLAYD_AUDIO_SOURCE_HPP
 
 #include <array>
 #include <cstdint>
@@ -28,7 +28,8 @@
  * the ffmpeg state associated with one file.  It can be polled to decode
  * frames of audio data, which are returned as byte vectors.
  */
-class AudioSource {
+class AudioSource
+{
 public:
 	/// An enumeration of possible states the decoder can be in.
 	enum class DecodeState : std::uint8_t {
@@ -153,4 +154,4 @@ private:
 	void Close();
 };
 
-#endif // PS_AUDIO_SOURCE_HPP
+#endif // PLAYD_AUDIO_SOURCE_HPP

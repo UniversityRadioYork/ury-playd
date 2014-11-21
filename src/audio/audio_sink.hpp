@@ -7,8 +7,8 @@
  * @see audio/audio.cpp
  */
 
-#ifndef PS_AUDIO_SINK_HPP
-#define PS_AUDIO_SINK_HPP
+#ifndef PLAYD_AUDIO_SINK_HPP
+#define PLAYD_AUDIO_SINK_HPP
 
 #include <cstdint>
 #include <memory>
@@ -30,7 +30,8 @@ typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
  * Interface for objects that can configure a PortAudio stream from an
  * AudioSource.
  */
-class AudioSinkConfigurator {
+class AudioSinkConfigurator
+{
 public:
 	/**
 	 * Configures and returns a PortAudio stream.
@@ -51,7 +52,8 @@ public:
  * periodically transfers samples from its buffer to PortAudio in a separate
  * thread.
  */
-class AudioSink : portaudio::CallbackInterface {
+class AudioSink : portaudio::CallbackInterface
+{
 public:
 	/// Type of positions measured in samples.
 	typedef std::uint64_t SamplePosition;
@@ -239,4 +241,4 @@ private:
 	                                  unsigned long buffered_count);
 };
 
-#endif // PS_AUDIO_SINK_HPP
+#endif // PLAYD_AUDIO_SINK_HPP

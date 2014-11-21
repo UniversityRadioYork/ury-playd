@@ -45,8 +45,7 @@ int Playd::GetDeviceID()
 	int id;
 	try {
 		id = std::stoi(this->arguments[1]);
-	}
-	catch (...) {
+	} catch (...) {
 		// Only std::{invalid_argument,out_of_range} are thrown here.
 		return this->INVALID_ID;
 	}
@@ -61,26 +60,22 @@ Playd::Playd(int argc, char *argv[])
     : audio(), player(audio, time_parser), handler(player), time_parser()
 {
 	for (int i = 0; i < argc; i++) {
-		this->arguments.push_back(std::string(argv[i]));
+		this->arguments.emplace_back(argv[i]);
 	}
 }
 
 int Playd::Run()
 {
+	// Fill in some default arguments.
+	// Note that we don't have a default device ID; if the user doesn't
+	// supply an ID, we treat it as if they had supplied an invalid one.
 	auto size = this->arguments.size();
 	std::string addr = size > 2 ? this->arguments.at(2) : "0.0.0.0";
 	std::string port = size > 3 ? this->arguments.at(3) : "1350";
-	try {
-		this->io = decltype(this->io)(new IoCore(
-		                this->player, this->handler, addr, port));
-	}
-	catch (NetError &e) {
-		std::cerr << "Network error: " << e.Message() << std::endl;
-		std::cerr << "Is " << addr << ":" << port << " available?"
-		          << std::endl;
-		return EXIT_FAILURE;
-	}
 
+	// Now set up the device ID.
+	// Do this now, so that an invalid ID is caught before we start trying
+	// to acquire the network socket.
 	int id = this->GetDeviceID();
 	if (id == INVALID_ID) {
 		// Show the user the valid device IDs they can use.
@@ -93,13 +88,23 @@ int Playd::Run()
 	}
 	this->audio.SetDeviceID(id);
 
+	// Now set up all the IO (network socket and event loop).
+	try {
+		this->io = decltype(this->io)(new IoCore(
+		                this->player, this->handler, addr, port));
+	} catch (NetError &e) {
+		std::cerr << "Network error: " << e.Message() << std::endl;
+		std::cerr << "Is " << addr << ":" << port << " available?"
+		          << std::endl;
+		return EXIT_FAILURE;
+	}
+
 	this->player.SetPositionResponsePeriod(POSITION_PERIOD);
 	this->player.SetResponseSink(*this->io);
 
 	try {
 		this->io->Run();
-	}
-	catch (Error &error) {
+	} catch (Error &error) {
 		std::cerr << "Unhandled exception in main loop: "
 		          << error.Message() << std::endl;
 		return EXIT_FAILURE;

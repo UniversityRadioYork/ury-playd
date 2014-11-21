@@ -1,6 +1,7 @@
-playd++
+playd
 Debug/
 Release/
+*.core
 *.o
 *.obj
 *.dll

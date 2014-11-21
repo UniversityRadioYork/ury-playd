@@ -10,8 +10,8 @@
  * @see player/player_state.cpp
  */
 
-#ifndef PS_PLAYER_HPP
-#define PS_PLAYER_HPP
+#ifndef PLAYD_PLAYER_HPP
+#define PLAYD_PLAYER_HPP
 
 #include <cstdint>
 #include <map>
@@ -34,7 +34,8 @@
  * @see PlayerPosition
  * @see PlayerState
  */
-class Player {
+class Player
+{
 private:
 	PlayerFile file;         ///< The file subcomponent of the Player.
 	PlayerPosition position; ///< The position subcomponent of the Player.
@@ -199,4 +200,4 @@ private:
 	void End();
 };
 
-#endif // PS_PLAYER_HPP
+#endif // PLAYD_PLAYER_HPP

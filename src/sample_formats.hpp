@@ -8,8 +8,8 @@
 
 #include <cstdint>
 
-#ifndef PS_SAMPLE_FORMATS_HPP
-#define PS_SAMPLE_FORMATS_HPP
+#ifndef PLAYD_SAMPLE_FORMATS_HPP
+#define PLAYD_SAMPLE_FORMATS_HPP
 
 /**
  * Sample formats available in playd.
@@ -30,4 +30,4 @@ enum class SampleFormat : std::uint8_t {
 	PACKED_FLOAT_32        ///< Packed 32-bit floating point.
 };
 
-#endif // PS_SAMPLE_FORMATS_HPP
+#endif // PLAYD_SAMPLE_FORMATS_HPP

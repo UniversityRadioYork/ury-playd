@@ -7,15 +7,16 @@
  * @see audio/audio_system.cpp
  */
 
-#ifndef PS_AUDIO_SYSTEM_HPP
-#define PS_AUDIO_SYSTEM_HPP
+#ifndef PLAYD_AUDIO_SYSTEM_HPP
+#define PLAYD_AUDIO_SYSTEM_HPP
 
 #include <string>
 #include <utility>
 
 #include "portaudiocpp/SampleDataFormat.hxx"
 #include "portaudiocpp/Stream.hxx"
-namespace portaudio {
+namespace portaudio
+{
 class CallbackInterface;
 class Device;
 }
@@ -36,7 +37,8 @@ class Device;
  * construction and unloads them on termination.  As such, it's probably not
  * wise to construct multiple AudioSystem instances.
  */
-class AudioSystem : public AudioSinkConfigurator {
+class AudioSystem : public AudioSinkConfigurator
+{
 public:
 	/// Type for device entries.
 	typedef std::pair<int, std::string> Device;
@@ -92,8 +94,7 @@ private:
 	 * @param id_string The device ID, as a string.
 	 * @return The device.
 	 */
-	static const portaudio::Device &PaDeviceFrom(
-	                const std::string &id_string);
+	static const portaudio::Device &PaDeviceFrom(const std::string &id_string);
 
 	/**
 	 * Converts a sample format identifier from playd to PortAudio.
@@ -103,4 +104,4 @@ private:
 	static portaudio::SampleDataFormat PaSampleFormatFrom(SampleFormat fmt);
 };
 
-#endif // PS_AUDIO_SYSTEM_HPP
+#endif // PLAYD_AUDIO_SYSTEM_HPP

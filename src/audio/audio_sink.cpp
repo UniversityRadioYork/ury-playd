@@ -151,24 +151,20 @@ PlayCallbackStepResult AudioSink::PlayCallbackSuccess(
 	return std::make_pair(paContinue, in.second + samples_read);
 }
 
-PlayCallbackStepResult AudioSink::PlayCallbackFailure(
-                char *out, unsigned long, unsigned long frames_per_buf,
-                PlayCallbackStepResult in)
+PlayCallbackStepResult AudioSink::PlayCallbackFailure(char *out, unsigned long,
+                                                      unsigned long frames_per_buf,
+                                                      PlayCallbackStepResult in)
 {
 	decltype(in) result;
 
-	if (this->InputReady()) {
-		// There's been some sort of genuine issue.
-		// Make up some silence to plug the gap.
-		Debug() << "Buffer underflow" << std::endl;
-		memset(out, 0, this->bytes_per_sample * frames_per_buf);
-		result = std::make_pair(paContinue, frames_per_buf);
-	} else {
-		// End of input is ok, it means the stream can finish.
-		result = std::make_pair(paComplete, in.second);
-	}
+	// End of input is ok, it means the stream can finish.
+	if (!this->InputReady()) return std::make_pair(paComplete, in.second);
 
-	return result;
+	// There's been some sort of genuine issue.
+	// Make up some silence to plug the gap.
+	Debug() << "Buffer underflow" << std::endl;
+	memset(out, 0, this->bytes_per_sample * frames_per_buf);
+	return std::make_pair(paContinue, frames_per_buf);
 }
 
 unsigned long AudioSink::ReadSamplesToOutput(char *&output,
@@ -176,16 +172,14 @@ unsigned long AudioSink::ReadSamplesToOutput(char *&output,
                                              unsigned long buffered_count)
 {
 	// Transfer the maximum that we can offer to PortAudio without
-	// overshooting
-	// its sample request limit.
+	// overshooting its sample request limit.
 	long transfer_sample_count = static_cast<long>(
 	                std::min({ output_capacity, buffered_count,
 		                   static_cast<unsigned long>(LONG_MAX) }));
 	output += this->ring_buf.Read(output, transfer_sample_count);
 
 	// Update the position count so it reflects the last position that was
-	// sent
-	// for playback (*not* the last position decoded).
+	// sent for playback (*not* the last position decoded).
 	this->position_sample_count += transfer_sample_count;
 	return transfer_sample_count;
 }

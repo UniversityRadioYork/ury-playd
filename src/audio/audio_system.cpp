@@ -26,7 +26,8 @@ extern "C" {
 #include "portaudiocpp/StreamParameters.hxx"
 #include "portaudiocpp/System.hxx"
 #include "portaudiocpp/SystemDeviceIterator.hxx"
-namespace portaudio {
+namespace portaudio
+{
 class CallbackInterface;
 }
 
@@ -59,8 +60,7 @@ AudioSystem::~AudioSystem()
 
 	for (auto d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) {
 		if (!(*d).isInputOnlyDevice()) {
-			list.push_back(std::make_pair((*d).index(),
-			                              (*d).name()));
+			list.push_back(std::make_pair((*d).index(), (*d).name()));
 		}
 	}
 	return list;
@@ -87,9 +87,8 @@ Audio *AudioSystem::Load(const std::string &path) const
 	return new Audio(source, sink);
 }
 
-portaudio::Stream *AudioSystem::Configure(
-                const AudioSource &source,
-                portaudio::CallbackInterface &cb) const
+portaudio::Stream *AudioSystem::Configure(const AudioSource &source,
+                                          portaudio::CallbackInterface &cb) const
 {
 	std::uint8_t channel_count = source.ChannelCount();
 	SampleFormat sample_format = source.OutputSampleFormat();
@@ -98,9 +97,8 @@ portaudio::Stream *AudioSystem::Configure(
 	const portaudio::Device &device = PaDeviceFrom(this->device_id);
 
 	portaudio::DirectionSpecificStreamParameters out_pars(
-	                device, channel_count,
-	                PaSampleFormatFrom(sample_format), true,
-	                device.defaultLowOutputLatency(), nullptr);
+	                device, channel_count, PaSampleFormatFrom(sample_format),
+	                true, device.defaultLowOutputLatency(), nullptr);
 
 	portaudio::StreamParameters pars(
 	                portaudio::DirectionSpecificStreamParameters::null(),
@@ -139,8 +137,7 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 {
 	try {
 		return pa_from_sf.at(fmt);
-	}
-	catch (std::out_of_range) {
+	} catch (std::out_of_range) {
 		throw FileError(MSG_DECODE_BADRATE);
 	}
 }

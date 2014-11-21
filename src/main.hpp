@@ -7,8 +7,8 @@
  * @see main.cpp
  */
 
-#ifndef PS_MAIN_HPP
-#define PS_MAIN_HPP
+#ifndef PLAYD_MAIN_HPP
+#define PLAYD_MAIN_HPP
 
 #include "audio/audio_system.hpp"
 #include "cmd.hpp"
@@ -25,7 +25,8 @@
  * destructing it will unload them.  It is probably not safe to create more than
  * one Playd.
  */
-class Playd {
+class Playd
+{
 public:
 	/**
 	 * Constructs a playd, initialising its libraries.
@@ -64,4 +65,4 @@ private:
 	int GetDeviceID();
 };
 
-#endif // PS_MAIN_HPP
+#endif // PLAYD_MAIN_HPP

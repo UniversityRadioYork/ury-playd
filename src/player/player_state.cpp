@@ -51,8 +51,8 @@ PlayerState::PlayerState() : ResponseSource(), current(State::EJECTED)
 
 void PlayerState::Emit(ResponseSink &responder) const
 {
-	responder.Respond(ResponseCode::STATE,
-	                  PlayerState::STRINGS.at(this->current));
+	auto c = static_cast<int>(this->current);
+	responder.Respond(ResponseCode::STATE, PlayerState::STRINGS[c]);
 }
 
 bool PlayerState::In(PlayerState::List states) const
@@ -68,12 +68,12 @@ bool PlayerState::IsRunning() const
 
 // Private
 
-const std::map<PlayerState::State, std::string> PlayerState::STRINGS = {
-	{ State::STARTING, "Starting" },
-	{ State::EJECTED, "Ejected" },
-	{ State::STOPPED, "Stopped" },
-	{ State::PLAYING, "Playing" },
-	{ State::QUITTING, "Quitting" }
+const std::string PlayerState::STRINGS[] = {
+	"Starting", // State::STARTING
+	"Ejected",  // State::EJECTED
+	"Stopped",  // State::STOPPED
+	"Playing",  // State::PLAYING
+	"Quitting", // State::QUITTING
 };
 
 void PlayerState::Set(PlayerState::State state)
