@@ -92,7 +92,6 @@ void AudioSink::Transfer(AudioSink::TransferIterator &start,
 	// Only transfer as many samples as the ring buffer can take.
 	// Don't bother trying to write 0 samples!
 	auto count = std::min(samples, this->ring_buf.WriteCapacity());
-	assert(0 < count);
 	if (count == 0) return;
 
 	auto start_ptr = reinterpret_cast<char *>(&*start);
