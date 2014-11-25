@@ -10,6 +10,7 @@
 #ifndef PLAYD_IO_RESPONSE_HPP
 #define PLAYD_IO_RESPONSE_HPP
 
+#include <cstdint>
 #include <map>
 #include <ostream>
 #include <string>
