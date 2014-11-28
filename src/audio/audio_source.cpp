@@ -176,7 +176,7 @@ void AudioSource::Open(const std::string &path)
 
 	this->context = sox_open_read(path.c_str(), nullptr, nullptr, nullptr);
 	if (this->context == nullptr) {
-		throw FileError("couldn't open" + path);
+		throw FileError("couldn't open " + path);
 	}
 }
 
