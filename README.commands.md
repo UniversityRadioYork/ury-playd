@@ -112,13 +112,19 @@ Announces a state change.  The _state_ will be one of:
 
 Announces that _file_ has just been loaded.
 
-### OKAY _command_
+### OKAY _command..._
 
-Announces that a valid command has just been received and processed.
+Announces that a valid _command_ has just been received and processed.
 
-### WHAT _error_
+### WHAT _message_ _command..._
 
-Announces that a bad command was just received.
+Announces that an invalid _command_ was just received.
+An error _message_ is provided.
+
+### FAIL _message_ _command..._
+
+Announces that a valid _command_ failed.
+An error _message_ is provided.
 
 [BAPS3 specification]: https://UniversityRadioYork.github.io/baps3-spec
 [PuTTY]:               http://www.chiark.greenend.org.uk/~sgtatham/putty/

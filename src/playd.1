@@ -152,9 +152,11 @@ may produce the following:
 The loaded file has reached its end of its own accord (not via a stop
 command).
 .\"
-.It FAIL Ar reason
+.It FAIL Ar reason Ar command...
 .Nm
-failed to execute a command.  A human-readable
+failed to execute
+.Ar command .
+A human-readable
 .Ar reason
 is provided.
 .\"
@@ -174,10 +176,10 @@ Sent at connection time;
 .Ar greeting
 identifies the playd server and version number.
 .\"
-.It OKAY Ar request
+.It OKAY Ar command...
 .Nm
 just finished processing
-.Ar request .
+.Ar command .
 .\"
 .It STATE Ar state
 The playback state has changed to
@@ -202,9 +204,11 @@ The
 .Ar position
 is in microseconds from the start of the file.
 .\"
-.It WHAT Ar message
+.It WHAT Ar message Ar command...
 .Nm
-did not understand a command.  A human-readable
+did not understand
+.Ar command .
+A human-readable
 .Ar message
 is provided.
 .El

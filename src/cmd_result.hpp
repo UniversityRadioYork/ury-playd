@@ -26,7 +26,12 @@
 class CommandResult
 {
 public:
-	/// Enumeration of possible types of CommandResult.
+	/**
+	 * Enumeration of possible types of CommandResult.
+	 * @note If changing this, change CommandResult::TYPE_CODES too.
+	 * @see CommandResult::TYPE_CODES
+	 * @todo Investigate whether polymorphism would be better?
+	 */
 	enum class Type : std::uint8_t {
 		SUCCESS, ///< The command was successful.
 		INVALID, ///< The command request was not well-formed.
@@ -66,7 +71,7 @@ public:
 	 * Determines whether this CommandResult was successful.
 	 * @return True if the result was a success; false otherwise.
 	 */
-	bool IsSuccess();
+	bool IsSuccess() const;
 
 	/**
 	 * Sends a response to a ResponseSink about this CommandResult.
@@ -79,11 +84,18 @@ public:
 	 * @param sink The ResponseSink to which the response will be sent.
 	 * @param cmd The original command that created this CommandResult.
 	 */
-	void Emit(const ResponseSink &sink, const std::vector<std::string> &cmd);
+	void Emit(const ResponseSink &sink, const std::vector<std::string> &cmd) const;
 
 private:
 	Type type;       ///< The command result's type.
 	std::string msg; ///< The command result's message.
+
+	/**
+	 * Map of types to their response codes.
+	 * @see ResponseCode
+	 * @see Type
+	 */
+	static const ResponseCode TYPE_CODES[];
 };
 
 #endif // PLAYD_CMD_RESULT
