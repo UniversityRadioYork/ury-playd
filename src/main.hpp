@@ -52,7 +52,7 @@ private:
 	static const int INVALID_ID = -1;
 
 	std::vector<std::string> arguments; ///< The argument vector.
-	AudioSystem audio;                  ///< The audio subsystem.
+	PaSoxAudioSystem audio;             ///< The audio subsystem.
 	Player player;                      ///< The player subsystem.
 	CommandHandler handler;             ///< The command handler.
 	TimeParser time_parser;             ///< The seek time parser.

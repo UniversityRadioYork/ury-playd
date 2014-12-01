@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of the AudioSystem class.
+ * Implementation of the PaSoxAudioSystem class.
  * @see audio/audio_system.hpp
  */
 
@@ -39,7 +39,7 @@ class CallbackInterface;
 #include "audio_source.hpp"
 #include "audio_system.hpp"
 
-AudioSystem::AudioSystem()
+PaSoxAudioSystem::PaSoxAudioSystem()
 {
 	portaudio::System::initialize();
 	sox_format_init();
@@ -47,13 +47,13 @@ AudioSystem::AudioSystem()
 	this->device_id = -1;
 }
 
-AudioSystem::~AudioSystem()
+PaSoxAudioSystem::~PaSoxAudioSystem()
 {
 	portaudio::System::terminate();
 	sox_format_quit();
 }
 
-/* static */ std::vector<AudioSystem::Device> AudioSystem::GetDevicesInfo()
+std::vector<AudioSystem::Device> PaSoxAudioSystem::GetDevicesInfo()
 {
 	auto &pa = portaudio::System::instance();
 	std::vector<AudioSystem::Device> list;
@@ -66,7 +66,7 @@ AudioSystem::~AudioSystem()
 	return list;
 }
 
-/* static */ bool AudioSystem::IsOutputDevice(int id)
+bool PaSoxAudioSystem::IsOutputDevice(int id)
 {
 	auto &pa = portaudio::System::instance();
 	if (id < 0 || id >= pa.deviceCount()) return false;
@@ -75,19 +75,19 @@ AudioSystem::~AudioSystem()
 	return !dev.isInputOnlyDevice();
 }
 
-void AudioSystem::SetDeviceID(int id)
+void PaSoxAudioSystem::SetDeviceID(int id)
 {
 	this->device_id = std::to_string(id);
 }
 
-Audio *AudioSystem::Load(const std::string &path) const
+Audio *PaSoxAudioSystem::Load(const std::string &path) const
 {
 	auto source = new AudioSource(path);
 	auto sink = new AudioSink(*source, *this);
 	return new PipeAudio(source, sink);
 }
 
-portaudio::Stream *AudioSystem::Configure(const AudioSource &source,
+portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
                                           portaudio::CallbackInterface &cb) const
 {
 	std::uint8_t channel_count = source.ChannelCount();
@@ -107,8 +107,7 @@ portaudio::Stream *AudioSystem::Configure(const AudioSource &source,
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
 
-/* static */ const portaudio::Device &AudioSystem::PaDeviceFrom(
-                const std::string &id_string)
+/* static */ const portaudio::Device &PaSoxAudioSystem::PaDeviceFrom(const std::string &id_string)
 {
 	auto &pa = portaudio::System::instance();
 
@@ -130,8 +129,7 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
 };
 
-/* static */ portaudio::SampleDataFormat AudioSystem::PaSampleFormatFrom(
-                SampleFormat fmt)
+/* static */ portaudio::SampleDataFormat PaSoxAudioSystem::PaSampleFormatFrom(SampleFormat fmt)
 {
 	try {
 		return pa_from_sf.at(fmt);
