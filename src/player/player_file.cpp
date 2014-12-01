@@ -20,23 +20,6 @@ PlayerFile::PlayerFile(const AudioSystem &audio_system)
 {
 }
 
-void PlayerFile::Emit(ResponseSink &sink) const
-{
-	if (this->audio != nullptr) {
-		sink.Respond(ResponseCode::FILE, this->audio->Path());
-	}
-}
-
-void PlayerFile::Load(const std::string &path)
-{
-	if (this->audio != nullptr) this->Eject();
-
-	this->audio = decltype(this->audio)(this->audio_system.Load(path));
-
-	// Let clients know the file has changed.
-	this->Push();
-}
-
 void PlayerFile::Eject()
 {
 	// Don't bother actually ejecting if there isn't anything to eject.
@@ -44,6 +27,17 @@ void PlayerFile::Eject()
 
 	this->audio->Stop();
 	this->audio = nullptr;
+}
+
+void PlayerFile::Load(const std::string &path)
+{
+	// We can load over existing audio, but we need to eject it first.
+	if (this->audio != nullptr) this->Eject();
+
+	this->audio = decltype(this->audio)(this->audio_system.Load(path));
+
+	// Let clients know the file has changed.
+	this->Push();
 }
 
 void PlayerFile::Start()
@@ -58,24 +52,26 @@ void PlayerFile::Stop()
 	this->audio->Stop();
 }
 
-bool PlayerFile::IsStopped()
+void PlayerFile::Emit(ResponseSink &sink) const
+{
+	if (this->audio == nullptr) return;
+	this->audio->Emit(sink);
+}
+
+Audio::State PlayerFile::Update()
+{
+	if (this->audio == nullptr) return Audio::State::NONE;
+	return this->audio->Update();
+}
+
+TimeParser::MicrosecondPosition PlayerFile::Position() const
 {
 	assert(this->audio != nullptr);
-	return this->audio->IsStopped();
+	return this->audio->Position();
 }
 
-void PlayerFile::Update()
+void PlayerFile::Seek(TimeParser::MicrosecondPosition position)
 {
 	assert(this->audio != nullptr);
-	this->audio->Update();
-}
-
-TimeParser::MicrosecondPosition PlayerFile::CurrentPosition()
-{
-	return this->audio->CurrentPositionMicroseconds();
-}
-
-void PlayerFile::SeekToPosition(TimeParser::MicrosecondPosition position)
-{
-	this->audio->SeekToPositionMicroseconds(position);
+	this->audio->Seek(position);
 }

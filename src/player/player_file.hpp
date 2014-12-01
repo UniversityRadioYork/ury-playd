@@ -13,17 +13,18 @@
 #include <memory>
 
 #include "../audio/audio_system.hpp"
+#include "../audio/audio.hpp"
 #include "../io/io_response.hpp"
 #include "../time_parser.hpp"
 #include "player_position.hpp"
 
-class Audio;
-
 /**
  * The subcomponent of a Player that stores the audio file.
+ * This itself adheres to the Audio interface.
+ * @see Audio
  * @see Player
  */
-class PlayerFile : public ResponseSource
+class PlayerFile : public ResponseSource, public Audio
 {
 public:
 	/**
@@ -33,51 +34,33 @@ public:
 	 */
 	PlayerFile(const AudioSystem &audio_system);
 
+	//
+	// File operations
+	//
+
 	/**
-	 * Opens a file and stores it in this PlayerFile.
-	 * @param path The absolute path to a track to load.
+	 * Ejects the current file.
+	 * @see Load
 	 */
-	void Load(const std::string &path);
-
-	/// Starts the current file.
-	void Start();
-
-	/// Stops the current file.
-	void Stop();
-
-	/// Ejects the current file.
 	void Eject();
 
 	/**
-	 * Emits the current filename to a ResponseSink.
-	 * @param sink The ResponseSink to which a FILE response shall be
-	 *   sent.
+	 * Opens a file and stores it in this PlayerFile.
+	 * @param path The absolute path to a track to load.
+	 * @see Eject
 	 */
+	void Load(const std::string &path);
+
+	//
+	// Audio interface
+	//
+
+	void Start() override;
+	void Stop() override;
 	void Emit(ResponseSink &sink) const override;
-
-	/**
-	 * Checks to see if the file has stopped playing.
-	 * @return True if the file has stopped; false otherwise.
-	 * @see Start
-	 * @see Stop
-	 */
-	bool IsStopped();
-
-	/// Updates the file (performing a round of decoding on it, etc.).
-	void Update();
-
-	/**
-	 * Return the current position.
-	 * @return The current position in the audio, in PlayerPosition units.
-	 */
-	TimeParser::MicrosecondPosition CurrentPosition();
-
-	/**
-	 * Seek to a position.
-	 * @param position The position to seek to in the audio,
-	 *   in PlayerPosition units.
-	 */
-	void SeekToPosition(TimeParser::MicrosecondPosition position);
+	Audio::State Update() override;
+	TimeParser::MicrosecondPosition Position() const override;
+	void Seek(TimeParser::MicrosecondPosition position) override;
 
 private:
 	/// The audio file.

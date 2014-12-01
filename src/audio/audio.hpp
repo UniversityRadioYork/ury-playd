@@ -24,95 +24,127 @@ class Stream;
 }
 
 #include "../time_parser.hpp"
+#include "../io/io_response.hpp"
 #include "audio_source.hpp"
 
 class AudioSink;
 
 /**
- * An audio file.
+ * An audio item.
  *
- * Audio contains all state pertaining to the output of one file to one
- * stream.  It contains a source of audio data and a sink to which it should
- * be sent.
+ * Audio abstractly represents an audio item that can be played, stopped,
+ * and queried for its position and path (or equivalent).
+ *
+ * Audio is a virtual interface implemented concretely by PipeAudio, and
+ * also by mock implementations for testing purposes.
+ *
+ * @see PipeAudio
  */
 class Audio
 {
 public:
 	/**
-	 * Constructs an Audio from a source and a sink.
+	 * Enumeration of possible states for this Audio.
+	 * @see Update
+	 */
+	enum class State : uint8_t {
+		NONE,    ///< There is no Audio.
+		STOPPED, ///< The Audio has been stopped, or not yet played.
+		PLAYING, ///< The Audio is currently playing.
+		AT_END,  ///< The Audio is at its end and cannot play without seeking.
+	};
+
+	//
+	// Control interface
+	//
+
+	/**
+	 * Starts playback of this Audio.
+	 * @see Stop
+	 */
+	virtual void Start() = 0;
+
+	/**
+	 * Stops playback of this Audio.
+	 * @see Start
+	 */
+	virtual void Stop() = 0;
+
+	/**
+	 * Attempts to seek to the given position.
+	 * @param position The position to seek to, in microseconds.
+	 * @see Position
+	 */
+	virtual void Seek(TimeParser::MicrosecondPosition position) = 0;
+
+	/**
+	 * Performs an update cycle on this Audio.
+	 *
+	 * Depending on the Audio implementation, this may do actions such as
+	 * performing a decoding round, checking for end-of-file, transferring
+	 * frames, and so on.
+	 *
+	 * @return The state of the Audio after updating.
+	 * @see State
+	 */
+	virtual State Update() = 0;
+
+	//
+	// Property access
+	//
+
+	/**
+	 * Emits a FILE response containing this Audio's path.
+	 *
+	 * This is usually literally the absolute file-path, but depends
+	 * on the implementation.
+	 *
+	 * @param sink The ResponseSink to which a FILE response shall be
+	 *   sent.
+	 */
+	virtual void Emit(ResponseSink &sink) const = 0;
+
+	/**
+	 * This Audio's current position.
+	 *
+	 * As this may be executing whilst the playing callback is running,
+	 * do not expect it to be highly accurate.
+	 *
+	 * @return The current position, in microseconds.
+	 * @see Seek
+	 */
+	virtual TimeParser::MicrosecondPosition Position() const = 0;
+};
+
+/**
+ * A concrete implementation of Audio as a 'pipe'.
+ *
+ * AudioPipe is comprised of a 'source', which decodes frames from a
+ * file, and a 'sink', which plays out the decoded frames.  Updating
+ * consists of shifting frames from the source to the sink.
+ *
+ * @see Audio
+ * @see AudioSink
+ * @see AudioSource
+ */
+class PipeAudio : public Audio
+{
+public:
+	/**
+	 * Constructs a PipeAudio from a source and a sink.
 	 * @param source The source of decoded audio frames.
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	Audio(AudioSource *source, AudioSink *sink);
+	PipeAudio(AudioSource *source, AudioSink *sink);
 
-	/**
-	 * Gets the file-path of this audio file.
-	 * @return The audio file's path.
-	 */
-	std::string Path() const;
-
-	/**
-	 * Starts playback of this audio file.
-	 * @see Stop
-	 * @see IsStopped
-	 */
-	void Start();
-
-	/**
-	 * Stops playback of this audio file.
-	 * @see Start
-	 * @see IsHalted
-	 */
-	void Stop();
-
-	/**
-	 * Performs an update cycle on this Audio.
-	 * This ensures the ring buffer has output to offer to the sound driver.
-	 * It does this by by asking the AudioSource to decode if necessary.
-	 * @return True if there is more output to send to the sound card; false
-	 *   otherwise.
-	 */
-	bool Update();
-
-	/**
-	 * Checks to see if audio playback has stopped.
-	 * @return True if the audio stream is inactive; false otherwise.
-	 * @see Start
-	 * @see Stop
-	 */
-	bool IsStopped();
-
-	/**
-	 * Returns whether the current frame has been finished.
-	 * If this is true, then either the frame is empty, or all of the
-	 * samples in the frame have been fed to the ringbuffer.
-	 * @return True if the frame is finished; false otherwise.
-	 */
-	bool FrameFinished() const;
-
-	/**
-	 * Returns whether the audio file has ended.
-	 * This does NOT mean that playback has ended; the ring buffer may still
-	 * have samples waiting to send to the audio library.
-	 * @return True if there is no audio left to decode; false otherwise.
-	 */
-	bool FileEnded() const;
-
-	/**
-	 * Gets the current played position in the song, in microseconds.
-	 * As this may be executing whilst the playing callback is running,
-	 * do not expect it to be highly accurate.
-	 * @return The current position, in microseconds.
-	 */
-	TimeParser::MicrosecondPosition CurrentPositionMicroseconds();
-
-	/**
-	 * Attempts to seek to the given position in microseconds.
-	 * @param microseconds The position to seek to, in microseconds.
-	 */
-	void SeekToPositionMicroseconds(
-	                TimeParser::MicrosecondPosition microseconds);
+	void Start() override;
+	void Stop() override;
+	void Seek(TimeParser::MicrosecondPosition position) override;
+	Audio::State Update() override;
+	
+	void Emit(ResponseSink &sink) const override;
+	TimeParser::MicrosecondPosition Position() const override;
 
 private:
 	/// The source of audio data.
@@ -139,6 +171,14 @@ private:
 	 *   otherwise.
 	 */
 	bool DecodeIfFrameEmpty();
+
+	/**
+	 * Returns whether the current frame has been finished.
+	 * If this is true, then either the frame is empty, or all of the
+	 * samples in the frame have been fed to the ringbuffer.
+	 * @return True if the frame is finished; false otherwise.
+	 */
+	bool FrameFinished() const;
 
 	/// Transfers as much of the current frame as possible to the sink.
 	void TransferFrame();

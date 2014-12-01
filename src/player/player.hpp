@@ -193,9 +193,6 @@ private:
 	 */
 	void ResetPosition();
 
-	/// Performs player updates necessary while the player is playing.
-	void PlaybackUpdate();
-
 	/// Handles ending a file (stopping and rewinding).
 	void End();
 };

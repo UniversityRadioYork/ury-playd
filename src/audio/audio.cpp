@@ -16,72 +16,85 @@
 #include "../sample_formats.hpp"
 #include "../messages.h"
 #include "../time_parser.hpp"
+#include "../io/io_response.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
 
-Audio::Audio(AudioSource *source, AudioSink *sink) : source(source), sink(sink)
+PipeAudio::PipeAudio(AudioSource *source, AudioSink *sink) : source(source), sink(sink)
 {
 	this->ClearFrame();
 }
 
-std::string Audio::Path() const
+void PipeAudio::Emit(ResponseSink &sink) const
 {
 	assert(this->source != nullptr);
-	return this->source->Path();
+	sink.Respond(ResponseCode::FILE, this->source->Path());
 }
 
-void Audio::Start()
+void PipeAudio::Start()
 {
+	assert(this->sink != nullptr);
 	this->sink->Start();
 }
 
-void Audio::Stop()
+void PipeAudio::Stop()
 {
+	assert(this->sink != nullptr);
 	this->sink->Stop();
 }
 
-bool Audio::IsStopped()
+TimeParser::MicrosecondPosition PipeAudio::Position() const
 {
-	return this->sink->IsStopped();
-}
+	assert(this->sink != nullptr);
+	assert(this->source != nullptr);
 
-TimeParser::MicrosecondPosition Audio::CurrentPositionMicroseconds()
-{
 	return this->source->MicrosecondPositionFromSamples(
 	                this->sink->Position());
 }
 
-void Audio::SeekToPositionMicroseconds(TimeParser::MicrosecondPosition microseconds)
+void PipeAudio::Seek(TimeParser::MicrosecondPosition position)
 {
-	auto samples = this->source->Seek(microseconds);
+	assert(this->sink != nullptr);
+	assert(this->source != nullptr);
+
+	auto samples = this->source->Seek(position);
 	this->sink->SetPosition(samples);
+
+	// We might still have decoded samples from the old position in
+	// our frame, so clear them out.
 	this->ClearFrame();
 }
 
-void Audio::ClearFrame()
+void PipeAudio::ClearFrame()
 {
 	this->frame.clear();
 	this->frame_iterator = this->frame.end();
 	this->file_ended = false;
 }
 
-bool Audio::Update()
+Audio::State PipeAudio::Update()
 {
+	assert(this->sink != nullptr);
+	assert(this->source != nullptr);
+
 	bool more_frames_available = this->DecodeIfFrameEmpty();
 
-	if (!this->FrameFinished()) {
-		this->TransferFrame();
-	}
+	if (!this->FrameFinished()) this->TransferFrame();
 
 	this->sink->SetInputReady(more_frames_available);
 	this->file_ended = !more_frames_available;
-	return more_frames_available;
+
+	if (this->file_ended) return Audio::State::AT_END;
+	if (this->sink->IsStopped()) return Audio::State::STOPPED;
+	return Audio::State::PLAYING;
 }
 
-void Audio::TransferFrame()
+void PipeAudio::TransferFrame()
 {
 	assert(!this->frame.empty());
+	assert(this->sink != nullptr);
+	assert(this->source != nullptr);
 
 	this->sink->Transfer(this->frame_iterator, this->frame.end());
 
@@ -99,34 +112,26 @@ void Audio::TransferFrame()
 	        this->frame_iterator < this->frame.end()));
 }
 
-bool Audio::DecodeIfFrameEmpty()
+bool PipeAudio::DecodeIfFrameEmpty()
 {
 	// Either the current frame is in progress, or has been emptied.
 	// AdvanceFrameIterator() establishes this assertion by emptying a
 	// frame as soon as it finishes.
 	assert(this->frame.empty() || !this->FrameFinished());
 
-	bool more_frames_available = true;
+	// If we still have a frame, don't bother decoding yet.
+	if (!this->FrameFinished()) return true;
 
-	if (this->FrameFinished()) {
-		AudioSource::DecodeResult result = this->source->Decode();
+	assert(this->source != nullptr);
+	AudioSource::DecodeResult result = this->source->Decode();
 
-		this->frame = result.second;
-		this->frame_iterator = this->frame.begin();
+	this->frame = result.second;
+	this->frame_iterator = this->frame.begin();
 
-		more_frames_available = result.first !=
-		                        AudioSource::DecodeState::END_OF_FILE;
-	}
-
-	return more_frames_available;
+	return result.first != AudioSource::DecodeState::END_OF_FILE;
 }
 
-bool Audio::FileEnded() const
-{
-	return this->file_ended;
-}
-
-bool Audio::FrameFinished() const
+bool PipeAudio::FrameFinished() const
 {
 	return this->frame.end() <= this->frame_iterator;
 }

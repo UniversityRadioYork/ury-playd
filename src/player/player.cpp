@@ -39,22 +39,11 @@ Player::Player(const AudioSystem &audio_system, const TimeParser &time_parser)
 
 bool Player::Update()
 {
-	if (this->CurrentStateIn(PlayerState::AUDIO_PLAYING_STATES)) {
-		this->PlaybackUpdate();
-	}
-	if (this->CurrentStateIn(PlayerState::AUDIO_LOADED_STATES)) {
-		this->file.Update();
-	}
-	return this->IsRunning();
-}
+	auto astate = this->file.Update();
+	if (astate == Audio::State::AT_END) this->End();
+	if (astate == Audio::State::PLAYING) this->UpdatePosition();
 
-void Player::PlaybackUpdate()
-{
-	if (this->file.IsStopped()) {
-		this->End();
-	} else {
-		this->UpdatePosition();
-	}
+	return this->IsRunning();
 }
 
 void Player::WelcomeClient(ResponseSink &client) const
@@ -81,10 +70,10 @@ void Player::End()
 	}
 	this->Stop();
 
-	// Rewind the file back to the start.  We can't use Seek() here
+	// Rewind the file back to the start.  We can't use Player::Seek() here
 	// in case End() is called from Seek(); a seek failure could start an
 	// infinite loop.
-	this->file.SeekToPosition(0);
+	this->file.Seek(0);
 	this->ResetPosition();
 	this->UpdatePosition();
 }
@@ -165,7 +154,7 @@ CommandResult Player::Seek(const std::string &time_str)
 	}
 
 	try {
-		this->file.SeekToPosition(position);
+		this->file.Seek(position);
 	} catch (SeekError) {
 		Debug() << "Seek failure" << std::endl;
 

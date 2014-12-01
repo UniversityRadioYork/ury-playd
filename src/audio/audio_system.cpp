@@ -84,7 +84,7 @@ Audio *AudioSystem::Load(const std::string &path) const
 {
 	auto source = new AudioSource(path);
 	auto sink = new AudioSink(*source, *this);
-	return new Audio(source, sink);
+	return new PipeAudio(source, sink);
 }
 
 portaudio::Stream *AudioSystem::Configure(const AudioSource &source,
@@ -117,9 +117,7 @@ portaudio::Stream *AudioSystem::Configure(const AudioSource &source,
 	std::istringstream is(id_string);
 	is >> id_pa;
 
-	if (id_pa >= pa.deviceCount()) {
-		throw ConfigError(MSG_DEV_BADID);
-	}
+	if (id_pa >= pa.deviceCount()) throw ConfigError(MSG_DEV_BADID);
 
 	return pa.deviceByIndex(id_pa);
 }

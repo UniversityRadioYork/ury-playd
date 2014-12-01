@@ -26,7 +26,7 @@ void Player::SetPositionResponsePeriod(TimeParser::MicrosecondPosition period)
 
 void Player::UpdatePosition()
 {
-	auto pos = this->file.CurrentPosition();
+	auto pos = this->file.Position();
 	this->position.Update(pos);
 }
 
