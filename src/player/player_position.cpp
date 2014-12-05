@@ -24,17 +24,6 @@ void Player::SetPositionResponsePeriod(TimeParser::MicrosecondPosition period)
 	this->position.SetResponsePeriod(period);
 }
 
-void Player::UpdatePosition()
-{
-	auto pos = this->file.Position();
-	this->position.Update(pos);
-}
-
-void Player::ResetPosition()
-{
-	this->position.Reset();
-}
-
 //
 // PlayerPosition
 //

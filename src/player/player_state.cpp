@@ -15,25 +15,6 @@
 #include "player.hpp"
 
 //
-// Player
-//
-
-bool Player::CurrentStateIn(PlayerState::List states) const
-{
-	return this->state.In(states);
-}
-
-bool Player::IsRunning() const
-{
-	return this->state.IsRunning();
-}
-
-void Player::SetState(PlayerState::State state)
-{
-	this->state.Set(state);
-}
-
-//
 // PlayerState
 //
 

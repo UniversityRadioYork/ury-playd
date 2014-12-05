@@ -64,15 +64,8 @@ public:
 	/// Deleted copy-assignment constructor.
 	Player &operator=(const Player &) = delete;
 
-	/**
-	 * Returns whether this Player is still running.
-	 * @return True if this player is not in the QUITTING state; false
-	 *   otherwise.
-	 */
-	bool IsRunning() const;
-
 	//
-	// Begin player commands:
+	// Commands
 	//
 
 	/**
@@ -119,7 +112,7 @@ public:
 	CommandResult Seek(const std::string &time_str);
 
 	//
-	// End player commands.
+	// Other methods
 	//
 
 	/**
@@ -158,19 +151,6 @@ public:
 
 private:
 	/**
-	 * Checks whether the current player state is one of the given states.
-	 * @param states The initialiser list of states.
-	 * @return True if the state is in the given list; false otherwise.
-	 */
-	bool CurrentStateIn(PlayerState::List states) const;
-
-	/**
-	 * Sets the current player state.
-	 * @param state The new state.
-	 */
-	void SetState(PlayerState::State state);
-
-	/**
 	 * Parses a time string into a pair of unit prefix and timestamp.
 	 * @param time_str The time string to parse.
 	 * @return A pair of unit prefix and timestamp.
@@ -179,19 +159,14 @@ private:
 	                const std::string &time_str) const;
 
 	/**
-	 * Updates the player position to reflect changes in the audio system.
-	 * Call this whenever the audio position has changed.
-	 * @see ResetPosition
+	 * Performs an actual seek.
+	 * This does not do any EOF handling.
+	 * @param pos The new position, in microseconds.
+	 * @exception SeekError
+	 *   Raised if the seek is out of range (usually EOF).
+	 * @see Player::Seek
 	 */
-	void UpdatePosition();
-
-	/**
-	 * Resets the player position.
-	 * Call this whenever the audio position has changed drastically (eg a
-	 *   seek has happened, or a new file has been loaded).
-	 * @see UpdatePosition
-	 */
-	void ResetPosition();
+	void SeekRaw(TimeParser::MicrosecondPosition pos);
 
 	/// Handles ending a file (stopping and rewinding).
 	void End();
