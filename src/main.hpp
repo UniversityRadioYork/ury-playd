@@ -14,6 +14,9 @@
 #include "cmd.hpp"
 #include "io/io_core.hpp"
 #include "player/player.hpp"
+#include "player/player_file.hpp"
+#include "player/player_position.hpp"
+#include "player/player_state.hpp"
 #include "time_parser.hpp"
 
 /**
@@ -29,7 +32,7 @@ class Playd
 {
 public:
 	/**
-	 * Constructs a playd, initialising its libraries.
+	 * Constructs an application instance, initialising its libraries.
 	 * @param argc The argument count from the main function.
 	 * @param argv The argument vector from the main function.
 	 */
@@ -51,12 +54,17 @@ private:
 	/// The ID returned by GetDeviceID if something goes wrong.
 	static const int INVALID_ID = -1;
 
-	std::vector<std::string> arguments; ///< The argument vector.
-	PaSoxAudioSystem audio;             ///< The audio subsystem.
-	Player player;                      ///< The player subsystem.
-	CommandHandler handler;             ///< The command handler.
-	TimeParser time_parser;             ///< The seek time parser.
-	std::unique_ptr<IoCore> io;         ///< The I/O handler.
+	std::vector<std::string> argv; ///< The argument vector.
+	PaSoxAudioSystem audio;        ///< The audio subsystem.
+
+	PlayerFile pfile;              ///< The player-file subsystem.
+	PlayerPosition pposition;      ///< The player-position subsystem.
+	PlayerState pstate;            ///< The player-state subsystem.
+	Player player;                 ///< The player subsystem.
+
+	CommandHandler handler;        ///< The command handler.
+	TimeParser time_parser;        ///< The seek time parser.
+	std::unique_ptr<IoCore> io;    ///< The I/O handler.
 
 	/**
 	 * Tries to get the output device ID from program arguments.

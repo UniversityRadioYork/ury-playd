@@ -37,9 +37,9 @@
 class Player
 {
 private:
-	PlayerFile file;         ///< The file subcomponent of the Player.
-	PlayerPosition position; ///< The position subcomponent of the Player.
-	PlayerState state;       ///< The state subcomponent of the Player.
+	PlayerFile &file;         ///< The file subcomponent of the Player.
+	PlayerPosition &position; ///< The position subcomponent of the Player.
+	PlayerState &state;       ///< The state subcomponent of the Player.
 
 	/// The time parser used to parse seek commands.
 	const TimeParser &time_parser;
@@ -53,10 +53,12 @@ private:
 public:
 	/**
 	 * Constructs a Player.
-	 * @param audio_system The audio system object.
+	 * @param file The player's audio-file component.
+	 * @param position The player's position component.
+	 * @param state The player's state component.
 	 * @param time_parser The parser used to interpret Seek commands.
 	 */
-	Player(const AudioSystem &audio_system, const TimeParser &time_parser);
+	Player(PlayerFile &file, PlayerPosition &position, PlayerState &state, const TimeParser &time_parser);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;

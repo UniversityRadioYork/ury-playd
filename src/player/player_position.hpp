@@ -40,16 +40,11 @@ private:
 	bool has_reset;
 
 public:
-	/// Constructs a PlayerPosition.
-	PlayerPosition();
-
 	/**
-	 * Sets the period between position signals.
-	 * This is shared across all listeners.
+	 * Constructs a PlayerPosition.
 	 * @param period The period to wait between responses.
-	 * @see SetResponseSink
 	 */
-	void SetResponsePeriod(TimeParser::MicrosecondPosition period);
+	PlayerPosition(TimeParser::MicrosecondPosition period);
 
 	/**
 	 * Updates the position tracker with the new position.

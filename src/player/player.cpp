@@ -28,10 +28,13 @@
 const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 	                                         "Seek", "TimeReport" };
 
-Player::Player(const AudioSystem &audio_system, const TimeParser &time_parser)
-    : file(audio_system),
-      position(),
-      state(),
+Player::Player(PlayerFile &file,
+               PlayerPosition &position,
+               PlayerState &state,
+               const TimeParser &time_parser)
+    : file(file),
+      position(position),
+      state(state),
       time_parser(time_parser),
       end_sink(nullptr)
 {

@@ -16,20 +16,12 @@
 #include "player_position.hpp"
 
 //
-// Player
-//
-
-void Player::SetPositionResponsePeriod(TimeParser::MicrosecondPosition period)
-{
-	this->position.SetResponsePeriod(period);
-}
-
-//
 // PlayerPosition
 //
 
 // Default to broadcasting the position every time it is changed.
-PlayerPosition::PlayerPosition() : ResponseSource(), period(0)
+PlayerPosition::PlayerPosition(TimeParser::MicrosecondPosition period)
+    : ResponseSource(), period(period)
 {
 	this->Reset();
 }
@@ -60,9 +52,4 @@ void PlayerPosition::Emit(ResponseSink &target) const
 bool PlayerPosition::IsReadyToSend() const
 {
 	return this->has_reset || (this->last + this->period <= this->current);
-}
-
-void PlayerPosition::SetResponsePeriod(TimeParser::MicrosecondPosition period)
-{
-	this->period = period;
 }
