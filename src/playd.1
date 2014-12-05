@@ -6,7 +6,7 @@
 .\" playd man page.
 .\" This man page uses the 'mdoc' macro set; see `man mdoc` for details.
 .\"
-.Dd November 16, 2014
+.Dd December 5, 2014
 .Dt PLAYD 1
 .Os
 .\"
@@ -28,71 +28,77 @@
 .Sh DESCRIPTION
 .\"=============
 .Nm
-is a very simple audio playback program, intended to be driven by other, more
-complex software.  Think of it as
-.Xr mpd 1 ,
-but on a diet.
-
+is a simple audio player,
+intended to be driven by other software via a line-based TCP protocol.
+Its feature set is described in
+.Sx COMMANDS .
+.Pp
 .Nm
-has a very simple feature list: it can load one audio file (given its path), it
-can play that file, it can pause playback of that file, it can seek and eject
-that file, and it periodically sends back the current position in that file.
-It is controlled via a simple, line-of-text-based protocol exposed as a TCP
-server.
-
-If supplied with zero arguments,
+has a simple feature list: it can
+load one audio file (given its path),
+play that file,
+pause playback of that file,
+seek and eject that file,
+and periodically emit the current position in that file.
+.\"------------
+.Ss Invocation
+.\"------------
+If no arguments are given,
 .Nm
-enumerates the possible values for the
-.Ar device-id
-argument.  Otherwise, it is launched according to the provided arguments, the
-meaning of which is as follows:
-.Bl -tag -width "device-id"
-.It Ar device-id
+lists all possible valid values for the
+.Ar device
+argument.
+Otherwise, it is launched as a daemon, with the arguments meaning:
+.Bl -tag -width "address" -offset indent
+.\"-
+.It Ar device
 The ID of the device onto which
 .Nm
-will output audio.  This must be one of the values provided when
+will output audio.  The
+.Ar device
+.Em must
+be on the list given when
 .Nm
-is executed with zero arguments.  Additionally, it must refer to a device
-capable of audio output.
+is executed with zero arguments.
+.\"-
 .It Ar address
-If provided, this specifies the TCP/IP address to which
+The IP address to which
 .Nm
-will bind when listening for client connections.  Typical values include
-127.0.0.1 (connections from localhost only) and 0.0.0.0 (connections from
-anywhere).  The default is 127.0.0.1.
+will bind when listening for client connections;
+the default is 127.0.0.1 (only local connections).
+To accept all connections, use 0.0.0.0.
+.\"-
 .It Ar port
-If provided, this specifies the TCP/IP port on which
+The TCP port on which
 .Nm
-will listen for client connections.  The default is 1350.
+will listen for client connections; the default is 1350.
 .El
 .\"----------
 .Ss Protocol
 .\"----------
 .Nm
-speaks a simple, text-based protocol based heavily on POSIX-style shell
-languages:
+speaks a simple, textual protocol inspired by the POSIX shell:
 .Bl -dash -offset indent -compact
 .It
-Every request or response consists of one or more whitespace-delimited
+Requests and responses consist of one or more whitespace-delimited
 .Em words ,
-followed by a line feed.
+followed by a line-feed.
 .It
-The first word is the
-.Em command word
-and denotes the specific request or response in question.
-.It
+The first word, the
+.Em command word ,
+denotes the specific request or response.
 A command word in
-.Em all lowercase
-denotes a request; a command word in
-.Em ALL CAPS
-is a response.
+.Em lowercase
+denotes a request; in
+.Em CAPITALS ,
+a response:
 .Nm
 is case-sensitive.
 .It
 Words may contain backslashes, which
 .Em escape
-the next character, reproducing it verbatim.  This can be used to permit
-whitespace characters, which would otherwise end the word.
+the next character, reproducing it verbatim.
+This can be used to permit whitespace, which would otherwise end the word.
 .It
 In addition, words may be
 .Em quoted
@@ -107,50 +113,51 @@ in which it is ignored.
 .\"-----------------------------
 Since
 .Nm
-only speaks TCP/IP (by design), it can be difficult to speak with it from a
-terminal on the local machine.  We recommend the use of a program such as
+only speaks TCP/IP (by design),
+it can be hard to speak with it from a terminal on the local machine.
+Programs such as
 .Xr nc 1
-to bridge this gap in functionality.
+may bridge this gap in functionality.
 .\"
 .\"==========
 .Sh COMMANDS
 .\"==========
+The sets of valid requests to, and responses from, a
 .Nm
-understands the following requests:
-.Bl -tag -width "eject" -offset indent
+session are:
+.\"
+.\"----------
+.Ss Requests
+.\"----------
+.Bl -tag -width "load path" -offset indent
 .It eject
-Unloads the current file, stopping playback if the file is playing.
+Unloads the current file, stopping any playback.
 .It load Ar path
 Loads the file at
-.Ar path .
-.Ar path
-.Em must
-be an absolute path;
-.Nm
-performs no expansion or relative path searching.
+.Ar path ,
+which must be absolute.
 .It play
 Starts, or resumes, playback of the current file.
-.It seek Ar position
+.It seek Ar pos
 Seeks to
-.Ar position
-microseconds after the start of the file.  A file can always be seeked.
+.Ar pos
+microseconds past the start of the file.
 Seeking past a file's end is equivalent to seeking to the end directly.
 .It stop
 Stops playback of the current file, keeping the current position.
 .It quit
-Quits
-.Nm .
-.El
-
-In response to requests or other events,
+Makes
 .Nm
-may produce the following:
+quit.
+.El
 .\"
-.Bl -tag -width "END" -offset indent
+.\"-----------
+.Ss Responses
+.\"-----------
+.Bl -tag -width "FILE path " -offset indent
 .\"
 .It END
-The loaded file has reached its end of its own accord (not via a stop
-command).
+The loaded file has reached its physical end.
 .\"
 .It FAIL Ar reason Ar command...
 .Nm
@@ -171,9 +178,9 @@ provides to external clients.
 The loaded file has changed to the file at
 .Ar path .
 .\"
-.It OHAI Ar greeting
-Sent at connection time;
-.Ar greeting
+.It OHAI Ar ident
+Sent upon connection;
+.Ar ident
 identifies the playd server and version number.
 .\"
 .It OKAY Ar command...
@@ -187,22 +194,19 @@ The playback state has changed to
 This may be one of the following:
 .Bl -tag -width "Quitting" -offset indent
 .It Ejected
-No file is currently loaded.
+No file is loaded.
 .It Playing
 A file is loaded and playing.
 .It Quitting
 .Nm
-is preparing to shut down.
+is about to shut down.
 .It Stopped
 A file is loaded, but is not playing.
 .El
 .\"
-.It TIME Ar position
-.Nm
-periodically announces the current position in the file using TIME.
-The
-.Ar position
-is in microseconds from the start of the file.
+.It TIME Ar pos
+Periodic announcement of the current file position in microseconds,
+.Ar pos .
 .\"
 .It WHAT Ar message Ar command...
 .Nm
@@ -216,11 +220,9 @@ is provided.
 .\"==========
 .Sh EXAMPLES
 .\"==========
-The command
-
+Without arguments,
 .Dl % playd
-
-will produce a listing similar to the following:
+will produce a list of available devices:
 .Bd -literal -offset indent
 0: HDA ATI SB: ALC892 Analog (hw:0,0)
 1: HDA ATI SB: ALC892 Digital (hw:0,1)
@@ -233,29 +235,24 @@ will produce a listing similar to the following:
 8: default
 9: dmix
 .Ed
-
-Suppose we want
-.Nm
-to output on the GameCom.  The command
-
+.Pp
+Say we want to output on the GameCon.
+The command
 .Dl % playd 4
-
 will start
 .Nm
 on its default address (localhost) and port, outputting on device ID 4.
-
-If we should need more control over the address and port, we may supply them as
-additional arguments, for example:
-
+.Pp
+To change the address and port, we specify them as arguments:
 .Dl % playd 4 127.0.0.1 1350
-
-To now connect to
+.Pp
+To connect to
 .Nm
-from the local terminal, one can use a command such as:
-
+from the terminal, we can use
+.Xr nc 1 :
 .Dl % nc 127.0.0.1 1350
-
-An example session with
+.Pp
+A session with
 .Nm
 may look like the following:
 .Bd -literal -offset indent
@@ -279,20 +276,25 @@ may look like the following:
 -> STATE Ejected
 (disconnect)
 .Ed
-
-This hopefully covers all command-line usage of
-.Nm .
 .\"
 .\"=========
 .Sh AUTHORS
 .\"=========
-.\" These are in alphabetical surname order.
-.An "Charles Pigott" Aq charles.pigott@ury.org.uk
-.An "Sam Willcocks" Aq sam.w@ury.org.uk
-.An "Matt Windsor" Aq matt.windsor@ury.org.uk
+In alphabetical surname order, the main contributors to
+.Nm
+at time of writing are:
+.Bl -item -offset indent
+.It
+.An Charles Pigott Aq charles.pigott@ury.org.uk
+.It
+.An Sam Willcocks Aq sam.w@ury.org.uk
+.It
+.An Matt Windsor Aq matt.windsor@ury.org.uk
+.El
 .\"
 .\"======
 .Sh BUGS
 .\"======
-.An Undefined behaviour if you try to escape (\*q\e\*q) a multi-byte UTF-8
-character. This is intentional, for reasons of code simplicity.
+Behaviour when escaping multi-byte UTF-8 characters with
+.Dq \e
+is undefined; this is intentional, for reasons of code simplicity.
