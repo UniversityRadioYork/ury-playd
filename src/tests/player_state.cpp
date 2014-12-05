@@ -13,7 +13,7 @@
 
 SCENARIO("PlayerState begins in a valid state", "[player-state]") {
 	GIVEN("a fresh PlayerState") {
-		PlayerState ps;
+		PlayerState ps(nullptr);
 
 		WHEN("the current state is compared with EJECTED") {
 			bool is_ejected = ps.In({ PlayerState::State::EJECTED });
@@ -29,8 +29,7 @@ SCENARIO("PlayerState pushes state changes to its registered response sink", "[p
 	GIVEN("a PlayerState with a dummy ResponseSink") {
 		std::ostringstream os;
 		DummyResponseSink rs(os);
-		PlayerState ps;
-		ps.SetResponseSink(rs);
+		PlayerState ps(&rs);
 
 		WHEN("the state is changed to a different state") {
 			ps.Set(PlayerState::State::PLAYING);
@@ -42,7 +41,7 @@ SCENARIO("PlayerState pushes state changes to its registered response sink", "[p
 	}
 
 	GIVEN("a PlayerState with no ResponseSink") {
-		PlayerState ps;
+		PlayerState ps(nullptr);
 
 		WHEN("the state is changed to a different state") {
 			// The Set has to be done in the THEN clause, as we're
@@ -56,7 +55,7 @@ SCENARIO("PlayerState pushes state changes to its registered response sink", "[p
 
 SCENARIO("PlayerState correctly returns whether or not it is running", "[player-state]") {
 	GIVEN("a fresh PlayerState") {
-		PlayerState ps;
+		PlayerState ps(nullptr);
 
 		WHEN("the current state is QUITTING") {
 			ps.Set(PlayerState::State::QUITTING);

@@ -18,7 +18,7 @@ SCENARIO("PlayerPosition begins in position 0", "[player-position]") {
 		std::ostringstream os;
 		DummyResponseSink rs(os);
 
-		PlayerPosition pp(0);
+		PlayerPosition pp(nullptr, 0);
 
 		WHEN("the current Position is emitted") {
 			pp.Emit(rs);
@@ -35,8 +35,7 @@ SCENARIO("PlayerPosition pushes position changes to its registered response sink
 		std::ostringstream os;
 		DummyResponseSink rs(os);
 
-		PlayerPosition pp(5000);
-		pp.SetResponseSink(rs);
+		PlayerPosition pp(&rs, 5000);
 
 		WHEN("the Position is changed to a sufficiently different Position") {
 			pp.Update(54321);
@@ -82,7 +81,7 @@ SCENARIO("PlayerPosition pushes position changes to its registered response sink
 	}
 
 	GIVEN("a PlayerPosition with no ResponseSink") {
-		PlayerPosition pp(5000);
+		PlayerPosition pp(nullptr, 5000);
 
 		WHEN("the Position is changed") {
 			// The Update has to be done in the THEN clause, as we're
@@ -102,8 +101,7 @@ SCENARIO("PlayerPosition::Reset() correctly resets the position counters", "[pla
 		std::ostringstream os2;
 		DummyResponseSink rs2(os2);
 
-		PlayerPosition pp(5000);
-		pp.SetResponseSink(rs1);
+		PlayerPosition pp(&rs1, 5000);
 
 		WHEN("the position has been set") {
 			pp.Update(54321);

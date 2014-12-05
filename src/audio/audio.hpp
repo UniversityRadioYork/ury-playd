@@ -102,7 +102,7 @@ public:
 	 * @param sink The ResponseSink to which a FILE response shall be
 	 *   sent.
 	 */
-	virtual void Emit(ResponseSink &sink) const = 0;
+	virtual void Emit(const ResponseSink &sink) const = 0;
 
 	/**
 	 * This Audio's current position.
@@ -143,7 +143,7 @@ public:
 	void Seek(TimeParser::MicrosecondPosition position) override;
 	Audio::State Update() override;
 	
-	void Emit(ResponseSink &sink) const override;
+	void Emit(const ResponseSink &sink) const override;
 	TimeParser::MicrosecondPosition Position() const override;
 
 private:

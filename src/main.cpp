@@ -58,10 +58,10 @@ int Playd::GetDeviceID()
 
 Playd::Playd(int argc, char *argv[])
     : audio(),
-      pfile(audio),
-      pposition(Playd::POSITION_PERIOD),
-      pstate(),
-      player(pfile, pposition, pstate, time_parser),
+      pfile(this, audio),
+      pposition(this, Playd::POSITION_PERIOD),
+      pstate(this),
+      player(this, pfile, pposition, pstate, time_parser),
       handler(player),
       time_parser()
 {
@@ -105,8 +105,6 @@ int Playd::Run()
 		return EXIT_FAILURE;
 	}
 
-	this->player.SetResponseSink(*this->io);
-
 	try {
 		this->io->Run();
 	} catch (Error &error) {
@@ -116,4 +114,9 @@ int Playd::Run()
 	}
 
 	return EXIT_SUCCESS;
+}
+
+void Playd::RespondRaw(const std::string &string) const
+{
+	if (this->io != nullptr) this->io->Broadcast(string);
 }

@@ -202,7 +202,7 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoCore::RespondRaw(const std::string &string) const
+void IoCore::Broadcast(const std::string &string) const
 {
 	this->pool.Broadcast(string);
 }

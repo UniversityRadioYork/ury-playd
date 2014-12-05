@@ -32,7 +32,7 @@ SCENARIO("PlayerFile passes Audio commands through to loaded Audio", "[player-fi
 		// to free it when it goes out of scope.
 		auto da = new DummyAudio;
 		DummyAudioSystem ds(da);
-		PlayerFile pf(ds);
+		PlayerFile pf(nullptr, ds);
 
 		pf.Load("/test/path");
 

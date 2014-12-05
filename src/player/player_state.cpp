@@ -26,11 +26,12 @@ const PlayerState::List PlayerState::AUDIO_LOADED_STATES = {
 	PlayerState::State::PLAYING, PlayerState::State::STOPPED
 };
 
-PlayerState::PlayerState() : ResponseSource(), current(State::EJECTED)
+PlayerState::PlayerState(const ResponseSink *state_sink)
+    : ResponseSource(state_sink), current(State::EJECTED)
 {
 }
 
-void PlayerState::Emit(ResponseSink &responder) const
+void PlayerState::Emit(const ResponseSink &responder) const
 {
 	auto c = static_cast<int>(this->current);
 	responder.Respond(ResponseCode::STATE, PlayerState::STRINGS[c]);

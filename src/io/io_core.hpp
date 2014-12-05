@@ -165,7 +165,7 @@ private:
  * The IO core, which services input, routes responses, and executes the
  * Player update routine periodically.
  */
-class IoCore : public ResponseSink
+class IoCore
 {
 public:
 	/**
@@ -198,6 +198,12 @@ public:
 	 */
 	static void End();
 
+	/**
+	 * Broadcasts a string to all connections.
+	 * @param string The string to broadcast.
+	 */
+	void Broadcast(const std::string &string) const;
+
 private:
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
@@ -206,8 +212,6 @@ private:
 	uv_timer_t updater;  ///< The libuv handle for the update timer.
 	Player &player;      ///< The player.
 	ConnectionPool pool; ///< The pool of client Connections.
-
-	void RespondRaw(const std::string &string) const override;
 
 	/**
 	 * Initialises a TCP acceptor on the given address and port.

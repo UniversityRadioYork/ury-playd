@@ -105,21 +105,20 @@ private:
 class ResponseSource
 {
 public:
-	ResponseSource() = default;
+	/**
+	 * Constructs a ResponseSource.
+	 * @param push_sink A pointer to the ResponseSink to which Push()
+	 *   notifications shall be sent.  May be nullptr, in which case said
+	 *   notifications are discarded.
+	 */
+	ResponseSource(const ResponseSink *push_sink);
+
 	/**
 	 * Emits a response to a given ResponseSink.
 	 * @param sink The ResponseSink to which this ResponseSource's current
 	 * response should be emitted.
 	 */
-	virtual void Emit(ResponseSink &sink) const = 0;
-
-	/**
-	 * Registers a ResponseSink with this ResponseSource.
-	 * The ResponseSource will periodically send a response to the given
-	 * ResponseSink.
-	 * @param sink The ResponseSink to register.
-	 */
-	void SetResponseSink(ResponseSink &sink);
+	virtual void Emit(const ResponseSink &sink) const = 0;
 
 protected:
 	/**
@@ -133,7 +132,7 @@ private:
 	 * A ResponseSink to which 'push' responses are emitted.
 	 * If the ResponseSink is not present, responses are not emitted.
 	 */
-	ResponseSink *push_sink;
+	const ResponseSink *push_sink;
 };
 
 #endif // PLAYD_IO_RESPONSE_HPP

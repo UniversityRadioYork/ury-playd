@@ -26,7 +26,7 @@ PipeAudio::PipeAudio(AudioSource *source, AudioSink *sink) : source(source), sin
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(ResponseSink &sink) const
+void PipeAudio::Emit(const ResponseSink &sink) const
 {
 	assert(this->source != nullptr);
 	sink.Respond(ResponseCode::FILE, this->source->Path());

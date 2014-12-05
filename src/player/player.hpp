@@ -45,7 +45,7 @@ private:
 	const TimeParser &time_parser;
 
 	/// The sink to which END responses shall be sent.
-	ResponseSink *end_sink;
+	const ResponseSink *end_sink;
 
 	/// The set of features playd implements.
 	const static std::vector<std::string> FEATURES;
@@ -53,12 +53,13 @@ private:
 public:
 	/**
 	 * Constructs a Player.
+	 * @param end_sink The sink to which END notifications are sent.
 	 * @param file The player's audio-file component.
 	 * @param position The player's position component.
 	 * @param state The player's state component.
 	 * @param time_parser The parser used to interpret Seek commands.
 	 */
-	Player(PlayerFile &file, PlayerPosition &position, PlayerState &state, const TimeParser &time_parser);
+	Player(const ResponseSink *end_sink, PlayerFile &file, PlayerPosition &position, PlayerState &state, const TimeParser &time_parser);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;

@@ -31,7 +31,7 @@ public:
 	void Seek(TimeParser::MicrosecondPosition position) override;
 	Audio::State Update() override;
 
-	void Emit(ResponseSink &sink) const override;
+	void Emit(const ResponseSink &sink) const override;
 	TimeParser::MicrosecondPosition Position() const override;
 
 	// These fields left public for purposes of easy testing.

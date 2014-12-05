@@ -23,7 +23,7 @@ DummyAudio::DummyAudio() : path(""), pos(0), state(Audio::State::STOPPED)
 {
 }
 
-void DummyAudio::Emit(ResponseSink &sink) const
+void DummyAudio::Emit(const ResponseSink &sink) const
 {
 	sink.Respond(ResponseCode::FILE, this->path);
 }

@@ -15,8 +15,8 @@
 #include "player_file.hpp"
 #include "player_position.hpp"
 
-PlayerFile::PlayerFile(const AudioSystem &audio_system)
-    : ResponseSource(), audio(nullptr), audio_system(audio_system)
+PlayerFile::PlayerFile(const ResponseSink *file_sink, const AudioSystem &audio_system)
+    : ResponseSource(file_sink), audio(nullptr), audio_system(audio_system)
 {
 }
 
@@ -52,10 +52,9 @@ void PlayerFile::Stop()
 	this->audio->Stop();
 }
 
-void PlayerFile::Emit(ResponseSink &sink) const
+void PlayerFile::Emit(const ResponseSink &sink) const
 {
-	if (this->audio == nullptr) return;
-	this->audio->Emit(sink);
+	if (this->audio != nullptr) this->audio->Emit(sink);
 }
 
 Audio::State PlayerFile::Update()

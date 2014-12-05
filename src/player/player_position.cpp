@@ -19,9 +19,8 @@
 // PlayerPosition
 //
 
-// Default to broadcasting the position every time it is changed.
-PlayerPosition::PlayerPosition(TimeParser::MicrosecondPosition period)
-    : ResponseSource(), period(period)
+PlayerPosition::PlayerPosition(const ResponseSink *time_sink, TimeParser::MicrosecondPosition period)
+    : ResponseSource(time_sink), period(period)
 {
 	this->Reset();
 }
@@ -44,7 +43,7 @@ void PlayerPosition::Reset()
 	this->has_reset = true;
 }
 
-void PlayerPosition::Emit(ResponseSink &target) const
+void PlayerPosition::Emit(const ResponseSink &target) const
 {
 	target.Respond(ResponseCode::TIME, std::to_string(this->current));
 }

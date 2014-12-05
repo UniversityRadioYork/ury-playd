@@ -29,10 +29,11 @@ class PlayerFile : public ResponseSource, public Audio
 public:
 	/**
 	 * Constructs a new PlayerFile.
+	 * @param file_sink The ResponseSink to which FILE notifications are sent.
 	 * @param audio_system The audio system to use when loading
 	 *   Audio.
 	 */
-	PlayerFile(const AudioSystem &audio_system);
+	PlayerFile(const ResponseSink *file_sink, const AudioSystem &audio_system);
 
 	//
 	// File operations
@@ -57,7 +58,7 @@ public:
 
 	void Start() override;
 	void Stop() override;
-	void Emit(ResponseSink &sink) const override;
+	void Emit(const ResponseSink &sink) const override;
 	Audio::State Update() override;
 	TimeParser::MicrosecondPosition Position() const override;
 	void Seek(TimeParser::MicrosecondPosition position) override;

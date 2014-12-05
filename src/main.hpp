@@ -13,6 +13,7 @@
 #include "audio/audio_system.hpp"
 #include "cmd.hpp"
 #include "io/io_core.hpp"
+#include "io/io_response.hpp"
 #include "player/player.hpp"
 #include "player/player_file.hpp"
 #include "player/player_position.hpp"
@@ -28,7 +29,7 @@
  * destructing it will unload them.  It is probably not safe to create more than
  * one Playd.
  */
-class Playd
+class Playd : public ResponseSink
 {
 public:
 	/**
@@ -65,6 +66,8 @@ private:
 	CommandHandler handler;        ///< The command handler.
 	TimeParser time_parser;        ///< The seek time parser.
 	std::unique_ptr<IoCore> io;    ///< The I/O handler.
+
+	void RespondRaw(const std::string &string) const override;
 
 	/**
 	 * Tries to get the output device ID from program arguments.

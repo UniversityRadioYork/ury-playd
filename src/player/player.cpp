@@ -28,7 +28,8 @@
 const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 	                                         "Seek", "TimeReport" };
 
-Player::Player(PlayerFile &file,
+Player::Player(const ResponseSink *end_sink,
+               PlayerFile &file,
                PlayerPosition &position,
                PlayerState &state,
                const TimeParser &time_parser)
@@ -36,7 +37,7 @@ Player::Player(PlayerFile &file,
       position(position),
       state(state),
       time_parser(time_parser),
-      end_sink(nullptr)
+      end_sink(end_sink)
 {
 }
 
@@ -56,14 +57,6 @@ void Player::WelcomeClient(ResponseSink &client) const
 	this->file.Emit(client);
 	this->position.Emit(client);
 	this->state.Emit(client);
-}
-
-void Player::SetResponseSink(ResponseSink &sink)
-{
-	this->file.SetResponseSink(sink);
-	this->position.SetResponseSink(sink);
-	this->state.SetResponseSink(sink);
-	this->end_sink = &sink;
 }
 
 void Player::End()
