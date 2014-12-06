@@ -51,6 +51,7 @@ SCENARIO("PlayerFile successfully ejects Audio", "[player-file]") {
 			da->started = true;
 
 			THEN("Eject stops the Audio") {
+				REQUIRE(da->started);
 				pf.Eject();
 				REQUIRE_FALSE(da->started);
 			}
