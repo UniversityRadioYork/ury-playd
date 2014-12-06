@@ -17,22 +17,23 @@
 #include "../time_parser.hpp"
 
 /**
- * A dummy Audio implementation, for testing.
- * @see Audio
+ * A dummy AudioSystem implementation, for testing.
+ *
+ * DummyAudioSystem contains several properties that are read and written by
+ * DummyAudio items created by the system, for ease of testing.
+ *
+ * @see AudioSystem
  */
-class DummyAudio : public Audio
+class DummyAudioSystem : public AudioSystem
 {
 public:
-	/// Constructs a DummyAudio.
-	DummyAudio();
+	/// Constructs a new DummyAudioSystem.
+	DummyAudioSystem();
 
-	void Start() override;
-	void Stop() override;
-	void Seek(TimeParser::MicrosecondPosition position) override;
-	Audio::State Update() override;
-
-	void Emit(const ResponseSink &sink) const override;
-	TimeParser::MicrosecondPosition Position() const override;
+	Audio *Load(const std::string &path) const override;
+	void SetDeviceID(int id) override;
+	std::vector<AudioSystem::Device> GetDevicesInfo() override;
+	bool IsOutputDevice(int id) override;
 
 	// These fields left public for purposes of easy testing.
 
@@ -43,28 +44,41 @@ public:
 };
 
 /**
- * A dummy AudioSystem implementation, for testing.
- * @see AudioSystem
+ * A dummy Audio implementation, for testing.
+ *
+ * All actions on DummyAudio set/get properties on the parent AudioSystem,
+ * so testing with these dummy objects is not thread-safe in any way.
+ *
+ * @see Audio
+ * @see DummyAudioSystem
  */
-class DummyAudioSystem : public AudioSystem
+class DummyAudio : public Audio
 {
 public:
 	/**
-	 * Constructs a new DummyAudioSystem.
-	 * @param audio A pointer to the Audio returned by this
-	 *   DummyAudioSystem when performing loads.
+	 * Constructs a DummyAudio.
+	 * @param sys The DummyAudioSystem spawning this DummyAudio.
 	 */
-	DummyAudioSystem(DummyAudio *audio) : audio(audio)
-	{
-	}
+	DummyAudio(DummyAudioSystem &sys);
 
-	Audio *Load(const std::string &path) const override;
-	void SetDeviceID(int id) override;
-	std::vector<AudioSystem::Device> GetDevicesInfo() override;
-	bool IsOutputDevice(int id) override;
+	void Start() override;
+	void Stop() override;
+	void Seek(TimeParser::MicrosecondPosition position) override;
+	Audio::State Update() override;
 
-	/// The Audio held by this DummyAudioSystem.
-	DummyAudio *audio;
+	void Emit(const ResponseSink &sink) const override;
+	TimeParser::MicrosecondPosition Position() const override;
+
+private:
+	/**
+	 * The DummyAudioSystem storing the testable properties for this Audio.
+	 *
+	 * Why are they there, and not here?  Because this Audio is owned by
+	 * the PlayerFile, hidden inside it, and deleted when ejected, so the
+	 * signature of any actions on the DummyAudio needs to persist past its
+	 * own lifetime.
+	 */
+	DummyAudioSystem &sys;
 };
 
 #endif // PLAYD_DUMMY_AUDIO_HPP

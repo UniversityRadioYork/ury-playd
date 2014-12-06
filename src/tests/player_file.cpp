@@ -30,15 +30,14 @@ SCENARIO("PlayerFile successfully ejects Audio", "[player-file]") {
 	GIVEN("a PlayerFile") {
 		// We allocate this on the heap, because PlayerFile wille try
 		// to free it when it goes out of scope.
-		auto da = new DummyAudio;
-		DummyAudioSystem ds(da);
+		DummyAudioSystem ds;
 		PlayerFile pf(nullptr, ds);
 
 		WHEN("the PlayerFile has no audio loaded") {
 			THEN("Eject is a harmless no-operation") {
 				// We can't actually measure this directly using the
 				// PlayerFile interface.  This is a best approximation.
-				da->state = Audio::State::PLAYING;
+				ds.state = Audio::State::PLAYING;
 
 				REQUIRE(pf.Update() == Audio::State::NONE);
 				pf.Eject();
@@ -48,18 +47,18 @@ SCENARIO("PlayerFile successfully ejects Audio", "[player-file]") {
 
 		WHEN("the PlayerFile has audio loaded") {
 			pf.Load("/test/path");
-			da->started = true;
+			ds.started = true;
 
 			THEN("Eject stops the Audio") {
-				REQUIRE(da->started);
+				REQUIRE(ds.started);
 				pf.Eject();
-				REQUIRE_FALSE(da->started);
+				REQUIRE_FALSE(ds.started);
 			}
 
 			THEN("Eject appears to unload the Audio") {
 				// We can't actually measure this directly using the
 				// PlayerFile interface.  This is a best approximation.
-				da->state = Audio::State::PLAYING;
+				ds.state = Audio::State::PLAYING;
 
 				REQUIRE(pf.Update() == Audio::State::PLAYING);
 				pf.Eject();
@@ -72,28 +71,27 @@ SCENARIO("PlayerFile successfully ejects Audio", "[player-file]") {
 SCENARIO("PlayerFile passes Audio commands through to loaded Audio", "[player-file]") {
 	GIVEN("a PlayerFile with loaded dummy audio") {
 		// We allocate this on the heap, because PlayerFile wille try
-		// to free it when it goes out of scope.
-		auto da = new DummyAudio;
-		DummyAudioSystem ds(da);
+		// to free it when it goes out of scope
+		DummyAudioSystem ds;
 		PlayerFile pf(nullptr, ds);
 
 		pf.Load("/test/path");
 
 		WHEN("PlayerFile::Start is invoked with stopped Audio") {
-			da->started = false;
+			ds.started = false;
 			pf.Start();
 
 			THEN("the loaded Audio should be started") {
-				REQUIRE(da->started);
+				REQUIRE(ds.started);
 			}
 		}
 
 		WHEN("PlayerFile::Stop is invoked with started Audio") {
-			da->started = true;
+			ds.started = true;
 			pf.Stop();
 
 			THEN("the loaded Audio should be stopped") {
-				REQUIRE_FALSE(da->started);
+				REQUIRE_FALSE(ds.started);
 			}
 		}
 
@@ -104,28 +102,28 @@ SCENARIO("PlayerFile passes Audio commands through to loaded Audio", "[player-fi
 					Audio::State::PLAYING,
 					Audio::State::STOPPED,
 				}) {
-					da->state = s;
-					REQUIRE(pf.Update() == da->state);
+					ds.state = s;
+					REQUIRE(pf.Update() == ds.state);
 				}					
 			}
 		}
 
 		WHEN("PlayerFile::Position is invoked") {
-			da->pos = 1337;
+			ds.pos = 1337;
 			auto pos = pf.Position();
 
 			THEN("the return value is the Audio position") {
 				REQUIRE(pos == 1337);
-				REQUIRE(da->pos == 1337);
+				REQUIRE(ds.pos == 1337);
 			}
 		}
 
 		WHEN("PlayerFile::Seek is invoked") {
-			da->pos = 27;
+			ds.pos = 27;
 			pf.Seek(53);
 
 			THEN("the Audio's position should have changed") {
-				REQUIRE(da->pos == 53);
+				REQUIRE(ds.pos == 53);
 			}
 		}
 

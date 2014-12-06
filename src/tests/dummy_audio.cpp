@@ -19,48 +19,55 @@
 // DummyAudio
 //
 
-DummyAudio::DummyAudio() : path(""), pos(0), state(Audio::State::STOPPED)
+DummyAudio::DummyAudio(DummyAudioSystem &sys) : sys(sys)
 {
 }
 
 void DummyAudio::Emit(const ResponseSink &sink) const
 {
-	sink.Respond(ResponseCode::FILE, this->path);
+	sink.Respond(ResponseCode::FILE, this->sys.path);
 }
 
 void DummyAudio::Start()
 {
-	this->started = true;
+	this->sys.started = true;
 }
 
 void DummyAudio::Stop()
 {
-	this->started = false;
+	this->sys.started = false;
 }
 
 Audio::State DummyAudio::Update()
 {
-	return this->state;
+	return this->sys.state;
 }
 
 TimeParser::MicrosecondPosition DummyAudio::Position() const
 {
-	return this->pos;
+	return this->sys.pos;
 }
 
 void DummyAudio::Seek(TimeParser::MicrosecondPosition position)
 {
-	this->pos = position;
+	this->sys.pos = position;
 }
 
 //
 // DummyAudioSystem
 //
 
+DummyAudioSystem::DummyAudioSystem() : path(""), pos(0), state(Audio::State::STOPPED)
+{
+}
+
 Audio *DummyAudioSystem::Load(const std::string &path) const
 {
-	this->audio->path = path;
-	return this->audio;
+	// Kids, don't try this at home.
+	// Were this not a test mock, I'd shoot myself for this!  ~ Matt
+	DummyAudioSystem &notconst = const_cast<DummyAudioSystem &>(*this);
+	notconst.path = path;
+	return new DummyAudio(notconst);
 }
 
 void DummyAudioSystem::SetDeviceID(int)
