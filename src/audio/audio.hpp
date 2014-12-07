@@ -23,7 +23,6 @@ namespace portaudio
 class Stream;
 }
 
-#include "../time_parser.hpp"
 #include "../io/io_response.hpp"
 #include "audio_source.hpp"
 
@@ -75,7 +74,7 @@ public:
 	 * @param position The position to seek to, in microseconds.
 	 * @see Position
 	 */
-	virtual void Seek(TimeParser::MicrosecondPosition position) = 0;
+	virtual void Seek(std::uint64_t position) = 0;
 
 	/**
 	 * Performs an update cycle on this Audio.
@@ -113,7 +112,7 @@ public:
 	 * @return The current position, in microseconds.
 	 * @see Seek
 	 */
-	virtual TimeParser::MicrosecondPosition Position() const = 0;
+	virtual std::uint64_t Position() const = 0;
 };
 
 /**
@@ -140,11 +139,11 @@ public:
 
 	void Start() override;
 	void Stop() override;
-	void Seek(TimeParser::MicrosecondPosition position) override;
+	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 	
 	void Emit(const ResponseSink &sink) const override;
-	TimeParser::MicrosecondPosition Position() const override;
+	std::uint64_t Position() const override;
 
 private:
 	/// The source of audio data.

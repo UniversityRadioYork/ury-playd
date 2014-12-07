@@ -6,13 +6,13 @@
  * Implementation of DummyAudio and related classes.
  */
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
 #include "../audio/audio.hpp"
 #include "../audio/audio_system.hpp"
 #include "../io/io_response.hpp"
-#include "../time_parser.hpp"
 #include "dummy_audio.hpp"
 
 //
@@ -43,12 +43,12 @@ Audio::State DummyAudio::Update()
 	return this->sys.state;
 }
 
-TimeParser::MicrosecondPosition DummyAudio::Position() const
+std::uint64_t DummyAudio::Position() const
 {
 	return this->sys.pos;
 }
 
-void DummyAudio::Seek(TimeParser::MicrosecondPosition position)
+void DummyAudio::Seek(std::uint64_t position)
 {
 	this->sys.pos = position;
 }

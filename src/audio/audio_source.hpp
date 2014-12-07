@@ -19,7 +19,6 @@
 
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
-#include "../time_parser.hpp"
 
 /**
  * An object responsible for decoding an audio file.
@@ -113,7 +112,7 @@ public:
 	 * @param position  The new position in the file, in microseconds.
 	 * @return The new position in the file, in samples.
 	 */
-	std::uint64_t Seek(TimeParser::MicrosecondPosition position);
+	std::uint64_t Seek(std::uint64_t position);
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
@@ -121,14 +120,14 @@ public:
 	 * @return The corresponding number of elapsed samples.
 	 */
 	std::uint64_t SamplePositionFromMicroseconds(
-	                TimeParser::MicrosecondPosition position) const;
+	                std::uint64_t position) const;
 
 	/**
 	 * Converts an elapsed sample count to a position in microseconds.
 	 * @param samples The number of elapsed samples.
 	 * @return The corresponding song position, in microseconds.
 	 */
-	TimeParser::MicrosecondPosition MicrosecondPositionFromSamples(
+	std::uint64_t MicrosecondPositionFromSamples(
 	                std::uint64_t samples) const;
 
 private:

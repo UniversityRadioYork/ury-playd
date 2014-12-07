@@ -8,10 +8,10 @@
  */
 
 #include <cassert>
+#include <cstdint>
 
 #include "../audio/audio_system.hpp"
 #include "../io/io_response.hpp"
-#include "../time_parser.hpp"
 #include "player_file.hpp"
 #include "player_position.hpp"
 
@@ -63,13 +63,13 @@ Audio::State PlayerFile::Update()
 	return this->audio->Update();
 }
 
-TimeParser::MicrosecondPosition PlayerFile::Position() const
+std::uint64_t PlayerFile::Position() const
 {
 	assert(this->audio != nullptr);
 	return this->audio->Position();
 }
 
-void PlayerFile::Seek(TimeParser::MicrosecondPosition position)
+void PlayerFile::Seek(std::uint64_t position)
 {
 	assert(this->audio != nullptr);
 	this->audio->Seek(position);

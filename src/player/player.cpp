@@ -10,6 +10,7 @@
  */
 
 #include <cassert>
+#include <cstdint>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -21,7 +22,6 @@
 #include "../errors.hpp"
 #include "../io/io_response.hpp"
 #include "../messages.h"
-#include "../time_parser.hpp"
 #include "player_state.hpp"
 #include "player.hpp"
 
@@ -31,12 +31,10 @@ const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 Player::Player(const ResponseSink *end_sink,
                PlayerFile &file,
                PlayerPosition &position,
-               PlayerState &state,
-               const TimeParser &time_parser)
+               PlayerState &state)
     : file(file),
       position(position),
       state(state),
-      time_parser(time_parser),
       end_sink(end_sink)
 {
 }
@@ -137,15 +135,22 @@ CommandResult Player::Seek(const std::string &time_str)
 		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
 	}
 
-	TimeParser::MicrosecondPosition pos(0);
-
+	std::uint64_t pos = 0;
+	size_t cpos = 0;
 	try {
-		pos = this->time_parser.Parse(time_str);
-	} catch (std::out_of_range) {
-		return CommandResult::Invalid(MSG_SEEK_INVALID_UNIT);
-	} catch (SeekError) {
+		// In previous versions, this used to parse a unit at the end.
+		// This was removed for simplicity--use baps3-cli etc. instead.
+		pos = std::stoull(time_str, &cpos);
+	} catch (...) {
+		// Should catch std::out_of_range and std::invalid_argument.
+		// http://www.cplusplus.com/reference/string/stoull/#exceptions
 		return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 	}
+
+	// cpos will point to the first character in pos that wasn't a number.
+	// We don't want any characters here, so bail if the position isn't at
+	// the end of the string.
+	if (cpos != time_str.length()) return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 
 	try {
 		this->SeekRaw(pos);
@@ -160,7 +165,7 @@ CommandResult Player::Seek(const std::string &time_str)
 	return CommandResult::Success();
 }
 
-void Player::SeekRaw(TimeParser::MicrosecondPosition pos)
+void Player::SeekRaw(std::uint64_t pos)
 {
 	this->file.Seek(pos);
 

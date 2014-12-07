@@ -84,10 +84,7 @@ const std::string MSG_OUTPUT_RINGINIT = "Ring buffer init error";
 /// Message shown when an attempt to seek fails.
 const std::string MSG_SEEK_FAIL = "Seek failed";
 
-/// Message shown when a seek command has an invalid time unit.
-const std::string MSG_SEEK_INVALID_UNIT = "Invalid time unit: try us, s, m, h";
-
 /// Message shown when a seek command has an invalid time value.
-const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer[unit]";
+const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer";
 
 #endif // PLAYD_MESSAGES_H
