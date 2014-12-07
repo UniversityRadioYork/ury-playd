@@ -76,7 +76,7 @@ public:
 	/**
 	 * Sends a response to a ResponseSink about this CommandResult.
 	 *
-	 * If the CommandResult was a success, then the response is 'OKAY cmd',
+	 * If the CommandResult was a success, then the response is 'OK cmd',
 	 * where 'cmd' is the parameter named as such.  Otherwise, the response
 	 * is 'X msg', where 'msg' is the result message and 'X' is whichever
 	 * response code is most appropriate for the failure.
