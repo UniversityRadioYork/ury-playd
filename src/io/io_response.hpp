@@ -24,7 +24,7 @@
  * @see ResponseSink::STRINGS
  */
 enum class ResponseCode : std::uint8_t {
-	OKAY,     ///< Request was valid and produced an answer.
+	OK,       ///< Request was valid and produced an answer.
 	WHAT,     ///< Request was invalid/user error.
 	FAIL,     ///< Error, pointing blame at environment.
 	OHAI,     ///< Server starting up.

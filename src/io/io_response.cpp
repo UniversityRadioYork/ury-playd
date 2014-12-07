@@ -15,7 +15,7 @@
 #include "io_response.hpp"
 
 const std::string ResponseSink::STRINGS[] = {
-	"OKAY",     // ResponseCode::OKAY
+	"OK",       // ResponseCode::OK
 	"WHAT",     // ResponseCode::WHAT
 	"FAIL",     // ResponseCode::FAIL
 	"OHAI",     // ResponseCode::OHAI

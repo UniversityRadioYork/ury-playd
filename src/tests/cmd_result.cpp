@@ -33,8 +33,8 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			WHEN("Emit(cmd) is called") {
 				c.Emit(d, cmd);
 				
-				THEN("the response is OKAY followed by the command words") {
-					REQUIRE(os.str() == "OKAY OHAI 'testy test'\n");
+				THEN("the response is OK followed by the command words") {
+					REQUIRE(os.str() == "OK OHAI 'testy test'\n");
 				}	
 			}
 		}
