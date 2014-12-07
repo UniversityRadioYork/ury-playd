@@ -48,15 +48,18 @@ public:
 	/// List of states in which some audio is loaded.
 	const static List AUDIO_LOADED_STATES;
 
-	/// Constructs a PlayerState.
-	PlayerState();
+	/**
+	 * Constructs a PlayerState.
+	 * @param state_sink The sink to which STATE notifications are sent.
+	 */
+	PlayerState(const ResponseSink *state_sink);
 
 	/**
 	 * Announces the current state to a ResponseSink.
 	 * @param sink The ResponseSink to which the current state shall be
 	 *   emitted.
 	 */
-	void Emit(ResponseSink &sink) const override;
+	void Emit(const ResponseSink &sink) const override;
 
 	/**
 	 * Checks whether the current state is in a given list of states.

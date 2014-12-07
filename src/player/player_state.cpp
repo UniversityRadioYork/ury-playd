@@ -15,25 +15,6 @@
 #include "player.hpp"
 
 //
-// Player
-//
-
-bool Player::CurrentStateIn(PlayerState::List states) const
-{
-	return this->state.In(states);
-}
-
-bool Player::IsRunning() const
-{
-	return this->state.IsRunning();
-}
-
-void Player::SetState(PlayerState::State state)
-{
-	this->state.Set(state);
-}
-
-//
 // PlayerState
 //
 
@@ -45,11 +26,12 @@ const PlayerState::List PlayerState::AUDIO_LOADED_STATES = {
 	PlayerState::State::PLAYING, PlayerState::State::STOPPED
 };
 
-PlayerState::PlayerState() : ResponseSource(), current(State::EJECTED)
+PlayerState::PlayerState(const ResponseSink *state_sink)
+    : ResponseSource(state_sink), current(State::EJECTED)
 {
 }
 
-void PlayerState::Emit(ResponseSink &responder) const
+void PlayerState::Emit(const ResponseSink &responder) const
 {
 	auto c = static_cast<int>(this->current);
 	responder.Respond(ResponseCode::STATE, PlayerState::STRINGS[c]);

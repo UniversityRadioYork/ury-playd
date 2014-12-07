@@ -33,56 +33,75 @@ class Device;
  * enumerating and resolving device IDs, and initialising and terminating the
  * audio libraries.
  *
- * AudioSystem is a RAII-style class: it loads the audio libraries on
- * construction and unloads them on termination.  As such, it's probably not
- * wise to construct multiple AudioSystem instances.
+ * This is an abstract class, implemented primarily by SoxPaAudioSystem.
+ *
+ * @see SoxPaAudioSystem
+ * @see Audio
  */
-class AudioSystem : public AudioSinkConfigurator
+class AudioSystem
 {
 public:
 	/// Type for device entries.
 	typedef std::pair<int, std::string> Device;
 
 	/**
-	 * Constructs an AudioSystem, initialising its libraries.
-	 * This sets the current device ID to a sane default; use SetDeviceID
-	 * to change it.
-	 */
-	AudioSystem();
-
-	/**
-	 * Destructs an AudioSystem, uninitialising its libraries.
-	 */
-	virtual ~AudioSystem();
-
-	/**
 	 * Loads a file, creating an Audio for it.
 	 * @param path The path to a file.
 	 * @return The Audio for that file.
 	 */
-	Audio *Load(const std::string &path) const;
+	virtual Audio *Load(const std::string &path) const = 0;
 
 	/**
 	 * Sets the current device ID.
 	 * @param id The device ID to use for subsequent Audios.
 	 */
-	void SetDeviceID(int id);
+	virtual void SetDeviceID(int id) = 0;
 
 	/**
 	 * Gets the number and name of each output device entry in the
 	 * AudioSystem.
 	 * @return List of output devices, as strings.
 	 */
-	static std::vector<AudioSystem::Device> GetDevicesInfo();
+	virtual std::vector<AudioSystem::Device> GetDevicesInfo() = 0;
 
 	/**
 	 * Can a sound device output sound?
 	 * @param id Device ID.
 	 * @return If the device can handle outputting sound.
 	 */
-	static bool IsOutputDevice(int id);
+	virtual bool IsOutputDevice(int id) = 0;
+};
 
-	virtual portaudio::Stream *Configure(
+/**
+ * Implementation of AudioSystem using libsox and PortAudio.
+ *
+ * PaSoxAudioSystem is a RAII-style class: it loads the audio libraries on
+ * construction and unloads them on termination.  As such, it's probably not
+ * wise to construct multiple AudioSystem instances.
+ */
+class PaSoxAudioSystem : public AudioSystem, public AudioSinkConfigurator
+{
+public:
+	/**
+	 * Constructs a PaSoxAudioSystem, initialising its libraries.
+	 * This sets the current device ID to a sane default; use SetDeviceID
+	 * to change it.
+	 */
+	PaSoxAudioSystem();
+
+	/**
+	 * Destructs an PaSoxAudioSystem, uninitialising its libraries.
+	 */
+	virtual ~PaSoxAudioSystem();
+
+	// AudioSystem implementation
+	Audio *Load(const std::string &path) const override;
+	void SetDeviceID(int id) override;
+	std::vector<AudioSystem::Device> GetDevicesInfo() override;
+	bool IsOutputDevice(int id) override;
+
+	// AudioSinkConfigurator implementation
+	portaudio::Stream *Configure(
 	                const AudioSource &source,
 	                portaudio::CallbackInterface &cb) const override;
 

@@ -10,7 +10,6 @@
 #include <string>
 #include "dummy_response_sink.hpp"
 
-
 DummyResponseSink::DummyResponseSink(std::ostream &os) : os(os)
 {
 }

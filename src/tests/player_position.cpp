@@ -18,7 +18,7 @@ SCENARIO("PlayerPosition begins in position 0", "[player-position]") {
 		std::ostringstream os;
 		DummyResponseSink rs(os);
 
-		PlayerPosition pp;
+		PlayerPosition pp(nullptr, 0);
 
 		WHEN("the current Position is emitted") {
 			pp.Emit(rs);
@@ -35,11 +35,9 @@ SCENARIO("PlayerPosition pushes position changes to its registered response sink
 		std::ostringstream os;
 		DummyResponseSink rs(os);
 
-		PlayerPosition pp;
-		pp.SetResponseSink(rs);
+		PlayerPosition pp(&rs, 5000);
 
 		WHEN("the Position is changed to a sufficiently different Position") {
-			pp.SetResponsePeriod(5000);
 			pp.Update(54321);
 
 			THEN("the response sink receives a TIME response") {
@@ -64,7 +62,6 @@ SCENARIO("PlayerPosition pushes position changes to its registered response sink
 		}
 
 		WHEN("the Position is changed from initial to a normally insufficiently different Position") {
-			pp.SetResponsePeriod(5000);
 			pp.Update(4321);
 
 			THEN("the response sink still receives a TIME response") {
@@ -84,13 +81,12 @@ SCENARIO("PlayerPosition pushes position changes to its registered response sink
 	}
 
 	GIVEN("a PlayerPosition with no ResponseSink") {
-		PlayerPosition pp;
+		PlayerPosition pp(nullptr, 5000);
 
 		WHEN("the Position is changed") {
 			// The Update has to be done in the THEN clause, as we're
 			// checking the statement itself for exceptions.
 			THEN("no error is thrown") {
-				pp.SetResponsePeriod(5000);
 				REQUIRE_NOTHROW(pp.Update(54321));
 			}
 		}
@@ -105,11 +101,9 @@ SCENARIO("PlayerPosition::Reset() correctly resets the position counters", "[pla
 		std::ostringstream os2;
 		DummyResponseSink rs2(os2);
 
-		PlayerPosition pp;
-		pp.SetResponseSink(rs1);
+		PlayerPosition pp(&rs1, 5000);
 
 		WHEN("the position has been set") {
-			pp.SetResponsePeriod(5000);
 			pp.Update(54321);
 
 			AND_WHEN("the position is reset") {

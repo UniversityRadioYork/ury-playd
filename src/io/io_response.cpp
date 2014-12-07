@@ -71,9 +71,9 @@ void ResponseSink::RespondArgs(ResponseCode code,
 // ResponseSource
 //
 
-void ResponseSource::SetResponseSink(ResponseSink &responder)
+ResponseSource::ResponseSource(const ResponseSink *push_sink)
+    : push_sink(push_sink)
 {
-	this->push_sink = &responder;
 }
 
 void ResponseSource::Push() const

@@ -40,16 +40,12 @@ private:
 	bool has_reset;
 
 public:
-	/// Constructs a PlayerPosition.
-	PlayerPosition();
-
 	/**
-	 * Sets the period between position signals.
-	 * This is shared across all listeners.
+	 * Constructs a PlayerPosition.
+	 * @param time_sink The ResponseSink to which TIME notifications are sent.
 	 * @param period The period to wait between responses.
-	 * @see SetResponseSink
 	 */
-	void SetResponsePeriod(TimeParser::MicrosecondPosition period);
+	PlayerPosition(const ResponseSink *time_sink, TimeParser::MicrosecondPosition period);
 
 	/**
 	 * Updates the position tracker with the new position.
@@ -73,7 +69,7 @@ public:
 	 * @param sink The ResponseSink to which a TIME response shall be
 	 *   sent.
 	 */
-	void Emit(ResponseSink &sink) const override;
+	void Emit(const ResponseSink &sink) const override;
 
 private:
 	/**
