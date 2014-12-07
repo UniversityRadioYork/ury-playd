@@ -253,11 +253,13 @@ std::string Connection::Name()
 
 	// Using this instead of struct sockaddr is advised by the libuv docs,
 	// for IPv6 compatibility.
-	struct sockaddr_in s;
-	socklen_t namelen = 0;
+	struct sockaddr_storage s;
+	auto sp = (struct sockaddr *) &s;
 
-	int pe = uv_tcp_getpeername(this->tcp, (struct sockaddr *)&s, (int *)&namelen);
-	
+	// Turns out if you don't do this, Windows (and only Windows?) is upset.
+	socklen_t namelen = sizeof(s);
+
+	int pe = uv_tcp_getpeername(this->tcp, sp, (int *)&namelen);
 	if (pe) return std::string("(error getting peer info: ") + uv_strerror(pe) + ")";
 
 	// Now, split the sockaddr into host and service.
@@ -268,8 +270,7 @@ std::string Connection::Name()
 	// Otherwise, we could get a (likely erroneous) string description of
 	// what
 	// the network stack *thinks* the port is used for.
-	int ne = getnameinfo((struct sockaddr *)&s, namelen, host, sizeof(host),
-	    serv, sizeof(serv), NI_NUMERICSERV);
+	int ne = getnameinfo(sp, namelen, host, sizeof(host), serv, sizeof(serv), NI_NUMERICSERV);
 	if (ne) return std::string("(error getting name: ") + gai_strerror(ne) + ")";
 
 	return std::string(host) + ":" + std::string(serv);
