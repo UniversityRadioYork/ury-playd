@@ -20,6 +20,9 @@
 #include <string>
 
 extern "C" {
+// If UNICODE is defined on Windows, it'll select the wide-char gai_strerror.
+// We don't want this.
+#undef UNICODE
 #include <uv.h>
 }
 
@@ -250,12 +253,12 @@ std::string Connection::Name()
 
 	// Using this instead of struct sockaddr is advised by the libuv docs,
 	// for IPv6 compatibility.
-	struct sockaddr_storage s;
-	int namelen;
+	struct sockaddr_in s;
+	socklen_t namelen = 0;
 
-	if (uv_tcp_getpeername(this->tcp, (struct sockaddr *)&s, &namelen) < 0) {
-		return "(error)";
-	}
+	int pe = uv_tcp_getpeername(this->tcp, (struct sockaddr *)&s, (int *)&namelen);
+	
+	if (pe) return std::string("(error getting peer info: ") + uv_strerror(pe) + ")";
 
 	// Now, split the sockaddr into host and service.
 	char host[NI_MAXHOST];
@@ -265,10 +268,9 @@ std::string Connection::Name()
 	// Otherwise, we could get a (likely erroneous) string description of
 	// what
 	// the network stack *thinks* the port is used for.
-	if (getnameinfo((struct sockaddr *)&s, namelen, host, sizeof(host),
-	                serv, sizeof(serv), NI_NUMERICSERV)) {
-		return "(error)";
-	}
+	int ne = getnameinfo((struct sockaddr *)&s, namelen, host, sizeof(host),
+	    serv, sizeof(serv), NI_NUMERICSERV);
+	if (ne) return std::string("(error getting name: ") + gai_strerror(ne) + ")";
 
 	return std::string(host) + ":" + std::string(serv);
 }
