@@ -72,10 +72,7 @@ use `seek 0` after `stop` to rewind the file.
 
 ### seek _position_
 
-Seeks to _position_, which may either be an integer (interpreted as microseconds
-since the beginning of the file), or an integer followed by a suffix denoting
-the unit.  Units supported include `s` (seconds), `m` (minutes), `h` (hours),
-`ms` (milliseconds), and `us` (microseconds).
+Seeks to _position_ microseconds since the beginning of the file.
 
 ## Responses
 

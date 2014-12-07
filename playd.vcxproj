@@ -28,7 +28,6 @@
     <ClCompile Include="src\player\player_file.cpp" />
     <ClCompile Include="src\player\player_position.cpp" />
     <ClCompile Include="src\player\player_state.cpp" />
-    <ClCompile Include="src\time_parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\audio\audio.hpp" />
@@ -52,7 +51,6 @@
     <ClInclude Include="src\player\player_state.hpp" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\sample_formats.hpp" />
-    <ClInclude Include="src\time_parser.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{625EC8F2-633C-4666-BC4B-25F6BECABA31}</ProjectGuid>

@@ -8,10 +8,10 @@
  * @see player/player.hpp
  */
 
+#include <cstdint>
 #include <sstream>
 
 #include "../io/io_response.hpp"
-#include "../time_parser.hpp"
 #include "player.hpp"
 #include "player_position.hpp"
 
@@ -19,13 +19,13 @@
 // PlayerPosition
 //
 
-PlayerPosition::PlayerPosition(const ResponseSink *time_sink, TimeParser::MicrosecondPosition period)
+PlayerPosition::PlayerPosition(const ResponseSink *time_sink, std::uint64_t period)
     : ResponseSource(time_sink), period(period)
 {
 	this->Reset();
 }
 
-void PlayerPosition::Update(const TimeParser::MicrosecondPosition position)
+void PlayerPosition::Update(const std::uint64_t position)
 {
 	this->current = position;
 
@@ -38,8 +38,8 @@ void PlayerPosition::Update(const TimeParser::MicrosecondPosition position)
 
 void PlayerPosition::Reset()
 {
-	this->current = TimeParser::MicrosecondPosition(0);
-	this->last = TimeParser::MicrosecondPosition(0);
+	this->current = 0;
+	this->last = 0;
 	this->has_reset = true;
 }
 

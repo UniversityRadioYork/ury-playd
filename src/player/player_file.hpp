@@ -15,7 +15,6 @@
 #include "../audio/audio_system.hpp"
 #include "../audio/audio.hpp"
 #include "../io/io_response.hpp"
-#include "../time_parser.hpp"
 #include "player_position.hpp"
 
 /**
@@ -60,8 +59,8 @@ public:
 	void Stop() override;
 	void Emit(const ResponseSink &sink) const override;
 	Audio::State Update() override;
-	TimeParser::MicrosecondPosition Position() const override;
-	void Seek(TimeParser::MicrosecondPosition position) override;
+	std::uint64_t Position() const override;
+	void Seek(std::uint64_t position) override;
 
 private:
 	/// The audio file.

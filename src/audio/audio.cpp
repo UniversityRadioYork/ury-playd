@@ -10,12 +10,12 @@
 #include <algorithm>
 #include <cassert>
 #include <climits>
+#include <cstdint>
 #include <string>
 
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
 #include "../messages.h"
-#include "../time_parser.hpp"
 #include "../io/io_response.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
@@ -44,7 +44,7 @@ void PipeAudio::Stop()
 	this->sink->Stop();
 }
 
-TimeParser::MicrosecondPosition PipeAudio::Position() const
+std::uint64_t PipeAudio::Position() const
 {
 	assert(this->sink != nullptr);
 	assert(this->source != nullptr);
@@ -53,7 +53,7 @@ TimeParser::MicrosecondPosition PipeAudio::Position() const
 	                this->sink->Position());
 }
 
-void PipeAudio::Seek(TimeParser::MicrosecondPosition position)
+void PipeAudio::Seek(std::uint64_t position)
 {
 	assert(this->sink != nullptr);
 	assert(this->source != nullptr);

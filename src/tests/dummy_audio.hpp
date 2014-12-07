@@ -9,12 +9,12 @@
 #ifndef PLAYD_DUMMY_AUDIO_HPP
 #define PLAYD_DUMMY_AUDIO_HPP
 
+#include <cstdint>
 #include <vector>
 
 #include "../audio/audio.hpp"
 #include "../audio/audio_system.hpp"
 #include "../io/io_response.hpp"
-#include "../time_parser.hpp"
 
 /**
  * A dummy AudioSystem implementation, for testing.
@@ -37,10 +37,10 @@ public:
 
 	// These fields left public for purposes of easy testing.
 
-	bool started;                        ///< Whether the audio is started.
-	std::string path;                    ///< The path.
-	TimeParser::MicrosecondPosition pos; ///< The position.
-	Audio::State state;                  ///< The state.
+	bool started;        ///< Whether the audio is started.
+	std::string path;    ///< The path.
+	std::uint64_t pos;   ///< The position.
+	Audio::State state;  ///< The state.
 };
 
 /**
@@ -63,11 +63,11 @@ public:
 
 	void Start() override;
 	void Stop() override;
-	void Seek(TimeParser::MicrosecondPosition position) override;
+	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
 	void Emit(const ResponseSink &sink) const override;
-	TimeParser::MicrosecondPosition Position() const override;
+	std::uint64_t Position() const override;
 
 private:
 	/**

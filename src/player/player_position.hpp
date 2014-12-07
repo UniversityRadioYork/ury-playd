@@ -10,11 +10,11 @@
 #ifndef PLAYD_PLAYER_POSITION_HPP
 #define PLAYD_PLAYER_POSITION_HPP
 
+#include <cstdint>
 #include <set>
 
 #include "../audio/audio_source.hpp"
 #include "../io/io_response.hpp"
-#include "../time_parser.hpp"
 
 /**
  * Tracker and broadcaster for the Player's current position in a song.
@@ -25,13 +25,13 @@ class PlayerPosition : public ResponseSource
 {
 private:
 	/// The period between each push of the position to the response sink.
-	TimeParser::MicrosecondPosition period;
+	std::uint64_t period;
 
 	/// The current position of the player.
-	TimeParser::MicrosecondPosition current;
+	std::uint64_t current;
 
 	/// The position of the player at the last push.
-	TimeParser::MicrosecondPosition last;
+	std::uint64_t last;
 
 	/**
 	 * Whether the position was reset since the last push.
@@ -45,7 +45,7 @@ public:
 	 * @param time_sink The ResponseSink to which TIME notifications are sent.
 	 * @param period The period to wait between responses.
 	 */
-	PlayerPosition(const ResponseSink *time_sink, TimeParser::MicrosecondPosition period);
+	PlayerPosition(const ResponseSink *time_sink, std::uint64_t period);
 
 	/**
 	 * Updates the position tracker with the new position.
@@ -54,7 +54,7 @@ public:
 	 * @param position The new position, in @a PositionUnit units.
 	 * @see Reset
 	 */
-	void Update(TimeParser::MicrosecondPosition position);
+	void Update(std::uint64_t position);
 
 	/**
 	 * Resets the position tracker's position data.

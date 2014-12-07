@@ -23,7 +23,6 @@
 #include "../audio/audio.hpp"
 #include "../io/io_response.hpp"
 #include "../cmd_result.hpp"
-#include "../time_parser.hpp"
 
 #include "player_file.hpp"
 #include "player_position.hpp"
@@ -41,9 +40,6 @@ private:
 	PlayerPosition &position; ///< The position subcomponent of the Player.
 	PlayerState &state;       ///< The state subcomponent of the Player.
 
-	/// The time parser used to parse seek commands.
-	const TimeParser &time_parser;
-
 	/// The sink to which END responses shall be sent.
 	const ResponseSink *end_sink;
 
@@ -57,9 +53,8 @@ public:
 	 * @param file The player's audio-file component.
 	 * @param position The player's position component.
 	 * @param state The player's state component.
-	 * @param time_parser The parser used to interpret Seek commands.
 	 */
-	Player(const ResponseSink *end_sink, PlayerFile &file, PlayerPosition &position, PlayerState &state, const TimeParser &time_parser);
+	Player(const ResponseSink *end_sink, PlayerFile &file, PlayerPosition &position, PlayerState &state);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;
@@ -143,7 +138,7 @@ public:
 	 * Sets the period between position responses.
 	 * @param period The period to wait between responses.
 	 */
-	void SetPositionResponsePeriod(TimeParser::MicrosecondPosition period);
+	void SetPositionResponsePeriod(std::uint64_t period);
 
 	/**
 	 * Sends welcome/current status information to a new client.
@@ -169,7 +164,7 @@ private:
 	 *   Raised if the seek is out of range (usually EOF).
 	 * @see Player::Seek
 	 */
-	void SeekRaw(TimeParser::MicrosecondPosition pos);
+	void SeekRaw(std::uint64_t pos);
 
 	/// Handles ending a file (stopping and rewinding).
 	void End();

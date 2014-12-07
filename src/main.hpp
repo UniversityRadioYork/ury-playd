@@ -18,7 +18,6 @@
 #include "player/player_file.hpp"
 #include "player/player_position.hpp"
 #include "player/player_state.hpp"
-#include "time_parser.hpp"
 
 /**
  * The playd application.
@@ -50,7 +49,7 @@ private:
 	 * The period between position announcements from the Player object.
 	 * This is given in microseconds, so eg. 500000 = 0.5sec = 2Hz.
 	 */
-	static const TimeParser::MicrosecondPosition POSITION_PERIOD = 500000;
+	static const std::uint64_t POSITION_PERIOD = 500000;
 
 	/// The ID returned by GetDeviceID if something goes wrong.
 	static const int INVALID_ID = -1;
@@ -64,7 +63,6 @@ private:
 	Player player;                 ///< The player subsystem.
 
 	CommandHandler handler;        ///< The command handler.
-	TimeParser time_parser;        ///< The seek time parser.
 	std::unique_ptr<IoCore> io;    ///< The I/O handler.
 
 	void RespondRaw(const std::string &string) const override;
