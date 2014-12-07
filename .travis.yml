@@ -27,7 +27,7 @@ script:
 
 # coveralls doesn't like gcc (segfaults)
 after_success:
-  - if [ "$CXX" == "clang++-3.4" ]; then coveralls -b . --exclude src/tests --exclude src/contrib; fi
+  - if [ "$CXX" == "clang++-3.4" ]; then coveralls -b . --exclude src/tests --exclude src/contrib --gcov "`which llvm-cov-3.4`"; fi
 
 notifications:
   irc:
