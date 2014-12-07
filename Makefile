@@ -187,11 +187,18 @@ $(TEST_BIN): $(COBJECTS) $(TEST_OBJECTS)
 # Special targets
 #
 
+# Make sure we clean up coverage artefacts in a make clean, too.
+COV_ARTEFACTS  = $(OBJECTS:.o=.gcno)
+COV_ARTEFACTS += $(OBJECTS:.o=.gcda)
+COV_ARTEFACTS += $(COBJECTS:.o=.gcda)
+COV_ARTEFACTS += $(COBJECTS:.o=.gcno)
+
 # Cleans up the results of a previous build.
 clean:
 	@echo CLEAN
 	@rm -f $(OBJECTS) $(COBJECTS) $(MAN_HTML) $(MAN_GZ) $(BIN)
 	@rm -f $(TEST_OBJECTS) $(TEST_BIN)
+	@rm -f $(COV_ARTEFACTS)
 
 # Makes the build subdirectories.
 mkdir:
@@ -209,4 +216,4 @@ format: $(TO_FORMAT)
 
 coverage: CXXFLAGS += -fprofile-arcs -ftest-coverage
 coverage: LDFLAGS += -fprofile-arcs -ftest-coverage
-coverage: mkdir test
+coverage: clean mkdir test
