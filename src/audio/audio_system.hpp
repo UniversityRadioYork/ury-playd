@@ -113,14 +113,14 @@ private:
 	 * @param id_string The device ID, as a string.
 	 * @return The device.
 	 */
-	static const portaudio::Device &PaDeviceFrom(const std::string &id_string);
+	static const portaudio::Device &PaDevice(const std::string &id_string);
 
 	/**
 	 * Converts a sample format identifier from playd to PortAudio.
 	 * @param fmt The playd sample format identifier.
 	 * @return The PortAudio equivalent of the given SampleFormat.
 	 */
-	static portaudio::SampleDataFormat PaSampleFormatFrom(SampleFormat fmt);
+	static portaudio::SampleDataFormat PaFormat(SampleFormat fmt);
 };
 
 #endif // PLAYD_AUDIO_SYSTEM_HPP

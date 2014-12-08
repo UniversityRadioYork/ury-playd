@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <csignal>
 #include <cstring>
+#include <sstream>
 #include <string>
 
 extern "C" {
@@ -53,7 +54,8 @@ const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
  *
  * [b]: https://nikhilm.github.io/uvbook/filesystem.html#buffers-and-streams
  */
-struct WriteReq {
+struct WriteReq
+{
 	uv_write_t req; ///< The main libuv write handle.
 	uv_buf_t buf;   ///< The associated write buffer.
 };
@@ -254,13 +256,18 @@ std::string Connection::Name()
 	// Using this instead of struct sockaddr is advised by the libuv docs,
 	// for IPv6 compatibility.
 	struct sockaddr_storage s;
-	auto sp = (struct sockaddr *) &s;
+	auto sp = (struct sockaddr *)&s;
 
 	// Turns out if you don't do this, Windows (and only Windows?) is upset.
 	socklen_t namelen = sizeof(s);
 
+	std::ostringstream os;
+
 	int pe = uv_tcp_getpeername(this->tcp, sp, (int *)&namelen);
-	if (pe) return std::string("(error getting peer info: ") + uv_strerror(pe) + ")";
+	if (pe) {
+		os << "<error (peer): " << uv_strerror(pe) << ">";
+		return os.str();
+	}
 
 	// Now, split the sockaddr into host and service.
 	char host[NI_MAXHOST];
@@ -268,12 +275,16 @@ std::string Connection::Name()
 
 	// We use NI_NUMERICSERV to ensure a port number comes out.
 	// Otherwise, we could get a (likely erroneous) string description of
-	// what
-	// the network stack *thinks* the port is used for.
-	int ne = getnameinfo(sp, namelen, host, sizeof(host), serv, sizeof(serv), NI_NUMERICSERV);
-	if (ne) return std::string("(error getting name: ") + gai_strerror(ne) + ")";
+	// what the network stack *thinks* the port is used for.
+	int ne = getnameinfo(sp, namelen, host, sizeof(host), serv,
+	                     sizeof(serv), NI_NUMERICSERV);
+	if (ne) {
+		os << "<error (name): " << gai_strerror(ne) << ">";
+		return os.str();
+	}
 
-	return std::string(host) + ":" + std::string(serv);
+	os << host << ":" << serv;
+	return os.str();
 }
 
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)

@@ -28,11 +28,11 @@ class PlayerFile : public ResponseSource, public Audio
 public:
 	/**
 	 * Constructs a new PlayerFile.
-	 * @param file_sink The ResponseSink to which FILE notifications are sent.
-	 * @param audio_system The audio system to use when loading
-	 *   Audio.
+	 * @param file_sink The ResponseSink to which FILE responses are pushed.
+	 * @param audio_system The AudioSystem to use for audio loads.
 	 */
-	PlayerFile(const ResponseSink *file_sink, const AudioSystem &audio_system);
+	PlayerFile(const ResponseSink *file_sink,
+	           const AudioSystem &audio_system);
 
 	//
 	// File operations

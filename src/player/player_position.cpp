@@ -19,7 +19,8 @@
 // PlayerPosition
 //
 
-PlayerPosition::PlayerPosition(const ResponseSink *time_sink, std::uint64_t period)
+PlayerPosition::PlayerPosition(const ResponseSink *time_sink,
+                               std::uint64_t period)
     : ResponseSource(time_sink), period(period)
 {
 	this->Reset();

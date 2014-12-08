@@ -28,14 +28,9 @@
 const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 	                                         "Seek", "TimeReport" };
 
-Player::Player(const ResponseSink *end_sink,
-               PlayerFile &file,
-               PlayerPosition &position,
-               PlayerState &state)
-    : file(file),
-      position(position),
-      state(state),
-      end_sink(end_sink)
+Player::Player(const ResponseSink *end_sink, PlayerFile &file,
+               PlayerPosition &position, PlayerState &state)
+    : file(file), position(position), state(state), end_sink(end_sink)
 {
 }
 
@@ -43,7 +38,11 @@ bool Player::Update()
 {
 	auto as = this->file.Update();
 	if (as == Audio::State::AT_END) this->End();
-	if (as == Audio::State::PLAYING) this->position.Update(this->file.Position());
+	if (as == Audio::State::PLAYING) {
+		// Since the audio is currently playing, the position may have
+		// advanced since last update.  So we need to update it.
+		this->position.Update(this->file.Position());
+	}
 
 	return this->state.IsRunning();
 }
@@ -150,7 +149,8 @@ CommandResult Player::Seek(const std::string &time_str)
 	// cpos will point to the first character in pos that wasn't a number.
 	// We don't want any characters here, so bail if the position isn't at
 	// the end of the string.
-	if (cpos != time_str.length()) return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
+	auto sl = time_str.length();
+	if (cpos != sl) return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 
 	try {
 		this->SeekRaw(pos);

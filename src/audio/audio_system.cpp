@@ -88,17 +88,17 @@ Audio *PaSoxAudioSystem::Load(const std::string &path) const
 }
 
 portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
-                                          portaudio::CallbackInterface &cb) const
+                                               portaudio::CallbackInterface &cb) const
 {
 	std::uint8_t channel_count = source.ChannelCount();
 	SampleFormat sample_format = source.OutputSampleFormat();
 	double sample_rate = source.SampleRate();
 	size_t buffer_size = source.BufferSampleCapacity();
-	const portaudio::Device &device = PaDeviceFrom(this->device_id);
+	const portaudio::Device &device = PaDevice(this->device_id);
 
 	portaudio::DirectionSpecificStreamParameters out_pars(
-	                device, channel_count, PaSampleFormatFrom(sample_format),
-	                true, device.defaultLowOutputLatency(), nullptr);
+	                device, channel_count, PaFormat(sample_format), true,
+	                device.defaultLowOutputLatency(), nullptr);
 
 	portaudio::StreamParameters pars(
 	                portaudio::DirectionSpecificStreamParameters::null(),
@@ -107,17 +107,13 @@ portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
 
-/* static */ const portaudio::Device &PaSoxAudioSystem::PaDeviceFrom(const std::string &id_string)
+/* static */ const portaudio::Device &PaSoxAudioSystem::PaDevice(
+                const std::string &id)
 {
 	auto &pa = portaudio::System::instance();
 
-	PaDeviceIndex id_pa = 0;
-
-	std::istringstream is(id_string);
-	is >> id_pa;
-
-	if (id_pa >= pa.deviceCount()) throw ConfigError(MSG_DEV_BADID);
-
+	PaDeviceIndex id_pa = std::stoi(id);
+	if (pa.deviceCount() <= id_pa) throw ConfigError(MSG_DEV_BADID);
 	return pa.deviceByIndex(id_pa);
 }
 
@@ -129,7 +125,8 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
 };
 
-/* static */ portaudio::SampleDataFormat PaSoxAudioSystem::PaSampleFormatFrom(SampleFormat fmt)
+/* static */ portaudio::SampleDataFormat PaSoxAudioSystem::PaFormat(
+                SampleFormat fmt)
 {
 	try {
 		return pa_from_sf.at(fmt);

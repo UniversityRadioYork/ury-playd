@@ -43,9 +43,7 @@ void AudioSink::Start()
 
 void AudioSink::Stop()
 {
-	if (!this->stream->isStopped()) {
-		this->stream->abort();
-	}
+	if (!this->stream->isStopped()) this->stream->abort();
 }
 
 bool AudioSink::IsStopped()
