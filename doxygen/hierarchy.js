@@ -1,10 +1,16 @@
 var hierarchy =
 [
-    [ "Audio", "classAudio.html", null ],
+    [ "Audio", "classAudio.html", [
+      [ "PipeAudio", "classPipeAudio.html", null ],
+      [ "PlayerFile", "classPlayerFile.html", null ]
+    ] ],
     [ "AudioSinkConfigurator", "classAudioSinkConfigurator.html", [
-      [ "AudioSystem", "classAudioSystem.html", null ]
+      [ "PaSoxAudioSystem", "classPaSoxAudioSystem.html", null ]
     ] ],
     [ "AudioSource", "classAudioSource.html", null ],
+    [ "AudioSystem", "classAudioSystem.html", [
+      [ "PaSoxAudioSystem", "classPaSoxAudioSystem.html", null ]
+    ] ],
     [ "CallbackInterface", null, [
       [ "AudioSink", "classAudioSink.html", null ]
     ] ],
@@ -18,21 +24,19 @@ var hierarchy =
       [ "NetError", "classNetError.html", null ],
       [ "SeekError", "classSeekError.html", null ]
     ] ],
-    [ "Playd", "classPlayd.html", null ],
+    [ "IoCore", "classIoCore.html", null ],
     [ "Player", "classPlayer.html", null ],
     [ "ResponseSink", "classResponseSink.html", [
       [ "Connection", "classConnection.html", null ],
       [ "ConnectionPool", "classConnectionPool.html", null ],
-      [ "IoCore", "classIoCore.html", null ]
+      [ "Playd", "classPlayd.html", null ]
     ] ],
     [ "ResponseSource", "classResponseSource.html", [
       [ "PlayerFile", "classPlayerFile.html", null ],
       [ "PlayerPosition", "classPlayerPosition.html", null ],
       [ "PlayerState", "classPlayerState.html", null ]
     ] ],
-    [ "RingBuffer< RepT, SampleCountT >", "classRingBuffer.html", null ],
-    [ "RingBuffer< char, unsigned long >", "classRingBuffer.html", null ],
-    [ "TimeParser", "classTimeParser.html", null ],
+    [ "RingBuffer", "classRingBuffer.html", null ],
     [ "Tokeniser", "classTokeniser.html", null ],
     [ "WriteReq", "structWriteReq.html", null ]
 ];

@@ -12,6 +12,5 @@ var searchData=
   ['msg_5foutput_5fringinit',['MSG_OUTPUT_RINGINIT',['../messages_8h.html#a3bf0477dded19418d7ecac95aeae8856',1,'messages.h']]],
   ['msg_5foutput_5fringwrite',['MSG_OUTPUT_RINGWRITE',['../messages_8h.html#a87bd24c0ca5a237881694d0842a4feed',1,'messages.h']]],
   ['msg_5fseek_5ffail',['MSG_SEEK_FAIL',['../messages_8h.html#aed3c894dfba47c4007dc39b38b5d3dbe',1,'messages.h']]],
-  ['msg_5fseek_5finvalid_5funit',['MSG_SEEK_INVALID_UNIT',['../messages_8h.html#a93a9ec2bbcde0a187ca93449de464d0b',1,'messages.h']]],
   ['msg_5fseek_5finvalid_5fvalue',['MSG_SEEK_INVALID_VALUE',['../messages_8h.html#aa47951fff8b73b3b9ab414bbb9b77a3e',1,'messages.h']]]
 ];

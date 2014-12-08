@@ -5,11 +5,7 @@ var searchData=
   ['main_2ehpp',['main.hpp',['../main_8hpp.html',1,'']]],
   ['message',['Message',['../classError.html#a006605b13a346cf019f60420f1b29b5a',1,'Error::Message() const '],['../classError.html#aa4713ef3ee9c3c0da43a54b01949510d',1,'Error::message()']]],
   ['messages_2eh',['messages.h',['../messages_8h.html',1,'']]],
-  ['microsecondposition',['MicrosecondPosition',['../classTimeParser.html#a24eef5daad0f14c60b2eaf55593afc81',1,'TimeParser']]],
-  ['microsecondpositionfromsamples',['MicrosecondPositionFromSamples',['../classAudioSource.html#afe7341f4a24f8a54a4302f748602a30b',1,'AudioSource']]],
-  ['microseconds',['MICROSECONDS',['../classTimeParser.html#a3d6dd538c58559b1001fc319a95f113da98a5b3971201a65b35d420793d7148ea',1,'TimeParser']]],
-  ['milliseconds',['MILLISECONDS',['../classTimeParser.html#a3d6dd538c58559b1001fc319a95f113dab4fd5e5c06e72437a57379576df36936',1,'TimeParser']]],
-  ['minutes',['MINUTES',['../classTimeParser.html#a3d6dd538c58559b1001fc319a95f113da7ffb9cea885bcba59e55574d54f819c2',1,'TimeParser']]],
+  ['microsfromsamples',['MicrosFromSamples',['../classAudioSource.html#ab052964cb76e37be223f361914b0758e',1,'AudioSource']]],
   ['msg',['msg',['../classCommandResult.html#a26d9a3ddd2cfb8baa1995dce949643c9',1,'CommandResult']]],
   ['msg_5fcmd_5finvalid',['MSG_CMD_INVALID',['../messages_8h.html#aae611bdef00661caf3dcce93fc2053fe',1,'messages.h']]],
   ['msg_5fcmd_5fneeds_5floaded',['MSG_CMD_NEEDS_LOADED',['../messages_8h.html#a2b810acf4d40096af5dae117db498061',1,'messages.h']]],
@@ -21,7 +17,5 @@ var searchData=
   ['msg_5foutput_5fringinit',['MSG_OUTPUT_RINGINIT',['../messages_8h.html#a3bf0477dded19418d7ecac95aeae8856',1,'messages.h']]],
   ['msg_5foutput_5fringwrite',['MSG_OUTPUT_RINGWRITE',['../messages_8h.html#a87bd24c0ca5a237881694d0842a4feed',1,'messages.h']]],
   ['msg_5fseek_5ffail',['MSG_SEEK_FAIL',['../messages_8h.html#aed3c894dfba47c4007dc39b38b5d3dbe',1,'messages.h']]],
-  ['msg_5fseek_5finvalid_5funit',['MSG_SEEK_INVALID_UNIT',['../messages_8h.html#a93a9ec2bbcde0a187ca93449de464d0b',1,'messages.h']]],
-  ['msg_5fseek_5finvalid_5fvalue',['MSG_SEEK_INVALID_VALUE',['../messages_8h.html#aa47951fff8b73b3b9ab414bbb9b77a3e',1,'messages.h']]],
-  ['multiplier',['Multiplier',['../classTimeParser.html#a3d6dd538c58559b1001fc319a95f113d',1,'TimeParser']]]
+  ['msg_5fseek_5finvalid_5fvalue',['MSG_SEEK_INVALID_VALUE',['../messages_8h.html#aa47951fff8b73b3b9ab414bbb9b77a3e',1,'messages.h']]]
 ];

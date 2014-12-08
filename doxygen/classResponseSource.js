@@ -1,8 +1,7 @@
 var classResponseSource =
 [
-    [ "ResponseSource", "classResponseSource.html#a621fa4539f78fdff10adcdd85faf3d48", null ],
-    [ "Emit", "classResponseSource.html#a498ee53cca912cdb6d48043108c39dc1", null ],
+    [ "ResponseSource", "classResponseSource.html#a5e83acbbb99819e9583d472e462aec83", null ],
+    [ "Emit", "classResponseSource.html#ac57cf10ac2f39b3f7e2c9326fa9b1c33", null ],
     [ "Push", "classResponseSource.html#a6e3b93326ee043f6d60510acd08de69b", null ],
-    [ "SetResponseSink", "classResponseSource.html#a12c45136716adffa59d5e5e1ca80b7ce", null ],
-    [ "push_sink", "classResponseSource.html#a8a3ce306db2d1a0a9b9c563e5e8c4b31", null ]
+    [ "push_sink", "classResponseSource.html#afe1a3c05f05f8f6c6d58e935b601103d", null ]
 ];

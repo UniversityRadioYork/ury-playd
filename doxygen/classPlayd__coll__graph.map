@@ -1,22 +1,19 @@
 <map id="Playd" name="Playd">
-<area shape="rect" id="node3" href="$classIoCore.html" title="The IO core, which services input, routes responses, and executes the Player update routine periodica..." alt="" coords="1136,853,1199,880"/>
-<area shape="rect" id="node4" href="$classResponseSink.html" title="Abstract class for anything that can be sent a response. " alt="" coords="1249,303,1360,329"/>
-<area shape="rect" id="node5" href="$classConnectionPool.html" title="A pool of TCP connections. " alt="" coords="1399,764,1520,791"/>
-<area shape="rect" id="node8" href="$classConnection.html" title="A TCP connection from a client. " alt="" coords="1435,853,1529,880"/>
-<area shape="rect" id="node15" href="$classPlayer.html" title="A Player contains a loaded audio file and the state of its playback. " alt="" coords="1215,585,1277,612"/>
-<area shape="rect" id="node17" href="$classResponseSource.html" title="Abstract helper class for sources of responses. " alt="" coords="1139,399,1267,426"/>
-<area shape="rect" id="node9" href="$classTokeniser.html" title="A string tokeniser. " alt="" coords="1805,675,1887,701"/>
-<area shape="rect" id="node10" title="STL class. " alt="" coords="1723,303,1809,329"/>
-<area shape="rect" id="node29" href="$classAudioSystem.html" title="An AudioSystem represents the entire audio stack used by playd. " alt="" coords="931,399,1038,426"/>
-<area shape="rect" id="node11" title="STL class. " alt="" coords="1697,199,1835,240"/>
-<area shape="rect" id="node14" href="$classCommandHandler.html" title="The playd command handler. " alt="" coords="1233,675,1371,701"/>
-<area shape="rect" id="node16" href="$classPlayerFile.html" title="The subcomponent of a Player that stores the audio file. " alt="" coords="1053,496,1135,523"/>
-<area shape="rect" id="node32" href="$classPlayerState.html" title="An object holding and representing the current state of a Player. " alt="" coords="1345,496,1441,523"/>
-<area shape="rect" id="node34" href="$classPlayerPosition.html" title="Tracker and broadcaster for the Player&#39;s current position in a song. " alt="" coords="1159,496,1269,523"/>
-<area shape="rect" id="node19" href="$classAudio.html" title="An audio file. " alt="" coords="649,303,707,329"/>
-<area shape="rect" id="node21" href="$classAudioSink.html" title="An output stream for an Audio file. " alt="" coords="283,109,369,136"/>
-<area shape="rect" id="node23" href="$classRingBuffer.html" title="RingBuffer\&lt; char, unsigned\l long \&gt;" alt="" coords="5,5,201,47"/>
-<area shape="rect" id="node26" href="$classAudioSource.html" title="An object responsible for decoding an audio file. " alt="" coords="695,109,797,136"/>
-<area shape="rect" id="node30" href="$classAudioSinkConfigurator.html" title="Interface for objects that can configure a PortAudio stream from an AudioSource. " alt="" coords="732,303,896,329"/>
-<area shape="rect" id="node31" href="$classTimeParser.html" title="A class for parsing time strings consisting of an integer and unit into a flat integer representing t..." alt="" coords="935,496,1029,523"/>
+<area shape="rect" id="node2" href="$classResponseSink.html" title="Abstract class for anything that can be sent a response. " alt="" coords="383,439,496,465"/>
+<area shape="rect" id="node7" href="$classConnectionPool.html" title="A pool of TCP connections. " alt="" coords="1719,364,1841,391"/>
+<area shape="rect" id="node10" href="$classConnection.html" title="A TCP connection from a client. " alt="" coords="1935,280,2029,307"/>
+<area shape="rect" id="node15" href="$classPlayer.html" title="A Player contains a loaded audio file and the state of its playback. " alt="" coords="1256,477,1319,504"/>
+<area shape="rect" id="node17" href="$classResponseSource.html" title="Abstract helper class for sources of responses. " alt="" coords="633,503,763,529"/>
+<area shape="rect" id="node3" title="STL class. " alt="" coords="185,439,268,465"/>
+<area shape="rect" id="node11" href="$classTokeniser.html" title="A string tokeniser. " alt="" coords="1507,93,1592,120"/>
+<area shape="rect" id="node21" href="$classPlayerState.html" title="An object holding and representing the current state of a Player. " alt="" coords="961,701,1055,728"/>
+<area shape="rect" id="node23" href="$classPaSoxAudioSystem.html" title="Implementation of AudioSystem using libsox and PortAudio. " alt="" coords="936,849,1080,876"/>
+<area shape="rect" id="node4" title="STL class. " alt="" coords="5,431,136,473"/>
+<area shape="rect" id="node6" href="$classIoCore.html" title="The IO core, which services input, routes responses, and executes the Player update routine periodica..." alt="" coords="1949,431,2015,457"/>
+<area shape="rect" id="node14" href="$classCommandHandler.html" title="The playd command handler. " alt="" coords="1481,427,1617,453"/>
+<area shape="rect" id="node16" href="$classPlayerFile.html" title="The subcomponent of a Player that stores the audio file. " alt="" coords="966,608,1050,635"/>
+<area shape="rect" id="node22" href="$classPlayerPosition.html" title="Tracker and broadcaster for the Player&#39;s current position in a song. " alt="" coords="952,489,1064,516"/>
+<area shape="rect" id="node18" href="$classAudio.html" title="An audio item. " alt="" coords="411,608,468,635"/>
+<area shape="rect" id="node20" href="$classAudioSystem.html" title="An AudioSystem represents the entire audio stack used by playd. " alt="" coords="647,796,749,823"/>
+<area shape="rect" id="node24" href="$classAudioSinkConfigurator.html" title="Interface for objects that can configure a PortAudio stream from an AudioSource. " alt="" coords="617,851,779,877"/>
 </map>

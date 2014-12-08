@@ -1,3 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classPlayer.html" title="A Player contains a loaded audio file and the state of its playback. " alt="" coords="5,5,67,32"/>
+<area shape="rect" id="node1" href="$classResponseSink.html" title="Abstract class for anything that can be sent a response. " alt="" coords="5,56,119,83"/>
+<area shape="rect" id="node2" href="$classConnection.html" title="A TCP connection from a client. " alt="" coords="181,5,275,32"/>
+<area shape="rect" id="node3" href="$classConnectionPool.html" title="A pool of TCP connections. " alt="" coords="167,56,289,83"/>
+<area shape="rect" id="node4" href="$classPlayd.html" title="The playd application. " alt="" coords="199,107,257,133"/>
 </map>

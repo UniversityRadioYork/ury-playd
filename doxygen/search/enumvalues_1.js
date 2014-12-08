@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['ejected',['EJECTED',['../classPlayerState.html#ab013f68ff23d69d677faae624b5dff07a209d5541434371bb6b79dc8cca8fa55b',1,'PlayerState']]],
-  ['end',['END',['../io__response_8hpp.html#af5828b68a5f305a17b90321710d9b546ab1a326c06d88bf042f73d70f50197905',1,'io_response.hpp']]],
-  ['end_5fof_5ffile',['END_OF_FILE',['../classAudioSource.html#a9a2f5de44325c84e69a7af1331aa159da581953f6b20ad7f993b64b1dc632032e',1,'AudioSource']]]
+  ['decoding',['DECODING',['../classAudioSource.html#a9a2f5de44325c84e69a7af1331aa159da9b75f3acd3c3480965b0f5ee466e7f25',1,'AudioSource']]],
+  ['double',['DOUBLE',['../classTokeniser.html#a71d622e60fae9d6c36c96ba69a4f62e4afd3e4ece78a7d422280d5ed379482229',1,'Tokeniser']]]
 ];

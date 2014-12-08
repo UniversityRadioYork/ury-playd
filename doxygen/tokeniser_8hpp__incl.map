@@ -1,18 +1,16 @@
 <map id="src/io/tokeniser.hpp" name="src/io/tokeniser.hpp">
-<area shape="rect" id="node2" href="$cmd_8hpp.html" title="Declaration of the CommandHandler class. " alt="" coords="587,80,677,107"/>
-<area shape="rect" id="node9" href="$io__response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="1846,379,1989,405"/>
-<area shape="rect" id="node6" href="$cmd__result_8hpp.html" title="Declaration of the CommandResult class. " alt="" coords="99,304,221,331"/>
-<area shape="rect" id="node14" href="$player_8hpp.html" title="Declaration of the Player class, and associated types. " alt="" coords="1240,155,1371,181"/>
-<area shape="rect" id="node11" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="1299,535,1399,562"/>
-<area shape="rect" id="node16" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="545,379,681,405"/>
-<area shape="rect" id="node19" href="$time__parser_8hpp.html" title="Declaration of the TimeParser class. " alt="" coords="1979,535,2117,562"/>
-<area shape="rect" id="node24" href="$player__file_8hpp.html" title="Declaration of the PlayerFile class, and associated types. " alt="" coords="1589,229,1704,256"/>
-<area shape="rect" id="node33" href="$player__position_8hpp.html" title="Declaration of the PlayerPosition class. " alt="" coords="1997,304,2144,331"/>
-<area shape="rect" id="node35" href="$player__state_8hpp.html" title="Declaration of the PlayerState class, and associated types. " alt="" coords="2169,304,2298,331"/>
-<area shape="rect" id="node20" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="1718,453,1853,480"/>
-<area shape="rect" id="node23" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="1737,535,1903,562"/>
-<area shape="rect" id="node25" href="$audio__system_8hpp.html" title="Declaration of the AudioSystem class. " alt="" coords="1391,304,1582,331"/>
-<area shape="rect" id="node28" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="1163,379,1280,405"/>
-<area shape="rect" id="node29" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="1171,453,1282,480"/>
-<area shape="rect" id="node32" href="$messages_8h.html" title="Constant human&#45;readable messages used within playd. " alt="" coords="587,535,699,562"/>
+<area shape="rect" id="node2" href="$cmd_8hpp.html" title="Declaration of the CommandHandler class. " alt="" coords="1743,80,1828,107"/>
+<area shape="rect" id="node9" href="$io__response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="1921,453,2063,480"/>
+<area shape="rect" id="node6" href="$cmd__result_8hpp.html" title="Declaration of the CommandResult class. " alt="" coords="1717,379,1835,405"/>
+<area shape="rect" id="node14" href="$player_8hpp.html" title="Declaration of the Player class, and associated types. " alt="" coords="1564,155,1695,181"/>
+<area shape="rect" id="node11" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="1971,535,2069,562"/>
+<area shape="rect" id="node16" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="1221,379,1352,405"/>
+<area shape="rect" id="node23" href="$player__file_8hpp.html" title="Declaration of the PlayerFile class, and associated types. " alt="" coords="1428,229,1543,256"/>
+<area shape="rect" id="node30" href="$player__position_8hpp.html" title="Declaration of the PlayerPosition class. " alt="" coords="1497,379,1642,405"/>
+<area shape="rect" id="node32" href="$player__state_8hpp.html" title="Declaration of the PlayerState class, and associated types. " alt="" coords="2086,379,2213,405"/>
+<area shape="rect" id="node19" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="1189,453,1323,480"/>
+<area shape="rect" id="node22" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="1449,535,1607,562"/>
+<area shape="rect" id="node24" href="$audio__system_8hpp.html" title="Declaration of the AudioSystem class. " alt="" coords="927,304,1110,331"/>
+<area shape="rect" id="node27" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="646,379,762,405"/>
+<area shape="rect" id="node28" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="393,453,501,480"/>
 </map>

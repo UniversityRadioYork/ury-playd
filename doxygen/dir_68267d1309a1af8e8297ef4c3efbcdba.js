@@ -27,9 +27,5 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     ] ],
     [ "messages.h", "messages_8h.html", "messages_8h" ],
     [ "resource.h", "resource_8h_source.html", null ],
-    [ "sample_formats.hpp", "sample__formats_8hpp.html", "sample__formats_8hpp" ],
-    [ "time_parser.cpp", "time__parser_8cpp.html", null ],
-    [ "time_parser.hpp", "time__parser_8hpp.html", [
-      [ "TimeParser", "classTimeParser.html", "classTimeParser" ]
-    ] ]
+    [ "sample_formats.hpp", "sample__formats_8hpp.html", "sample__formats_8hpp" ]
 ];

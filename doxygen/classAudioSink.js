@@ -20,6 +20,6 @@ var classAudioSink =
     [ "input_ready", "classAudioSink.html#ad644a3477077e87f76cd24c9cb268f30", null ],
     [ "just_started", "classAudioSink.html#a00cbaaf2b4fcf5d9acb614b909234196", null ],
     [ "position_sample_count", "classAudioSink.html#ac3403a492b8aba8d483961d1ec09fa26", null ],
-    [ "ring_buf", "classAudioSink.html#a87184f85d6cfcc7310043b877caeaee2", null ],
+    [ "ring_buf", "classAudioSink.html#a8b189a2f3970682b082fb8763606b50d", null ],
     [ "stream", "classAudioSink.html#aac90e7d95e98ac08b7c661a301eff1b2", null ]
 ];

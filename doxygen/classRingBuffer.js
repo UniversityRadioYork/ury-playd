@@ -1,14 +1,14 @@
 var classRingBuffer =
 [
-    [ "RingBuffer", "classRingBuffer.html#a2f831ec4941885db960a833cb807465e", null ],
-    [ "~RingBuffer", "classRingBuffer.html#a39d93b7f608eb69a7a569e61b5abc979", null ],
-    [ "RingBuffer", "classRingBuffer.html#a16e7e006ded5d4aad8b37ee7bea8f90d", null ],
-    [ "Flush", "classRingBuffer.html#a1eb1acca6905e7678fbbdb70238cdc26", null ],
-    [ "operator=", "classRingBuffer.html#a6f552e291e577aeffc57b846969d11d6", null ],
-    [ "Read", "classRingBuffer.html#af892330ee102bd50a493b8afa814a0f0", null ],
-    [ "ReadCapacity", "classRingBuffer.html#a7086cc66306105db205842af7a88c2d8", null ],
-    [ "Write", "classRingBuffer.html#aa7f863968cb641946b0cf341bda11e16", null ],
-    [ "WriteCapacity", "classRingBuffer.html#ab00617ab6e379ad146cb7b80079f4c4c", null ],
-    [ "buffer", "classRingBuffer.html#a09103853af3302b27d2bbd46f1dfbe87", null ],
-    [ "rb", "classRingBuffer.html#a10985ec171bcc15c1301dc74fcb6e7b2", null ]
+    [ "RingBuffer", "classRingBuffer.html#af0150c275335e1f24ee6342f1e52db0f", null ],
+    [ "~RingBuffer", "classRingBuffer.html#a2715b2e99ea24521ef7a586c2f33e1c9", null ],
+    [ "RingBuffer", "classRingBuffer.html#a0ac7985eb168a6f65e3fabfc6f31580c", null ],
+    [ "Flush", "classRingBuffer.html#a66d87ffb1eb3ea864cb2ecc6dd09e507", null ],
+    [ "operator=", "classRingBuffer.html#aeef1b822b06f55101cfd805de75bbe40", null ],
+    [ "Read", "classRingBuffer.html#a00dd46d66bef019d57a1d72e76ea9101", null ],
+    [ "ReadCapacity", "classRingBuffer.html#a0303deb25e0c2b598df2ee1da894c89d", null ],
+    [ "Write", "classRingBuffer.html#a55776373c9a2e63dbf54296229baa20a", null ],
+    [ "WriteCapacity", "classRingBuffer.html#abb6d6209052d87debb86abfb3c61e61a", null ],
+    [ "buffer", "classRingBuffer.html#a8aab7ba395e129264013fef555070127", null ],
+    [ "rb", "classRingBuffer.html#ad9dc807da0c32d155645ae33ff31fe4a", null ]
 ];

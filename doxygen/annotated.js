@@ -16,6 +16,8 @@ var annotated =
     [ "InternalError", "classInternalError.html", "classInternalError" ],
     [ "IoCore", "classIoCore.html", "classIoCore" ],
     [ "NetError", "classNetError.html", "classNetError" ],
+    [ "PaSoxAudioSystem", "classPaSoxAudioSystem.html", "classPaSoxAudioSystem" ],
+    [ "PipeAudio", "classPipeAudio.html", "classPipeAudio" ],
     [ "Playd", "classPlayd.html", "classPlayd" ],
     [ "Player", "classPlayer.html", "classPlayer" ],
     [ "PlayerFile", "classPlayerFile.html", "classPlayerFile" ],
@@ -25,7 +27,6 @@ var annotated =
     [ "ResponseSource", "classResponseSource.html", "classResponseSource" ],
     [ "RingBuffer", "classRingBuffer.html", "classRingBuffer" ],
     [ "SeekError", "classSeekError.html", "classSeekError" ],
-    [ "TimeParser", "classTimeParser.html", "classTimeParser" ],
     [ "Tokeniser", "classTokeniser.html", "classTokeniser" ],
     [ "WriteReq", "structWriteReq.html", "structWriteReq" ]
 ];

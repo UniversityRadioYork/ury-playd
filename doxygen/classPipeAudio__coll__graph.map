@@ -1,0 +1,6 @@
+<map id="PipeAudio" name="PipeAudio">
+<area shape="rect" id="node2" href="$classAudio.html" title="An audio item. " alt="" coords="554,67,611,93"/>
+<area shape="rect" id="node4" href="$classAudioSink.html" title="An output stream for an Audio file. " alt="" coords="313,85,397,112"/>
+<area shape="rect" id="node6" href="$classRingBuffer.html" title="A ring buffer. " alt="" coords="59,56,147,83"/>
+<area shape="rect" id="node9" href="$classAudioSource.html" title="An object responsible for decoding an audio file. " alt="" coords="304,173,405,200"/>
+</map>

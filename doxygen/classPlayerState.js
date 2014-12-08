@@ -8,8 +8,8 @@ var classPlayerState =
       [ "PLAYING", "classPlayerState.html#ab013f68ff23d69d677faae624b5dff07a50366a49630a416ab3ccaa004196027e", null ],
       [ "QUITTING", "classPlayerState.html#ab013f68ff23d69d677faae624b5dff07a4eb3979af877a3c13830cd69c746e230", null ]
     ] ],
-    [ "PlayerState", "classPlayerState.html#a6d3de3f57e9db4ec34e5a7403fc03868", null ],
-    [ "Emit", "classPlayerState.html#aa93a9879688bfbd3d89ac102c079cbfd", null ],
+    [ "PlayerState", "classPlayerState.html#a67ad763fc83eb0c660e24a6e8f0eea7e", null ],
+    [ "Emit", "classPlayerState.html#ae0dbafeca5d9cff92d0c020445272537", null ],
     [ "In", "classPlayerState.html#aa2c0e603dd57dcc37759d716596ffa33", null ],
     [ "IsRunning", "classPlayerState.html#aeb19817b9da2f6765b990983f87e1527", null ],
     [ "Set", "classPlayerState.html#a822999cf7d4cf72ba77f218906bb8aaa", null ],

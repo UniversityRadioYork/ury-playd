@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['multiplier',['Multiplier',['../classTimeParser.html#a3d6dd538c58559b1001fc319a95f113d',1,'TimeParser']]]
+  ['quotetype',['QuoteType',['../classTokeniser.html#a71d622e60fae9d6c36c96ba69a4f62e4',1,'Tokeniser']]]
 ];

@@ -1,10 +1,9 @@
 <map id="src/audio/audio_system.hpp" name="src/audio/audio_system.hpp">
-<area shape="rect" id="node6" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="671,237,838,263"/>
-<area shape="rect" id="node8" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="653,80,770,107"/>
-<area shape="rect" id="node13" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="539,155,674,181"/>
-<area shape="rect" id="node24" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="1174,80,1260,107"/>
-<area shape="rect" id="node20" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="282,155,392,181"/>
-<area shape="rect" id="node16" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="547,237,647,263"/>
-<area shape="rect" id="node19" href="$time__parser_8hpp.html" title="Declaration of the TimeParser class. " alt="" coords="1210,237,1349,263"/>
-<area shape="rect" id="node23" href="$messages_8h.html" title="Constant human&#45;readable messages used within playd. " alt="" coords="24,237,136,263"/>
+<area shape="rect" id="node6" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="191,237,349,263"/>
+<area shape="rect" id="node8" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="604,80,720,107"/>
+<area shape="rect" id="node13" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="441,155,574,181"/>
+<area shape="rect" id="node21" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="1026,80,1109,107"/>
+<area shape="rect" id="node19" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="308,155,416,181"/>
+<area shape="rect" id="node16" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="1203,237,1300,263"/>
+<area shape="rect" id="node22" href="$io__response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="1409,155,1561,181"/>
 </map>

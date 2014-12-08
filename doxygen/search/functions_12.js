@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['unitmultiplier',['UnitMultiplier',['../classTimeParser.html#afbc58e065e751e19aefbd5465411e14b',1,'TimeParser']]],
-  ['update',['Update',['../classAudio.html#a6db65dd8ffbd616d3f5dc81b5144c864',1,'Audio::Update()'],['../classPlayer.html#a91f887a024035be5030aa4b3384705fa',1,'Player::Update()'],['../classPlayerFile.html#afe0b43a6980e548a6faa87f84d22d65b',1,'PlayerFile::Update()'],['../classPlayerPosition.html#a0579824399c2cb78cbc798c240296913',1,'PlayerPosition::Update()']]],
-  ['updateposition',['UpdatePosition',['../classPlayer.html#aa055a70690c66e3fd9949358fccadd5c',1,'Player']]],
+  ['update',['Update',['../classAudio.html#a0b5198e4aecc2f1dd6659f79b3a32db8',1,'Audio::Update()'],['../classPipeAudio.html#a72e685bdc4694e0bca8a82d8e0f0c02e',1,'PipeAudio::Update()'],['../classPlayer.html#a91f887a024035be5030aa4b3384705fa',1,'Player::Update()'],['../classPlayerFile.html#a8ed2bcd8ff4c34bb578e10005a1b1fb9',1,'PlayerFile::Update()'],['../classPlayerPosition.html#a8c1d6abd1a1723e52173feb3edba3e75',1,'PlayerPosition::Update()']]],
   ['uvalloc',['UvAlloc',['../io__core_8cpp.html#ab0c51a1d8447db72e81a13d45448b85f',1,'io_core.cpp']]],
   ['uvclosecallback',['UvCloseCallback',['../io__core_8cpp.html#ab85791c3e9c737453047decfbb7388f4',1,'io_core.cpp']]],
   ['uvlistencallback',['UvListenCallback',['../io__core_8cpp.html#ab1a411534cf6420d24748b0e78927ebf',1,'io_core.cpp']]],

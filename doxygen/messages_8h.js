@@ -12,6 +12,5 @@ var messages_8h =
     [ "MSG_OUTPUT_RINGINIT", "messages_8h.html#a3bf0477dded19418d7ecac95aeae8856", null ],
     [ "MSG_OUTPUT_RINGWRITE", "messages_8h.html#a87bd24c0ca5a237881694d0842a4feed", null ],
     [ "MSG_SEEK_FAIL", "messages_8h.html#aed3c894dfba47c4007dc39b38b5d3dbe", null ],
-    [ "MSG_SEEK_INVALID_UNIT", "messages_8h.html#a93a9ec2bbcde0a187ca93449de464d0b", null ],
     [ "MSG_SEEK_INVALID_VALUE", "messages_8h.html#aa47951fff8b73b3b9ab414bbb9b77a3e", null ]
 ];
