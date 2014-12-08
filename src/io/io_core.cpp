@@ -248,6 +248,10 @@ void Connection::RespondRaw(const std::string &string) const
 	         UvRespondCallback);
 }
 
+const static std::string ERR_B = "<error at "; ///< Prefix of Name() errors.
+const static std::string ERR_E = ">";          ///< Suffix of Name() errors.
+const static std::string N_SEP = ":";          ///< Name host:port separator.
+
 std::string Connection::Name()
 {
 	// Warning: fairly low-level Berkeley sockets code ahead!
@@ -261,13 +265,8 @@ std::string Connection::Name()
 	// Turns out if you don't do this, Windows (and only Windows?) is upset.
 	socklen_t namelen = sizeof(s);
 
-	std::ostringstream os;
-
 	int pe = uv_tcp_getpeername(this->tcp, sp, (int *)&namelen);
-	if (pe) {
-		os << "<error (peer): " << uv_strerror(pe) << ">";
-		return os.str();
-	}
+	if (pe) return ERR_B + "peer: " + uv_strerror(pe) + ERR_E;
 
 	// Now, split the sockaddr into host and service.
 	char host[NI_MAXHOST];
@@ -278,13 +277,9 @@ std::string Connection::Name()
 	// what the network stack *thinks* the port is used for.
 	int ne = getnameinfo(sp, namelen, host, sizeof(host), serv,
 	                     sizeof(serv), NI_NUMERICSERV);
-	if (ne) {
-		os << "<error (name): " << gai_strerror(ne) << ">";
-		return os.str();
-	}
+	if (ne) return ERR_B + "name: " + gai_strerror(ne) + ERR_E;
 
-	os << host << ":" << serv;
-	return os.str();
+	return host + N_SEP + serv;
 }
 
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
