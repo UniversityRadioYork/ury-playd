@@ -109,7 +109,7 @@ Announces a state change.  The _state_ will be one of:
 
 Announces that _file_ has just been loaded.
 
-### OKAY _command..._
+### OK _command..._
 
 Announces that a valid _command_ has just been received and processed.
 
