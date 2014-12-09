@@ -248,10 +248,6 @@ void Connection::RespondRaw(const std::string &string) const
 	         UvRespondCallback);
 }
 
-const static std::string ERR_B = "<error at "; ///< Prefix of Name() errors.
-const static std::string ERR_E = ">";          ///< Suffix of Name() errors.
-const static std::string N_SEP = ":";          ///< Name host:port separator.
-
 std::string Connection::Name()
 {
 	// Warning: fairly low-level Berkeley sockets code ahead!
@@ -266,7 +262,10 @@ std::string Connection::Name()
 	socklen_t namelen = sizeof(s);
 
 	int pe = uv_tcp_getpeername(this->tcp, sp, (int *)&namelen);
-	if (pe) return ERR_B + "peer: " + uv_strerror(pe) + ERR_E;
+	// These std::string()s are needed as, otherwise, the compiler would
+	// think we're trying to add const char*s together.  We need AT LEAST
+	// ONE of the sides of the first + to be a std::string.
+	if (pe) return "<error@peer: " + std::string(uv_strerror(pe)) + ">";
 
 	// Now, split the sockaddr into host and service.
 	char host[NI_MAXHOST];
@@ -277,9 +276,10 @@ std::string Connection::Name()
 	// what the network stack *thinks* the port is used for.
 	int ne = getnameinfo(sp, namelen, host, sizeof(host), serv,
 	                     sizeof(serv), NI_NUMERICSERV);
-	if (ne) return ERR_B + "name: " + gai_strerror(ne) + ERR_E;
+	// See comment for above error.
+	if (ne) return "<error@name: " + std::string(gai_strerror(ne)) + ">";
 
-	return host + N_SEP + serv;
+	return host + std::string(":") + serv;
 }
 
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
