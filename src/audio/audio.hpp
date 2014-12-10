@@ -50,7 +50,7 @@ public:
 		NONE,    ///< There is no Audio.
 		STOPPED, ///< The Audio has been stopped, or not yet played.
 		PLAYING, ///< The Audio is currently playing.
-		AT_END,  ///< The Audio is at its end and cannot play without seeking.
+		AT_END,  ///< The Audio has ended and can't play without a seek.
 	};
 
 	//
@@ -98,8 +98,7 @@ public:
 	 * This is usually literally the absolute file-path, but depends
 	 * on the implementation.
 	 *
-	 * @param sink The ResponseSink to which a FILE response shall be
-	 *   sent.
+	 * @param sink The ResponseSink to which the response shall be sent.
 	 */
 	virtual void Emit(const ResponseSink &sink) const = 0;
 
@@ -131,23 +130,23 @@ class PipeAudio : public Audio
 public:
 	/**
 	 * Constructs a PipeAudio from a source and a sink.
-	 * @param source The source of decoded audio frames.
+	 * @param src The source of decoded audio frames.
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	PipeAudio(AudioSource *source, AudioSink *sink);
+	PipeAudio(AudioSource *src, AudioSink *sink);
 
 	void Start() override;
 	void Stop() override;
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
-	
+
 	void Emit(const ResponseSink &sink) const override;
 	std::uint64_t Position() const override;
 
 private:
 	/// The source of audio data.
-	std::unique_ptr<AudioSource> source;
+	std::unique_ptr<AudioSource> src;
 
 	/// The sink to which audio data is sent.
 	std::unique_ptr<AudioSink> sink;

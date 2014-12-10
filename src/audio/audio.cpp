@@ -21,15 +21,15 @@
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
 
-PipeAudio::PipeAudio(AudioSource *source, AudioSink *sink) : source(source), sink(sink)
+PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
 {
 	this->ClearFrame();
 }
 
 void PipeAudio::Emit(const ResponseSink &sink) const
 {
-	assert(this->source != nullptr);
-	sink.Respond(ResponseCode::FILE, this->source->Path());
+	assert(this->src != nullptr);
+	sink.Respond(ResponseCode::FILE, this->src->Path());
 }
 
 void PipeAudio::Start()
@@ -47,18 +47,17 @@ void PipeAudio::Stop()
 std::uint64_t PipeAudio::Position() const
 {
 	assert(this->sink != nullptr);
-	assert(this->source != nullptr);
+	assert(this->src != nullptr);
 
-	return this->source->MicrosecondPositionFromSamples(
-	                this->sink->Position());
+	return this->src->MicrosFromSamples(this->sink->Position());
 }
 
 void PipeAudio::Seek(std::uint64_t position)
 {
 	assert(this->sink != nullptr);
-	assert(this->source != nullptr);
+	assert(this->src != nullptr);
 
-	auto samples = this->source->Seek(position);
+	auto samples = this->src->Seek(position);
 	this->sink->SetPosition(samples);
 
 	// We might still have decoded samples from the old position in
@@ -76,7 +75,7 @@ void PipeAudio::ClearFrame()
 Audio::State PipeAudio::Update()
 {
 	assert(this->sink != nullptr);
-	assert(this->source != nullptr);
+	assert(this->src != nullptr);
 
 	bool more_frames_available = this->DecodeIfFrameEmpty();
 
@@ -94,7 +93,7 @@ void PipeAudio::TransferFrame()
 {
 	assert(!this->frame.empty());
 	assert(this->sink != nullptr);
-	assert(this->source != nullptr);
+	assert(this->src != nullptr);
 
 	this->sink->Transfer(this->frame_iterator, this->frame.end());
 
@@ -122,8 +121,8 @@ bool PipeAudio::DecodeIfFrameEmpty()
 	// If we still have a frame, don't bother decoding yet.
 	if (!this->FrameFinished()) return true;
 
-	assert(this->source != nullptr);
-	AudioSource::DecodeResult result = this->source->Decode();
+	assert(this->src != nullptr);
+	AudioSource::DecodeResult result = this->src->Decode();
 
 	this->frame = result.second;
 	this->frame_iterator = this->frame.begin();

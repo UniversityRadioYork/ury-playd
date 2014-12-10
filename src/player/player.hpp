@@ -54,7 +54,8 @@ public:
 	 * @param position The player's position component.
 	 * @param state The player's state component.
 	 */
-	Player(const ResponseSink *end_sink, PlayerFile &file, PlayerPosition &position, PlayerState &state);
+	Player(const ResponseSink *end_sink, PlayerFile &file,
+	       PlayerPosition &position, PlayerState &state);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;

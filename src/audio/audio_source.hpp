@@ -119,16 +119,14 @@ public:
 	 * @param position The song position, in microseconds.
 	 * @return The corresponding number of elapsed samples.
 	 */
-	std::uint64_t SamplePositionFromMicroseconds(
-	                std::uint64_t position) const;
+	std::uint64_t SamplesFromMicros(std::uint64_t micros) const;
 
 	/**
 	 * Converts an elapsed sample count to a position in microseconds.
 	 * @param samples The number of elapsed samples.
 	 * @return The corresponding song position, in microseconds.
 	 */
-	std::uint64_t MicrosecondPositionFromSamples(
-	                std::uint64_t samples) const;
+	std::uint64_t MicrosFromSamples(std::uint64_t samples) const;
 
 private:
 	/// The size of the internal decoding buffer, in bytes.

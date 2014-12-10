@@ -84,7 +84,8 @@ public:
 	 * @param sink The ResponseSink to which the response will be sent.
 	 * @param cmd The original command that created this CommandResult.
 	 */
-	void Emit(const ResponseSink &sink, const std::vector<std::string> &cmd) const;
+	void Emit(const ResponseSink &sink,
+	          const std::vector<std::string> &cmd) const;
 
 private:
 	Type type;       ///< The command result's type.

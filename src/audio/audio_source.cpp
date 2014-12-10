@@ -65,18 +65,18 @@ double AudioSource::SampleRate() const
 	return this->context->signal.rate;
 }
 
-std::uint64_t AudioSource::SamplePositionFromMicroseconds(std::uint64_t position) const
+std::uint64_t AudioSource::SamplesFromMicros(std::uint64_t micros) const
 {
 	// The sample rate is expressed in terms of samples per second, so we
 	// need to convert the position to seconds then multiply by the rate.
 	// We do things in a slightly peculiar order to minimise rounding.
 
-	return (position * this->SampleRate()) / 1000000;
+	return (micros * this->SampleRate()) / 1000000;
 }
 
-std::uint64_t AudioSource::MicrosecondPositionFromSamples(std::uint64_t samples) const
+std::uint64_t AudioSource::MicrosFromSamples(std::uint64_t samples) const
 {
-	// This is basically SamplePositionFromMicroseconds but backwards.
+	// This is basically SamplesFromMicros but backwards.
 
 	return (samples * 1000000) / this->SampleRate();
 }
@@ -99,7 +99,7 @@ std::uint64_t AudioSource::Seek(std::uint64_t position)
 {
 	assert(this->context != nullptr);
 
-	auto samples = this->SamplePositionFromMicroseconds(position);
+	auto samples = this->SamplesFromMicros(position);
 
 	// See BytesPerSample() for an explanation of this ChannelCount().
 	auto sox_samples = samples * this->ChannelCount();
@@ -180,8 +180,6 @@ void AudioSource::Open(const std::string &path)
 
 void AudioSource::Close()
 {
-	if (this->context != nullptr) {
-		sox_close(this->context);
-		this->context = nullptr;
-	}
+	if (this->context != nullptr) sox_close(this->context);
+	this->context = nullptr;
 }

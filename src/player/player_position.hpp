@@ -42,7 +42,7 @@ private:
 public:
 	/**
 	 * Constructs a PlayerPosition.
-	 * @param time_sink The ResponseSink to which TIME notifications are sent.
+	 * @param time_sink The ResponseSink to which TIME responses are pushed.
 	 * @param period The period to wait between responses.
 	 */
 	PlayerPosition(const ResponseSink *time_sink, std::uint64_t period);
