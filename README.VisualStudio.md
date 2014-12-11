@@ -122,7 +122,7 @@ one of the reasons why we fork it.
 
 You may get issues relating to missing functions `ftello` and `fseeko`.
 A very quick hack to fix these problems is to change the `ifdefs` in the
-following locations in `LibFlac` so that they are always true:
+following locations in SoX's `LibFlac` project so that they are always true:
 
 1. `metadata_iterators.c:31`;
 2. `stream_decoder.c:25`;
