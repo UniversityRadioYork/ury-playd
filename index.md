@@ -73,3 +73,4 @@ Articles that are relevant, but not directly related, to playd.
 [Music Player Daemon]:         http://www.musicpd.org
 [aplay]:                       http://linux.die.net/man/1/aplay
 [The Art of Unix Programming]: http://www.catb.org/esr/writings/taoup/
+[A Plea for Lean Software]:    http://cr.yp.to/bib/1995/wirth.pdf
