@@ -84,7 +84,7 @@ Articles that are relevant, but not directly related, to playd.
 [libuv]:                       https://github.com/libuv/libuv
 [University Radio York]:       http://ury.org.uk
 [v0.2.0]:                      https://github.com/UniversityRadioYork/ury-playd/releases/tag/v0.2.0
-[MIT licence]:                 https://raw.githubusercontent.com/UniversityRadioYork/ury-playd/master/license.txt
+[MIT licence]:                 https://raw.githubusercontent.com/UniversityRadioYork/ury-playd/master/LICENSE.txt
 [Man page]:                    https://universityradioyork.github.io/ury-playd/man.html
 [Documentation]:               https://universityradioyork.github.io/ury-playd/doxygen
 [GitHub]:                      https://github.com/UniversityRadioYork/ury-playd
