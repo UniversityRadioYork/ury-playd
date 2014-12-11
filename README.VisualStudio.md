@@ -39,10 +39,10 @@ help you on the track.
 `playd` requires several tools to build:
 
 You will need:
-  - [Visual Studio 2013 Community] (other VS2013en may work, but are untested);
-  - [Python 2.7.9] (__not__ 3; other 2.7 versions are probably ok);
-  - [CMake 3.1.0-rc3] (again, other versions may work);
-  - [git 1.9.4] (any git will do, in likelihood).
+  - [Visual Studio 2013 Community]: other VS2013en may work, but are untested;
+  - [Python 2.7.9]: __not__ 3; other 2.7 versions are probably ok;
+  - [CMake 3.1.0-rc3]: again, other versions may work;
+  - [git 1.9.4]: any git will do, in likelihood.
 
 Some general pointers as to how to get these available in a PATH:
 
@@ -79,27 +79,27 @@ refer to them later.
 
 You will need:
 
-* [playd 0.2.0], save in `\ury-playd-0.2.0`;
-* [PortAudio v19-20140130], save in `\portaudio`;
-* [libuv 1.0.2], save in `\libuv-1.0.2`;
-* [A LibSox fork] maintained for playd, save in `\sox-master`.
+* [playd 0.2.0]: save in `\ury-playd-0.2.0`;
+* [PortAudio v19-20140130]: save in `\portaudio`;
+* [libuv 1.0.2]: save in `\libuv-1.0.2`;
+* [A LibSox fork] maintained for playd: save in `\sox-master`.
 
 #### LibSoX meta-dependencies
 
 LibSox pulls in a lot of dependency decoder libraries.  These _must_ be
 saved to the given directories for the LibSox build to find them.
 
-   - [flac 1.2.1], save in `\flac`;
-   - [libid3tag 0.15.1b], save in `\libid3tag`;
-   - [libmad 0.15.1b], save in `\libmad`;
-   - [libmp3lame 3.99.5], save in `\lame`;
-   - [libogg 1.3.2], save in `\libogg`;
-   - [libpng 1.6.15], save in `\libpng`;
-   - [libsndfile 1.0.25], save in `\libsndfile`;
-   - [speex 1.2rc1], save in `\speex`;
-   - [libvorbis 1.3.4], save in `\libvorbis`;
-   - [wavpack 4.70.0], save in `\wavpack`;
-   - [zlib1.2.8], save in `\zlib`.
+   - [flac 1.2.1]: save in `\flac`;
+   - [libid3tag 0.15.1b]: save in `\libid3tag`;
+   - [libmad 0.15.1b]: save in `\libmad`;
+   - [lame 3.99.5]: save in `\lame`;
+   - [libogg 1.3.2]: save in `\libogg`;
+   - [libpng 1.6.15]: save in `\libpng`;
+   - [libsndfile 1.0.25]: save in `\libsndfile`;
+   - [speex 1.2rc1]: save in `\speex`;
+   - [libvorbis 1.3.4]: save in `\libvorbis`;
+   - [wavpack 4.70.0]: save in `\wavpack`;
+   - [zlib 1.2.8]: save in `\zlib`.
 
 
 ### Make directories
@@ -203,22 +203,41 @@ this should be straightforward.
 To test, run `\ury-playd-0.2.0\Debug\playd.exe`.
 
 [Visual Studio 2013 Community]: http://go.microsoft.com/fwlink/?LinkId=517284
+                                "Download for Visual Studio 2013 Community".
 [Python 2.7.9]:                 https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi
+                                "Download for Python 2.7.9."
 [CMake 3.1.0-rc3]:              http://www.cmake.org/files/v3.1/cmake-3.1.0-rc3-win32-x86.exe
-[git 1.9.4]:                    https://github.com/msysgit/msysgit/releases/download/Git-1.9.4-preview20140929/Git-1.9.4-preview20140929.exe
+[git 1.9.4]:                   https://github.com/msysgit/msysgit/releases/download/Git-1.9.4-preview20140929/Git-1.9.4-preview20140929.exe
+                                "Download for git 1.9.4."
 [Windows SDK]:                  http://www.microsoft.com/en-gb/download/confirmation.aspx?id=8279
+                                "Download for Windows SDK for Windows 7."
 [playd 0.2.0]:                  https://github.com/UniversityRadioYork/ury-playd/archive/v0.2.0.zip
+                                "Download for playd 0.2.0."
 [PortAudio v19-20140130]:       http://www.portaudio.com/archives/pa_stable_v19_20140130.tgz
+                                "Download for PortAudio v19-20140130."
 [libuv 1.0.2]:                  https://github.com/libuv/libuv/archive/v1.0.2.zip
+                                "Download for libuv 1.0.2."
 [A LibSoX fork]:                https://github.com/CaptainHayashi/sox/archive/master.zip
-[flac 1.2.1]:                   http://downloads.xiph.org/releases/flac/flac-1.2.1.tar.xz (older versions may work?)
+                                "Download for a dynamically buildable distribution of LibSoX."
+[flac 1.2.1]:                   http://downloads.xiph.org/releases/flac/flac-1.2.1.tar.xz
+                                "Download for flac 1.2.1."
 [libid3tag 0.15.1b]:            http://sourceforge.net/projects/mad/files/libid3tag/0.15.1b/libid3tag-0.15.1b.tar.gz/download
+                                "Download for libid3tag 0.15.1b."
 [libmad 0.15.1b]:               http://sourceforge.net/projects/mad/files/libmad/0.15.1b/libmad-0.15.1b.tar.gz/download
-[libmp3lame 3.99.5]:            http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download
+                                "Download for libmad 0.15.1b."
+[lame 3.99.5]:                  http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download
+                                "Download for libmp3lame 3.99.5."
 [libogg 1.3.2]:                 http://downloads.xiph.org/releases/ogg/libogg-1.3.2.zip
+                                "Download for libogg 1.3.2."
 [libpng 1.6.15]:                http://sourceforge.net/projects/libpng/files/libpng16/1.6.15/lpng1615.zip/download
+                                "Download for libpng 1.6.15."
 [libsndfile 1.0.25]:            http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.25.tar.gz
+                                "Download for libsndfile 1.0.25."
 [speex 1.2rc1]:                 http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz
+                                "Download for speex 1.2rc1."
 [libvorbis 1.3.4]:              http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.4.zip
+                                "Download for libvorbis 1.3.4."
 [wavpack 4.70.0]:               http://www.wavpack.com/wavpack-4.70.0.tar.bz2
-[zlib1.2.8]:                    http://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib128.zip/download
+                                "Download for wavpack 4.70.0."
+[zlib 1.2.8]:                   http://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib128.zip/download
+                                "Download for zlib 1.2.8."
