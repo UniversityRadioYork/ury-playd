@@ -11,99 +11,76 @@
       <p>University Radio York Player Daemon</p>
     </header>
     <main role="main">
-    <section id="introduction">
-      <h2>Welcome</h2>
-      <p>
-      <strong>URY playd</strong> is a minimalist audio player written in
-      <a href="https://isocpp.org/" title="The Standard C++ web site.">C++11</a>.  It uses
-      <a href="http://sox.sourceforge.net/libsox.html" title="The `libsox` SourceForge page.">libsox</a>,
-      <a href="http://www.portaudio.com/" title="The PortAudio web site.">PortAudio</a>, and
-      <a href="https://github.com/joyent/libuv" title="The `libuv` GitHub page.">libuv</a>
-      to decode audio, play it to any output device, and take commands via a
-      simple, line-based TCP protocol.
-      </p>
-      <p>
-      playd is part of the <strong>BAPS3</strong> project at
-      <a href="http://ury.org.uk" title="The University Radio York web site.">University Radio York</a>.  It is under
-      <em>active development</em>, and we can't yet guarantee it won't try to
-      strangle your cat.
-      </p>
-    </section>
-    <section id="features">
-      <h2>Features</h2>
-      <p>
-      playd doesn't have many features, as it's intended to be a minimal player
-      core for use in bigger things.  Here are some features it <em>does</em>
-      have:
-      </p>
-      <ul>
-        <li>Plays any file format supported by libsox;</li>
-        <li>Selectable output device at launch-time;</li>
-        <li>Play/Stop/Seek/Eject/Load commands;</li>
-        <li>Text-based TCP/IP interface;</li>
-        <li>
-          Cross-platform: we've built it on Windows, FreeBSD, OS X, and some
-          GNU/Linux distributions.
-        </li>
-      </ul>
-    </section>
-    <nav role="navigation">
-      <h2>Links</h2>
-      <section id="playd-links">
-        <h3>playd</h3>
-        <ul>
-          <li>
-            <a href="https://universityradioyork.github.io/ury-playd/man.html" title="The `playd` man page.">Man page</a> &mdash;
-            a concise, if visually unappealing, description of how to run playd
-            on POSIX systems.
-          </li>
-          <li>
-            <a href="https://universityradioyork.github.io/ury-playd/doxygen" title="The `playd` documentation.">Documentation</a> &mdash;
-            contains the READMEs included in the playd distribution, as well as
-            auto-generated source code documentation.
-          </li>
-          <li>
-            <a href="https://github.com/UniversityRadioYork/ury-playd" title="The `playd` GitHub page.">GitHub</a> &mdash;
-            source code for playd, as well as an issue tracker and resources for
-            contributing.
-          </li>
-          <li>
-            <a href="https://github.com/UniversityRadioYork/baps3-spec" title="The BAPS3 specification.">BAPS3 Specification</a> &mdash;
-            a formal(ish) document on the playout system for which playd was
-            developed.
-          </li>
-        </ul>
-      </section>
-      <section id="similar">
-        <h3>Similar projects</h3>
-        <p>
-        playd is not the first attempt at a minimalist audio player.  Here are
-        resources on similar projects which may better suit your needs.
-        </p>
-        <ul>
-          <li>
-            <a href="http://www.musicpd.org" title="The Music Player Daemon web site.">Music Player Daemon</a> has a
-            similar, minimalist philosophy, but a wider scope.
-          </li>
-          <li>
-            <a href="http://linux.die.net/man/1/aplay" title="The `aplay` man page.">aplay</a> (and similar
-            programs) are examples of lightweight audio players, but lack playd's
-            network interface.
-          </li>
-        </ul>
-      </section>
-      <section id="reading">
-        <h3>Further reading</h3>
-        <p>Articles that are relevant, but not directly related, to playd.
-        </p>
-        <ul>
-          <li>
-            <a href="http://www.catb.org/esr/writings/taoup/" title="The 'The Art of Computer Programming' web site."><cite>The Art of Unix Programming</cite></a> &mdash;
-            a very good resource on the UNIX philosophy and its influences on software development.
-          </li>
-        </ul>
-      </section>
-    </nav>
+<!-- Begin auto-generated HTML from index.md -->
+<h2>Welcome</h2>
+
+<p><strong>URY playd</strong> is a minimalist audio player written in <a href="https://isocpp.org/">C++11</a>.  It
+uses <a href="http://sox.sourceforge.net/libsox.html">libsox</a>, <a href="http://www.portaudio.com/">PortAudio</a>, and <a href="https://github.com/libuv/libuv">libuv</a> to decode audio, play it
+to any output device, and take commands via a simple, line-based
+TCP protocol.</p>
+
+<p>playd is part of the <strong>BAPS3</strong> project at <a href="http://ury.org.uk">University
+Radio York</a>.  It is under <em>active development</em>, and we can&#39;t yet
+guarantee it won&#39;t try to strangle your cat.</p>
+
+<h1>Features</h1>
+
+<p>playd doesn&#39;t have many features, as it&#39;s intended to be a minimal
+player core for use in bigger things.  Here are some features it
+<em>does</em> have:</p>
+
+<ul>
+<li>Plays any file format supported by libsox;</li>
+<li>Selectable output device at launch-time;</li>
+<li>Play/Stop/Seek/Eject/Load commands;</li>
+<li>Text-based TCP/IP interface;</li>
+<li>Cross-platform: we&#39;ve built it on Windows, FreeBSD, OS X, and
+some GNU/Linux distributions.</li>
+</ul>
+
+<h2>Resources</h2>
+
+<h3>playd</h3>
+
+<ul>
+<li><a href="https://universityradioyork.github.io/ury-playd/man.html">Man page</a> -
+provides a concise description of how to run playd.</li>
+<li><a href="https://universityradioyork.github.io/ury-playd/doxygen">Documentation</a> -
+contains the READMEs included in the playd distribution, as
+well as auto-generated source code documentation.</li>
+<li><a href="https://github.com/UniversityRadioYork/ury-playd">GitHub</a> -
+source code for playd, as well as an issue tracker and resources
+for contributing.</li>
+<li><a href="https://github.com/UniversityRadioYork/baps3-spec">BAPS3 Spec</a> -
+a formal(ish) document on the playout system for which playd
+was developed.</li>
+</ul>
+
+<h3>Similar projects</h3>
+
+<p>playd is not the first attempt at a minimalist audio player.  Here
+are resources on similar projects which may better suit your needs.</p>
+
+<ul>
+<li><a href="http://www.musicpd.org">Music Player Daemon</a>
+has a similar, minimalist philosophy, but a wider scope.</li>
+<li><a href="and%20similar%20programs">aplay</a>
+are examples of lightweight audio players, but lack playd&#39;s
+network interface.</li>
+</ul>
+
+<h3>Further reading</h3>
+
+<p>Articles that are relevant, but not directly related, to playd.</p>
+
+<ul>
+<li><a href="Wirth,%201995">A Plea for Lean Software</a> -
+dated, but an early article about the perils of bloated software.</li>
+<li><a href="Raymond,%202003">The Art of Unix Programming</a> -
+a very good resource on the UNIX philosophy and its influences on
+software development.</li>
+</ul>
+<!-- End auto-generated HTML -->
     </main>
   </body>
 </html>
