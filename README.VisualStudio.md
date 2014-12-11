@@ -121,15 +121,27 @@ one of the reasons why we fork it.
 #### Patch things
 
 You may get issues relating to missing functions `ftello` and `fseeko`.
-A very quick hack to fix these problems is to change the `ifdefs` in the
+A very quick hack to fix these problems is to change some `ifdefs` in the
 following locations in SoX's `LibFlac` project so that they are always true:
 
-1. `metadata_iterators.c:31`;
-2. `stream_decoder.c:25`;
-3. `stream_encoder.c:19`.
+1. `metadata_iterators.c`;
+2. `stream_decoder.c`;
+3. `stream_encoder.c`.
 
-You may also have to change the settings on `LibFlac` so that warnings are
-not treated as errors.
+The `ifdefs` will look something like:
+
+```C++
+#if _MSC_VER <= 1600 || defined __BORLANDC__ /* @@@ [2G limit] */
+#define fseeko fseek
+#define ftello ftell
+#endif
+```
+
+At time of writing, it currently isn't clear why this is necessary.
+
+You may also have to change a setting on `LibFlac` so that warnings are
+not treated as errors.  In the IDE, the setting in question is
+_Properties > Configuration Properties > C/C++ > Treat Warnings As Errors_.
 
 #### Compile sox
 
@@ -149,7 +161,7 @@ not treated as errors.
 
 This is probably the easiest dependency.
 
-Ensure Python is version 2 (NOT 3) and GYP_MSVS_VERSION is set (eg. as below.)
+Ensure Python is version 2 (NOT 3) and `GYP_MSVS_VERSION` is set (eg. as below.)
 
 ```
 SET GYP_MSVS_VERSION=2013
