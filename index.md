@@ -47,7 +47,7 @@ are resources on similar projects which may better suit your needs.
 
   - [Music Player Daemon]
     has a similar, minimalist philosophy, but a wider scope.
-  - [aplay]  (and similar programs)
+  - [aplay][] (and similar programs)
     are examples of lightweight audio players, but lack playd's
     network interface.
 
@@ -55,9 +55,9 @@ are resources on similar projects which may better suit your needs.
 
 Articles that are relevant, but not directly related, to playd.
 
-  - [A Plea for Lean Software]  (Wirth, 1995) -
+  - [A Plea for Lean Software][] (Wirth, 1995) -
     dated, but an early article about the perils of bloated software.
-  - [The Art of Unix Programming]  (Raymond, 2003) -
+  - [The Art of Unix Programming][] (Raymond, 2003) -
     a very good resource on the UNIX philosophy and its influences on
     software development.
 
