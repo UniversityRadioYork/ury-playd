@@ -9,7 +9,7 @@ playd is part of the <strong>BAPS3</strong> project at [University
 Radio York].  It is under _active development_, and we can't yet
 guarantee it won't try to strangle your cat.
 
-The latest release is [v0.2.0] __Edgware__; the documentation
+The latest release is [v0.2.0] _Edgware_; the documentation
 hosted here refers to it.
 
 ## Features
