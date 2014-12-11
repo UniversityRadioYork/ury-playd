@@ -9,7 +9,10 @@ playd is part of the <strong>BAPS3</strong> project at [University
 Radio York].  It is under _active development_, and we can't yet
 guarantee it won't try to strangle your cat.
 
-# Features
+The latest release is [v0.2.0] (__Edgware__); the documentation
+hosted here refers to it.
+
+## Features
 
 playd doesn't have many features, as it's intended to be a minimal
 player core for use in bigger things.  Here are some features it
@@ -21,6 +24,22 @@ _does_ have:
   - Text-based TCP/IP interface;
   - Cross-platform: we've built it on Windows, FreeBSD, OS X, and
     some GNU/Linux distributions.
+
+## Legal
+
+playd itself is licensed under the [MIT licence].  However, it
+includes, and uses, code under other licences, including the LGPL.
+A full build of playd is likely to come under the GPL, due to
+optional sound library dependencies.
+
+## Installation
+
+You can find the latest code, and instructions on how to use it,
+at playd's [GitHub] page.
+
+## Usage
+
+See the [man page] for usage instructions.
 
 ## Resources
 
@@ -37,8 +56,6 @@ _does_ have:
   - [BAPS3 Spec] -
     a formal(ish) document on the playout system for which playd
     was developed.
-
-
 
 ### Similar projects
 
@@ -66,6 +83,8 @@ Articles that are relevant, but not directly related, to playd.
 [PortAudio]:                   http://www.portaudio.com/
 [libuv]:                       https://github.com/libuv/libuv
 [University Radio York]:       http://ury.org.uk
+[v0.2.0]:                      https://github.com/UniversityRadioYork/ury-playd/releases/tag/v0.2.0
+[MIT licence]:                 https://raw.githubusercontent.com/UniversityRadioYork/ury-playd/master/license.txt
 [Man page]:                    https://universityradioyork.github.io/ury-playd/man.html
 [Documentation]:               https://universityradioyork.github.io/ury-playd/doxygen
 [GitHub]:                      https://github.com/UniversityRadioYork/ury-playd
