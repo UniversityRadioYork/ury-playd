@@ -73,7 +73,7 @@ void Mp3AudioSource::AddFormat(long rate)
 	    MPG123_ERR) {
 		// Ignore the error for now -- another sample rate may be available.
 		// If no sample rates work, loading a file will fail anyway.
-		Debug() << "can't support " << rate << std::endl;
+		Debug() << "can't support" << rate << std::endl;
 	};
 }
 
@@ -86,11 +86,8 @@ std::uint8_t Mp3AudioSource::ChannelCount() const
 {
 	assert(this->context != nullptr);
 
-	long rate = 0;
 	int chans = 0;
-	int encoding = 0;
-
-	mpg123_getformat(this->context, &rate, &chans, &encoding);
+	mpg123_getformat(this->context, nullptr, &chans, nullptr);
 	assert(chans != 0);
 	return static_cast<std::uint8_t>(chans);
 }
@@ -100,10 +97,8 @@ double Mp3AudioSource::SampleRate() const
 	assert(this->context != nullptr);
 
 	long rate = 0;
-	int chans = 0;
-	int encoding = 0;
-
-	mpg123_getformat(this->context, &rate, &chans, &encoding);
+	mpg123_getformat(this->context, &rate, nullptr, nullptr);
+	assert(rate != 0);
 	return static_cast<double>(rate);
 }
 
@@ -111,11 +106,9 @@ size_t Mp3AudioSource::BytesPerSample() const
 {
 	assert(this->context != nullptr);
 
-	long rate = 0;
-	int chans = 0;
 	int encoding = 0;
+	mpg123_getformat(this->context, nullptr, nullptr, &encoding);
 
-	mpg123_getformat(this->context, &rate, &chans, &encoding);
 	auto es = mpg123_encsize(encoding);
 	assert(es != 0);
 
@@ -193,11 +186,8 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 {
 	assert(this->context != nullptr);
 
-	long rate = 0;
-	int chans = 0;
 	int encoding = 0;
-
-	mpg123_getformat(this->context, &rate, &chans, &encoding);
+	mpg123_getformat(this->context, nullptr, nullptr, &encoding);
 
 	switch (encoding) {
 		case MPG123_ENC_UNSIGNED_8:
