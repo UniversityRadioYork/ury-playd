@@ -64,7 +64,7 @@ SUBDIRS     = $(OWN_SUBDIRS) contrib/pa_ringbuffer
 
 # Now we work out which libraries to use, using pkg-config.
 # These packages are always used: the PortAudio C library, libsox, and libuv.
-PKGS = portaudio-2.0 sox libuv
+PKGS = portaudio-2.0 sox libmpg123 libuv
 
 # PortAudio's C++ bindings aren't always available, so we bundle them.
 # However, if there is a PortAudioCPP package available, we can make use of it

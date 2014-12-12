@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of the AudioSource class.
+ * Implementation of the SoXAudioSource class.
  * @see audio/audio_source.hpp
  */
 
@@ -26,44 +26,9 @@ extern "C" {
 #include "../sample_formats.hpp"
 #include "audio_source.hpp"
 
-// This value is somewhat arbitrary, but corresponds to the minimum buffer size
-// used by ffmpeg, so it's probably sensible.
-const size_t AudioSource::BUFFER_SIZE = 16384;
-
-AudioSource::AudioSource(const std::string &path)
-    : buffer(BUFFER_SIZE), context(nullptr)
-{
-	this->Open(path);
-}
-
-AudioSource::~AudioSource()
-{
-	this->Close();
-}
-
-std::string AudioSource::Path() const
-{
-	assert(this->context != nullptr);
-	assert(this->context->filename != nullptr);
-	return std::string(this->context->filename);
-}
-
-std::uint8_t AudioSource::ChannelCount() const
-{
-	assert(this->context != nullptr);
-	return this->context->signal.channels;
-}
-
-size_t AudioSource::BufferSampleCapacity() const
-{
-	return this->buffer.size() / this->BytesPerSample();
-}
-
-double AudioSource::SampleRate() const
-{
-	assert(this->context != nullptr);
-	return this->context->signal.rate;
-}
+//
+// AudioSource
+//
 
 std::uint64_t AudioSource::SamplesFromMicros(std::uint64_t micros) const
 {
@@ -81,7 +46,50 @@ std::uint64_t AudioSource::MicrosFromSamples(std::uint64_t samples) const
 	return (samples * 1000000) / this->SampleRate();
 }
 
-size_t AudioSource::BytesPerSample() const
+//
+// SoXAudioSource
+//
+
+// This value is somewhat arbitrary, but corresponds to the minimum buffer size
+// used by ffmpeg, so it's probably sensible.
+const size_t SoXAudioSource::BUFFER_SIZE = 16384;
+
+SoXAudioSource::SoXAudioSource(const std::string &path)
+    : buffer(BUFFER_SIZE), context(nullptr)
+{
+	this->Open(path);
+}
+
+SoXAudioSource::~SoXAudioSource()
+{
+	this->Close();
+}
+
+std::string SoXAudioSource::Path() const
+{
+	assert(this->context != nullptr);
+	assert(this->context->filename != nullptr);
+	return std::string(this->context->filename);
+}
+
+std::uint8_t SoXAudioSource::ChannelCount() const
+{
+	assert(this->context != nullptr);
+	return this->context->signal.channels;
+}
+
+size_t SoXAudioSource::BufferSampleCapacity() const
+{
+	return this->buffer.size() / this->BytesPerSample();
+}
+
+double SoXAudioSource::SampleRate() const
+{
+	assert(this->context != nullptr);
+	return this->context->signal.rate;
+}
+
+size_t SoXAudioSource::BytesPerSample() const
 {
 	assert(this->context != nullptr);
 
@@ -95,7 +103,7 @@ size_t AudioSource::BytesPerSample() const
 	return 4 * this->ChannelCount();
 }
 
-std::uint64_t AudioSource::Seek(std::uint64_t position)
+std::uint64_t SoXAudioSource::Seek(std::uint64_t position)
 {
 	assert(this->context != nullptr);
 
@@ -128,7 +136,7 @@ std::uint64_t AudioSource::Seek(std::uint64_t position)
 	return samples;
 }
 
-AudioSource::DecodeResult AudioSource::Decode()
+SoXAudioSource::DecodeResult SoXAudioSource::Decode()
 {
 	assert(this->context != nullptr);
 
@@ -160,7 +168,7 @@ AudioSource::DecodeResult AudioSource::Decode()
 /**
  * @return The sample format of the data returned by this decoder.
  */
-/* static */ SampleFormat AudioSource::OutputSampleFormat()
+SampleFormat SoXAudioSource::OutputSampleFormat() const
 {
 	// 'The function sox_read reads len samples in to buf using the format
 	// handler specified by ft. All data read is converted to 32-bit signed
@@ -168,7 +176,7 @@ AudioSource::DecodeResult AudioSource::Decode()
 	return SampleFormat::PACKED_SIGNED_INT_32;
 }
 
-void AudioSource::Open(const std::string &path)
+void SoXAudioSource::Open(const std::string &path)
 {
 	this->Close();
 
@@ -178,7 +186,7 @@ void AudioSource::Open(const std::string &path)
 	}
 }
 
-void AudioSource::Close()
+void SoXAudioSource::Close()
 {
 	if (this->context != nullptr) sox_close(this->context);
 	this->context = nullptr;

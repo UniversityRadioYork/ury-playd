@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+#include <mpg123.h>
 #include <sox.h>
 
 #include "../errors.hpp"
@@ -50,20 +51,10 @@ public:
 	typedef int SampleByteCount;
 
 	/**
-	 * Constructs an AudioSource.
-	 * @param path The path to the file to load and decode using this
-	 *   decoder.
-	 */
-	AudioSource(const std::string &path);
-
-	/// Destructs an AudioSource.
-	~AudioSource();
-
-	/**
 	 * Gets the file-path of this audio source's audio file.
 	 * @return The audio file's path.
 	 */
-	std::string Path() const;
+	virtual std::string Path() const = 0;
 
 	/**
 	 * Performs a round of decoding.
@@ -71,32 +62,26 @@ public:
 	 *   round and the vector of bytes decoded.  The vector may be empty,
 	 *   if the decoding round did not finish off a frame.
 	 */
-	DecodeResult Decode();
+	virtual DecodeResult Decode() = 0;
 
 	/**
 	 * Returns the channel count.
 	 * @return The number of channels this AudioSource is decoding.
 	 */
-	std::uint8_t ChannelCount() const;
+	virtual std::uint8_t ChannelCount() const = 0;
 
 	/**
 	 * Returns the sample rate.
 	 * @return The output sample rate (Hz) as a double-precision floating
 	 * point.
 	 */
-	double SampleRate() const;
+	virtual double SampleRate() const = 0;
 
 	/**
 	 * Returns the output sample format.
 	 * @return The output sample format, as a SampleFormat.
 	 */
-	static SampleFormat OutputSampleFormat();
-
-	/**
-	 * Returns the number of samples this decoder's buffer can store.
-	 * @return The buffer sample capacity, in samples.
-	 */
-	size_t BufferSampleCapacity() const;
+	virtual SampleFormat OutputSampleFormat() const = 0;
 
 	/**
 	 * Returns the number of bytes for each sample this decoder outputs.
@@ -104,7 +89,7 @@ public:
 	 *   count as a factor.
 	 * @return The number of bytes per sample.
 	 */
-	size_t BytesPerSample() const;
+	virtual size_t BytesPerSample() const = 0;
 
 	/**
 	 * Seeks to the given position, in microseconds.
@@ -112,7 +97,7 @@ public:
 	 * @param position  The new position in the file, in microseconds.
 	 * @return The new position in the file, in samples.
 	 */
-	std::uint64_t Seek(std::uint64_t position);
+	virtual std::uint64_t Seek(std::uint64_t position) = 0;
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
@@ -127,6 +112,75 @@ public:
 	 * @return The corresponding song position, in microseconds.
 	 */
 	std::uint64_t MicrosFromSamples(std::uint64_t samples) const;
+};
+
+class Mp3AudioSource : public AudioSource
+{
+public:
+	/**
+	 * Constructs an Mp3AudioSource.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 */
+	Mp3AudioSource(const std::string &path);
+
+	/// Destructs an Mp3AudioSource.
+	~Mp3AudioSource();
+
+	DecodeResult Decode() override;
+	std::uint64_t Seek(std::uint64_t position) override;
+
+	std::string Path() const override;
+	std::uint8_t ChannelCount() const override;
+	double SampleRate() const override;
+	SampleFormat OutputSampleFormat() const override;
+	size_t BytesPerSample() const override;
+
+private:
+	/// The size of the internal decoding buffer, in bytes.
+	static const size_t BUFFER_SIZE;
+
+	/// The current state of decoding.
+	/// @see DecodeState
+	DecodeState decode_state;
+
+	std::vector<uint8_t> buffer; ///< The decoding buffer.
+
+	/// Pointer to the mpg123 context associated with this source.
+	mpg123_handle *context;
+
+	/// The current path.
+	/// @see Path
+	std::string path;
+
+	/**
+	 * Adds a format for the given sample rate to mpg123.
+	 * @param rate The sample rate to add.
+	 */
+	void AddFormat(long rate);
+};
+
+class SoXAudioSource : public AudioSource
+{
+public:
+	/**
+	 * Constructs an SoXAudioSource.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 */
+	SoXAudioSource(const std::string &path);
+
+	/// Destructs a SoXAudioSource.
+	~SoXAudioSource();
+
+	DecodeResult Decode() override;
+	std::uint64_t Seek(std::uint64_t position) override;
+
+	std::string Path() const override;
+	std::uint8_t ChannelCount() const override;
+	double SampleRate() const override;
+	SampleFormat OutputSampleFormat() const override;
+	size_t BytesPerSample() const override;
 
 private:
 	/// The size of the internal decoding buffer, in bytes.
@@ -149,6 +203,13 @@ private:
 
 	/// Closes the AudioSource's current file.
 	void Close();
+
+	/**
+	 * Returns the number of samples this decoder's buffer can store.
+	 * @return The buffer sample capacity, in samples.
+	 */
+	size_t BufferSampleCapacity() const;
+
 };
 
 #endif // PLAYD_AUDIO_SOURCE_HPP

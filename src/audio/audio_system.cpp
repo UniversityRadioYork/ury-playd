@@ -8,6 +8,7 @@
  */
 
 #include <algorithm>
+#include <cassert>
 #include <map>
 #include <sstream>
 #include <stdexcept>
@@ -15,6 +16,7 @@
 
 extern "C" {
 #include <sox.h>
+#include <mpg123.h>
 #include "portaudio.h"
 }
 
@@ -43,6 +45,7 @@ PaSoxAudioSystem::PaSoxAudioSystem()
 {
 	portaudio::System::initialize();
 	sox_format_init();
+	mpg123_init();
 
 	this->device_id = -1;
 }
@@ -51,6 +54,7 @@ PaSoxAudioSystem::~PaSoxAudioSystem()
 {
 	portaudio::System::terminate();
 	sox_format_quit();
+	mpg123_exit();
 }
 
 std::vector<AudioSystem::Device> PaSoxAudioSystem::GetDevicesInfo()
@@ -82,7 +86,20 @@ void PaSoxAudioSystem::SetDeviceID(int id)
 
 Audio *PaSoxAudioSystem::Load(const std::string &path) const
 {
-	auto source = new AudioSource(path);
+	AudioSource *source = nullptr;
+
+	size_t extpoint = path.find_last_of('.');
+	std::string ext = path.substr(extpoint + 1);
+
+	if (ext == "mp3") {
+		Debug() << "Using Mp3AudioSource" << std::endl;
+		source = new Mp3AudioSource(path);
+	} else {
+		Debug() << "Using SoXAudioSource" << std::endl;
+		source = new SoXAudioSource(path);
+	}
+	assert(source != nullptr); 
+
 	auto sink = new AudioSink(*source, *this);
 	return new PipeAudio(source, sink);
 }
@@ -93,7 +110,6 @@ portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
 	std::uint8_t channel_count = source.ChannelCount();
 	SampleFormat sample_format = source.OutputSampleFormat();
 	double sample_rate = source.SampleRate();
-	size_t buffer_size = source.BufferSampleCapacity();
 	const portaudio::Device &device = PaDevice(this->device_id);
 
 	portaudio::DirectionSpecificStreamParameters out_pars(
@@ -102,7 +118,7 @@ portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
 
 	portaudio::StreamParameters pars(
 	                portaudio::DirectionSpecificStreamParameters::null(),
-	                out_pars, sample_rate, buffer_size, paClipOff);
+	                out_pars, sample_rate, paFramesPerBufferUnspecified, paClipOff);
 
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
