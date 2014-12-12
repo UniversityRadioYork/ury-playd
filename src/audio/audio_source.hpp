@@ -209,7 +209,6 @@ private:
 	 * @return The buffer sample capacity, in samples.
 	 */
 	size_t BufferSampleCapacity() const;
-
 };
 
 #endif // PLAYD_AUDIO_SOURCE_HPP

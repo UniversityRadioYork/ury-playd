@@ -16,9 +16,8 @@
 #include <sstream>
 #include <string>
 
-// libsox
 extern "C" {
-#include <sox.h>
+#include <mpg123.h>
 }
 
 #include "../errors.hpp"
@@ -40,18 +39,22 @@ Mp3AudioSource::Mp3AudioSource(const std::string &path)
 	size_t nrates = 0;
 	mpg123_rates(&rates, &nrates);
 	for (size_t r = 0; r < nrates; r++) {
-		Debug() << "trying to enable formats at " << rates[r] << std::endl;
+		Debug() << "trying to enable formats at " << rates[r]
+		        << std::endl;
 		AddFormat(rates[r]);
 	}
 
 	if (mpg123_open(this->context, path.c_str()) == MPG123_ERR) {
-		throw FileError("mp3: can't open " + path + ": " + mpg123_strerror(this->context));
+		throw FileError("mp3: can't open " + path + ": " +
+		                mpg123_strerror(this->context));
 	}
 
 	Debug() << "mp3: sample rate:" << this->SampleRate() << std::endl;
-	Debug() << "mp3: bytes per sample:" << this->BytesPerSample() << std::endl;
+	Debug() << "mp3: bytes per sample:" << this->BytesPerSample()
+	        << std::endl;
 	Debug() << "mp3: channels:" << (int)this->ChannelCount() << std::endl;
-	Debug() << "mp3: playd format:" << (int)this->OutputSampleFormat() << std::endl;
+	Debug() << "mp3: playd format:" << (int)this->OutputSampleFormat()
+	        << std::endl;
 }
 
 Mp3AudioSource::~Mp3AudioSource()
@@ -62,9 +65,14 @@ Mp3AudioSource::~Mp3AudioSource()
 
 void Mp3AudioSource::AddFormat(long rate)
 {
+	// The requested encodings correspond to the sample formats available in
+	// the SampleFormat enum.
 	if (mpg123_format(this->context, rate, MPG123_STEREO | MPG123_MONO,
-	    MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_16 | MPG123_ENC_SIGNED_32 |
-	    MPG123_ENC_FLOAT_32) == MPG123_ERR) {
+	                  (MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_16 |
+	                   MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32)) ==
+	    MPG123_ERR) {
+		// Ignore the error for now -- another sample rate may be available.
+		// If no sample rates work, loading a file will fail anyway.
 		Debug() << "can't support " << rate << std::endl;
 	};
 }
@@ -99,7 +107,6 @@ double Mp3AudioSource::SampleRate() const
 	return static_cast<double>(rate);
 }
 
-
 size_t Mp3AudioSource::BytesPerSample() const
 {
 	assert(this->context != nullptr);
@@ -112,6 +119,10 @@ size_t Mp3AudioSource::BytesPerSample() const
 	auto es = mpg123_encsize(encoding);
 	assert(es != 0);
 
+	// mpg123_encsize returns bytes per mono sample, so we need to
+	// convert to bytes per all-channels sample.
+	// All of mpg123's samples counts are like this, so you'll see this
+	// pattern all over the class.
 	return es * this->ChannelCount();
 }
 
@@ -124,24 +135,19 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t position)
 	// See BytesPerSample() for an explanation of this ChannelCount().
 	auto mono_samples = samples * this->ChannelCount();
 
-	// libsox doesn't seem to like seeking into an ended file, so close
-	// and re-open it first.
-	//if (this->decode_state == DecodeState::END_OF_FILE) {
-	//	std::string path = this->Path();
-	//	this->Close();
-//		this->Open(path);
-//	}
-
 	// Have we tried to seek past the end of the file?
 	auto clen = static_cast<unsigned long>(mpg123_length(this->context));
 	if (clen < mono_samples) {
-		Debug() << "mp3: seek at" << mono_samples << "past EOF at" << clen << std::endl;
-		Debug() << "mp3: requested position micros:" << position << std::endl;
+		Debug() << "mp3: seek at" << mono_samples << "past EOF at"
+		        << clen << std::endl;
+		Debug() << "mp3: requested position micros:" << position
+		        << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
 	if (mpg123_seek(this->context, mono_samples, SEEK_SET) == MPG123_ERR) {
-		Debug() << "mp3: seek failed:" << mpg123_strerror(this->context) << std::endl;
+		Debug() << "mp3: seek failed:" << mpg123_strerror(this->context)
+		        << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
@@ -149,6 +155,9 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t position)
 	// confused.
 	this->decode_state = DecodeState::DECODING;
 
+	// The actual seek position may not be the same as the requested
+	// position.
+	// mpg123_tell gives us the exact mono-samples position.
 	return mpg123_tell(this->context) / this->ChannelCount();
 }
 
@@ -165,11 +174,11 @@ Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()
 	if (err == MPG123_DONE) {
 		Debug() << "mp3: end of file" << std::endl;
 		this->decode_state = DecodeState::END_OF_FILE;
-	} else if (err != MPG123_OK) {
-		Debug() << "mp3: decode error:" << mpg123_strerror(this->context) << std::endl;
+	} else if (err != MPG123_OK && err != MPG123_NEW_FORMAT) {
+		Debug() << "mp3: decode error:" << mpg123_strerror(this->context)
+		        << std::endl;
 		this->decode_state = DecodeState::END_OF_FILE;
 	} else {
-		assert(0 < rbytes);
 		this->decode_state = DecodeState::DECODING;
 
 		// Copy only the bit of the buffer occupied by decoded data
@@ -190,18 +199,18 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 
 	mpg123_getformat(this->context, &rate, &chans, &encoding);
 
-	switch(encoding) {
-	case MPG123_ENC_UNSIGNED_8:
-		return SampleFormat::PACKED_UNSIGNED_INT_8;
-	case MPG123_ENC_SIGNED_16:
-		return SampleFormat::PACKED_SIGNED_INT_16;
-	case MPG123_ENC_SIGNED_32:
-		return SampleFormat::PACKED_SIGNED_INT_32;
-	case MPG123_ENC_FLOAT_32:
-		return SampleFormat::PACKED_FLOAT_32;
-	default:
-		// We shouldn't get here, if the format was set up correctly
-		// earlier.
-		assert(false);
+	switch (encoding) {
+		case MPG123_ENC_UNSIGNED_8:
+			return SampleFormat::PACKED_UNSIGNED_INT_8;
+		case MPG123_ENC_SIGNED_16:
+			return SampleFormat::PACKED_SIGNED_INT_16;
+		case MPG123_ENC_SIGNED_32:
+			return SampleFormat::PACKED_SIGNED_INT_32;
+		case MPG123_ENC_FLOAT_32:
+			return SampleFormat::PACKED_FLOAT_32;
+		default:
+			// We shouldn't get here, if the format was set up
+			// correctly earlier.
+			assert(false);
 	}
 }

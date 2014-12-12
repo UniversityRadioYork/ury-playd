@@ -98,7 +98,7 @@ Audio *PaSoxAudioSystem::Load(const std::string &path) const
 		Debug() << "Using SoXAudioSource" << std::endl;
 		source = new SoXAudioSource(path);
 	}
-	assert(source != nullptr); 
+	assert(source != nullptr);
 
 	auto sink = new AudioSink(*source, *this);
 	return new PipeAudio(source, sink);
@@ -118,7 +118,8 @@ portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
 
 	portaudio::StreamParameters pars(
 	                portaudio::DirectionSpecificStreamParameters::null(),
-	                out_pars, sample_rate, paFramesPerBufferUnspecified, paClipOff);
+	                out_pars, sample_rate, paFramesPerBufferUnspecified,
+	                paClipOff);
 
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
