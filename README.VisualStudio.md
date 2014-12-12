@@ -231,7 +231,7 @@ To test, run `\ury-playd-0.2.0\Debug\playd.exe`.
                                 "Download for libuv 1.0.2."
 [A LibSoX fork]:                https://github.com/CaptainHayashi/sox/archive/master.zip
                                 "Download for a dynamically buildable distribution of LibSoX."
-[flac 1.2.1]:                   http://downloads.xiph.org/releases/flac/flac-1.2.1.tar.xz
+[flac 1.2.1]:                   http://downloads.xiph.org/releases/flac/flac-1.2.1.tar.gz
                                 "Download for flac 1.2.1."
 [libid3tag 0.15.1b]:            http://sourceforge.net/projects/mad/files/libid3tag/0.15.1b/libid3tag-0.15.1b.tar.gz/download
                                 "Download for libid3tag 0.15.1b."
