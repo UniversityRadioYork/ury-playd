@@ -59,7 +59,7 @@ MAN_HTML  = $(builddir)/$(NAME).1.html
 # This should include all of the source directories for playd,
 # excluding any special ones defined below.  The root source directory is
 # implied.
-OWN_SUBDIRS = audio io player
+OWN_SUBDIRS = audio audio/sources io player
 SUBDIRS     = $(OWN_SUBDIRS) contrib/pa_ringbuffer
 
 # Now we work out which libraries to use, using pkg-config.

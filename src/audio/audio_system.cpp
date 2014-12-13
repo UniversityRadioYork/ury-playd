@@ -41,6 +41,9 @@ class CallbackInterface;
 #include "audio_source.hpp"
 #include "audio_system.hpp"
 
+#include "sources/mp3.hpp"
+#include "sources/sox.hpp"
+
 PaSoxAudioSystem::PaSoxAudioSystem()
 {
 	portaudio::System::initialize();

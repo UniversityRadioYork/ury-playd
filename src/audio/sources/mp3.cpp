@@ -4,7 +4,7 @@
 /**
  * @file
  * Implementation of the Mp3AudioSource class.
- * @see audio/audio_source.hpp
+ * @see audio/sources/mp3.hpp
  */
 
 #include <cassert>
@@ -20,10 +20,11 @@ extern "C" {
 #include <mpg123.h>
 }
 
-#include "../errors.hpp"
-#include "../messages.h"
-#include "../sample_formats.hpp"
-#include "audio_source.hpp"
+#include "../../errors.hpp"
+#include "../../messages.h"
+#include "../../sample_formats.hpp"
+#include "../audio_source.hpp"
+#include "mp3.hpp"
 
 // This value is somewhat arbitrary, but corresponds to the minimum buffer size
 // used by ffmpeg, so it's probably sensible.

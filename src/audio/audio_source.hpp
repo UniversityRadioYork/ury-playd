@@ -10,13 +10,9 @@
 #ifndef PLAYD_AUDIO_SOURCE_HPP
 #define PLAYD_AUDIO_SOURCE_HPP
 
-#include <array>
 #include <cstdint>
 #include <string>
 #include <vector>
-
-#include <mpg123.h>
-#include <sox.h>
 
 #include "../errors.hpp"
 #include "../sample_formats.hpp"
@@ -24,9 +20,11 @@
 /**
  * An object responsible for decoding an audio file.
  *
- * The AudioSource is an interface to the ffmpeg library, which represents all
- * the ffmpeg state associated with one file.  It can be polled to decode
- * frames of audio data, which are returned as byte vectors.
+ * AudioSource is an abstract base class, implemented separately for each supported audio file format.
+ *
+ * @see FlacAudioSource
+ * @see Mp3AudioSource
+ * @see OggAudioSource
  */
 class AudioSource
 {
@@ -49,6 +47,10 @@ public:
 
 	/// Type for the count of bytes per sample.
 	typedef int SampleByteCount;
+
+	//
+	// Methods that must be overridden
+	//
 
 	/**
 	 * Gets the file-path of this audio source's audio file.
@@ -99,6 +101,10 @@ public:
 	 */
 	virtual std::uint64_t Seek(std::uint64_t position) = 0;
 
+	//
+	// Methods provided 'for free'
+	//
+
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
 	 * @param position The song position, in microseconds.
@@ -112,146 +118,6 @@ public:
 	 * @return The corresponding song position, in microseconds.
 	 */
 	std::uint64_t MicrosFromSamples(std::uint64_t samples) const;
-};
-
-/// AudioSource for use on MP3 files.
-class Mp3AudioSource : public AudioSource
-{
-public:
-	/**
-	 * Constructs an Mp3AudioSource.
-	 * @param path The path to the file to load and decode using this
-	 *   decoder.
-	 */
-	Mp3AudioSource(const std::string &path);
-
-	/// Destructs an Mp3AudioSource.
-	~Mp3AudioSource();
-
-	DecodeResult Decode() override;
-	std::uint64_t Seek(std::uint64_t position) override;
-
-	std::string Path() const override;
-	std::uint8_t ChannelCount() const override;
-	double SampleRate() const override;
-	SampleFormat OutputSampleFormat() const override;
-	size_t BytesPerSample() const override;
-
-private:
-	/// The size of the internal decoding buffer, in bytes.
-	static const size_t BUFFER_SIZE;
-
-	/// The current state of decoding.
-	/// @see DecodeState
-	DecodeState decode_state;
-
-	std::vector<uint8_t> buffer; ///< The decoding buffer.
-
-	/// Pointer to the mpg123 context associated with this source.
-	mpg123_handle *context;
-
-	/// The current path.
-	/// @see Path
-	std::string path;
-
-	/**
-	 * Adds a format for the given sample rate to mpg123.
-	 * @param rate The sample rate to add.
-	 */
-	void AddFormat(long rate);
-};
-
-/// AudioSource for use on FLAC files.
-class FlacAudioSource : public AudioSource, protected FLAC::Decoder::Stream
-{
-public:
-	/**
-	 * Constructs a FlacAudioSource.
-	 * @param path The path to the file to load and decode using this
-	 *   decoder.
-	 */
-	FlacAudioSource(const std::string &path);
-
-	/// Destructs an Mp3AudioSource.
-	~FlacAudioSource();
-
-	DecodeResult Decode() override;
-	std::uint64_t Seek(std::uint64_t position) override;
-
-	std::string Path() const override;
-	std::uint8_t ChannelCount() const override;
-	double SampleRate() const override;
-	SampleFormat OutputSampleFormat() const override;
-	size_t BytesPerSample() const override;
-
-	/**
-	 * Converts a FLAC init error to an error message.
-	 * @param err The error number.
-	 * @return The corresponding error message.
-	 */
-	/* static */ std::string InitStrError(int err);
-private:
-	/// The current state of decoding.
-	/// @see DecodeState
-	DecodeState decode_state;
-
-	std::vector<uint8_t> buffer; ///< The decoding buffer.
-
-	/// The current path.
-	/// @see Path
-	std::string path;
-};
-
-class SoXAudioSource : public AudioSource
-{
-public:
-	/**
-	 * Constructs an SoXAudioSource.
-	 * @param path The path to the file to load and decode using this
-	 *   decoder.
-	 */
-	SoXAudioSource(const std::string &path);
-
-	/// Destructs a SoXAudioSource.
-	~SoXAudioSource();
-
-	DecodeResult Decode() override;
-	std::uint64_t Seek(std::uint64_t position) override;
-
-	std::string Path() const override;
-	std::uint8_t ChannelCount() const override;
-	double SampleRate() const override;
-	SampleFormat OutputSampleFormat() const override;
-	size_t BytesPerSample() const override;
-
-private:
-	/// The size of the internal decoding buffer, in bytes.
-	static const size_t BUFFER_SIZE;
-
-	/// The current state of decoding.
-	/// @see DecodeState
-	DecodeState decode_state;
-
-	std::vector<uint8_t> buffer; ///< The decoding buffer.
-
-	/// Pointer to the SoX context associated with this source.
-	sox_format_t *context;
-
-	/**
-	 * Opens a new file for this AudioSource.
-	 * @param path The absolute path to the audio file to load.
-	 */
-	void Open(const std::string &path);
-
-	/// Closes the AudioSource's current file.
-	void Close();
-
-	/**
-	 * Returns the number of samples this decoder's buffer can store.
-	 * @return The buffer sample capacity, in samples.
-	 */
-	size_t BufferSampleCapacity() const;
-
 };
 
 #endif // PLAYD_AUDIO_SOURCE_HPP
