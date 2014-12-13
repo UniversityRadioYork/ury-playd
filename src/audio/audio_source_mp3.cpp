@@ -68,7 +68,8 @@ void Mp3AudioSource::AddFormat(long rate)
 	// The requested encodings correspond to the sample formats available in
 	// the SampleFormat enum.
 	if (mpg123_format(this->context, rate, MPG123_STEREO | MPG123_MONO,
-	                  (MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_16 |
+	                  (MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_8 |
+	                   MPG123_ENC_SIGNED_16 | MPG123_ENC_SIGNED_24 |
 	                   MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32)) ==
 	    MPG123_ERR) {
 		// Ignore the error for now -- another sample rate may be available.
@@ -192,8 +193,12 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 	switch (encoding) {
 		case MPG123_ENC_UNSIGNED_8:
 			return SampleFormat::PACKED_UNSIGNED_INT_8;
+		case MPG123_ENC_SIGNED_8:
+			return SampleFormat::PACKED_SIGNED_INT_8;
 		case MPG123_ENC_SIGNED_16:
 			return SampleFormat::PACKED_SIGNED_INT_16;
+		case MPG123_ENC_SIGNED_24:
+			return SampleFormat::PACKED_SIGNED_INT_24;
 		case MPG123_ENC_SIGNED_32:
 			return SampleFormat::PACKED_SIGNED_INT_32;
 		case MPG123_ENC_FLOAT_32:

@@ -137,7 +137,9 @@ portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
 /// Mappings from SampleFormats to their equivalent PaSampleFormats.
 static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	{ SampleFormat::PACKED_UNSIGNED_INT_8, portaudio::UINT8 },
+	{ SampleFormat::PACKED_SIGNED_INT_8, portaudio::INT8 },
 	{ SampleFormat::PACKED_SIGNED_INT_16, portaudio::INT16 },
+	{ SampleFormat::PACKED_SIGNED_INT_24, portaudio::INT24 },
 	{ SampleFormat::PACKED_SIGNED_INT_32, portaudio::INT32 },
 	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
 };

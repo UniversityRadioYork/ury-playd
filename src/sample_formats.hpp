@@ -14,7 +14,7 @@
 /**
  * Sample formats available in playd.
  *
- * This is the intersection of those sample formats available in ffmpeg and
+ * This is the intersection of those sample formats available in the decoders and
  * PortAudio.  In the future, if and when other input and output libraries are
  * used/supported, this may change.
  *
@@ -25,7 +25,9 @@
  */
 enum class SampleFormat : std::uint8_t {
 	PACKED_UNSIGNED_INT_8, ///< Packed 8-bit unsigned integer.
+	PACKED_SIGNED_INT_8,   ///< Packed 8-bit signed integer.
 	PACKED_SIGNED_INT_16,  ///< Packed 16-bit signed integer.
+	PACKED_SIGNED_INT_24,  ///< Packed 24-bit signed integer.
 	PACKED_SIGNED_INT_32,  ///< Packed 32-bit signed integer.
 	PACKED_FLOAT_32        ///< Packed 32-bit floating point.
 };

@@ -114,6 +114,7 @@ public:
 	std::uint64_t MicrosFromSamples(std::uint64_t samples) const;
 };
 
+/// AudioSource for use on MP3 files.
 class Mp3AudioSource : public AudioSource
 {
 public:
@@ -158,6 +159,47 @@ private:
 	 * @param rate The sample rate to add.
 	 */
 	void AddFormat(long rate);
+};
+
+/// AudioSource for use on FLAC files.
+class FlacAudioSource : public AudioSource, protected FLAC::Decoder::Stream
+{
+public:
+	/**
+	 * Constructs a FlacAudioSource.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 */
+	FlacAudioSource(const std::string &path);
+
+	/// Destructs an Mp3AudioSource.
+	~FlacAudioSource();
+
+	DecodeResult Decode() override;
+	std::uint64_t Seek(std::uint64_t position) override;
+
+	std::string Path() const override;
+	std::uint8_t ChannelCount() const override;
+	double SampleRate() const override;
+	SampleFormat OutputSampleFormat() const override;
+	size_t BytesPerSample() const override;
+
+	/**
+	 * Converts a FLAC init error to an error message.
+	 * @param err The error number.
+	 * @return The corresponding error message.
+	 */
+	/* static */ std::string InitStrError(int err);
+private:
+	/// The current state of decoding.
+	/// @see DecodeState
+	DecodeState decode_state;
+
+	std::vector<uint8_t> buffer; ///< The decoding buffer.
+
+	/// The current path.
+	/// @see Path
+	std::string path;
 };
 
 class SoXAudioSource : public AudioSource
@@ -209,6 +251,7 @@ private:
 	 * @return The buffer sample capacity, in samples.
 	 */
 	size_t BufferSampleCapacity() const;
+
 };
 
 #endif // PLAYD_AUDIO_SOURCE_HPP
