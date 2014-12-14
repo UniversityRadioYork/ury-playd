@@ -8,6 +8,20 @@
 #
 #
 # Variables:
+#   General:
+#     PROGNAME...................................program name
+#                                          (default: 'playd')
+#     PROGVER.................................program version
+#                                  (default: acquire via git)
+#
+#   Directories:
+#     SRCDIR........................directory of source files
+#                                            (default: ./src)
+#     BUILDDIR.....................directory for object files
+#                                          (default: ./build)
+#     PREFIX.........................root of where to install
+#                                      (default: ./usr/local)
+#
 #   Programs:
 #     PKGCONF........................pkg-config or equivalent
 #
@@ -33,6 +47,43 @@
 #   - lack of libvorbisfile implies NO_OGG;
 #   - lack of portaudio++ implies NO_SYS_PORTAUDIOCXX.
 #   - lack of pkgconf/pkg-config or portaudio is fatal.
+
+#
+# Misc variable finding
+#
+
+# Populates $PROGNAME and $PROGVER if not already set up.
+find_name_and_version()
+{
+	if [ -z "$PROGNAME" ]; then PROGNAME="playd"; fi
+
+	if [ -z "$PROGVER" ]
+	then
+		PROGVER=`git describe --tags --always`
+		if [ -ne $? 0 ]
+		then
+			echo "not a git clone, need to set 'PROGVER'."
+			echo "cannot continue"
+			exit 1
+		fi
+	fi
+
+	echo "Configuring build for $PROGNAME-$PROGVER"
+}
+
+find_dirs()
+{
+	echo "DIRECTORIES:"
+
+	if [ -z "$SRCDIR" ]; then SRCDIR="`pwd`/src"; fi
+	echo "  srcdir:   $SRCDIR"
+
+	if [ -z "$BUILDDIR" ]; then BUILDDIR="`pwd`/build"; fi
+	echo "  builddir: $BUILDDIR"
+
+	if [ -z "$PREFIX" ]; then PREFIX="/usr/local"; fi
+	echo "  prefix:   $PREFIX"
+}
 
 
 #
@@ -242,33 +293,90 @@ list_packages()
 # Makefile making
 #
 
+# Finds all relevant sources.
+# Outputs to the variables $CXXSOURCES and $CSOURCES.
+find_sources()
+{
+	# Start off by looking for all cpp or cxx files.
+	cxx_expr="\( -name "*.cpp" -o -name "*.cxx" \)"
+
+	# Disable feature files if those features are disabled.
+	if [ -n "$NO_FLAC" ]; then cxx_expr="$cxx_expr -a \( \! -name '*flac*' \)"; fi
+	if [ -n "$NO_MP3"  ]; then cxx_expr="$cxx_expr -a \( \! -name '*mp3*'  \)"; fi
+	if [ -n "$NO_OGG"  ]; then cxx_expr="$cxx_expr -a \( \! -name '*ogg*'  \)"; fi
+
+	CXXSOURCES=`eval find "$SRCDIR" "$cxx_expr"`
+
+	# Need to backslash-escape slashes so the upcoming seds work.
+	sd=`echo "$SRCDIR" | sed 's|/|\\\\/|g'`
+
+	# Remove test code.
+	CXXSOURCES=`echo "$CXXSOURCES" | sed '/'"$sd"'\/tests/d'`
+
+	# Disable own PortAudio C++ bindings if not needed.
+	#
+	# Why don't we do this in the `find` command?, you may ask.  Well.
+	# It so happens that POSIX find has _no_ way of matching on a full name,
+	# only a basename.  So, we either have to expect GNU find (ew), or we
+	# can just sed out the offending paths here.
+	# 
+	if [ -z "$NO_SYS_PORTAUDIOCXX" ]
+	then
+		CXXSOURCES=`echo "$CXXSOURCES" |
+			sed '/'"$sd"'\/contrib\/portaudiocpp/d'`
+	fi
+
+	# Compared to above, the C sources are easy--they're always there,
+	# regardless of features.
+	CSOURCES=`find "$SRCDIR" -name '*.c'`
+}
+
 write_makefile()
 {
 	echo "Now making the Makefile."
+
+	find_sources
+
+	# Make sure the sources are all on one line.
+	CXXSOURCES=`echo "$CXXSOURCES" | tr "\n" " "`
+	CSOURCES=`echo "$CSOURCES" | tr "\n" " "`
+
+	# Generate object sets:
+	# $SRCDIR/.../foo.cxx => $BUILDDIR/.../foo.o
+	# $SRCDIR/.../bar.cpp => $BUILDDIR/.../bar.o
+	# $SRCDIR/.../baz.c   => $BUILDDIR/.../baz.o
+	CXXOBJECTS=`echo "$CXXSOURCES" | sed -e "s|$SRCDIR/|$BUILDDIR/|g" -e 's|\.[^ ]*|.o|g'`
+	COBJECTS=`echo "$CSOURCES" | sed -e "s|$SRCDIR/|$BUILDDIR/|g" -e 's|\.[^ ]*|.o|g'`
+
 	cat Makefile.in |
-		sed "s/%%PACKAGES%%/$PACKAGES/g" |
-		sed "s/%%FCFLAGS%%/$FCFLAGS/g" |
-		sed "s/%%NO_SYS_PORTAUDIOCXX%%/$NO_SYS_PORTAUDIOCXX/g" > Makefile
+		sed "s|%%COBJECTS%%|$COBJECTS|g" |
+		sed "s|%%CSOURCES%%|$CSOURCES|g" |
+		sed "s|%%CXXOBJECTS%%|$CXXOBJECTS|g" |
+		sed "s|%%CXXSOURCES%%|$CXXSOURCES|g" |
+		sed "s|%%FCFLAGS%%|$FCFLAGS|g" |
+		sed "s|%%PACKAGES%%|$PACKAGES|g" |
+		sed "s|%%PROGNAME%%|$PROGNAME|g" |
+		sed "s|%%PROGVER%%|$PROGVER|g" |
+		sed "s|%%SRCDIR%%|$SRCDIR|g" |
+		sed "s|%%BUILDDIR%%|$BUILDDIR|g" |
+		sed "s|%%NO_SYS_PORTAUDIOCXX%%|$NO_SYS_PORTAUDIOCXX|g" > Makefile
 }
 
 #
 # Main script
 #
 
+find_name_and_version
+echo
+find_dirs
+echo
 find_deps
-
 echo
-
 list_features
-
 echo
-
 list_packages
-
 echo
-
 write_makefile
-
 echo
 echo "If this is what you wanted, now run GNU make."
 echo "Else, fix any environment problems and re-run $0."

@@ -11,10 +11,10 @@
 ## BEGIN USER-CHANGEABLE VARIABLES ##
 
 # Where to put the object files and other intermediate fluff.
-builddir ?= build
+builddir ?= /home/mattbw/ury-playd/build
 
 # Where the source resides.
-srcdir ?= src
+srcdir ?= /home/mattbw/ury-playd/src
 
 # The warning flags to use when building playd.
 WARNS ?= -Wall -Wextra -Werror
@@ -91,10 +91,10 @@ SRC_SUBDIRS = $(srcdir) $(addprefix $(srcdir)/,$(SUBDIRS))
 OBJ_SUBDIRS = $(builddir) $(builddir)/tests $(addprefix $(builddir)/,$(SUBDIRS))
 
 # ...And find the sources to compile and the objects they make.
-SOURCES  = $(foreach dir,$(SRC_SUBDIRS),$(wildcard $(dir)/*.cpp))
-OBJECTS  = $(patsubst $(srcdir)%,$(builddir)%,$(SOURCES:.cpp=.o))
-CSOURCES = $(foreach dir,$(SRC_SUBDIRS),$(wildcard $(dir)/*.c))
-COBJECTS = $(patsubst $(srcdir)%,$(builddir)%,$(CSOURCES:.c=.o))
+SOURCES  = /home/mattbw/ury-playd/src/cmd_result.cpp /home/mattbw/ury-playd/src/cmd.cpp /home/mattbw/ury-playd/src/player/player_file.cpp /home/mattbw/ury-playd/src/player/player_state.cpp /home/mattbw/ury-playd/src/player/player_position.cpp /home/mattbw/ury-playd/src/player/player.cpp /home/mattbw/ury-playd/src/audio/audio.cpp /home/mattbw/ury-playd/src/audio/sources/sox.cpp /home/mattbw/ury-playd/src/audio/sources/mp3.cpp /home/mattbw/ury-playd/src/audio/audio_source.cpp /home/mattbw/ury-playd/src/audio/ringbuffer.cpp /home/mattbw/ury-playd/src/audio/audio_system.cpp /home/mattbw/ury-playd/src/audio/audio_sink.cpp /home/mattbw/ury-playd/src/io/io_core.cpp /home/mattbw/ury-playd/src/io/io_response.cpp /home/mattbw/ury-playd/src/io/tokeniser.cpp /home/mattbw/ury-playd/src/main.cpp /home/mattbw/ury-playd/src/errors.cpp 
+OBJECTS  = /home/mattbw/ury-playd/build/cmd_result.o /home/mattbw/ury-playd/build/cmd.o /home/mattbw/ury-playd/build/player/player_file.o /home/mattbw/ury-playd/build/player/player_state.o /home/mattbw/ury-playd/build/player/player_position.o /home/mattbw/ury-playd/build/player/player.o /home/mattbw/ury-playd/build/audio/audio.o /home/mattbw/ury-playd/build/audio/sources/sox.o /home/mattbw/ury-playd/build/audio/sources/mp3.o /home/mattbw/ury-playd/build/audio/audio_source.o /home/mattbw/ury-playd/build/audio/ringbuffer.o /home/mattbw/ury-playd/build/audio/audio_system.o /home/mattbw/ury-playd/build/audio/audio_sink.o /home/mattbw/ury-playd/build/io/io_core.o /home/mattbw/ury-playd/build/io/io_response.o /home/mattbw/ury-playd/build/io/tokeniser.o /home/mattbw/ury-playd/build/main.o /home/mattbw/ury-playd/build/errors.o 
+CSOURCES = /home/mattbw/ury-playd/src/contrib/pa_ringbuffer/pa_ringbuffer.c 
+COBJECTS = /home/mattbw/ury-playd/build/contrib/pa_ringbuffer/pa_ringbuffer.o 
 
 # When running unit tests, we add in the test objects, defined below.
 # Note that main.o is NOT built during testing, because it contains the main
@@ -114,11 +114,13 @@ OWN_CHEADERS    = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.h))
 TO_FORMAT       = $(OWN_SOURCES) $(OWN_CSOURCES) $(OWN_HEADERS) $(OWN_CHEADERS)
 
 # Version stuff
-CXXFLAGS += -D PD_VERSION=\"$(shell git describe --tags --always)\"
+CXXFLAGS += -D PD_VERSION=\"v0.2.0-6-ga9aedb1\"
 
 # Now set up the flags needed for playd.
+# The -I/usr/include, incidentally, is to stop certain misbehaving libraries from
+# overriding the C standard library with their own badly named files.
 CFLAGS   += -c $(WARNS) $(PKG_CFLAGS)  -g -std=$(C_STD)
-CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS)  -g -std=$(CXX_STD)
+CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS)  -I/usr/include -g -std=$(CXX_STD)
 LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##
@@ -141,7 +143,10 @@ $(builddir)/%.o: $(srcdir)/%.c
 	@echo CC $@
 	@$(CC) $(CFLAGS) $< -o $@
 
-# Rule for compiling C++ code.
+# Rules for compiling C++ code.
+$(builddir)/%.o: $(srcdir)/%.cxx
+	@echo CXX $@
+	@$(CXX) $(CXXFLAGS) $< -o $@
 $(builddir)/%.o: $(srcdir)/%.cpp
 	@echo CXX $@
 	@$(CXX) $(CXXFLAGS) $< -o $@

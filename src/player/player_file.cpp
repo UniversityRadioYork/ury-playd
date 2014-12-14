@@ -15,6 +15,10 @@
 #include "player_file.hpp"
 #include "player_position.hpp"
 
+#ifndef _ASSERT_H
+#error assert has gone walkies
+#endif
+
 PlayerFile::PlayerFile(const ResponseSink *file_sink,
                        const AudioSystem &audio_system)
     : ResponseSource(file_sink), audio(nullptr), audio_system(audio_system)
