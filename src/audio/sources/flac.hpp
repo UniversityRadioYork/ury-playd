@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include <FLAC++/decode.hpp>
+#include <FLAC++/decoder.h>
 
 #include "../audio_source.hpp"
 #include "../../sample_formats.hpp"

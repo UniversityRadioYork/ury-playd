@@ -18,7 +18,7 @@
 #include <sstream>
 #include <string>
 
-#include <FLAC++/decoder.hpp>
+#include <FLAC++/decoder.h>
 
 #include "../errors.hpp"
 #include "../messages.h"
