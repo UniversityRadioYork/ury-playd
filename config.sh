@@ -194,7 +194,7 @@ add_format_to_lists()
 list_features()
 {
 	echo -n "Using "
-	if [ -z "$NO_SYS_PORTAUDIOCXX"]
+	if [ -z "$NO_SYS_PORTAUDIOCXX" ]
 	then
 		echo -n "system "
 	else
