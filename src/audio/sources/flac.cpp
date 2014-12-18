@@ -7,6 +7,8 @@
  * @see audio/audio_source.hpp
  */
 
+#ifndef NO_FLAC
+
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -209,3 +211,5 @@ FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(const ::FLAC__Fra
 		}
 	}
 }
+
+#endif // NO_FLAC

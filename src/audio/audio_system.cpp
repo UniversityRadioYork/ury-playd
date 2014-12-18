@@ -15,8 +15,6 @@
 #include <string>
 
 extern "C" {
-#include <sox.h>
-#include <mpg123.h>
 #include "portaudio.h"
 }
 
@@ -41,7 +39,14 @@ class CallbackInterface;
 #include "audio_source.hpp"
 #include "audio_system.hpp"
 
+#ifndef NO_FLAC
+#include "sources/flac.hpp"
+#endif // NO_FLAC
+
+#ifndef NO_MP3
 #include "sources/mp3.hpp"
+#endif // NO_MP3
+
 #include "sources/sox.hpp"
 
 PaSoxAudioSystem::PaSoxAudioSystem()
@@ -89,22 +94,36 @@ void PaSoxAudioSystem::SetDeviceID(int id)
 
 Audio *PaSoxAudioSystem::Load(const std::string &path) const
 {
-	AudioSource *source = nullptr;
-
-	size_t extpoint = path.find_last_of('.');
-	std::string ext = path.substr(extpoint + 1);
-
-	if (ext == "mp3") {
-		Debug() << "Using Mp3AudioSource" << std::endl;
-		source = new Mp3AudioSource(path);
-	} else {
-		Debug() << "Using SoXAudioSource" << std::endl;
-		source = new SoXAudioSource(path);
-	}
+	AudioSource *source = this->LoadSource(path);
 	assert(source != nullptr);
 
 	auto sink = new AudioSink(*source, *this);
 	return new PipeAudio(source, sink);
+}
+
+AudioSource *PaSoxAudioSystem::LoadSource(const std::string &path) const
+{
+	size_t extpoint = path.find_last_of('.');
+	std::string ext = path.substr(extpoint + 1);
+
+#ifndef NO_FLAC
+	if (ext == "flac") {
+		Debug() << "Using FlacAudioSource" << std::endl;
+		return new FlacAudioSource(path);
+	}
+#endif
+
+#ifndef NO_MP3
+	if (ext == "mp3") {
+		Debug() << "Using Mp3AudioSource" << std::endl;
+		return new Mp3AudioSource(path);
+	}
+#endif
+
+	// TODO: Ogg
+
+	Debug() << "Using SoXAudioSource" << std::endl;
+	return new SoXAudioSource(path);
 }
 
 portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,

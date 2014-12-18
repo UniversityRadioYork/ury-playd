@@ -9,6 +9,7 @@
 
 #ifndef PLAYD_AUDIO_SOURCE_FLAC_HPP
 #define PLAYD_AUDIO_SOURCE_FLAC_HPP
+#ifndef NO_FLAC
 
 #include <cstdint>
 #include <string>
@@ -60,4 +61,5 @@ private:
 	std::string path;
 };
 
+#endif // NO_FLAC
 #endif // PLAYD_AUDIO_SOURCE_FLAC_HPP

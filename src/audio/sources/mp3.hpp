@@ -9,6 +9,7 @@
 
 #ifndef PLAYD_AUDIO_SOURCE_MP3_HPP
 #define PLAYD_AUDIO_SOURCE_MP3_HPP
+#ifndef NO_MP3
 
 #include <cstdint>
 #include <string>
@@ -66,4 +67,5 @@ private:
 	void AddFormat(long rate);
 };
 
+#endif // NO_MP3
 #endif // PLAYD_AUDIO_SOURCE_MP3_HPP

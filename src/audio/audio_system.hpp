@@ -109,6 +109,15 @@ private:
 	std::string device_id; ///< The current device ID.
 
 	/**
+	 * Loads a file, creating an AudioSource.
+	 * @param path The path to the file to load.
+	 * @return An AudioSource pointer (may be nullptr, if no available
+	 *   and suitable AudioSource was found).
+	 * @see Load
+	 */
+	AudioSource *LoadSource(const std::string &path) const;
+
+	/**
 	 * Converts a string device ID to a PortAudio device.
 	 * @param id_string The device ID, as a string.
 	 * @return The device.
