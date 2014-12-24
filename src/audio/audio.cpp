@@ -14,12 +14,12 @@
 #include <string>
 
 #include "../errors.hpp"
-#include "../sample_formats.hpp"
 #include "../messages.h"
 #include "../io/io_response.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
+#include "sample_formats.hpp"
 
 PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
 {

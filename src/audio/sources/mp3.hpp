@@ -18,7 +18,7 @@
 #include <mpg123.h>
 
 #include "../audio_source.hpp"
-#include "../../sample_formats.hpp"
+#include "../sample_formats.hpp"
 
 /// AudioSource for use on MP3 files.
 class Mp3AudioSource : public AudioSource

@@ -17,8 +17,8 @@
 #include <sox.h>
 
 #include "../../errors.hpp"
-#include "../../sample_formats.hpp"
 #include "../audio_source.hpp"
+#include "../sample_formats.hpp"
 
 class SoXAudioSource : public AudioSource
 {

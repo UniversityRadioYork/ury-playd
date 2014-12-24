@@ -23,8 +23,8 @@ extern "C" {
 
 #include "../../errors.hpp"
 #include "../../messages.h"
-#include "../../sample_formats.hpp"
 #include "../audio_source.hpp"
+#include "../sample_formats.hpp"
 #include "sox.hpp"
 
 // This value is somewhat arbitrary, but corresponds to the minimum buffer size

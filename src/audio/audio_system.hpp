@@ -21,10 +21,10 @@ class CallbackInterface;
 class Device;
 }
 
-#include "../sample_formats.hpp"
+#include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
-#include "audio.hpp"
+#include "sample_formats.hpp"
 
 /**
  * An AudioSystem represents the entire audio stack used by playd.

@@ -33,11 +33,11 @@ class CallbackInterface;
 
 #include "../errors.hpp"
 #include "../messages.h"
-#include "../sample_formats.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
 #include "audio_system.hpp"
+#include "sample_formats.hpp"
 
 #ifndef NO_FLAC
 #include "sources/flac.hpp"

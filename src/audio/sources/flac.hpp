@@ -18,10 +18,10 @@
 #include <FLAC++/decoder.h>
 
 #include "../audio_source.hpp"
-#include "../../sample_formats.hpp"
+#include "../sample_formats.hpp"
 
 /// AudioSource for use on FLAC files.
-class FlacAudioSource : public AudioSource, protected FLAC::Decoder::Stream
+class FlacAudioSource : public AudioSource, protected FLAC::Decoder::File
 {
 public:
 	/**
@@ -49,6 +49,9 @@ public:
 	 * @return The corresponding error message.
 	 */
 	/* static */ std::string InitStrError(int err);
+protected:
+	FLAC__StreamDecoderWriteStatus write_callback(const FLAC__Frame *frame, const FLAC__int32 *const buffer[]) override;
+	void error_callback(FLAC__StreamDecoderErrorStatus status) override;
 private:
 	/// The current state of decoding.
 	/// @see DecodeState

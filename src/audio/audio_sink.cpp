@@ -16,11 +16,11 @@
 #include "portaudiocpp/PortAudioCpp.hxx"
 
 #include "../errors.hpp"
-#include "../sample_formats.hpp"
 #include "../messages.h"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
 #include "ringbuffer.hpp"
+#include "sample_formats.hpp"
 
 const size_t AudioSink::RINGBUF_POWER = 16;
 

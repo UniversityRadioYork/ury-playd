@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "../errors.hpp"
-#include "../sample_formats.hpp"
+#include "sample_formats.hpp"
 
 /**
  * An object responsible for decoding an audio file.

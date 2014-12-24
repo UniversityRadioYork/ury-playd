@@ -20,22 +20,20 @@
 
 #include <FLAC++/decoder.h>
 
-#include "../errors.hpp"
-#include "../messages.h"
+#include "../../errors.hpp"
+#include "../../messages.h"
 #include "../sample_formats.hpp"
-#include "audio_source.hpp"
-
-// This value is somewhat arbitrary, but corresponds to the minimum buffer size
-// used by ffmpeg, so it's probably sensible.
-const size_t FlacAudioSource::BUFFER_SIZE = 16384;
+#include "../audio_source.hpp"
+#include "flac.hpp"
 
 FlacAudioSource::FlacAudioSource(const std::string &path)
-    : buffer(), context(), path(path)
+    : buffer(), path(path)
 {
 	auto err = this->init(path);
 	if (err != FLAC__STREAM_DECODER_INIT_STATUS_OK) {
-		throw FileError("flac: can't open " + path ": " +
-		                FlacAudioSource::StrError(err));
+		throw FileError("flac: can't open " + path + ": " +
+		                FlacAudioSource::InitStrError(err));
+	}
 
 	// We need to decode one sample to get the sample rate etc.
 	// Because libflac is callback-based, we have to spin on waiting for
@@ -91,8 +89,6 @@ double FlacAudioSource::SampleRate() const
 
 size_t FlacAudioSource::BytesPerSample() const
 {
-	assert(this->context != nullptr);
-
 	// Assuming, of course, there are 8 bits in the byte. :o)
 	auto es = this->get_bits_per_sample() / 8;
 	assert(es != 0);
@@ -106,8 +102,6 @@ size_t FlacAudioSource::BytesPerSample() const
 
 std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
 {
-	assert(this->context != nullptr);
-
 	auto samples = this->SamplesFromMicros(position);
 
 	// See BytesPerSample() for an explanation of this ChannelCount().
@@ -123,7 +117,7 @@ std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
-	bool seeked = this->seek_absolute(mono_samples)
+	bool seeked = this->seek_absolute(mono_samples);
 	if (!seeked || this->get_state() == FLAC__STREAM_DECODER_SEEK_ERROR) {
 		Debug() << "flac: seek failed" << std::endl;
 		this->flush();
@@ -143,7 +137,7 @@ std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
 		this->flush();
 		throw SeekError(MSG_SEEK_FAIL);
 	}
-	return this->SamplesFromBytes(new_bytes);
+	return new_bytes / this->BytesPerSample();
 }
 
 FlacAudioSource::DecodeResult FlacAudioSource::Decode()
@@ -180,7 +174,7 @@ SampleFormat FlacAudioSource::OutputSampleFormat() const
 	return SampleFormat::PACKED_SIGNED_INT_32;
 }
 
-FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[])
+FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(const FLAC__Frame *frame, const FLAC__int32 *const buffer[])
 {
 	// Each buffer index contains a full sample, padded up to 32 bits.
 	// These are in planar (per-channel) format.
@@ -195,7 +189,7 @@ FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(const ::FLAC__Fra
 
 	// FLAC returns its samples in planar format, and playd wants them to be packed.
 	// We do a simple interleaving here.
-	for (size_t s = 0; s < nsamples / ; b++) {
+	for (size_t s = 0; s < nsamples; s++) {
 		for (size_t c = 0; c < nchans; c++) {
 			std::int32_t samp = buffer[c][s];
 
@@ -204,12 +198,20 @@ FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(const ::FLAC__Fra
 			samp <<= (4 - bps);
 
 			// Now to push it onto the buffer, which is byte-addressed.
-			std::uint8_t *sbytes = std::reinterpret_cast<std::uint8_t *>&samp;
-			for (int b = 0; b < 4; i++)
+			std::uint8_t *sbytes = reinterpret_cast<std::uint8_t *>(&samp);
+			for (int b = 0; b < 4; b++) {
 				this->buffer.push_back(sbytes[b]);
 			}
 		}
 	}
+	
+	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+}
+
+void FlacAudioSource::error_callback(FLAC__StreamDecoderErrorStatus)
+{
+	// Currently ignored.
+	// TODO(CaptainHayashi): not ignore these?
 }
 
 #endif // NO_FLAC
