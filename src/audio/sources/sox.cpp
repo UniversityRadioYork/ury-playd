@@ -32,7 +32,7 @@ extern "C" {
 const size_t SoXAudioSource::BUFFER_SIZE = 16384;
 
 SoXAudioSource::SoXAudioSource(const std::string &path)
-    : buffer(BUFFER_SIZE), context(nullptr)
+    : AudioSource(path), buffer(BUFFER_SIZE), context(nullptr)
 {
 	this->Open(path);
 }
@@ -40,13 +40,6 @@ SoXAudioSource::SoXAudioSource(const std::string &path)
 SoXAudioSource::~SoXAudioSource()
 {
 	this->Close();
-}
-
-std::string SoXAudioSource::Path() const
-{
-	assert(this->context != nullptr);
-	assert(this->context->filename != nullptr);
-	return std::string(this->context->filename);
 }
 
 std::uint8_t SoXAudioSource::ChannelCount() const

@@ -37,7 +37,6 @@ public:
 	DecodeResult Decode() override;
 	std::uint64_t Seek(std::uint64_t position) override;
 
-	std::string Path() const override;
 	std::uint8_t ChannelCount() const override;
 	double SampleRate() const override;
 	SampleFormat OutputSampleFormat() const override;
@@ -57,10 +56,6 @@ private:
 	DecodeState decode_state;
 
 	std::vector<int32_t> buffer; ///< The decoding buffer.
-
-	/// The current path.
-	/// @see Path
-	std::string path;
 };
 
 #endif // NO_FLAC

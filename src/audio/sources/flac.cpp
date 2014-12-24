@@ -27,7 +27,7 @@
 #include "flac.hpp"
 
 FlacAudioSource::FlacAudioSource(const std::string &path)
-    : buffer(), path(path)
+    : AudioSource(path), buffer()
 {
 	auto err = this->init(path);
 	if (err != FLAC__STREAM_DECODER_INIT_STATUS_OK) {
@@ -76,11 +76,6 @@ FlacAudioSource::~FlacAudioSource()
 		default:
 			return "unknown error";
 	}
-}
-
-std::string FlacAudioSource::Path() const
-{
-	return this->path;
 }
 
 std::uint8_t FlacAudioSource::ChannelCount() const

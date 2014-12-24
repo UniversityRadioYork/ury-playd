@@ -37,7 +37,6 @@ public:
 	DecodeResult Decode() override;
 	std::uint64_t Seek(std::uint64_t position) override;
 
-	std::string Path() const override;
 	std::uint8_t ChannelCount() const override;
 	double SampleRate() const override;
 	SampleFormat OutputSampleFormat() const override;
@@ -54,10 +53,6 @@ private:
 
 	/// Pointer to the mpg123 context associated with this source.
 	mpg123_handle *context;
-
-	/// The current path.
-	/// @see Path
-	std::string path;
 
 	/**
 	 * Adds a format for the given sample rate to mpg123.

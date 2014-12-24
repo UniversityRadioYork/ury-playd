@@ -36,7 +36,6 @@ public:
 	DecodeResult Decode() override;
 	std::uint64_t Seek(std::uint64_t position) override;
 
-	std::string Path() const override;
 	std::uint8_t ChannelCount() const override;
 	double SampleRate() const override;
 	SampleFormat OutputSampleFormat() const override;

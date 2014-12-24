@@ -33,7 +33,7 @@ extern "C" {
 const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 
 Mp3AudioSource::Mp3AudioSource(const std::string &path)
-    : buffer(BUFFER_SIZE), context(nullptr), path(path)
+    : AudioSource(path), buffer(BUFFER_SIZE), context(nullptr)
 {
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
@@ -79,11 +79,6 @@ void Mp3AudioSource::AddFormat(long rate)
 		// If no sample rates work, loading a file will fail anyway.
 		Debug() << "can't support" << rate << std::endl;
 	};
-}
-
-std::string Mp3AudioSource::Path() const
-{
-	return this->path;
 }
 
 std::uint8_t Mp3AudioSource::ChannelCount() const

@@ -48,15 +48,15 @@ public:
 	/// Type for the count of bytes per sample.
 	typedef int SampleByteCount;
 
+	/**
+	 * Constructs an AudioSource.
+	 * @param path The path to the file from which this AudioSource is decoding.
+	 */
+	AudioSource(const std::string &path);
+
 	//
 	// Methods that must be overridden
 	//
-
-	/**
-	 * Gets the file-path of this audio source's audio file.
-	 * @return The audio file's path.
-	 */
-	virtual std::string Path() const = 0;
 
 	/**
 	 * Performs a round of decoding.
@@ -86,14 +86,6 @@ public:
 	virtual SampleFormat OutputSampleFormat() const = 0;
 
 	/**
-	 * Returns the number of bytes for each sample this decoder outputs.
-	 * As the decoder returns packed samples, this includes the channel
-	 *   count as a factor.
-	 * @return The number of bytes per sample.
-	 */
-	size_t BytesPerSample() const;
-
-	/**
 	 * Seeks to the given position, in microseconds.
 	 * For convenience, the new position (in terms of samples) is returned.
 	 * @param position  The new position in the file, in microseconds.
@@ -104,6 +96,20 @@ public:
 	//
 	// Methods provided 'for free'
 	//
+
+	/**
+	 * Returns the number of bytes for each sample this decoder outputs.
+	 * As the decoder returns packed samples, this includes the channel
+	 *   count as a factor.
+	 * @return The number of bytes per sample.
+	 */
+	size_t BytesPerSample() const;
+
+	/**
+	 * Gets the file-path of this audio source's audio file.
+	 * @return The audio file's path.
+	 */
+	const std::string &Path() const;
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
@@ -118,6 +124,10 @@ public:
 	 * @return The corresponding song position, in microseconds.
 	 */
 	std::uint64_t MicrosFromSamples(std::uint64_t samples) const;
+
+protected:
+	/// The file-path of this AudioSource's audio file.
+	std::string path;
 };
 
 #endif // PLAYD_AUDIO_SOURCE_HPP
