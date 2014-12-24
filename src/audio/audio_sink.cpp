@@ -30,7 +30,8 @@ AudioSink::AudioSink(const AudioSource &source,
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
       position_sample_count(0),
       just_started(false),
-      input_ready(false)
+      source_out(false),
+      sink_out(false)
 {
 	this->stream = decltype(this->stream)(conf.Configure(source, *this));
 }
@@ -46,19 +47,19 @@ void AudioSink::Stop()
 	if (!this->stream->isStopped()) this->stream->abort();
 }
 
-bool AudioSink::IsStopped()
+Audio::State AudioSink::State()
 {
-	return !this->stream->isActive();
+	if (this->sink_out) return Audio::State::AT_END;
+	if (this->stream->isActive()) return Audio::State::PLAYING;
+	return Audio::State::STOPPED;
 }
 
-bool AudioSink::InputReady()
+void AudioSink::SourceOut()
 {
-	return this->input_ready;
-}
+	// The sink should only be out if the source is.
+	assert(this->source_out || !this->sink_out);
 
-void AudioSink::SetInputReady(bool ready)
-{
-	this->input_ready = ready;
+	this->source_out = true;
 }
 
 AudioSink::SamplePosition AudioSink::Position()
@@ -69,6 +70,7 @@ AudioSink::SamplePosition AudioSink::Position()
 void AudioSink::SetPosition(AudioSink::SamplePosition samples)
 {
 	this->position_sample_count = samples;
+	this->source_out = this->sink_out = false;
 	this->ring_buf.Flush();
 }
 
@@ -148,14 +150,22 @@ PlayCallbackStepResult AudioSink::PlayCallbackSuccess(
 	return std::make_pair(paContinue, in.second + samples_read);
 }
 
-PlayCallbackStepResult AudioSink::PlayCallbackFailure(char *out, unsigned long,
+PlayCallbackStepResult AudioSink::PlayCallbackFailure(char *out, unsigned long avail,
                                                       unsigned long frames_per_buf,
                                                       PlayCallbackStepResult in)
 {
 	decltype(in) result;
 
-	// End of input is ok, it means the stream can finish.
-	if (!this->InputReady()) return std::make_pair(paComplete, in.second);
+	// We've hit end of file if:
+	// 1) The decoder has said it's run out;
+	// 2) The number of available samples is exactly zero.
+	// End of input is ok: it means the stream can finish.
+	if (this->source_out && avail == 0) {
+		// Make sure future state queries return AT_END.
+		this->sink_out = true;
+
+		return std::make_pair(paComplete, in.second);
+	}
 
 	// There's been some sort of genuine issue.
 	// Make up some silence to plug the gap.

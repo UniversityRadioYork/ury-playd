@@ -151,9 +151,6 @@ private:
 	/// The sink to which audio data is sent.
 	std::unique_ptr<AudioSink> sink;
 
-	/// Whether the current file has stopped decoding.
-	bool file_ended;
-
 	/// The current decoded frame.
 	AudioSource::DecodeVector frame;
 

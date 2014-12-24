@@ -153,7 +153,7 @@ FlacAudioSource::DecodeResult FlacAudioSource::Decode()
 		std::uint64_t current;
 		if (this->get_decode_position(&current)) {
 			auto bps = this->get_bits_per_sample() / 8;
-			if (0 < bps && total <= current / bps) {
+			if ((0 < bps) && (total <= (current / bps))) {
 				this->decode_state = DecodeState::END_OF_FILE;
 				return std::make_pair(DecodeState::END_OF_FILE,
 			  		DecodeVector());
@@ -192,6 +192,7 @@ SampleFormat FlacAudioSource::OutputSampleFormat() const
 	// See https://xiph.org/flac/api/group__flac__stream__decoder.html.
 
 	// See write_callback() for an explanation of why this is always 32 bits.
+	// (This is also why BytesPerSample() is slightly weird.)
 	return SampleFormat::PACKED_SIGNED_INT_32;
 }
 

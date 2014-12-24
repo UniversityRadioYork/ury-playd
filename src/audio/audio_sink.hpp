@@ -20,6 +20,7 @@
 #include "portaudiocpp/CallbackInterface.hxx"
 #include "portaudiocpp/Stream.hxx"
 
+#include "audio.hpp"
 #include "audio_source.hpp"
 #include "ringbuffer.hpp"
 
@@ -83,12 +84,11 @@ public:
 	void Stop();
 
 	/**
-	 * Checks to see if audio playback has stopped.
-	 * @return True if the audio stream is inactive; false otherwise.
-	 * @see Start
-	 * @see Stop
+	 * Gets this AudioSink's current state (playing/stopped/at end).
+	 * @return The Audio::State representing this AudioSink's state.
+	 * @see Audio::State
 	 */
-	bool IsStopped();
+	Audio::State State();
 
 	/**
 	 * Gets the current played position in the song, in samples.
@@ -109,18 +109,12 @@ public:
 	void SetPosition(SamplePosition samples);
 
 	/**
-	 * Gets whether this AudioSink is expecting input.
-	 * @return Whether the input-ready flag has been set.
-	 * @see SetInputReady
+	 * Tells this AudioSink that the source has run out.
+	 *
+	 * When this occurs, the next time the ringbuf goes empty, the sink has
+	 * also run out and should stop.
 	 */
-	bool InputReady();
-
-	/**
-	 * Set whether this AudioSink can expect input.
-	 * @param ready True if there is input ready; false otherwise.
-	 * @see InputReady
-	 */
-	void SetInputReady(bool ready);
+	void SourceOut();
 
 	/**
 	 * Transfers a range of sample bytes into the AudioSink.
@@ -159,8 +153,11 @@ private:
 	/// successfully read its first set of samples from the buffer.
 	bool just_started;
 
-	/// Whether there is input ready for this sink.
-	bool input_ready;
+	/// Whether the source has run out of things to feed the sink.
+	bool source_out;
+
+	/// Whether the sink has run out of things to output.
+	bool sink_out;
 
 	/**
 	 * The callback proper.

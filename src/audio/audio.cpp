@@ -3,8 +3,8 @@
 
 /**
  * @file
- * Implementation of the Audio class.
- * @see audio/audio.hpp
+ * Implementation of the PipeAudio class.
+ * @see audio/pipe_audio.hpp
  */
 
 #include <algorithm>
@@ -69,7 +69,6 @@ void PipeAudio::ClearFrame()
 {
 	this->frame.clear();
 	this->frame_iterator = this->frame.end();
-	this->file_ended = false;
 }
 
 Audio::State PipeAudio::Update()
@@ -77,16 +76,12 @@ Audio::State PipeAudio::Update()
 	assert(this->sink != nullptr);
 	assert(this->src != nullptr);
 
-	bool more_frames_available = this->DecodeIfFrameEmpty();
+	bool more_available = this->DecodeIfFrameEmpty();
+	if (!more_available) this->sink->SourceOut();
 
-	if (!this->FrameFinished()) this->TransferFrame();
+	if (!this->FrameFinished()) this->TransferFrame();	
 
-	this->sink->SetInputReady(more_frames_available);
-	this->file_ended = !more_frames_available;
-
-	if (this->file_ended) return Audio::State::AT_END;
-	if (this->sink->IsStopped()) return Audio::State::STOPPED;
-	return Audio::State::PLAYING;
+	return this->sink->State();
 }
 
 void PipeAudio::TransferFrame()
