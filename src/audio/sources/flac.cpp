@@ -145,20 +145,9 @@ std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
 FlacAudioSource::DecodeResult FlacAudioSource::Decode()
 {
 	// Have we hit the end of the file?
-	// (Note: in order to know this, we need a definite count of total
-	// samples in file, bits per sample, and decode position.  If any of these
-	// are missing, we assume we're not at EOF just yet.)
-	auto total = this->get_total_samples();
-	if (0 < total) {
-		std::uint64_t current;
-		if (this->get_decode_position(&current)) {
-			auto bps = this->get_bits_per_sample() / 8;
-			if ((0 < bps) && (total <= (current / bps))) {
-				this->decode_state = DecodeState::END_OF_FILE;
-				return std::make_pair(DecodeState::END_OF_FILE,
+	if (this->get_state() == FLAC__STREAM_DECODER_END_OF_STREAM) {
+		return std::make_pair(DecodeState::END_OF_FILE,
 			  		DecodeVector());
-			}
-		}
 	}
 
 	if (!this->process_single()) {
