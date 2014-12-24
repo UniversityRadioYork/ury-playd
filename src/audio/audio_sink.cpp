@@ -70,14 +70,20 @@ AudioSink::SamplePosition AudioSink::Position()
 void AudioSink::SetPosition(AudioSink::SamplePosition samples)
 {
 	this->position_sample_count = samples;
+
+	// We might have been at the end of the file previously.
+	// If so, we might not be now, so clear the out flags.
 	this->source_out = this->sink_out = false;
+
+	// The ringbuf will have been full of samples from the old
+	// position, so we need to get rid of them.
 	this->ring_buf.Flush();
 }
 
 void AudioSink::Transfer(AudioSink::TransferIterator &start,
                          const AudioSink::TransferIterator &end)
 {
-	assert(start < end);
+	assert(start <= end);
 
 	// No point transferring 0 bytes.
 	if (start == end) return;
