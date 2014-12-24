@@ -57,7 +57,7 @@ private:
 	/// @see DecodeState
 	DecodeState decode_state;
 
-	std::vector<uint8_t> buffer; ///< The decoding buffer.
+	std::vector<int32_t> buffer; ///< The decoding buffer.
 
 	/// The current path.
 	/// @see Path

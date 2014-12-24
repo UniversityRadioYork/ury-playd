@@ -35,12 +35,18 @@ FlacAudioSource::FlacAudioSource(const std::string &path)
 		                FlacAudioSource::InitStrError(err));
 	}
 
-	// We need to decode one sample to get the sample rate etc.
+	// We need to decode some to get the sample rate etc.
 	// Because libflac is callback-based, we have to spin on waiting for
-	this->process_single();
+	// the sample rate to materialise.
+	do {
+		this->process_single();
+	} while (this->SampleRate() == 0);
 
 	Debug() << "flac: sample rate:" << this->SampleRate() << std::endl;
 	Debug() << "flac: bytes per sample:" << this->BytesPerSample()
+	        << std::endl;
+	Debug() << "flac: mono bytes per sample:"
+	        << (this->get_bits_per_sample() / 8)
 	        << std::endl;
 	Debug() << "flac: channels:" << (int)this->ChannelCount() << std::endl;
 	Debug() << "flac: playd format:" << (int)this->OutputSampleFormat()
@@ -89,35 +95,29 @@ double FlacAudioSource::SampleRate() const
 
 size_t FlacAudioSource::BytesPerSample() const
 {
-	// Assuming, of course, there are 8 bits in the byte. :o)
-	auto es = this->get_bits_per_sample() / 8;
-	assert(es != 0);
-
-	// This returns bytes per mono sample, so we need to
-	// convert to bytes per all-channels sample.
-	// All of FLAC's samples counts are like this, so you'll see this
-	// pattern all over the class.
-	return es * this->ChannelCount();
+	// We convert the samples from FLAC to 32-bit signed, for convenience.
+	// Thus, bytes per mono sample is 4; bytes per sample is 4*channels.
+	//
+	// NOTE: Because the external bps is different from the libflac bps,
+	// do NOT use this in the decoder logic!  Use the frame parameters.
+	return 4 * this->ChannelCount();
 }
 
 std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
 {
 	auto samples = this->SamplesFromMicros(position);
 
-	// See BytesPerSample() for an explanation of this ChannelCount().
-	auto mono_samples = samples * this->ChannelCount();
-
 	// Have we tried to seek past the end of the file?
 	auto clen = static_cast<unsigned long>(this->get_total_samples());
-	if (clen < mono_samples) {
-		Debug() << "flac: seek at" << mono_samples << "past EOF at"
+	if (clen < samples) {
+		Debug() << "flac: seek at" << samples << "past EOF at"
 		        << clen << std::endl;
 		Debug() << "flac: requested position micros:" << position
 		        << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
-	bool seeked = this->seek_absolute(mono_samples);
+	bool seeked = this->seek_absolute(samples);
 	if (!seeked || this->get_state() == FLAC__STREAM_DECODER_SEEK_ERROR) {
 		Debug() << "flac: seek failed" << std::endl;
 		this->flush();
@@ -137,11 +137,30 @@ std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
 		this->flush();
 		throw SeekError(MSG_SEEK_FAIL);
 	}
-	return new_bytes / this->BytesPerSample();
+	
+	// Don't use this->BytesPerSample() here--it returns bytes per *output* sample.
+	return new_bytes / (this->get_bits_per_sample() / 8);
 }
 
 FlacAudioSource::DecodeResult FlacAudioSource::Decode()
 {
+	// Have we hit the end of the file?
+	// (Note: in order to know this, we need a definite count of total
+	// samples in file, bits per sample, and decode position.  If any of these
+	// are missing, we assume we're not at EOF just yet.)
+	auto total = this->get_total_samples();
+	if (0 < total) {
+		std::uint64_t current;
+		if (this->get_decode_position(&current)) {
+			auto bps = this->get_bits_per_sample() / 8;
+			if (0 < bps && total <= current / bps) {
+				this->decode_state = DecodeState::END_OF_FILE;
+				return std::make_pair(DecodeState::END_OF_FILE,
+			  		DecodeVector());
+			}
+		}
+	}
+
 	if (!this->process_single()) {
 		// Something went wrong... or we're at end of file.
 		// Let's find out.
@@ -161,8 +180,10 @@ FlacAudioSource::DecodeResult FlacAudioSource::Decode()
 	// Else, we're good to go.
 	// The callback will have set up the vector to have precisely the
 	// correct number of bytes in it.
+	uint8_t *begin = reinterpret_cast<uint8_t *>(&*this->buffer.begin());
+	uint8_t *end = reinterpret_cast<uint8_t *>(&*this->buffer.end());
 	return std::make_pair(DecodeState::DECODING,
-		  DecodeVector(this->buffer.begin(), this->buffer.end()));
+		  DecodeVector(begin, end));
 }
 
 SampleFormat FlacAudioSource::OutputSampleFormat() const
@@ -174,37 +195,43 @@ SampleFormat FlacAudioSource::OutputSampleFormat() const
 	return SampleFormat::PACKED_SIGNED_INT_32;
 }
 
-FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(const FLAC__Frame *frame, const FLAC__int32 *const buffer[])
-{
+FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(const FLAC__Frame *frame, const FLAC__int32 *const buf[])
+{	
 	// Each buffer index contains a full sample, padded up to 32 bits.
 	// These are in planar (per-channel) format.
 
+	this->buffer.clear();
+	assert(this->buffer.empty());
+	
 	size_t nsamples = frame->header.blocksize;
-	size_t nchans = sizeof(buffer);
+	if (nsamples == 0) {
+		// No point trying to decode 0 samples.
+		return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+	}
+	
+	size_t nchans = frame->header.channels;
 
 	// Need to prepare the buffer for writing however many bytes this works out as.
-	int bps = this->BytesPerSample();
-	this->buffer.clear();
-	this->buffer.reserve(bps * nchans * nsamples);
+	// We need to get the bytes-per-sample from the *frame*, because it may well be that the global bytes-per-sample count hasn't populated yet.
+	int bits = frame->header.bits_per_sample;
+	this->buffer = std::vector<std::int32_t>(nsamples * nchans, 0);
 
 	// FLAC returns its samples in planar format, and playd wants them to be packed.
 	// We do a simple interleaving here.
+	size_t sc = 0;
 	for (size_t s = 0; s < nsamples; s++) {
 		for (size_t c = 0; c < nchans; c++) {
-			std::int32_t samp = buffer[c][s];
+			std::int32_t samp = buf[c][s];
 
 			// Now, we've set up so that we always send 32-bit samples, but this 32-bit integer may actually contain an 8, 16, or 24 bit sample.
-			// How do we convert to 32 bit?  Simple--left bitshift up the missing number of bytes.
-			samp <<= (4 - bps);
-
-			// Now to push it onto the buffer, which is byte-addressed.
-			std::uint8_t *sbytes = reinterpret_cast<std::uint8_t *>(&samp);
-			for (int b = 0; b < 4; b++) {
-				this->buffer.push_back(sbytes[b]);
-			}
+			// How do we convert to 32 bit?  Simple--left bitshift up the missing number of bits.
+			this->buffer[sc] = samp << (32 - bits);
+			sc++;
 		}
 	}
-	
+
+	assert(this->buffer.size() == nchans * nsamples);
+	assert(sc == nchans * nsamples);
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
