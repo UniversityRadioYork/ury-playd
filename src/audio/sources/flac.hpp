@@ -41,7 +41,6 @@ public:
 	std::uint8_t ChannelCount() const override;
 	double SampleRate() const override;
 	SampleFormat OutputSampleFormat() const override;
-	size_t BytesPerSample() const override;
 
 	/**
 	 * Converts a FLAC init error to an error message.

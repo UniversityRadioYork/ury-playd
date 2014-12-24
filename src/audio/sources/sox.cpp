@@ -66,20 +66,6 @@ double SoXAudioSource::SampleRate() const
 	return this->context->signal.rate;
 }
 
-size_t SoXAudioSource::BytesPerSample() const
-{
-	assert(this->context != nullptr);
-
-	// Since libsox always outputs 32-bit samples, the bytes per sample is
-	// always 4 per channel.
-
-	// SoX has a slightly peculiar notion of sample counts, in that it
-	// regards each channel as having its own separate sample, so we need
-	// to multiply and divide sample counts by the channel count when
-	// talking to SoX.
-	return 4 * this->ChannelCount();
-}
-
 std::uint64_t SoXAudioSource::Seek(std::uint64_t position)
 {
 	assert(this->context != nullptr);

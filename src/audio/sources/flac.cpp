@@ -93,16 +93,6 @@ double FlacAudioSource::SampleRate() const
 	return static_cast<double>(this->get_sample_rate());
 }
 
-size_t FlacAudioSource::BytesPerSample() const
-{
-	// We convert the samples from FLAC to 32-bit signed, for convenience.
-	// Thus, bytes per mono sample is 4; bytes per sample is 4*channels.
-	//
-	// NOTE: Because the external bps is different from the libflac bps,
-	// do NOT use this in the decoder logic!  Use the frame parameters.
-	return 4 * this->ChannelCount();
-}
-
 std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
 {
 	auto samples = this->SamplesFromMicros(position);

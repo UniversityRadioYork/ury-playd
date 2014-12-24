@@ -3,7 +3,8 @@
 
 /**
  * @file
- * The SampleFormat enumeration.
+ * The SampleFormat enumeration and related declarations.
+ * @see audio/sample_formats.cpp
  */
 
 #include <cstdint>
@@ -31,5 +32,8 @@ enum class SampleFormat : std::uint8_t {
 	PACKED_SIGNED_INT_32,  ///< Packed 32-bit signed integer.
 	PACKED_FLOAT_32        ///< Packed 32-bit floating point.
 };
+
+/// Map from SampleFormats to bytes-per-mono-sample.
+extern const size_t SAMPLE_FORMAT_BPS[6];
 
 #endif // PLAYD_SAMPLE_FORMATS_HPP

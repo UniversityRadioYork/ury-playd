@@ -106,23 +106,6 @@ double Mp3AudioSource::SampleRate() const
 	return static_cast<double>(rate);
 }
 
-size_t Mp3AudioSource::BytesPerSample() const
-{
-	assert(this->context != nullptr);
-
-	int encoding = 0;
-	mpg123_getformat(this->context, nullptr, nullptr, &encoding);
-
-	auto es = mpg123_encsize(encoding);
-	assert(es != 0);
-
-	// mpg123_encsize returns bytes per mono sample, so we need to
-	// convert to bytes per all-channels sample.
-	// All of mpg123's samples counts are like this, so you'll see this
-	// pattern all over the class.
-	return es * this->ChannelCount();
-}
-
 std::uint64_t Mp3AudioSource::Seek(std::uint64_t position)
 {
 	assert(this->context != nullptr);

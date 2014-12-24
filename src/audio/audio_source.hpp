@@ -91,7 +91,7 @@ public:
 	 *   count as a factor.
 	 * @return The number of bytes per sample.
 	 */
-	virtual size_t BytesPerSample() const = 0;
+	size_t BytesPerSample() const;
 
 	/**
 	 * Seeks to the given position, in microseconds.
