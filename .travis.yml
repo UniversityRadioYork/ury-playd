@@ -24,7 +24,7 @@ compiler:
   - gcc
 
 script:
-  - make coverage
+  - ./config.sh && make coverage
 
 # coveralls doesn't like gcc (segfaults)
 after_success:
