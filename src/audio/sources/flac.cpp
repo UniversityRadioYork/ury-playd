@@ -7,8 +7,6 @@
  * @see audio/audio_source.hpp
  */
 
-#ifndef NO_FLAC
-
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -215,5 +213,3 @@ void FlacAudioSource::error_callback(FLAC__StreamDecoderErrorStatus)
 	// Currently ignored.
 	// TODO(CaptainHayashi): not ignore these?
 }
-
-#endif // NO_FLAC

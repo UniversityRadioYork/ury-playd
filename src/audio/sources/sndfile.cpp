@@ -7,8 +7,6 @@
  * @see audio/audio_source.hpp
  */
 
-#ifndef NO_SNDFILE
-
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -117,5 +115,3 @@ SampleFormat SndfileAudioSource::OutputSampleFormat() const
 	              "sndfile outputs int, which we need to be 4 bytes");
 	return SampleFormat::PACKED_SIGNED_INT_32;
 }
-
-#endif // NO_SNDFILE

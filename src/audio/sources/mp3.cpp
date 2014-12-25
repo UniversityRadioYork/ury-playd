@@ -7,8 +7,6 @@
  * @see audio/sources/mp3.hpp
  */
 
-#ifndef NO_MP3
-
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -190,5 +188,3 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 			assert(false);
 	}
 }
-
-#endif // NO_MP3
