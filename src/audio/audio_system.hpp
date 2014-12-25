@@ -73,26 +73,26 @@ public:
 };
 
 /**
- * Implementation of AudioSystem using libsox and PortAudio.
+ * Implementation of AudioSystem using PortAudio and friends.
  *
- * PaSoxAudioSystem is a RAII-style class: it loads the audio libraries on
+ * PaAudioSystem is a RAII-style class: it loads the audio libraries on
  * construction and unloads them on termination.  As such, it's probably not
  * wise to construct multiple AudioSystem instances.
  */
-class PaSoxAudioSystem : public AudioSystem, public AudioSinkConfigurator
+class PaAudioSystem : public AudioSystem, public AudioSinkConfigurator
 {
 public:
 	/**
-	 * Constructs a PaSoxAudioSystem, initialising its libraries.
+	 * Constructs a PaAudioSystem, initialising its libraries.
 	 * This sets the current device ID to a sane default; use SetDeviceID
 	 * to change it.
 	 */
-	PaSoxAudioSystem();
+	PaAudioSystem();
 
 	/**
-	 * Destructs an PaSoxAudioSystem, uninitialising its libraries.
+	 * Destructs an PaAudioSystem, uninitialising its libraries.
 	 */
-	virtual ~PaSoxAudioSystem();
+	virtual ~PaAudioSystem();
 
 	// AudioSystem implementation
 	Audio *Load(const std::string &path) const override;

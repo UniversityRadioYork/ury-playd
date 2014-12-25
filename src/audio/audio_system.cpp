@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of the PaSoxAudioSystem class.
+ * Implementation of the PaAudioSystem class.
  * @see audio/audio_system.hpp
  */
 
@@ -42,9 +42,8 @@ class CallbackInterface;
 #include "sources/flac.hpp"
 #include "sources/mp3.hpp"
 #include "sources/sndfile.hpp"
-#include "sources/sox.hpp"
 
-PaSoxAudioSystem::PaSoxAudioSystem()
+PaAudioSystem::PaAudioSystem()
 {
 	portaudio::System::initialize();
 
@@ -55,7 +54,7 @@ PaSoxAudioSystem::PaSoxAudioSystem()
 	this->device_id = -1;
 }
 
-PaSoxAudioSystem::~PaSoxAudioSystem()
+PaAudioSystem::~PaAudioSystem()
 {
 	portaudio::System::terminate();
 
@@ -64,7 +63,7 @@ PaSoxAudioSystem::~PaSoxAudioSystem()
 #endif // NO_MP3
 }
 
-std::vector<AudioSystem::Device> PaSoxAudioSystem::GetDevicesInfo()
+std::vector<AudioSystem::Device> PaAudioSystem::GetDevicesInfo()
 {
 	auto &pa = portaudio::System::instance();
 	std::vector<AudioSystem::Device> list;
@@ -77,7 +76,7 @@ std::vector<AudioSystem::Device> PaSoxAudioSystem::GetDevicesInfo()
 	return list;
 }
 
-bool PaSoxAudioSystem::IsOutputDevice(int id)
+bool PaAudioSystem::IsOutputDevice(int id)
 {
 	auto &pa = portaudio::System::instance();
 	if (id < 0 || id >= pa.deviceCount()) return false;
@@ -86,12 +85,12 @@ bool PaSoxAudioSystem::IsOutputDevice(int id)
 	return !dev.isInputOnlyDevice();
 }
 
-void PaSoxAudioSystem::SetDeviceID(int id)
+void PaAudioSystem::SetDeviceID(int id)
 {
 	this->device_id = std::to_string(id);
 }
 
-Audio *PaSoxAudioSystem::Load(const std::string &path) const
+Audio *PaAudioSystem::Load(const std::string &path) const
 {
 	AudioSource *source = this->LoadSource(path);
 	assert(source != nullptr);
@@ -100,7 +99,7 @@ Audio *PaSoxAudioSystem::Load(const std::string &path) const
 	return new PipeAudio(source, sink);
 }
 
-AudioSource *PaSoxAudioSystem::LoadSource(const std::string &path) const
+AudioSource *PaAudioSystem::LoadSource(const std::string &path) const
 {
 	size_t extpoint = path.find_last_of('.');
 	std::string ext = path.substr(extpoint + 1);
@@ -129,7 +128,7 @@ AudioSource *PaSoxAudioSystem::LoadSource(const std::string &path) const
 	throw FileError("Unknown file format: " + ext);
 }
 
-portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
+portaudio::Stream *PaAudioSystem::Configure(const AudioSource &source,
                                                portaudio::CallbackInterface &cb) const
 {
 	std::uint8_t channel_count = source.ChannelCount();
@@ -149,7 +148,7 @@ portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
 	return new portaudio::InterfaceCallbackStream(pars, cb);
 }
 
-/* static */ const portaudio::Device &PaSoxAudioSystem::PaDevice(
+/* static */ const portaudio::Device &PaAudioSystem::PaDevice(
                 const std::string &id)
 {
 	auto &pa = portaudio::System::instance();
@@ -169,7 +168,7 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
 };
 
-/* static */ portaudio::SampleDataFormat PaSoxAudioSystem::PaFormat(
+/* static */ portaudio::SampleDataFormat PaAudioSystem::PaFormat(
                 SampleFormat fmt)
 {
 	try {

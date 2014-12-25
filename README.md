@@ -42,41 +42,47 @@ do weird things in the presence of Telnet-isms.
 
 ## Features
 
-* Plays virtually anything [libsox] can play (notably, MP3s, OGGs, and FLACs)
-* Seek (microseconds, seconds, minutes etc)
-* Frequently announces the current position
-* TCP/IP interface with text protocol
-* Deliberately not much else
+* Plays MP3s, Ogg Vorbis, FLACs and WAV files;
+* Seek;
+* Frequently announces the current position;
+* TCP/IP interface with text protocol;
+* Deliberately not much else.
 
 
 ## Philosophy
 
 `playd` is developed using the following guidelines:
 
-* Do one thing and do it well
-* Be hackable
-* Favour simplicity over performance
-* Favour simplicity over features
-* Let other programs handle the shinies
+* Do one thing and do it well;
+* Be hackable;
+* Favour simplicity over performance;
+* Favour simplicity over features;
+* Let other programs handle the shinies.
 
 
 ## Compilation
 
 ### Requirements
 
-* [libsox] (1.14.1)
-* [libuv] (0.11.29)
-* [PortAudio] (19_20140130)
+* [libuv] 0.10+
+* [PortAudio] 19_20140130
 * A C++11 compiler (recent versions of [clang], [gcc], and Visual Studio
   work)
+
+The following dependencies are used for file format support, and you'll need at
+least one of them:
+
+* [libmpg123] 1.20.1+, for MP3 support;
+* [libflac++] 1.3.0+, for FLAC support;
+* [libsndfile] 1.0.25+, for Ogg Vorbis, WAV, and FLAC support (if libflac++ isn't available).
 
 Certain operating systems may need additional dependencies; see the OS-specific
 build instructions below.
 
 ### POSIX (GNU/Linux, BSD, OS X)
 
-`playd` comes with a GNU-compatible Makefile that can be used both to
-make and install.
+`playd` comes `config.sh`, a Bourne shell script that will generate a
+GNU-compatible Makefile that can be used both to make and install.
 
 To use the Makefile, you'll need [GNU Make] and `pkg-config` (or equivalent),
 and pkg-config packages for PortAudio, libsox and libuv.  We've tested building
@@ -86,8 +92,9 @@ should work.
 Using the Makefile is straightforward:
 
 * Ensure you have the dependencies above;
-* Read the `Makefile`, to see if any variables need to be overridden for your
-  environment;
+* Run `config.sh` (optionally, read it first to see if any variables need to be
+  overriden for your environment);
+* Optionally read the generated `Makefile`, to make sure it's ok;
 * Run `make` (or whatever GNU Make is called on your OS; in FreeBSD, for
   example, it'd be `gmake`), and, optionally, `sudo make install`.
   The latter will globally install playd and its man page.
@@ -110,7 +117,7 @@ Collection and standard package repository.  (The FreeBSD port for PortAudio
 doesn't build C++ bindings, but we bundle them anyway.)  To install them as
 packages:
 
-    root@freebsd:/ # pkg install gmake sox libuv portaudio2 pkgconf
+    root@freebsd:/ # pkg install gmake libmpg123 libsndfile libflac libuv portaudio2 pkgconf
 
 Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
 `playd` (as root):
@@ -136,8 +143,7 @@ We haven't managed ourselves, but assuming you can build all the dependencies,
 ### PortAudio C++ Bindings
 
 If you have the PortAudio C++ bindings available, those may be used in place of
-the bundled bindings.  This will happen automatically when using the Makefile,
-if the C++ bindings are installed as a pkg-config package.
+the bundled bindings.  Usually, `config.sh` will detect them and use them.
 
 __Visual Studio users:__ The Visual Studio 7.1 project supplied in the
 PortAudio source distribution for building the C++ bindings
@@ -163,6 +169,9 @@ as well as [CATCH] (see LICENSE.catch).
 [gcc]:                   https://gcc.gnu.org
 [GNU Make]:              https://www.gnu.org/software/make/
 [Homebrew]:              http://brew.sh
+[libmpg123]:             http://www.mpg123.de
+[libflac++]:             https://xiph.org/flac/
+[libsndfile]:            http://www.mega-nerd.com/libsndfile/
 [libsox]:                http://sox.sourceforge.net
 [libuv]:                 https://github.com/joyent/libuv
 [MIT licence]:           http://opensource.org/licenses/MIT

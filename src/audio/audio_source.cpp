@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of the SoXAudioSource class.
+ * Implementation of the AudioSource class.
  * @see audio/audio_source.hpp
  */
 

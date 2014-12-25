@@ -186,7 +186,7 @@ find_mp3()
 # Finds libsndfile, if requested.
 find_sndfile()
 {
-	echo -n "  libsndfile: "
+	echo -n "  libsndfile:    "
 
 	if [ -n "$NO_SNDFILE" ]
 	then

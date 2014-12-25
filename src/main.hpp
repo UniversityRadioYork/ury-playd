@@ -55,15 +55,15 @@ private:
 	static const int INVALID_ID = -1;
 
 	std::vector<std::string> argv; ///< The argument vector.
-	PaSoxAudioSystem audio;        ///< The audio subsystem.
+	PaAudioSystem audio;           ///< The audio subsystem.
 
-	PlayerFile pfile;         ///< The player-file subsystem.
-	PlayerPosition pposition; ///< The player-position subsystem.
-	PlayerState pstate;       ///< The player-state subsystem.
-	Player player;            ///< The player subsystem.
+	PlayerFile pfile;              ///< The player-file subsystem.
+	PlayerPosition pposition;      ///< The player-position subsystem.
+	PlayerState pstate;            ///< The player-state subsystem.
+	Player player;                 ///< The player subsystem.
 
-	CommandHandler handler;     ///< The command handler.
-	std::unique_ptr<IoCore> io; ///< The I/O handler.
+	CommandHandler handler;        ///< The command handler.
+	std::unique_ptr<IoCore> io;    ///< The I/O handler.
 
 	void RespondRaw(const std::string &string) const override;
 
