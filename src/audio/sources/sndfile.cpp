@@ -113,6 +113,8 @@ SampleFormat SndfileAudioSource::OutputSampleFormat() const
 {
 	// Because we use int-sized reads, assume this corresponds to 32-bit signed int.
 	// Really, we shouldn't assume int is 32-bit!
+	static_assert(sizeof(int) == 4,
+	              "sndfile outputs int, which we need to be 4 bytes");
 	return SampleFormat::PACKED_SIGNED_INT_32;
 }
 
