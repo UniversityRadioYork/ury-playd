@@ -28,14 +28,14 @@
 #   Package name overrides:
 #     FLACXX_PKG....................FLAC++ pkg-config package
 #     LIBMPG123_PKG..............libmpg123 pkg-config package
-#     LIBVORBISFILE_PKG......libvorbisfile pkg-config package
+#     LIBSNDFILE_PKG............libsndfile pkg-config package
 #     PORTAUDIO_PKG..............PortAudio pkg-config package
 #     PORTAUDIOCXX_PKG.........PortAudio++ pkg-config package
 #
 #   File format flags (set to non-empty string to activate):
 #     NO_FLAC..............................don't support FLAC
 #     NO_MP3................................don't support MP3
-#     NO_OGG.........................don't support Ogg Vorbis
+#     NO_SNDFILE.............don't support libsndfile formats
 #
 #   Other flags (set to non-empty string to activate):
 #     NO_SYS_PORTAUDIOCXX....use bundled PortAudio++ bindings
@@ -44,7 +44,7 @@
 # Notes:
 #   - lack of FLAC++ implies NO_FLAC;
 #   - lack of libmpg123 implies NO_MP3;
-#   - lack of libvorbisfile implies NO_OGG;
+#   - lack of libsndfile implies NO_SNDFILE;
 #   - lack of portaudio++ implies NO_SYS_PORTAUDIOCXX.
 #   - lack of pkgconf/pkg-config or portaudio is fatal.
 
@@ -124,7 +124,7 @@ find_deps()
 	find_pkgconf
 	find_flac
 	find_mp3
-	find_ogg
+	find_sndfile
 	find_portaudio
 	find_portaudiocxx
 }
@@ -183,20 +183,20 @@ find_mp3()
 	disable_if_no_pkg LIBMPG123 MP3
 }
 
-# Finds libvorbisfile to provide Ogg support, if requested.
-find_ogg()
+# Finds libsndfile, if requested.
+find_sndfile()
 {
-	echo -n "  libvorbisfile: "
+	echo -n "  libsndfile: "
 
-	if [ -n "$NO_OGG" ]
+	if [ -n "$NO_SNDFILE" ]
 	then
-		echo "ogg disabled; skipping"
+		echo "sndfile disabled; skipping"
 		return
 	fi
 
-	try_use_pkg LIBVORBISFILE "libvorbisfile"
-	try_use_pkg LIBVORBISFILE "vorbisfile"
-	disable_if_no_pkg LIBVORBISFILE OGG
+	try_use_pkg LIBSNDFILE "libsndfile"
+	try_use_pkg LIBSNDFILE "sndfile"
+	disable_if_no_pkg LIBSNDFILE SNDFILE
 }
 
 # Finds PortAudio.
@@ -260,7 +260,7 @@ list_features()
 
 	add_format_to_lists flac NO_FLAC
 	add_format_to_lists mp3 NO_MP3
-	add_format_to_lists ogg NO_OGG
+	add_format_to_lists sndfile NO_SNDFILE
 
 	# Strip off trailing spaces, if any.
 	FORMATS=`echo "$FORMATS" | sed 's/^ //g'`
@@ -283,7 +283,7 @@ list_features()
 # Also lists on stdout.
 list_packages()
 {
-	PACKAGES=`echo "$FLACXX_PKG $LIBMPG123_PKG $LIBVORBISFILE_PKG $PORTAUDIO_PKG $PORTAUDIOCXX_PKG" | sed 's/  */ /g'`
+	PACKAGES=`echo "$FLACXX_PKG $LIBMPG123_PKG $LIBSNDFILE_PKG $PORTAUDIO_PKG $PORTAUDIOCXX_PKG" | sed 's/  */ /g'`
 	echo "PACKAGES USED:"
 	echo "  $PACKAGES"
 }
@@ -301,9 +301,9 @@ find_sources()
 	cxx_expr="\( -name "*.cpp" -o -name "*.cxx" \)"
 
 	# Disable feature files if those features are disabled.
-	if [ -n "$NO_FLAC" ]; then cxx_expr="$cxx_expr -a \( \! -name '*flac*' \)"; fi
-	if [ -n "$NO_MP3"  ]; then cxx_expr="$cxx_expr -a \( \! -name '*mp3*'  \)"; fi
-	if [ -n "$NO_OGG"  ]; then cxx_expr="$cxx_expr -a \( \! -name '*ogg*'  \)"; fi
+	if [ -n "$NO_FLAC"    ]; then cxx_expr="$cxx_expr -a \( \! -name '*flac*' \)"; fi
+	if [ -n "$NO_MP3"     ]; then cxx_expr="$cxx_expr -a \( \! -name '*mp3*'  \)"; fi
+	if [ -n "$NO_SNDFILE" ]; then cxx_expr="$cxx_expr -a \( \! -name '*sndfile*'  \)"; fi
 
 	CXXSOURCES=`eval find "$SRCDIR" "$cxx_expr"`
 

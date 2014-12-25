@@ -39,21 +39,18 @@ class CallbackInterface;
 #include "audio_system.hpp"
 #include "sample_formats.hpp"
 
-#ifndef NO_FLAC
 #include "sources/flac.hpp"
-#endif // NO_FLAC
-
-#ifndef NO_MP3
 #include "sources/mp3.hpp"
-#endif // NO_MP3
-
+#include "sources/sndfile.hpp"
 #include "sources/sox.hpp"
 
 PaSoxAudioSystem::PaSoxAudioSystem()
 {
 	portaudio::System::initialize();
-	sox_format_init();
+
+#ifndef NO_MP3
 	mpg123_init();
+#endif // NO_MP3
 
 	this->device_id = -1;
 }
@@ -61,8 +58,10 @@ PaSoxAudioSystem::PaSoxAudioSystem()
 PaSoxAudioSystem::~PaSoxAudioSystem()
 {
 	portaudio::System::terminate();
-	sox_format_quit();
+
+#ifndef NO_MP3
 	mpg123_exit();
+#endif // NO_MP3
 }
 
 std::vector<AudioSystem::Device> PaSoxAudioSystem::GetDevicesInfo()
@@ -120,10 +119,14 @@ AudioSource *PaSoxAudioSystem::LoadSource(const std::string &path) const
 	}
 #endif
 
-	// TODO: Ogg
+#ifndef NO_SNDFILE
+	if (ext == "ogg" || ext == "wav" || ext == "flac") {
+		Debug() << "Using SndfileAudioSource" << std::endl;
+		return new SndfileAudioSource(path);
+	}
+#endif
 
-	Debug() << "Using SoXAudioSource" << std::endl;
-	return new SoXAudioSource(path);
+	throw FileError("Unknown file format: " + ext);
 }
 
 portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
