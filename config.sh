@@ -5,41 +5,42 @@
 #
 #
 # Configuration script for playd.
+# This config script is directed by several environment
+# variables, given below.
 #
 #
 # Variables:
 #   General:
-#     PROGNAME...................................program name
-#                                          (default: 'playd')
-#     PROGVER.................................program version
-#                                  (default: acquire via git)
+#     PROGNAME.....................................................program name
+#                                                            (default: 'playd')
+#     PROGVER...................................................program version
+#                                                    (default: acquire via git)
 #
 #   Directories:
-#     SRCDIR........................directory of source files
-#                                            (default: ./src)
-#     BUILDDIR.....................directory for object files
-#                                          (default: ./build)
-#     PREFIX.........................root of where to install
-#                                      (default: ./usr/local)
+#     SRCDIR..........................................directory of source files
+#                                                              (default: ./src)
+#     BUILDDIR.......................................directory for object files
+#                                                            (default: ./build)
+#     PREFIX...........................................root of where to install
+#                                                        (default: ./usr/local)
 #
 #   Programs:
-#     PKGCONF........................pkg-config or equivalent
+#     PKGCONF..........................................pkg-config or equivalent
 #
 #   Package name overrides:
-#     FLACXX_PKG....................FLAC++ pkg-config package
-#     LIBMPG123_PKG..............libmpg123 pkg-config package
-#     LIBSNDFILE_PKG............libsndfile pkg-config package
-#     PORTAUDIO_PKG..............PortAudio pkg-config package
-#     PORTAUDIOCXX_PKG.........PortAudio++ pkg-config package
+#     FLACXX_PKG......................................FLAC++ pkg-config package
+#     LIBMPG123_PKG................................libmpg123 pkg-config package
+#     LIBSNDFILE_PKG..............................libsndfile pkg-config package
+#     PORTAUDIO_PKG................................PortAudio pkg-config package
+#     PORTAUDIOCXX_PKG...........................PortAudio++ pkg-config package
 #
 #   File format flags (set to non-empty string to activate):
-#     NO_FLAC..............................don't support FLAC
-#     NO_MP3................................don't support MP3
-#     NO_SNDFILE.............don't support libsndfile formats
+#     NO_FLAC................................................don't support FLAC
+#     NO_MP3..................................................don't support MP3
+#     NO_SNDFILE...............................don't support libsndfile formats
 #
 #   Other flags (set to non-empty string to activate):
-#     NO_SYS_PORTAUDIOCXX....use bundled PortAudio++ bindings
-#                                         instead of system's
+#     NO_SYS_PORTAUDIOCXX...........use bundled PortAudio++ instead of system's
 #
 # Notes:
 #   - lack of FLAC++ implies NO_FLAC;
@@ -47,6 +48,19 @@
 #   - lack of libsndfile implies NO_SNDFILE;
 #   - lack of portaudio++ implies NO_SYS_PORTAUDIOCXX.
 #   - lack of pkgconf/pkg-config or portaudio is fatal.
+
+# Runs `make clean`, if a Makefile is present.
+clean()
+{
+	if [ -f "Makefile" ]
+	then
+		echo 'running `make clean` first...'
+		make clean >/dev/null
+		echo 'removing existing Makefile...'
+		rm Makefile
+		echo
+	fi
+}
 
 #
 # Misc variable finding
@@ -60,7 +74,7 @@ find_name_and_version()
 	if [ -z "$PROGVER" ]
 	then
 		PROGVER=`git describe --tags --always`
-		if [ -ne $? 0 ]
+		if [ "$?" -ne 0 ]
 		then
 			echo "not a git clone, need to set 'PROGVER'."
 			echo "cannot continue"
@@ -76,13 +90,13 @@ find_dirs()
 	echo "DIRECTORIES:"
 
 	if [ -z "$SRCDIR" ]; then SRCDIR="`pwd`/src"; fi
-	echo "  srcdir:   $SRCDIR"
+	echo "  srcdir:        $SRCDIR"
 
 	if [ -z "$BUILDDIR" ]; then BUILDDIR="`pwd`/build"; fi
-	echo "  builddir: $BUILDDIR"
+	echo "  builddir:      $BUILDDIR"
 
 	if [ -z "$PREFIX" ]; then PREFIX="/usr/local"; fi
-	echo "  prefix:   $PREFIX"
+	echo "  prefix:        $PREFIX"
 }
 
 
@@ -234,9 +248,9 @@ add_format_to_lists()
 {
 	if [ -z `eval echo '$'"$2"` ]
 	then
-		FORMATS="$FORMATS $1"
+		FORMATS=`printf "%s\n%s" "$FORMATS" "$1"`
 	else
-		FCFLAGS="$FCFLAGS -D$2"
+		FCFLAGS=`printf "%s\n%s" "$FCFLAGS" "-D$2"`
 	fi
 
 }
@@ -260,11 +274,13 @@ list_features()
 
 	add_format_to_lists flac NO_FLAC
 	add_format_to_lists mp3 NO_MP3
-	add_format_to_lists sndfile NO_SNDFILE
+	add_format_to_lists flac NO_SNDFILE
+	add_format_to_lists ogg NO_SNDFILE
+	add_format_to_lists wav NO_SNDFILE
 
-	# Strip off trailing spaces, if any.
-	FORMATS=`echo "$FORMATS" | sed 's/^ //g'`
-	FCFLAGS=`echo "$FCFLAGS" | sed 's/^ //g'`
+	# Sort, uniquify, space-delimit and strip formats/flags
+	FORMATS=`echo "$FORMATS" | sort | uniq | tr "\n" " "| sed 's/^ //g'`
+	FCFLAGS=`echo "$FCFLAGS" | sort | uniq | tr "\n" " "| sed 's/^ //g'`
 
 	# No point building playd with no file formats!
 	if [ -z "$FORMATS" ]
@@ -366,6 +382,7 @@ write_makefile()
 # Main script
 #
 
+clean
 find_name_and_version
 echo
 find_dirs
