@@ -177,8 +177,8 @@ find_flac()
 		return
 	fi
 
-	try_use_pkg FLACXX "FLAC++"
-	try_use_pkg FLACXX "flac++"
+	try_use_pkg       FLACXX "FLAC++"
+	try_use_pkg       FLACXX "flac++"
 	disable_if_no_pkg FLACXX FLAC
 }
 
@@ -193,7 +193,7 @@ find_mp3()
 		return
 	fi
 
-	try_use_pkg LIBMPG123 "libmpg123"
+	try_use_pkg       LIBMPG123 "libmpg123"
 	disable_if_no_pkg LIBMPG123 MP3
 }
 
@@ -208,8 +208,8 @@ find_sndfile()
 		return
 	fi
 
-	try_use_pkg LIBSNDFILE "libsndfile"
-	try_use_pkg LIBSNDFILE "sndfile"
+	try_use_pkg       LIBSNDFILE "libsndfile"
+	try_use_pkg       LIBSNDFILE "sndfile"
 	disable_if_no_pkg LIBSNDFILE SNDFILE
 }
 
@@ -309,6 +309,15 @@ list_packages()
 # Makefile making
 #
 
+# If $0 is non-empty, adds to cxx_expr a rule removing filenames containing $1.
+disable_feature_files()
+{
+	if [ -n "$0" ]
+	then
+		cxx_expr="${cxx_expr} -a \( \! -name '*"$1"*' \)"
+	fi
+}
+
 # Finds all relevant sources.
 # Outputs to the variables $CXXSOURCES and $CSOURCES.
 find_sources()
@@ -317,9 +326,9 @@ find_sources()
 	cxx_expr="\( -name "*.cpp" -o -name "*.cxx" \)"
 
 	# Disable feature files if those features are disabled.
-	if [ -n "$NO_FLAC"    ]; then cxx_expr="$cxx_expr -a \( \! -name '*flac*' \)"; fi
-	if [ -n "$NO_MP3"     ]; then cxx_expr="$cxx_expr -a \( \! -name '*mp3*'  \)"; fi
-	if [ -n "$NO_SNDFILE" ]; then cxx_expr="$cxx_expr -a \( \! -name '*sndfile*'  \)"; fi
+	disable_feature_files "$NO_FLAC"    flac
+	disable_feature_files "$NO_MP3"     mp3
+	disable_feature_files "$NO_SNDFILE" sndfile
 
 	CXXSOURCES=`eval find "$SRCDIR" "$cxx_expr"`
 
