@@ -309,12 +309,12 @@ list_packages()
 # Makefile making
 #
 
-# If $0 is non-empty, adds to cxx_expr a rule removing filenames containing $1.
+# If $1 is non-empty, adds to cxx_expr a rule removing filenames containing $2.
 disable_feature_files()
 {
-	if [ -n "$0" ]
+	if [ -n "$1" ]
 	then
-		cxx_expr="${cxx_expr} -a \( \! -name '*"$1"*' \)"
+		cxx_expr="${cxx_expr} -a \( \! -name '*"$2"*' \)"
 	fi
 }
 
@@ -326,9 +326,9 @@ find_sources()
 	cxx_expr="\( -name "*.cpp" -o -name "*.cxx" \)"
 
 	# Disable feature files if those features are disabled.
-	disable_feature_files "$NO_FLAC"    flac
-	disable_feature_files "$NO_MP3"     mp3
-	disable_feature_files "$NO_SNDFILE" sndfile
+	disable_feature_files "${NO_FLAC}"    flac
+	disable_feature_files "${NO_MP3}"     mp3
+	disable_feature_files "${NO_SNDFILE}" sndfile
 
 	CXXSOURCES=`eval find "$SRCDIR" "$cxx_expr"`
 
