@@ -95,7 +95,7 @@ Audio *PaAudioSystem::Load(const std::string &path) const
 	AudioSource *source = this->LoadSource(path);
 	assert(source != nullptr);
 
-	auto sink = new AudioSink(*source, *this);
+	auto sink = new AudioSink(*source, this->device_id);
 	return new PipeAudio(source, sink);
 }
 
@@ -128,51 +128,3 @@ AudioSource *PaAudioSystem::LoadSource(const std::string &path) const
 	throw FileError("Unknown file format: " + ext);
 }
 
-portaudio::Stream *PaAudioSystem::Configure(const AudioSource &source,
-                                            portaudio::CallbackInterface &cb) const
-{
-	std::uint8_t channel_count = source.ChannelCount();
-	SampleFormat sample_format = source.OutputSampleFormat();
-	double sample_rate = source.SampleRate();
-	const portaudio::Device &device = PaDevice(this->device_id);
-
-	portaudio::DirectionSpecificStreamParameters out_pars(
-	                device, channel_count, PaFormat(sample_format), true,
-	                device.defaultLowOutputLatency(), nullptr);
-
-	portaudio::StreamParameters pars(
-	                portaudio::DirectionSpecificStreamParameters::null(),
-	                out_pars, sample_rate, paFramesPerBufferUnspecified,
-	                paClipOff);
-
-	return new portaudio::InterfaceCallbackStream(pars, cb);
-}
-
-/* static */ const portaudio::Device &PaAudioSystem::PaDevice(
-                const std::string &id)
-{
-	auto &pa = portaudio::System::instance();
-
-	PaDeviceIndex id_pa = std::stoi(id);
-	if (pa.deviceCount() <= id_pa) throw ConfigError(MSG_DEV_BADID);
-	return pa.deviceByIndex(id_pa);
-}
-
-/// Mappings from SampleFormats to their equivalent PaSampleFormats.
-static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
-	{ SampleFormat::PACKED_UNSIGNED_INT_8, portaudio::UINT8 },
-	{ SampleFormat::PACKED_SIGNED_INT_8, portaudio::INT8 },
-	{ SampleFormat::PACKED_SIGNED_INT_16, portaudio::INT16 },
-	{ SampleFormat::PACKED_SIGNED_INT_24, portaudio::INT24 },
-	{ SampleFormat::PACKED_SIGNED_INT_32, portaudio::INT32 },
-	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
-};
-
-/* static */ portaudio::SampleDataFormat PaAudioSystem::PaFormat(SampleFormat fmt)
-{
-	try {
-		return pa_from_sf.at(fmt);
-	} catch (std::out_of_range) {
-		throw FileError(MSG_DECODE_BADRATE);
-	}
-}

@@ -13,18 +13,11 @@
 #include <string>
 #include <utility>
 
-#include "portaudiocpp/SampleDataFormat.hxx"
-#include "portaudiocpp/Stream.hxx"
-namespace portaudio
-{
-class CallbackInterface;
-class Device;
-}
+#include "portaudiocpp/PortAudioCpp.hxx"
 
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
-#include "sample_formats.hpp"
 
 /**
  * An AudioSystem represents the entire audio stack used by playd.
@@ -79,7 +72,7 @@ public:
  * construction and unloads them on termination.  As such, it's probably not
  * wise to construct multiple AudioSystem instances.
  */
-class PaAudioSystem : public AudioSystem, public AudioSinkConfigurator
+class PaAudioSystem : public AudioSystem
 {
 public:
 	/**
@@ -100,11 +93,6 @@ public:
 	std::vector<AudioSystem::Device> GetDevicesInfo() override;
 	bool IsOutputDevice(int id) override;
 
-	// AudioSinkConfigurator implementation
-	portaudio::Stream *Configure(
-	                const AudioSource &source,
-	                portaudio::CallbackInterface &cb) const override;
-
 private:
 	std::string device_id; ///< The current device ID.
 
@@ -116,20 +104,6 @@ private:
 	 * @see Load
 	 */
 	AudioSource *LoadSource(const std::string &path) const;
-
-	/**
-	 * Converts a string device ID to a PortAudio device.
-	 * @param id_string The device ID, as a string.
-	 * @return The device.
-	 */
-	static const portaudio::Device &PaDevice(const std::string &id_string);
-
-	/**
-	 * Converts a sample format identifier from playd to PortAudio.
-	 * @param fmt The playd sample format identifier.
-	 * @return The PortAudio equivalent of the given SampleFormat.
-	 */
-	static portaudio::SampleDataFormat PaFormat(SampleFormat fmt);
 };
 
 #endif // PLAYD_AUDIO_SYSTEM_HPP

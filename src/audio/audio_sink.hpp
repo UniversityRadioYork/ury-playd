@@ -16,34 +16,15 @@
 #include <utility>
 #include <vector>
 
-#include "portaudio.h"
-#include "portaudiocpp/CallbackInterface.hxx"
-#include "portaudiocpp/Stream.hxx"
+#include "portaudiocpp/PortAudioCpp.hxx"
 
 #include "audio.hpp"
 #include "audio_source.hpp"
 #include "ringbuffer.hpp"
+#include "sample_formats.hpp"
 
 /// Type of results emitted during the play callback step.
 typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
-
-/**
- * Interface for objects that can configure a PortAudio stream from an
- * AudioSource.
- */
-class AudioSinkConfigurator
-{
-public:
-	/**
-	 * Configures and returns a PortAudio stream.
-	 * @param source The audio source to use to configure the stream.
-	 * @param cb The object that PortAudio will call to receive audio.
-	 * @return The configured PortAudio stream.
-	 */
-	virtual portaudio::Stream *Configure(
-	                const AudioSource &source,
-	                portaudio::CallbackInterface &cb) const = 0;
-};
 
 /**
  * An output stream for an Audio file.
@@ -53,7 +34,7 @@ public:
  * periodically transfers samples from its buffer to PortAudio in a separate
  * thread.
  */
-class AudioSink : portaudio::CallbackInterface
+class AudioSink : public portaudio::CallbackInterface
 {
 public:
 	/// Type of positions measured in samples.
@@ -65,9 +46,9 @@ public:
 	/**
 	 * Constructs an AudioSink.
 	 * @param source The source from which this sink will receive audio.
-	 * @param conf The configurator to use to create streams for this sink.
+	 * @param device_id The device ID to which this sink will output.
 	 */
-	AudioSink(const AudioSource &source, const AudioSinkConfigurator &conf);
+	AudioSink(const AudioSource &source, const std::string &device_id);
 
 	/**
 	 * Starts the audio stream.
@@ -132,6 +113,19 @@ public:
 	 */
 	void Transfer(TransferIterator &start, const TransferIterator &end);
 
+	/**
+	 * Converts a string device ID to a PortAudio device.
+	 * @param id_string The device ID, as a string.
+	 * @return The device.
+	 */
+	static const portaudio::Device &PaDevice(const std::string &id_string);
+
+	/**
+	 * Converts a sample format identifier from playd to PortAudio.
+	 * @param fmt The playd sample format identifier.
+	 * @return The PortAudio equivalent of the given SampleFormat.
+	 */
+	static portaudio::SampleDataFormat PaFormat(SampleFormat fmt);
 private:
 	/// n, where 2^n is the capacity of the Audio ring buffer.
 	/// @see RINGBUF_SIZE

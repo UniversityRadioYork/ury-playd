@@ -11,6 +11,7 @@
 #include <cassert>
 #include <climits>
 #include <cstring>
+#include <memory>
 #include <string>
 
 #include "portaudiocpp/PortAudioCpp.hxx"
@@ -24,8 +25,7 @@
 
 const size_t AudioSink::RINGBUF_POWER = 16;
 
-AudioSink::AudioSink(const AudioSource &source,
-                     const AudioSinkConfigurator &conf)
+AudioSink::AudioSink(const AudioSource &source, const std::string &device_id)
     : bytes_per_sample(source.BytesPerSample()),
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
       position_sample_count(0),
@@ -33,7 +33,22 @@ AudioSink::AudioSink(const AudioSource &source,
       source_out(false),
       sink_out(false)
 {
-	this->stream = decltype(this->stream)(conf.Configure(source, *this));
+	std::uint8_t channel_count = source.ChannelCount();
+	SampleFormat sample_format = source.OutputSampleFormat();
+	double sample_rate = source.SampleRate();
+	const portaudio::Device &device = AudioSink::PaDevice(device_id);
+
+	portaudio::DirectionSpecificStreamParameters out_pars(
+	                device, channel_count,
+	                AudioSink::PaFormat(sample_format), true,
+	                device.defaultLowOutputLatency(), nullptr);
+
+	portaudio::StreamParameters pars(
+	                portaudio::DirectionSpecificStreamParameters::null(),
+	                out_pars, sample_rate, paFramesPerBufferUnspecified,
+	                paClipOff);
+
+	this->stream = std::make_unique<portaudio::InterfaceCallbackStream>(pars, *this);
 }
 
 void AudioSink::Start()
@@ -195,4 +210,33 @@ unsigned long AudioSink::ReadSamplesToOutput(char *&output,
 	// sent for playback (*not* the last position decoded).
 	this->position_sample_count += transfer_sample_count;
 	return transfer_sample_count;
+}
+
+/* static */ const portaudio::Device &AudioSink::PaDevice(
+                const std::string &id)
+{
+	auto &pa = portaudio::System::instance();
+
+	PaDeviceIndex id_pa = std::stoi(id);
+	if (pa.deviceCount() <= id_pa) throw ConfigError(MSG_DEV_BADID);
+	return pa.deviceByIndex(id_pa);
+}
+
+/// Mappings from SampleFormats to their equivalent PaSampleFormats.
+static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
+	{ SampleFormat::PACKED_UNSIGNED_INT_8, portaudio::UINT8 },
+	{ SampleFormat::PACKED_SIGNED_INT_8, portaudio::INT8 },
+	{ SampleFormat::PACKED_SIGNED_INT_16, portaudio::INT16 },
+	{ SampleFormat::PACKED_SIGNED_INT_24, portaudio::INT24 },
+	{ SampleFormat::PACKED_SIGNED_INT_32, portaudio::INT32 },
+	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
+};
+
+/* static */ portaudio::SampleDataFormat AudioSink::PaFormat(SampleFormat fmt)
+{
+	try {
+		return pa_from_sf.at(fmt);
+	} catch (std::out_of_range) {
+		throw FileError(MSG_DECODE_BADRATE);
+	}
 }
