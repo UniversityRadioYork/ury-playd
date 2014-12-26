@@ -33,6 +33,6 @@ enum class SampleFormat : std::uint8_t {
 };
 
 /// Map from SampleFormats to bytes-per-mono-sample.
-extern const size_t SAMPLE_FORMAT_BPS[6];
+extern const std::size_t SAMPLE_FORMAT_BPS[6];
 
 #endif // PLAYD_SAMPLE_FORMATS_HPP
