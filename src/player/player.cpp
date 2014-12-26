@@ -49,8 +49,12 @@ bool Player::Update()
 
 void Player::WelcomeClient(ResponseSink &client) const
 {
-	client.Respond(ResponseCode::OHAI, MSG_OHAI);
-	client.RespondArgs(ResponseCode::FEATURES, FEATURES);
+	client.Respond(Response(Response::Code::OHAI).Arg(MSG_OHAI));
+
+	auto features = Response(Response::Code::FEATURES);
+	for (auto &f : FEATURES) features.Arg(f);
+	client.Respond(features);
+
 	this->file.Emit(client);
 	this->position.Emit(client);
 	this->state.Emit(client);
@@ -59,7 +63,7 @@ void Player::WelcomeClient(ResponseSink &client) const
 void Player::End()
 {
 	if (this->end_sink != nullptr) {
-		this->end_sink->RespondArgs(ResponseCode::END, {});
+		this->end_sink->Respond(Response(Response::Code::END));
 	}
 	this->Stop();
 

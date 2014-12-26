@@ -46,7 +46,7 @@ void PlayerPosition::Reset()
 
 void PlayerPosition::Emit(const ResponseSink &target) const
 {
-	target.Respond(ResponseCode::TIME, std::to_string(this->current));
+	target.Respond(Response(Response::Code::TIME).Arg(std::to_string(this->current)));
 }
 
 bool PlayerPosition::IsReadyToSend() const

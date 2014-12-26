@@ -25,7 +25,7 @@ DummyAudio::DummyAudio(DummyAudioSystem &sys) : sys(sys)
 
 void DummyAudio::Emit(const ResponseSink &sink) const
 {
-	sink.Respond(ResponseCode::FILE, this->sys.path);
+	sink.Respond(Response(Response::Code::FILE).Arg(this->sys.path));
 }
 
 void DummyAudio::Start()

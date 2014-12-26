@@ -13,10 +13,10 @@
 #include "io/io_response.hpp"
 #include "cmd_result.hpp"
 
-/* static */ const ResponseCode CommandResult::TYPE_CODES[] = {
-	ResponseCode::OK,   // Type::SUCCESS
-	ResponseCode::WHAT, // Type::INVALID
-	ResponseCode::FAIL, // Type::FAILURE
+/* static */ const Response::Code CommandResult::TYPE_CODES[] = {
+	Response::Code::OK,   // Type::SUCCESS
+	Response::Code::WHAT, // Type::INVALID
+	Response::Code::FAIL, // Type::FAILURE
 };
 
 CommandResult CommandResult::Success()
@@ -47,13 +47,15 @@ bool CommandResult::IsSuccess() const
 void CommandResult::Emit(const ResponseSink &sink,
                          const std::vector<std::string> &cmd) const
 {
-	std::vector<std::string> args(cmd);
+	Response r(CommandResult::TYPE_CODES[static_cast<uint8_t>(this->type)]);
 
 	// Only display a message if the result wasn't a successful one.
 	// The message goes at the front, as then clients always know it's the
 	// first argument.
-	if (this->type != Type::SUCCESS) args.insert(args.begin(), this->msg);
+	if (this->type != Type::SUCCESS) r.Arg(this->msg);
 
-	auto code = CommandResult::TYPE_CODES[static_cast<uint8_t>(this->type)];
-	sink.RespondArgs(code, args);
+	// Then, add in the original command words.
+	for (auto &cwd : cmd) r.Arg(cwd);
+
+	sink.Respond(r);
 }

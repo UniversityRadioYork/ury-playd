@@ -12,84 +12,77 @@
 
 #include "catch.hpp"
 #include "../io/io_response.hpp"
-#include "dummy_response_sink.hpp"
 
+SCENARIO("Responses correctly escape arguments with single quotes", "[response]") {
+	WHEN("the Response is fed no arguments") {
+		auto r = Response(Response::Code::OHAI);
 
-SCENARIO("ResponseSinks correctly escape arguments with singLe quotes", "[response-sink]") {
-	GIVEN("A dummy ResponseSink") {
-		std::ostringstream os;
-		DummyResponseSink rs(os);
-
-		WHEN("the ResponseSink is fed no arguments") {
-			rs.RespondArgs(ResponseCode::OHAI, {});
-
-			THEN("the emitted response has no quoting") {
-				REQUIRE(os.str() == "OHAI\n");
-			}
+		THEN("the emitted response has no quoting") {
+			REQUIRE(r.Pack() == "OHAI");
 		}
+	}
 
-		WHEN("the ResponseSink is fed a single argument with no quotes") {
-			rs.Respond(ResponseCode::OHAI, "ulyoath");
+	WHEN("the Response is fed a single argument with no quotes") {
+		auto r = Response(Response::Code::OHAI).Arg("ulyoath");
 
-			THEN("the emitted response's argument is not quoted") {
-				REQUIRE(os.str() == "OHAI ulyoath\n");
-			}
+		THEN("the emitted response's argument is not quoted") {
+			REQUIRE(r.Pack() == "OHAI ulyoath");
 		}
+	}
 
-		WHEN("the ResponseSink is fed a single argument with single quotes") {
-			rs.Respond(ResponseCode::OHAI, "chattur'gha");
+	WHEN("the Response is fed a single argument with single quotes") {
+		auto r = Response(Response::Code::OHAI).Arg("chattur'gha");
 
-			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha')" "\n");
-			}
+		THEN("the emitted response's argument is single-quoted") {
+			REQUIRE(r.Pack() == R"(OHAI 'chattur'\''gha')");
 		}
+	}
 
-		WHEN("the ResponseSink is fed two arguments, both with single quotes") {
-			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "xel'lotath" });
+	WHEN("the Response is fed two arguments, both with single quotes") {
+		auto r = Response(Response::Code::OHAI).Arg("chattur'gha").Arg("xel'lotath");
 
-			THEN("the emitted response's arguments are both single-quoted") {
-				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' 'xel'\''lotath')" "\n");
-			}
+		THEN("the emitted response's arguments are both single-quoted") {
+			REQUIRE(r.Pack() == R"(OHAI 'chattur'\''gha' 'xel'\''lotath')");
 		}
+	}
 
-		WHEN("the ResponseSink is fed two arguments, one quoted, one unquoted") {
-			rs.RespondArgs(ResponseCode::OHAI, { "chattur'gha", "ulyoath" });
+	WHEN("the Response is fed two arguments, one quoted, one unquoted") {
+		auto r = Response(Response::Code::OHAI).Arg("chattur'gha").Arg("ulyoath");
 
-			THEN("the emitted response's arguments are quoted accordingly") {
-				REQUIRE(os.str() == R"(OHAI 'chattur'\''gha' ulyoath)" "\n");
-			}
+		THEN("the emitted response's arguments are quoted accordingly") {
+			REQUIRE(r.Pack() == R"(OHAI 'chattur'\''gha' ulyoath)");
 		}
+	}
 
-		WHEN("the ResponseSink is fed a single argument with double quotes") {
-			rs.Respond(ResponseCode::FILE, R"("scare"-quotes)");
+	WHEN("the Response is fed a single argument with double quotes") {
+		auto r = Response(Response::Code::FILE).Arg(R"("scare"-quotes)");
 
-			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == R"(FILE '"scare"-quotes')" "\n");
-			}
+		THEN("the emitted response's argument is single-quoted") {
+			REQUIRE(r.Pack() == R"(FILE '"scare"-quotes')");
 		}
+	}
 
-		WHEN("the ResponseSink is fed a single argument with whitespace") {
-			rs.Respond(ResponseCode::END, "pargon pargon pargon");
+	WHEN("the Response is fed a single argument with whitespace") {
+		auto r = Response(Response::Code::END).Arg("pargon pargon pargon");
 
-			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == R"(END 'pargon pargon pargon')" "\n");
-			}
+		THEN("the emitted response's argument is single-quoted") {
+			REQUIRE(r.Pack() == R"(END 'pargon pargon pargon')");
 		}
+	}
 
-		WHEN("the ResponseSink is fed several arguments with differing whitespace") {
-			rs.RespondArgs(ResponseCode::END, { "a space", "new\nline", "tab\tstop" });
+	WHEN("the Response is fed several arguments with differing whitespace") {
+		auto r = Response(Response::Code::END).Arg("a space").Arg("new\nline").Arg("tab\tstop");
 
-			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == "END 'a space' 'new\nline' 'tab\tstop'\n");
-			}
+		THEN("the emitted response's argument is single-quoted") {
+			REQUIRE(r.Pack() == "END 'a space' 'new\nline' 'tab\tstop'");
 		}
+	}
 
-		WHEN("the ResponseSink is fed a representative example with backslashes and spaces") {
-			rs.Respond(ResponseCode::FILE, R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
+	WHEN("the Response is fed a representative example with backslashes and spaces") {
+		auto r = Response(Response::Code::FILE).Arg(R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
 
-			THEN("the emitted response's argument is single-quoted") {
-				REQUIRE(os.str() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')" "\n");
-			}
+		THEN("the emitted response's argument is single-quoted") {
+			REQUIRE(r.Pack() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
 		}
 	}
 }

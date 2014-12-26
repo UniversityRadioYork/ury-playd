@@ -29,7 +29,7 @@ PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
 void PipeAudio::Emit(const ResponseSink &sink) const
 {
 	assert(this->src != nullptr);
-	sink.Respond(ResponseCode::FILE, this->src->Path());
+	sink.Respond(Response(Response::Code::FILE).Arg(this->src->Path()));
 }
 
 void PipeAudio::Start()

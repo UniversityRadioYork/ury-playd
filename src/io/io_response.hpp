@@ -18,21 +18,63 @@
 
 #include "../errors.hpp"
 
-/**
- * Four-character response codes.
- * @note If you're adding new responses here, update ResponseSink::STRINGS.
- * @see ResponseSink::STRINGS
- */
-enum class ResponseCode : std::uint8_t {
-	OK,       ///< Request was valid and produced an answer.
-	WHAT,     ///< Request was invalid/user error.
-	FAIL,     ///< Error, pointing blame at environment.
-	OHAI,     ///< Server starting up.
-	STATE,    ///< Server changing state.
-	TIME,     ///< Server sending current song time,
-	FILE,     ///< The loaded file just changed.
-	FEATURES, ///< Server sending feature list.
-	END       ///< The loaded file just ended on its own.
+/// A response.
+class Response {
+public:
+	/**
+	 * Four-character response codes.
+	 * @note If you're adding new responses here, update ResponseSink::STRINGS.
+	 * @see ResponseSink::STRINGS
+	 */
+	enum class Code : std::uint8_t {
+		OK,       ///< Request was valid and produced an answer.
+		WHAT,     ///< Request was invalid/user error.
+		FAIL,     ///< Error, pointing blame at environment.
+		OHAI,     ///< Server starting up.
+		STATE,    ///< Server changing state.
+		TIME,     ///< Server sending current song time,
+		FILE,     ///< The loaded file just changed.
+		FEATURES, ///< Server sending feature list.
+		END       ///< The loaded file just ended on its own.
+	};
+
+	/**
+	 * Constructs a Response with no arguments.
+	 * @param code The Response::Code representing the response command.
+	 */
+	Response(Response::Code code);
+
+	/**
+	 * Adds an argument to this Response.
+	 * @param arg The argument to add.  The argument must not be escaped.
+	 * @return A reference to this Response, for chaining.
+	 */
+	Response &Arg(const std::string &arg);
+	
+
+	/**
+	 * Packs the Response, converting it to a BAPS3 protocol message.
+	 * Pack()ing does not alter the Response, which may be Pack()ed again.
+	 * @return The BAPS3 message, sans newline, ready to send.
+	 */
+	std::string Pack() const;
+private:
+	/**
+	 * A map from Response::Code codes to their string equivalents.
+	 * @see Response::Code
+	 */
+	static const std::string STRINGS[];
+
+	/**
+	 * Escapes a single response argument.
+	 * @param argument The argument to escape.
+	 * @return The escaped argument.
+	 */
+	static std::string EscapeArgument(const std::string &argument);
+
+	/// The current packed form of the response.
+	/// @see Pack
+	std::string string;
 };
 
 /**
@@ -50,21 +92,10 @@ class ResponseSink
 {
 public:
 	/**
-	 * Outputs a response with a single message argument.
-	 * @param code The code of the response to emit.
-	 * @param message The unescaped response message.
-	 * @see RespondArgs
+	 * Outputs a response.
+	 * @param response The Response to output.
 	 */
-	void Respond(ResponseCode code, const std::string &message) const;
-
-	/**
-	 * Outputs a response with multiple message arguments.
-	 * @param code The code of the response to emit.
-	 * @param arguments The vector of unescaped arguments to emit.
-	 * @see Respond
-	 */
-	void RespondArgs(ResponseCode code,
-	                 const std::vector<std::string> &arguments) const;
+	virtual void Respond(Response response) const;
 
 protected:
 	/**
@@ -72,20 +103,6 @@ protected:
 	 * @param string The raw, escaped response string.
 	 */
 	virtual void RespondRaw(const std::string &string) const = 0;
-
-private:
-	/**
-	 * A map from ResponseCode codes to their string equivalents.
-	 * @see ResponseCode
-	 */
-	static const std::string STRINGS[];
-
-	/**
-	 * Escapes a single response argument.
-	 * @param argument The argument to escape.
-	 * @return The escaped argument.
-	 */
-	static std::string EscapeArgument(const std::string &argument);
 };
 
 /**

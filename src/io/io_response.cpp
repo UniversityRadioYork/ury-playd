@@ -14,35 +14,35 @@
 #include "../errors.hpp"
 #include "io_response.hpp"
 
-const std::string ResponseSink::STRINGS[] = {
-	"OK",       // ResponseCode::OK
-	"WHAT",     // ResponseCode::WHAT
-	"FAIL",     // ResponseCode::FAIL
-	"OHAI",     // ResponseCode::OHAI
-	"STATE",    // ResponseCode::STATE
-	"TIME",     // ResponseCode::TIME
-	"FILE",     // ResponseCode::FILE
-	"FEATURES", // ResponseCode::FEATURES
-	"END"       // ResponseCode::END
+const std::string Response::STRINGS[] = {
+	"OK",       // Code::OK
+	"WHAT",     // Code::WHAT
+	"FAIL",     // Code::FAIL
+	"OHAI",     // Code::OHAI
+	"STATE",    // Code::STATE
+	"TIME",     // Code::TIME
+	"FILE",     // Code::FILE
+	"FEATURES", // Code::FEATURES
+	"END"       // Code::END
 };
 
-void ResponseSink::Respond(ResponseCode code, const std::string &message) const
+Response::Response(Response::Code code)
 {
-	this->RespondArgs(code, std::vector<std::string>(1, message));
+	this->string = Response::STRINGS[static_cast<int>(code)];
 }
 
-void ResponseSink::RespondArgs(ResponseCode code,
-                               const std::vector<std::string> &arguments) const
+Response &Response::Arg(const std::string &arg)
 {
-	std::ostringstream os;
-	os << ResponseSink::STRINGS[static_cast<int>(code)];
-	for (auto argument : arguments) {
-		os << " " << this->EscapeArgument(argument);
-	}
-	this->RespondRaw(os.str());
+	this->string += " " + Response::EscapeArgument(arg);
+	return *this;
 }
 
-/* static */ std::string ResponseSink::EscapeArgument(const std::string &argument)
+std::string Response::Pack() const
+{
+	return this->string;
+}
+
+/* static */ std::string Response::EscapeArgument(const std::string &argument)
 {
 	bool escaping = false;
 	std::string escaped;
@@ -65,6 +65,15 @@ void ResponseSink::RespondArgs(ResponseCode code,
 	// Otherwise, it wastes two characters!
 	if (escaping) return "'" + escaped + "'";
 	return escaped;
+}
+
+//
+// ResponseSink
+//
+
+void ResponseSink::Respond(Response response) const
+{
+	this->RespondRaw(response.Pack());
 }
 
 //
