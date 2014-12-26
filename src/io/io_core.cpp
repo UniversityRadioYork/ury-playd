@@ -123,7 +123,7 @@ ConnectionPool::ConnectionPool(Player &player, CommandHandler &handler)
 
 void ConnectionPool::Accept(uv_stream_t *server)
 {
-	uv_tcp_t *client = new uv_tcp_t();
+	auto client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
 
 	if (uv_accept(server, (uv_stream_t *)client) == 0) {
@@ -239,7 +239,7 @@ void Connection::RespondRaw(const std::string &string) const
 	unsigned int l = string.length();
 	const char *s = string.c_str();
 
-	WriteReq *req = new WriteReq;
+	auto req = new WriteReq;
 	req->buf = uv_buf_init(new char[l + 1], l + 1);
 	memcpy(req->buf.base, s, l);
 	req->buf.base[l] = '\n';
