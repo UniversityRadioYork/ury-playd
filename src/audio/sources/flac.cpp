@@ -107,10 +107,6 @@ std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
-	// Reset the decoder state, because otherwise the decoder will get very
-	// confused.
-	this->decode_state = DecodeState::DECODING;
-
 	// The actual seek position may not be the same as the requested
 	// position.
 	// get_decode_position() tells us the new position, in bytes.
@@ -138,7 +134,6 @@ FlacAudioSource::DecodeResult FlacAudioSource::Decode()
 		// Let's find out.
 		int s = this->get_state();
 		if (s == FLAC__STREAM_DECODER_END_OF_STREAM) {
-			this->decode_state = DecodeState::END_OF_FILE;
 			return std::make_pair(DecodeState::END_OF_FILE,
 			  DecodeVector());
 		} else {

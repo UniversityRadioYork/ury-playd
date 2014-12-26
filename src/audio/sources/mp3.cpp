@@ -124,10 +124,6 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t position)
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
-	// Reset the decoder state, because otherwise the decoder will get very
-	// confused.
-	this->decode_state = DecodeState::DECODING;
-
 	// The actual seek position may not be the same as the requested
 	// position.
 	// mpg123_tell gives us the exact mono-samples position.
@@ -143,23 +139,24 @@ Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()
 	int err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
 
 	DecodeVector decoded;
+	DecodeState decode_state;
 
 	if (err == MPG123_DONE) {
 		Debug() << "mp3: end of file" << std::endl;
-		this->decode_state = DecodeState::END_OF_FILE;
+		decode_state = DecodeState::END_OF_FILE;
 	} else if (err != MPG123_OK && err != MPG123_NEW_FORMAT) {
 		Debug() << "mp3: decode error:" << mpg123_strerror(this->context)
 		        << std::endl;
-		this->decode_state = DecodeState::END_OF_FILE;
+		decode_state = DecodeState::END_OF_FILE;
 	} else {
-		this->decode_state = DecodeState::DECODING;
+		decode_state = DecodeState::DECODING;
 
 		// Copy only the bit of the buffer occupied by decoded data
 		auto front = this->buffer.begin();
 		decoded = DecodeVector(front, front + rbytes);
 	}
 
-	return std::make_pair(this->decode_state, decoded);
+	return std::make_pair(decode_state, decoded);
 }
 
 SampleFormat Mp3AudioSource::OutputSampleFormat() const

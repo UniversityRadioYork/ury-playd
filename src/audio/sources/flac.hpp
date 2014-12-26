@@ -51,10 +51,6 @@ protected:
 	FLAC__StreamDecoderWriteStatus write_callback(const FLAC__Frame *frame, const FLAC__int32 *const buffer[]) override;
 	void error_callback(FLAC__StreamDecoderErrorStatus status) override;
 private:
-	/// The current state of decoding.
-	/// @see DecodeState
-	DecodeState decode_state;
-
 	std::vector<int32_t> buffer; ///< The decoding buffer.
 };
 

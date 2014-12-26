@@ -45,10 +45,6 @@ private:
 	/// The size of the internal decoding buffer, in bytes.
 	static const size_t BUFFER_SIZE;
 
-	/// The current state of decoding.
-	/// @see DecodeState
-	DecodeState decode_state;
-
 	std::vector<uint8_t> buffer; ///< The decoding buffer.
 
 	/// Pointer to the mpg123 context associated with this source.
