@@ -94,7 +94,7 @@ public:
 	bool IsOutputDevice(int id) override;
 
 private:
-	std::string device_id; ///< The current device ID.
+	int device_id; ///< The current device ID.
 
 	/**
 	 * Loads a file, creating an AudioSource.

@@ -87,7 +87,7 @@ bool PaAudioSystem::IsOutputDevice(int id)
 
 void PaAudioSystem::SetDeviceID(int id)
 {
-	this->device_id = std::to_string(id);
+	this->device_id = id;
 }
 
 Audio *PaAudioSystem::Load(const std::string &path) const

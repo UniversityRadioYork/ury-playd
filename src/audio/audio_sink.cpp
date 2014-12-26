@@ -25,7 +25,7 @@
 
 const size_t AudioSink::RINGBUF_POWER = 16;
 
-AudioSink::AudioSink(const AudioSource &source, const std::string &device_id)
+AudioSink::AudioSink(const AudioSource &source, int device_id)
     : bytes_per_sample(source.BytesPerSample()),
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
       position_sample_count(0),
@@ -212,14 +212,11 @@ unsigned long AudioSink::ReadSamplesToOutput(char *&output,
 	return transfer_sample_count;
 }
 
-/* static */ const portaudio::Device &AudioSink::PaDevice(
-                const std::string &id)
+/* static */ const portaudio::Device &AudioSink::PaDevice(int id)
 {
 	auto &pa = portaudio::System::instance();
-
-	PaDeviceIndex id_pa = std::stoi(id);
-	if (pa.deviceCount() <= id_pa) throw ConfigError(MSG_DEV_BADID);
-	return pa.deviceByIndex(id_pa);
+	if (pa.deviceCount() <= id) throw ConfigError(MSG_DEV_BADID);
+	return pa.deviceByIndex(id);
 }
 
 /// Mappings from SampleFormats to their equivalent PaSampleFormats.

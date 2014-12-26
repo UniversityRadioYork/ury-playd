@@ -48,7 +48,7 @@ public:
 	 * @param source The source from which this sink will receive audio.
 	 * @param device_id The device ID to which this sink will output.
 	 */
-	AudioSink(const AudioSource &source, const std::string &device_id);
+	AudioSink(const AudioSource &source, int device_id);
 
 	/**
 	 * Starts the audio stream.
@@ -114,11 +114,11 @@ public:
 	void Transfer(TransferIterator &start, const TransferIterator &end);
 
 	/**
-	 * Converts a string device ID to a PortAudio device.
-	 * @param id_string The device ID, as a string.
+	 * Finds a PortAudio device, given its device ID.
+	 * @param id The device ID.
 	 * @return The device.
 	 */
-	static const portaudio::Device &PaDevice(const std::string &id_string);
+	static const portaudio::Device &PaDevice(int id);
 
 	/**
 	 * Converts a sample format identifier from playd to PortAudio.
