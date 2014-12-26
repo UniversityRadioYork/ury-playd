@@ -38,7 +38,7 @@ public:
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	std::uint8_t ChannelCount() const override;
-	double SampleRate() const override;
+	std::uint32_t SampleRate() const override;
 	SampleFormat OutputSampleFormat() const override;
 
 private:

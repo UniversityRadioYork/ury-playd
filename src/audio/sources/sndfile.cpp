@@ -56,10 +56,14 @@ std::uint8_t SndfileAudioSource::ChannelCount() const
 	return static_cast<std::uint8_t>(this->info.channels);
 }
 
-double SndfileAudioSource::SampleRate() const
+std::uint32_t SndfileAudioSource::SampleRate() const
 {
 	assert(0 < this->info.samplerate);
-	return static_cast<double>(this->info.samplerate);
+	// INT32_MAX isn't a typo; if we compare against UINT32_MAX, we'll
+	// set off sign-compare errors, and the sample rate shouldn't be above
+	// INT32_MAX anyroad.
+	assert(this->info.samplerate <= INT32_MAX);
+	return static_cast<std::uint32_t>(this->info.samplerate);
 }
 
 std::uint64_t SndfileAudioSource::Seek(std::uint64_t position)

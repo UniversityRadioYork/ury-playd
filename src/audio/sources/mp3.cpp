@@ -90,14 +90,19 @@ std::uint8_t Mp3AudioSource::ChannelCount() const
 	return static_cast<std::uint8_t>(chans);
 }
 
-double Mp3AudioSource::SampleRate() const
+std::uint32_t Mp3AudioSource::SampleRate() const
 {
 	assert(this->context != nullptr);
 
 	long rate = 0;
 	mpg123_getformat(this->context, &rate, nullptr, nullptr);
-	assert(rate != 0);
-	return static_cast<double>(rate);
+
+	assert(0 < rate);
+	// INT32_MAX isn't a typo; if we compare against UINT32_MAX, we'll
+	// set off sign-compare errors, and the sample rate shouldn't be above
+	// INT32_MAX anyroad.
+	assert(rate <= INT32_MAX);
+	return static_cast<std::uint32_t>(rate);
 }
 
 std::uint64_t Mp3AudioSource::Seek(std::uint64_t position)

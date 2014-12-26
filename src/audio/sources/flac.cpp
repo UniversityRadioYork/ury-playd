@@ -80,9 +80,12 @@ std::uint8_t FlacAudioSource::ChannelCount() const
 	return static_cast<std::uint8_t>(this->get_channels());
 }
 
-double FlacAudioSource::SampleRate() const
+std::uint32_t FlacAudioSource::SampleRate() const
 {
-	return static_cast<double>(this->get_sample_rate());
+	auto rate = this->get_sample_rate();
+	assert(0 < rate);
+	assert(rate < UINT32_MAX);
+	return static_cast<std::uint32_t>(rate);
 }
 
 std::uint64_t FlacAudioSource::Seek(std::uint64_t position)

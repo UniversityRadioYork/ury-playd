@@ -76,10 +76,11 @@ public:
 
 	/**
 	 * Returns the sample rate.
-	 * @return The output sample rate (Hz) as a double-precision floating
-	 * point.
+	 * Should fail if, for some peculiar reason, the sample rate is above
+	 * ((2^31) - 1)Hz; this probably implies something is wrong anyway.
+	 * @return The output sample rate (Hz) as a 32-bit unsigned integer.
 	 */
-	virtual double SampleRate() const = 0;
+	virtual std::uint32_t SampleRate() const = 0;
 
 	/**
 	 * Returns the output sample format.
