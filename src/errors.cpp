@@ -9,7 +9,7 @@
 
 #include "errors.hpp"
 
-Error::Error(const std::string &message) : message(message)
+Error::Error(const std::string &msg) : message(msg)
 {
 }
 
