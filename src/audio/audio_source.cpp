@@ -13,7 +13,9 @@
 #include "audio_source.hpp"
 #include "sample_formats.hpp"
 
-AudioSource::AudioSource(const std::string &path) : path(path) {}
+AudioSource::AudioSource(const std::string &path) : path(path)
+{
+}
 
 size_t AudioSource::BytesPerSample() const
 {

@@ -15,9 +15,8 @@
 /**
  * Sample formats available in playd.
  *
- * This is the intersection of those sample formats available in the decoders and
- * PortAudio.  In the future, if and when other input and output libraries are
- * used/supported, this may change.
+ * This is the intersection of those sample formats available in the decoders
+ * and PortAudio.
  *
  * Packed formats are those where each sample contains each audio channel, one
  * packed after the other.  Planar formats use separate runs of samples for each

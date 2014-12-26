@@ -35,7 +35,7 @@ class Device;
  *
  * This is an abstract class, implemented primarily by SoxPaAudioSystem.
  *
- * @see SoxPaAudioSystem
+ * @see PaAudioSystem
  * @see Audio
  */
 class AudioSystem

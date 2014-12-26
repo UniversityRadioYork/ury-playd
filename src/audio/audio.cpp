@@ -79,7 +79,7 @@ Audio::State PipeAudio::Update()
 	bool more_available = this->DecodeIfFrameEmpty();
 	if (!more_available) this->sink->SourceOut();
 
-	if (!this->FrameFinished()) this->TransferFrame();	
+	if (!this->FrameFinished()) this->TransferFrame();
 
 	return this->sink->State();
 }

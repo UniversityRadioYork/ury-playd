@@ -20,7 +20,8 @@
 /**
  * An object responsible for decoding an audio file.
  *
- * AudioSource is an abstract base class, implemented separately for each supported audio file format.
+ * AudioSource is an abstract base class, implemented separately for each
+ * supported audio file format.
  *
  * @see FlacAudioSource
  * @see Mp3AudioSource
@@ -50,7 +51,8 @@ public:
 
 	/**
 	 * Constructs an AudioSource.
-	 * @param path The path to the file from which this AudioSource is decoding.
+	 * @param path The path to the file from which this AudioSource is
+	 *   decoding.
 	 */
 	AudioSource(const std::string &path);
 
@@ -100,7 +102,7 @@ public:
 	/**
 	 * Returns the number of bytes for each sample this decoder outputs.
 	 * As the decoder returns packed samples, this includes the channel
-	 *   count as a factor.
+	 * count as a factor.
 	 * @return The number of bytes per sample.
 	 */
 	size_t BytesPerSample() const;

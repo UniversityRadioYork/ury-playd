@@ -40,6 +40,7 @@ public:
 	std::uint8_t ChannelCount() const override;
 	double SampleRate() const override;
 	SampleFormat OutputSampleFormat() const override;
+
 private:
 	SF_INFO info;  ///< The libsndfile info structure.
 	SNDFILE *file; ///< The libsndfile file structure.

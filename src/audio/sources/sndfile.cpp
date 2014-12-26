@@ -87,14 +87,12 @@ std::uint64_t SndfileAudioSource::Seek(std::uint64_t position)
 
 SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()
 {
-	auto read = sf_read_int(this->file,
-	                        &*this->buffer.begin(),
+	auto read = sf_read_int(this->file, &*this->buffer.begin(),
 	                        this->buffer.size());
 
 	// Have we hit the end of the file?
 	if (read == 0) {
-		return std::make_pair(DecodeState::END_OF_FILE,
-		                      DecodeVector());
+		return std::make_pair(DecodeState::END_OF_FILE, DecodeVector());
 	}
 
 	// Else, we're good to go (hopefully).
@@ -103,13 +101,13 @@ SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()
 	// The end is 'read' 32-bit items--read*4 bytes--after.
 	uint8_t *end = begin + (read * 4);
 
-	return std::make_pair(DecodeState::DECODING,
-		  DecodeVector(begin, end));
+	return std::make_pair(DecodeState::DECODING, DecodeVector(begin, end));
 }
 
 SampleFormat SndfileAudioSource::OutputSampleFormat() const
 {
-	// Because we use int-sized reads, assume this corresponds to 32-bit signed int.
+	// Because we use int-sized reads, assume this corresponds to 32-bit
+	// signed int.
 	// Really, we shouldn't assume int is 32-bit!
 	static_assert(sizeof(int) == 4,
 	              "sndfile outputs int, which we need to be 4 bytes");

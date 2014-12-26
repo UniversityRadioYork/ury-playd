@@ -129,7 +129,7 @@ AudioSource *PaAudioSystem::LoadSource(const std::string &path) const
 }
 
 portaudio::Stream *PaAudioSystem::Configure(const AudioSource &source,
-                                               portaudio::CallbackInterface &cb) const
+                                            portaudio::CallbackInterface &cb) const
 {
 	std::uint8_t channel_count = source.ChannelCount();
 	SampleFormat sample_format = source.OutputSampleFormat();
@@ -168,8 +168,7 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
 };
 
-/* static */ portaudio::SampleDataFormat PaAudioSystem::PaFormat(
-                SampleFormat fmt)
+/* static */ portaudio::SampleDataFormat PaAudioSystem::PaFormat(SampleFormat fmt)
 {
 	try {
 		return pa_from_sf.at(fmt);

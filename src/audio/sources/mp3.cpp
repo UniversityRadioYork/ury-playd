@@ -73,7 +73,8 @@ void Mp3AudioSource::AddFormat(long rate)
 	                   MPG123_ENC_SIGNED_16 | MPG123_ENC_SIGNED_24 |
 	                   MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32)) ==
 	    MPG123_ERR) {
-		// Ignore the error for now -- another sample rate may be available.
+		// Ignore the error for now -- another sample rate may be
+		// available.
 		// If no sample rates work, loading a file will fail anyway.
 		Debug() << "can't support" << rate << std::endl;
 	};
