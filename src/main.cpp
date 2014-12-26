@@ -95,8 +95,8 @@ int Playd::Run()
 
 	// Now set up all the IO (network socket and event loop).
 	try {
-		this->io = decltype(this->io)(new IoCore(
-		                this->player, this->handler, addr, port));
+		this->io = std::make_unique<IoCore>(
+		                this->player, this->handler, addr, port);
 	} catch (NetError &e) {
 		std::cerr << "Network error: " << e.Message() << std::endl;
 		std::cerr << "Is " << addr << ":" << port << " available?"
