@@ -374,17 +374,17 @@ write_makefile()
 	COBJECTS=`echo "$CSOURCES" | sed -e "s|$SRCDIR/|$BUILDDIR/|g" -e 's|\.[^ ]*|.o|g'`
 
 	cat Makefile.in |
-		sed "s|%%COBJECTS%%|$COBJECTS|g" |
-		sed "s|%%CSOURCES%%|$CSOURCES|g" |
-		sed "s|%%CXXOBJECTS%%|$CXXOBJECTS|g" |
-		sed "s|%%CXXSOURCES%%|$CXXSOURCES|g" |
-		sed "s|%%FCFLAGS%%|$FCFLAGS|g" |
-		sed "s|%%PACKAGES%%|$PACKAGES|g" |
-		sed "s|%%PROGNAME%%|$PROGNAME|g" |
-		sed "s|%%PROGVER%%|$PROGVER|g" |
-		sed "s|%%SRCDIR%%|$SRCDIR|g" |
-		sed "s|%%BUILDDIR%%|$BUILDDIR|g" |
-		sed "s|%%NO_SYS_PORTAUDIOCXX%%|$NO_SYS_PORTAUDIOCXX|g" > Makefile
+		sed -e "s|%%COBJECTS%%|$COBJECTS|g"	\
+		    -e "s|%%CSOURCES%%|$CSOURCES|g"	\
+		    -e "s|%%CXXOBJECTS%%|$CXXOBJECTS|g"	\
+		    -e "s|%%CXXSOURCES%%|$CXXSOURCES|g" \
+		    -e "s|%%FCFLAGS%%|$FCFLAGS|g"	\
+		    -e "s|%%PACKAGES%%|$PACKAGES|g"	\
+		    -e "s|%%PROGNAME%%|$PROGNAME|g"	\
+		    -e "s|%%PROGVER%%|$PROGVER|g"	\
+		    -e "s|%%SRCDIR%%|$SRCDIR|g"		\
+		    -e "s|%%BUILDDIR%%|$BUILDDIR|g"	\
+		    -e "s|%%NO_SYS_PORTAUDIOCXX%%|$NO_SYS_PORTAUDIOCXX|g" > Makefile
 }
 
 #
