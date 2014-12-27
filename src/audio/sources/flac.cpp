@@ -38,7 +38,7 @@ FlacAudioSource::FlacAudioSource(const std::string &path)
 	// the sample rate to materialise.
 	do {
 		this->process_single();
-	} while (this->SampleRate() == 0);
+	} while (this->get_sample_rate() == 0);
 
 	Debug() << "flac: sample rate:" << this->SampleRate() << std::endl;
 	Debug() << "flac: bytes per sample:" << this->BytesPerSample()
