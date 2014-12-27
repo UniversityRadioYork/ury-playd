@@ -15,6 +15,7 @@
  */
 
 #include <algorithm>
+#include <cassert>
 #include <csignal>
 #include <cstring>
 #include <sstream>
@@ -69,13 +70,18 @@ void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 /// The callback fired when a client connection closes.
 void UvCloseCallback(uv_handle_t *handle)
 {
+	assert(handle != nullptr);
 	delete handle;
 }
 
 /// The callback fired when some bytes are read from a client connection.
 void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
+	assert(stream != nullptr);
+
 	Connection *tcp = static_cast<Connection *>(stream->data);
+	assert(tcp != nullptr);
+
 	tcp->Read(nread, buf);
 }
 
@@ -83,8 +89,11 @@ void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 void UvListenCallback(uv_stream_t *server, int status)
 {
 	if (status < 0) return;
+	assert(server != nullptr);
 
 	ConnectionPool *pool = static_cast<ConnectionPool *>(server->data);
+	assert(pool != nullptr);
+
 	pool->Accept(server);
 }
 
@@ -96,15 +105,21 @@ void UvRespondCallback(uv_write_t *req, int status)
 		        << std::endl;
 	}
 
-	WriteReq *wr = reinterpret_cast<WriteReq *>(req);
-	delete[] wr -> buf.base;
+	auto *wr = reinterpret_cast<WriteReq *>(req);
+	assert(wr != nullptr);
+
+	delete[] wr->buf.base;
 	delete wr;
 }
 
 /// The callback fired when the update timer fires.
 void UvUpdateTimerCallback(uv_timer_t *handle)
 {
+	assert(handle != nullptr);
+
 	Player *player = static_cast<Player *>(handle->data);
+	assert(player != nullptr);
+
 	bool running = player->Update();
 
 	// If the player is ready to terminate, we need to kill the event loop
@@ -123,6 +138,8 @@ ConnectionPool::ConnectionPool(Player &player, CommandHandler &handler)
 
 void ConnectionPool::Accept(uv_stream_t *server)
 {
+	assert(server != nullptr);
+
 	auto client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
 
@@ -188,6 +205,7 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 
 	uv_tcp_init(uv_default_loop(), &this->server);
 	this->server.data = static_cast<void *>(&this->pool);
+	assert(this->server.data != nullptr);
 
 	struct sockaddr_in bind_addr;
 	uv_ip4_addr(address.c_str(), uport, &bind_addr);
@@ -235,9 +253,11 @@ void Connection::Respond(const Response &response) const
 
 	unsigned int l = string.length();
 	const char *s = string.c_str();
+	assert(s != nullptr);
 
 	auto req = new WriteReq;
 	req->buf = uv_buf_init(new char[l + 1], l + 1);
+	assert(req->buf.base != nullptr);
 	memcpy(req->buf.base, s, l);
 	req->buf.base[l] = '\n';
 
@@ -281,6 +301,8 @@ std::string Connection::Name()
 
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 {
+	assert(buf != nullptr);
+
 	// Did the connection hang up?  If so, de-pool it.
 	// De-pooling the connection will usually lead to the connection being
 	// destroyed.
