@@ -28,15 +28,13 @@
 #include "sources/mp3.hpp"
 #include "sources/sndfile.hpp"
 
-PaAudioSystem::PaAudioSystem()
+PaAudioSystem::PaAudioSystem() : device_id(-1)
 {
 	portaudio::System::initialize();
 
 #ifndef NO_MP3
 	mpg123_init();
 #endif // NO_MP3
-
-	this->device_id = -1;
 }
 
 PaAudioSystem::~PaAudioSystem()
