@@ -34,7 +34,8 @@ PlayerState::PlayerState(const ResponseSink *state_sink)
 void PlayerState::Emit(const ResponseSink &responder) const
 {
 	auto c = static_cast<int>(this->current);
-	responder.Respond(Response(Response::Code::STATE).Arg(PlayerState::STRINGS[c]));
+	responder.Respond(Response(Response::Code::STATE)
+	                                  .Arg(PlayerState::STRINGS[c]));
 }
 
 bool PlayerState::In(PlayerState::List states) const

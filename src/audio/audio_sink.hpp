@@ -122,6 +122,7 @@ public:
 	 * @return The PortAudio equivalent of the given SampleFormat.
 	 */
 	static portaudio::SampleDataFormat PaFormat(SampleFormat fmt);
+
 private:
 	/// n, where 2^n is the capacity of the Audio ring buffer.
 	/// @see RINGBUF_SIZE

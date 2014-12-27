@@ -19,11 +19,13 @@
 #include "../errors.hpp"
 
 /// A response.
-class Response {
+class Response
+{
 public:
 	/**
 	 * Four-character response codes.
-	 * @note If you're adding new responses here, update ResponseSink::STRINGS.
+	 * @note If you're adding new responses here, update
+	 * ResponseSink::STRINGS.
 	 * @see ResponseSink::STRINGS
 	 */
 	enum class Code : std::uint8_t {
@@ -50,7 +52,6 @@ public:
 	 * @return A reference to this Response, for chaining.
 	 */
 	Response &Arg(const std::string &arg);
-	
 
 	/**
 	 * Packs the Response, converting it to a BAPS3 protocol message.
@@ -58,6 +59,7 @@ public:
 	 * @return The BAPS3 message, sans newline, ready to send.
 	 */
 	std::string Pack() const;
+
 private:
 	/**
 	 * A map from Response::Code codes to their string equivalents.

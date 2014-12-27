@@ -70,6 +70,7 @@ public:
 	void Remove(Connection &conn);
 
 	void Respond(const Response &response) const override;
+
 private:
 	Player &player;          ///< The player.
 	CommandHandler &handler; ///< The command handler.

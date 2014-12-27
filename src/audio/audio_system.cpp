@@ -108,4 +108,3 @@ AudioSource *PaAudioSystem::LoadSource(const std::string &path) const
 
 	throw FileError("Unknown file format: " + ext);
 }
-

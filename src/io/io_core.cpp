@@ -132,8 +132,7 @@ void ConnectionPool::Accept(uv_stream_t *server)
 	}
 
 	this->connections.emplace_back(
-		new Connection(*this, client, this->handler)
-	);
+	                new Connection(*this, client, this->handler));
 
 	this->player.WelcomeClient(*this->connections.back());
 	client->data = static_cast<void *>(this->connections.back().get());
