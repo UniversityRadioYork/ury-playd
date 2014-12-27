@@ -13,8 +13,6 @@
 #include <string>
 #include <utility>
 
-#include "portaudiocpp/PortAudioCpp.hxx"
-
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"

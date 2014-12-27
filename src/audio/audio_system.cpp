@@ -48,24 +48,12 @@ PaAudioSystem::~PaAudioSystem()
 
 std::vector<AudioSystem::Device> PaAudioSystem::GetDevicesInfo()
 {
-	auto &pa = portaudio::System::instance();
-	std::vector<AudioSystem::Device> list;
-
-	for (auto d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) {
-		if (!d->isInputOnlyDevice()) {
-			list.emplace_back(d->index(), d->name());
-		}
-	}
-	return list;
+	return AudioSink::GetDevicesInfo();
 }
 
 bool PaAudioSystem::IsOutputDevice(int id)
 {
-	auto &pa = portaudio::System::instance();
-	if (id < 0 || pa.deviceCount() <= id) return false;
-
-	portaudio::Device &dev = pa.deviceByIndex(id);
-	return !dev.isInputOnlyDevice();
+	return AudioSink::IsOutputDevice(id);
 }
 
 void PaAudioSystem::SetDeviceID(int id)

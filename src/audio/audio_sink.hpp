@@ -123,6 +123,19 @@ public:
 	 */
 	static portaudio::SampleDataFormat PaFormat(SampleFormat fmt);
 
+	/**
+	 * Gets the number and name of each output device entry in the
+	 * AudioSystem.
+	 * @return List of output devices, as strings.
+	 */
+	static std::vector<std::pair<int, std::string>> GetDevicesInfo();
+
+	/**
+	 * Can a sound device output sound?
+	 * @param id Device ID.
+	 * @return If the device can handle outputting sound.
+	 */
+	static bool IsOutputDevice(int id);
 private:
 	/// n, where 2^n is the capacity of the Audio ring buffer.
 	/// @see RINGBUF_SIZE

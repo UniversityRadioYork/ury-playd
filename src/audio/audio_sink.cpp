@@ -238,3 +238,26 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 		throw FileError(MSG_DECODE_BADRATE);
 	}
 }
+
+/* static */ std::vector<std::pair<int, std::string>> AudioSink::GetDevicesInfo()
+{
+	auto &pa = portaudio::System::instance();
+
+	decltype(AudioSink::GetDevicesInfo()) list;
+
+	for (auto d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) {
+		if (!d->isInputOnlyDevice()) {
+			list.emplace_back(d->index(), d->name());
+		}
+	}
+	return list;
+}
+
+/* static */ bool AudioSink::IsOutputDevice(int id)
+{
+	auto &pa = portaudio::System::instance();
+	if (id < 0 || pa.deviceCount() <= id) return false;
+
+	auto &dev = pa.deviceByIndex(id);
+	return !dev.isInputOnlyDevice();
+}
