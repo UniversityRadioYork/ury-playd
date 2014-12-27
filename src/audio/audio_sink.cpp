@@ -48,8 +48,8 @@ AudioSink::AudioSink(const AudioSource &source, int device_id)
 	                out_pars, sample_rate, paFramesPerBufferUnspecified,
 	                paClipOff);
 
-	this->stream = std::make_unique<portaudio::InterfaceCallbackStream>(
-	                pars, *this);
+	this->stream = std::unique_ptr<portaudio::InterfaceCallbackStream>(
+	                new portaudio::InterfaceCallbackStream(pars, *this));
 }
 
 void AudioSink::Start()

@@ -36,9 +36,9 @@ GROFF_HTML ?= mandoc -Thtml -Ostyle=man.css
 C_STD ?= c99
 
 # The C++ standard used to compile playd.
-# This should usually be 'c++14', but older compilers might need
+# This should usually be 'c++11', but older compilers might need
 # 'c++0x'.
-CXX_STD ?= c++14
+CXX_STD ?= c++11
 
 # Variables used to decide where to install playd and its man pages.
 prefix      ?= /usr/local
