@@ -14,22 +14,7 @@
 #include <stdexcept>
 #include <string>
 
-extern "C" {
-#include "portaudio.h"
-}
-
-#include "portaudiocpp/Device.hxx"
-#include "portaudiocpp/DirectionSpecificStreamParameters.hxx"
-#include "portaudiocpp/InterfaceCallbackStream.hxx"
-#include "portaudiocpp/SampleDataFormat.hxx"
-#include "portaudiocpp/Stream.hxx"
-#include "portaudiocpp/StreamParameters.hxx"
-#include "portaudiocpp/System.hxx"
-#include "portaudiocpp/SystemDeviceIterator.hxx"
-namespace portaudio
-{
-class CallbackInterface;
-}
+#include "portaudiocpp/PortAudioCpp.hxx"
 
 #include "../errors.hpp"
 #include "../messages.h"
@@ -119,10 +104,8 @@ AudioSource *PaAudioSystem::LoadSource(const std::string &path) const
 #endif
 
 #ifndef NO_SNDFILE
-	if (ext == "ogg" || ext == "wav" || ext == "flac") {
-		Debug() << "Using SndfileAudioSource" << std::endl;
-		return new SndfileAudioSource(path);
-	}
+	Debug() << "Using SndfileAudioSource" << std::endl;
+	return new SndfileAudioSource(path);
 #endif
 
 	throw FileError("Unknown file format: " + ext);
