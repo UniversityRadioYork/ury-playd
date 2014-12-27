@@ -30,11 +30,11 @@ extern "C" {
 // which doesn't have 24-bit support
 // See http://www.mpg123.de/cgi-bin/scm/mpg123/trunk/NEWS?pathrev=2791
 #if MPG123_API_VERSION < 28
-	// Let us be able to omit the check for 24-bit formats later.
-	#define HAVE_MPG123_24BIT 1
+// Let us be able to omit the check for 24-bit formats later.
+#define HAVE_MPG123_24BIT 1
 
-	// Make the use of this when divining formats a no-op.
-	#define MPG123_ENC_SIGNED_24 0
+// Make the use of this when divining formats a no-op.
+#define MPG123_ENC_SIGNED_24 0
 #endif
 
 // This value is somewhat arbitrary, but corresponds to the minimum buffer size
