@@ -105,22 +105,18 @@ std::uint32_t Mp3AudioSource::SampleRate() const
 	return static_cast<std::uint32_t>(rate);
 }
 
-std::uint64_t Mp3AudioSource::Seek(std::uint64_t position)
+std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 {
 	assert(this->context != nullptr);
 
-	auto samples = this->SamplesFromMicros(position);
-
 	// See BytesPerSample() for an explanation of this ChannelCount().
-	auto mono_samples = samples * this->ChannelCount();
+	auto mono_samples = in_samples * this->ChannelCount();
 
 	// Have we tried to seek past the end of the file?
 	auto clen = static_cast<unsigned long>(mpg123_length(this->context));
 	if (clen < mono_samples) {
 		Debug() << "mp3: seek at" << mono_samples << "past EOF at"
 		        << clen << std::endl;
-		Debug() << "mp3: requested position micros:" << position
-		        << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 

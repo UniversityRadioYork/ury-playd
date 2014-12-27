@@ -66,27 +66,23 @@ std::uint32_t SndfileAudioSource::SampleRate() const
 	return static_cast<std::uint32_t>(this->info.samplerate);
 }
 
-std::uint64_t SndfileAudioSource::Seek(std::uint64_t position)
+std::uint64_t SndfileAudioSource::Seek(std::uint64_t in_samples)
 {
-	auto samples = this->SamplesFromMicros(position);
-
 	// Have we tried to seek past the end of the file?
 	auto clen = static_cast<unsigned long>(this->info.frames);
-	if (clen < samples) {
-		Debug() << "sndfile: seek at" << samples << "past EOF at"
+	if (clen < in_samples) {
+		Debug() << "sndfile: seek at" << in_samples << "past EOF at"
 		        << clen << std::endl;
-		Debug() << "sndfile: requested position micros:" << position
-		        << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
-	auto new_samples = sf_seek(this->file, samples, SEEK_SET);
-	if (new_samples == -1) {
+	auto out_samples = sf_seek(this->file, in_samples, SEEK_SET);
+	if (out_samples == -1) {
 		Debug() << "sndfile: seek failed" << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
-	return new_samples;
+	return out_samples;
 }
 
 SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()

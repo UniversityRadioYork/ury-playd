@@ -37,9 +37,6 @@ typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
 class AudioSink : public portaudio::CallbackInterface
 {
 public:
-	/// Type of positions measured in samples.
-	typedef std::uint64_t SamplePosition;
-
 	/// Type of iterators used in the Transfer() method.
 	typedef AudioSource::DecodeVector::iterator TransferIterator;
 
@@ -76,9 +73,8 @@ public:
 	 * As this may be executing whilst the playing callback is running,
 	 * do not expect it to be highly accurate.
 	 * @return The current position, as a count of elapsed samples.
-	 * @see SamplePosition
 	 */
-	SamplePosition Position();
+	std::uint64_t Position();
 
 	/**
 	 * Sets the current played position, given a position in samples.
@@ -87,7 +83,7 @@ public:
 	 * @param samples The new position, as a count of elapsed samples.
 	 * @see Position
 	 */
-	void SetPosition(SamplePosition samples);
+	void SetPosition(std::uint64_t samples);
 
 	/**
 	 * Tells this AudioSink that the source has run out.
@@ -132,7 +128,7 @@ private:
 	static const size_t RINGBUF_POWER;
 
 	/// Number of bytes in one sample.
-	AudioSource::SampleByteCount bytes_per_sample;
+	size_t bytes_per_sample;
 
 	/// The ring buffer used to transfer samples to the playing callback.
 	RingBuffer ring_buf;

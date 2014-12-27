@@ -26,6 +26,12 @@
  * @see FlacAudioSource
  * @see Mp3AudioSource
  * @see OggAudioSource
+ *
+ * @note When we refer to 'samples' in this class, this usually refers to
+ *   the smallest unit of data for *all* channels.  Some audio decoders
+ *   call the smallest unit of data for one channel a 'sample'--so that
+ *   there are exactly ChannelCount() of their samples to one of ours.
+ *   We usually call this a 'mono sample'.
  */
 class AudioSource
 {
@@ -45,9 +51,6 @@ public:
 
 	/// Type of the result of Decode().
 	typedef std::pair<DecodeState, DecodeVector> DecodeResult;
-
-	/// Type for the count of bytes per sample.
-	typedef int SampleByteCount;
 
 	/**
 	 * Constructs an AudioSource.
@@ -89,9 +92,9 @@ public:
 	virtual SampleFormat OutputSampleFormat() const = 0;
 
 	/**
-	 * Seeks to the given position, in microseconds.
+	 * Seeks to the given position, in samples.
 	 * For convenience, the new position (in terms of samples) is returned.
-	 * @param position  The new position in the file, in microseconds.
+	 * @param in_samples  The new position in the file, in samples.
 	 * @return The new position in the file, in samples.
 	 */
 	virtual std::uint64_t Seek(std::uint64_t position) = 0;

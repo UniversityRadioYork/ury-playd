@@ -57,8 +57,9 @@ void PipeAudio::Seek(std::uint64_t position)
 	assert(this->sink != nullptr);
 	assert(this->src != nullptr);
 
-	auto samples = this->src->Seek(position);
-	this->sink->SetPosition(samples);
+	auto in_samples = this->src->SamplesFromMicros(position);
+	auto out_samples = this->src->Seek(in_samples);
+	this->sink->SetPosition(out_samples);
 
 	// We might still have decoded samples from the old position in
 	// our frame, so clear them out.

@@ -88,21 +88,17 @@ std::uint32_t FlacAudioSource::SampleRate() const
 	return static_cast<std::uint32_t>(rate);
 }
 
-std::uint64_t FlacAudioSource::Seek(std::uint64_t position)
+std::uint64_t FlacAudioSource::Seek(std::uint64_t in_samples)
 {
-	auto samples = this->SamplesFromMicros(position);
-
 	// Have we tried to seek past the end of the file?
 	auto clen = static_cast<unsigned long>(this->get_total_samples());
-	if (clen < samples) {
-		Debug() << "flac: seek at" << samples << "past EOF at" << clen
-		        << std::endl;
-		Debug() << "flac: requested position micros:" << position
-		        << std::endl;
+	if (clen < in_samples) {
+		Debug() << "flac: seek at" << in_samples << "past EOF at"
+		        << clen << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
-	bool seeked = this->seek_absolute(samples);
+	bool seeked = this->seek_absolute(in_samples);
 	if (!seeked || this->get_state() == FLAC__STREAM_DECODER_SEEK_ERROR) {
 		Debug() << "flac: seek failed" << std::endl;
 		this->flush();

@@ -77,12 +77,12 @@ void AudioSink::SourceOut()
 	this->source_out = true;
 }
 
-AudioSink::SamplePosition AudioSink::Position()
+std::uint64_t AudioSink::Position()
 {
 	return this->position_sample_count;
 }
 
-void AudioSink::SetPosition(AudioSink::SamplePosition samples)
+void AudioSink::SetPosition(std::uint64_t samples)
 {
 	this->position_sample_count = samples;
 
