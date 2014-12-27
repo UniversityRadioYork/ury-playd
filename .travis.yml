@@ -12,8 +12,16 @@ install:
   - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.5; fi
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.5" CC="clang-3.5"; fi
 
-  - sudo apt-get install -y libflac++-dev libmpg123-dev libsndfile-dev portaudio19-dev
+  - sudo apt-get install -y libmpg123-dev libsndfile-dev portaudio19-dev
   - sudo pip install cpp-coveralls
+
+# Why are we not installing libflac++-dev?
+# Because:
+# a) We want to see what happens if not all of playd's available drivers are
+#    available;
+# b) Some libflac packages have a nasty tendency to pull libflac's assert.h
+#    into the main include namespace, which knackers any attempt to use
+#    <cassert>.
 
 # Ubuntu 12.04 doesn't have a libuv package, so we install it from source.
 before_script:
