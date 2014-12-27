@@ -131,6 +131,7 @@ int AudioSink::paCallbackFun(const void *, void *out,
                              const PaStreamCallbackTimeInfo *,
                              PaStreamCallbackFlags)
 {
+	assert(out != nullptr);
 	char *cout = static_cast<char *>(out);
 
 	std::pair<PaStreamCallbackResult, unsigned long> result =

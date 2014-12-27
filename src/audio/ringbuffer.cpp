@@ -75,6 +75,7 @@ unsigned long RingBuffer::Read(char *start, unsigned long count)
 void RingBuffer::Flush()
 {
 	PaUtil_FlushRingBuffer(this->rb);
+	assert(this->ReadCapacity() == 0);
 }
 
 /* static */ unsigned long RingBuffer::CountCast(ring_buffer_size_t count)

@@ -34,8 +34,10 @@ void PlayerFile::Load(const std::string &path)
 {
 	// We can load over existing audio, but we need to eject it first.
 	if (this->audio != nullptr) this->Eject();
+	assert(this->audio == nullptr);
 
 	this->audio = decltype(this->audio)(this->audio_system.Load(path));
+	assert(this->audio != nullptr);
 
 	// Let clients know the file has changed.
 	this->Push();
