@@ -14,8 +14,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "portaudiocpp/PortAudioCpp.hxx"
-
 #include "../errors.hpp"
 #include "../messages.h"
 #include "audio.hpp"
@@ -30,7 +28,7 @@
 
 PaAudioSystem::PaAudioSystem() : device_id(-1)
 {
-	portaudio::System::initialize();
+	AudioSink::InitLibrary();
 
 #ifdef WITH_MP3
 	mpg123_init();
@@ -39,7 +37,7 @@ PaAudioSystem::PaAudioSystem() : device_id(-1)
 
 PaAudioSystem::~PaAudioSystem()
 {
-	portaudio::System::terminate();
+	AudioSink::CleanupLibrary();
 
 #ifdef WITH_MP3
 	mpg123_exit();

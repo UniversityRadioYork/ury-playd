@@ -261,3 +261,13 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 	auto &dev = pa.deviceByIndex(id);
 	return !dev.isInputOnlyDevice();
 }
+
+/* static */ void AudioSink::InitLibrary()
+{
+	portaudio::System::initialize();
+}
+
+/* static */ void AudioSink::CleanupLibrary()
+{
+	portaudio::System::terminate();
+}

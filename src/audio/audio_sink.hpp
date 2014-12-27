@@ -136,6 +136,13 @@ public:
 	 * @return If the device can handle outputting sound.
 	 */
 	static bool IsOutputDevice(int id);
+
+	/// Initialises the AudioSink's library.
+	static void InitLibrary();
+
+	/// Cleans up the AudioSink's library.
+	static void CleanupLibrary();
+
 private:
 	/// n, where 2^n is the capacity of the Audio ring buffer.
 	/// @see RINGBUF_SIZE
