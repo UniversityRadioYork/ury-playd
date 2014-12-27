@@ -62,7 +62,7 @@ std::vector<AudioSystem::Device> PaAudioSystem::GetDevicesInfo()
 bool PaAudioSystem::IsOutputDevice(int id)
 {
 	auto &pa = portaudio::System::instance();
-	if (id < 0 || id >= pa.deviceCount()) return false;
+	if (id < 0 || pa.deviceCount() <= id) return false;
 
 	portaudio::Device &dev = pa.deviceByIndex(id);
 	return !dev.isInputOnlyDevice();

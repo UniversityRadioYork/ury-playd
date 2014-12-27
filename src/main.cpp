@@ -115,7 +115,7 @@ int Playd::Run()
 	return EXIT_SUCCESS;
 }
 
-void Playd::RespondRaw(const std::string &string) const
+void Playd::Respond(const Response &response) const
 {
-	if (this->io != nullptr) this->io->Broadcast(string);
+	if (this->io != nullptr) this->io->Respond(response);
 }

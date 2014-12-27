@@ -69,20 +69,13 @@ public:
 	 */
 	void Remove(Connection &conn);
 
-	/**
-	 * Broadcasts a message to all connections.
-	 * @param message The message to send to all connections.
-	 */
-	void Broadcast(const std::string &message) const;
-
+	void Respond(const Response &response) const override;
 private:
 	Player &player;          ///< The player.
 	CommandHandler &handler; ///< The command handler.
 
 	/// The set of connections inside this ConnectionPool.
 	std::vector<std::unique_ptr<Connection>> connections;
-
-	void RespondRaw(const std::string &string) const override;
 };
 
 /**
@@ -116,9 +109,7 @@ public:
 	/// Connection cannot be copy-assigned.
 	Connection &operator=(const Connection &) = delete;
 
-	// Note: This is made public so that the IoCore can send raw data
-	// to the connection.
-	void RespondRaw(const std::string &response) const override;
+	void Respond(const Response &response) const override;
 
 	/**
 	 * Processes a data read on this connection.
@@ -165,7 +156,7 @@ private:
  * The IO core, which services input, routes responses, and executes the
  * Player update routine periodically.
  */
-class IoCore
+class IoCore : public ResponseSink
 {
 public:
 	/**
@@ -198,11 +189,7 @@ public:
 	 */
 	static void End();
 
-	/**
-	 * Broadcasts a string to all connections.
-	 * @param string The string to broadcast.
-	 */
-	void Broadcast(const std::string &string) const;
+	void Respond(const Response &response) const override;
 
 private:
 	/// The period between player updates.

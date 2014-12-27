@@ -126,18 +126,19 @@ void ConnectionPool::Accept(uv_stream_t *server)
 	auto client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
 
-	if (uv_accept(server, (uv_stream_t *)client) == 0) {
-		this->connections.emplace_back(
-		                new Connection(*this, client, this->handler));
-
-		this->player.WelcomeClient(*this->connections.back());
-		client->data = static_cast<void *>(
-		                this->connections.back().get());
-
-		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
-	} else {
+	if (uv_accept(server, (uv_stream_t *)client)) {
 		uv_close((uv_handle_t *)client, UvCloseCallback);
+		return;
 	}
+
+	this->connections.emplace_back(
+		new Connection(*this, client, this->handler)
+	);
+
+	this->player.WelcomeClient(*this->connections.back());
+	client->data = static_cast<void *>(this->connections.back().get());
+
+	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 }
 
 void ConnectionPool::Remove(Connection &conn)
@@ -149,17 +150,12 @@ void ConnectionPool::Remove(Connection &conn)
 		        }));
 }
 
-void ConnectionPool::Broadcast(const std::string &message) const
+void ConnectionPool::Respond(const Response &response) const
 {
 	if (this->connections.empty()) return;
 
-	Debug() << "Sending command:" << message << std::endl;
-	for (const auto &conn : this->connections) conn->RespondRaw(message);
-}
-
-void ConnectionPool::RespondRaw(const std::string &string) const
-{
-	this->Broadcast(string);
+	Debug() << "Sending command:" << response.Pack() << std::endl;
+	for (const auto &conn : this->connections) conn->Respond(response);
 }
 
 //
@@ -207,9 +203,9 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoCore::Broadcast(const std::string &string) const
+void IoCore::Respond(const Response &response) const
 {
-	this->pool.Broadcast(string);
+	this->pool.Respond(response);
 }
 
 /* static */ void IoCore::End()
@@ -234,8 +230,10 @@ Connection::~Connection()
 	uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
 }
 
-void Connection::RespondRaw(const std::string &string) const
+void Connection::Respond(const Response &response) const
 {
+	auto string = response.Pack();
+
 	unsigned int l = string.length();
 	const char *s = string.c_str();
 

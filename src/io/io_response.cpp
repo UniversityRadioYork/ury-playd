@@ -71,9 +71,9 @@ std::string Response::Pack() const
 // ResponseSink
 //
 
-void ResponseSink::Respond(Response response) const
+void ResponseSink::Respond(const Response &) const
 {
-	this->RespondRaw(response.Pack());
+	// By default, do nothing.
 }
 
 //

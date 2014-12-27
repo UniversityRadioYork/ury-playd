@@ -95,14 +95,7 @@ public:
 	 * Outputs a response.
 	 * @param response The Response to output.
 	 */
-	virtual void Respond(Response response) const;
-
-protected:
-	/**
-	 * Outputs a raw response string.
-	 * @param string The raw, escaped response string.
-	 */
-	virtual void RespondRaw(const std::string &string) const = 0;
+	virtual void Respond(const Response &response) const;
 };
 
 /**

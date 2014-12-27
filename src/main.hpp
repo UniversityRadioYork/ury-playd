@@ -65,7 +65,7 @@ private:
 	CommandHandler handler;     ///< The command handler.
 	std::unique_ptr<IoCore> io; ///< The I/O handler.
 
-	void RespondRaw(const std::string &string) const override;
+	void Respond(const Response &response) const override;
 
 	/**
 	 * Tries to get the output device ID from program arguments.
