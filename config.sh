@@ -242,14 +242,12 @@ find_portaudiocxx()
 # Feature listing
 #
 
-# If $2 is not set, adds $1 to $FORMATS.
-# Else, adds $2 as a compile flag to $FCFLAGS.
+# If $2 is not set, adds $1 to $FORMATS and $2 as a compile flag to $FCFLAGS.
 add_format_to_lists()
 {
 	if [ -z `eval echo '$'"$2"` ]
 	then
 		FORMATS=`printf "%s\n%s" "$FORMATS" "$1"`
-	else
 		FCFLAGS=`printf "%s\n%s" "$FCFLAGS" "-D$2"`
 	fi
 
@@ -272,15 +270,15 @@ list_features()
 	FORMATS=""
 	FCFLAGS=""
 
-	add_format_to_lists flac NO_FLAC
-	add_format_to_lists mp3 NO_MP3
-	add_format_to_lists flac NO_SNDFILE
-	add_format_to_lists ogg NO_SNDFILE
-	add_format_to_lists wav NO_SNDFILE
+	add_format_to_lists flac WITH_FLAC
+	add_format_to_lists mp3  WITH_MP3
+	add_format_to_lists flac WITH_SNDFILE
+	add_format_to_lists ogg  WITH_SNDFILE
+	add_format_to_lists wav  WITH_SNDFILE
 
 	# Sort, uniquify, space-delimit and strip formats/flags
-	FORMATS=`echo "$FORMATS" | sort | uniq | tr "\n" " "| sed 's/^ //g'`
-	FCFLAGS=`echo "$FCFLAGS" | sort | uniq | tr "\n" " "| sed 's/^ //g'`
+	FORMATS=`echo "$FORMATS" | sort | uniq | tr -s "\n" " " | sed -e 's/^ //g' -e 's/ $//g'`
+	FCFLAGS=`echo "$FCFLAGS" | sort | uniq | tr -s "\n" " " | sed -e 's/^ //g' -e 's/ $//g'`
 
 	# No point building playd with no file formats!
 	if [ -z "$FORMATS" ]

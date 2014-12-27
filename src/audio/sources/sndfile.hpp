@@ -9,7 +9,7 @@
 
 #ifndef PLAYD_AUDIO_SOURCE_SNDFILE_HPP
 #define PLAYD_AUDIO_SOURCE_SNDFILE_HPP
-#ifndef NO_SNDFILE
+#ifdef WITH_SNDFILE
 
 #include <cstdint>
 #include <string>
@@ -48,5 +48,5 @@ private:
 	std::vector<int32_t> buffer; ///< The decoding buffer.
 };
 
-#endif // NO_SNDFILE
+#endif // WITH_SNDFILE
 #endif // PLAYD_AUDIO_SOURCE_SNDFILE_HPP

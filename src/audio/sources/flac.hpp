@@ -9,7 +9,7 @@
 
 #ifndef PLAYD_AUDIO_SOURCE_FLAC_HPP
 #define PLAYD_AUDIO_SOURCE_FLAC_HPP
-#ifndef NO_FLAC
+#ifdef WITH_FLAC
 
 #include <cstdint>
 #include <string>
@@ -58,5 +58,5 @@ private:
 	std::vector<int32_t> buffer; ///< The decoding buffer.
 };
 
-#endif // NO_FLAC
+#endif // WITH_FLAC
 #endif // PLAYD_AUDIO_SOURCE_FLAC_HPP
