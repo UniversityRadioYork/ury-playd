@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -198,5 +199,6 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 			// We shouldn't get here, if the format was set up
 			// correctly earlier.
 			assert(false);
+			return SampleFormat::PACKED_UNSIGNED_INT_8;
 	}
 }
