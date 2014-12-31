@@ -16,13 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include "portaudio.h"
-#include "portaudiocpp/CallbackInterface.hxx"
-namespace portaudio
-{
-class Stream;
-}
-
 #include "../io/io_response.hpp"
 #include "audio_source.hpp"
 

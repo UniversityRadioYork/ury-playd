@@ -25,37 +25,34 @@
 #                                                        (default: ./usr/local)
 #
 #   Programs:
+#     MAKE.....................................GNU Make (specifically GNU Make)
 #     PKGCONF..........................................pkg-config or equivalent
 #
 #   Package name overrides:
 #     FLACXX_PKG......................................FLAC++ pkg-config package
 #     LIBMPG123_PKG................................libmpg123 pkg-config package
 #     LIBSNDFILE_PKG..............................libsndfile pkg-config package
-#     PORTAUDIO_PKG................................PortAudio pkg-config package
-#     PORTAUDIOCXX_PKG...........................PortAudio++ pkg-config package
+#     SDL2_PKG..........................................SDL2 pkg-config package
+#     LIBUV_PKG........................................libuv pkg-config package
 #
 #   File format flags (set to non-empty string to activate):
 #     NO_FLAC................................................don't support FLAC
 #     NO_MP3..................................................don't support MP3
 #     NO_SNDFILE...............................don't support libsndfile formats
 #
-#   Other flags (set to non-empty string to activate):
-#     NO_SYS_PORTAUDIOCXX...........use bundled PortAudio++ instead of system's
-#
 # Notes:
 #   - lack of FLAC++ implies NO_FLAC;
 #   - lack of libmpg123 implies NO_MP3;
 #   - lack of libsndfile implies NO_SNDFILE;
-#   - lack of portaudio++ implies NO_SYS_PORTAUDIOCXX.
-#   - lack of pkgconf/pkg-config or portaudio is fatal.
+#   - lack of pkgconf/pkg-config or SDL2 is fatal.
 
 # Runs `make clean`, if a Makefile is present.
 clean()
 {
 	if [ -f "Makefile" ]
 	then
-		echo 'running `make clean` first...'
-		make clean >/dev/null
+		echo 'running `'$MAKE' clean` first...'
+		$MAKE clean >/dev/null
 		echo 'removing existing Makefile...'
 		rm Makefile
 		echo
@@ -131,16 +128,64 @@ disable_if_no_pkg()
 	fi
 }
 
-# Tries to find all dependencies.
-find_deps()
+# Tries to find needed programs.
+find_progs()
 {
-	echo "DEPENDENCIES:"
+	echo "PROGRAMS:"
+	find_cc
+	find_cxx
+	find_gnumake
 	find_pkgconf
-	find_flac
-	find_mp3
-	find_sndfile
-	find_portaudio
-	find_portaudiocxx
+}
+
+# If $2 exists, sets $1 to it.
+find_prog()
+{
+	if [ -z `eval echo '"$'${1}'"'` ]
+	then
+		if which "${2}" >/dev/null
+		then
+			eval "${1}=`which ${2}`"
+		fi
+	fi
+}
+
+# Tries to find a sane C compiler.
+#
+# Stores the result in $CC if successful.
+# Halts the script on failure.
+find_cc()
+{
+	echo -n "  C compiler:    "
+	find_prog CC clang
+	find_prog CC gcc
+
+	if [ -n "$CC" ]
+	then
+		echo "$CC"
+	else
+		echo "not found"
+		exit 1
+	fi
+}
+
+# Tries to find a sane C++ compiler.
+#
+# Stores the result in $CXX if successful.
+# Halts the script on failure.
+find_cxx()
+{
+	echo -n "  C++ compiler:  "
+	find_prog CXX clang++
+	find_prog CXX g++
+
+	if [ -n "$CXX" ]
+	then
+		echo "$CXX"
+	else
+		echo "not found"
+		exit 1
+	fi
 }
 
 # Tries to find a sane pkgconf/pkg-config.
@@ -150,20 +195,47 @@ find_deps()
 find_pkgconf()
 {
 	echo -n "  pkgconf:       "
+	find_prog PKGCONF pkgconf
+	find_prog PKGCONF pkg-config
 
 	if [ -n "$PKGCONF" ]
 	then
 		echo "$PKGCONF"
-	elif which pkgconf
-	then
-		PKGCONF=`which pkgconf`
-	elif which pkg-config
-	then
-		PKGCONF=`which pkg-config`
 	else
 		echo "not found"
 		exit 1
 	fi
+}
+
+# Tries to find a sane GNU make.
+#
+# Stores the result in $MAKE if successful.
+# Halts the script on failure.
+find_gnumake()
+{
+	echo -n "  GNU Make:      "
+	find_prog MAKE gmake
+	find_prog MAKE gnumake
+	find_prog MAKE make
+
+	if [ -n "$MAKE" ]
+	then
+		echo "$MAKE"
+	else
+		echo "not found"
+		exit 1
+	fi
+}
+
+# Tries to find all dependencies.
+find_deps()
+{
+	echo "DEPENDENCIES:"
+	find_flac
+	find_mp3
+	find_sndfile
+	find_sdl2
+	find_libuv
 }
 
 # Finds FLAC++ to provide FLAC support, if requested.
@@ -213,30 +285,33 @@ find_sndfile()
 	disable_if_no_pkg LIBSNDFILE SNDFILE
 }
 
-# Finds PortAudio.
-find_portaudio()
+# Finds SDL2
+find_sdl2()
 {
-	echo -n "  PortAudio:     "
+	echo -n "  SDL2:          "
 
-	try_use_pkg PORTAUDIO "portaudio2"
-	try_use_pkg PORTAUDIO "portaudio-2.0"
+	try_use_pkg SDL2 "sdl2"
 
-	if [ -z "$PORTAUDIO_PKG" ]
+	if [ -z "$SDL2_PKG" ]
 	then
 		echo "not found; cannot continue"
 		exit 2
 	fi
 }
 
-# Finds any available C++ bindings for PortAudio.
-find_portaudiocxx()
+# Finds libuv
+find_libuv()
 {
-	echo -n "  PortAudioC++:  "
+	echo -n "  libuv:         "
 
-	try_use_pkg PORTAUDIOCXX "portaudiocpp"
-	disable_if_no_pkg PORTAUDIOCXX SYS_PORTAUDIOCXX
+	try_use_pkg LIBUV "libuv"
+
+	if [ -z "$LIBUV_PKG" ]
+	then
+		echo "not found; cannot continue"
+		exit 2
+	fi
 }
-
 
 #
 # Feature listing
@@ -256,17 +331,6 @@ add_format_to_lists()
 # Lists features on stdout.
 list_features()
 {
-	echo -n "Using "
-	if [ -z "$NO_SYS_PORTAUDIOCXX" ]
-	then
-		echo -n "system "
-	else
-		echo -n "bundled "
-	fi
-	echo "PortAudio C++ bindings."
-
-	echo
-
 	FORMATS=""
 	FCFLAGS=""
 
@@ -297,7 +361,7 @@ list_features()
 # Also lists on stdout.
 list_packages()
 {
-	PACKAGES=`echo "$FLACXX_PKG $LIBMPG123_PKG $LIBSNDFILE_PKG $PORTAUDIO_PKG $PORTAUDIOCXX_PKG" | sed 's/  */ /g'`
+	PACKAGES=`echo "$FLACXX_PKG $LIBMPG123_PKG $LIBSNDFILE_PKG $SDL2_PKG $LIBUV_PKG" | sed 's/  */ /g'`
 	echo "PACKAGES USED:"
 	echo "  $PACKAGES"
 }
@@ -336,19 +400,6 @@ find_sources()
 	# Remove test code.
 	CXXSOURCES=`echo "$CXXSOURCES" | sed '/'"$sd"'\/tests/d'`
 
-	# Disable own PortAudio C++ bindings if not needed.
-	#
-	# Why don't we do this in the `find` command?, you may ask.  Well.
-	# It so happens that POSIX find has _no_ way of matching on a full name,
-	# only a basename.  So, we either have to expect GNU find (ew), or we
-	# can just sed out the offending paths here.
-	# 
-	if [ -z "$NO_SYS_PORTAUDIOCXX" ]
-	then
-		CXXSOURCES=`echo "$CXXSOURCES" |
-			sed '/'"$sd"'\/contrib\/portaudiocpp/d'`
-	fi
-
 	# Compared to above, the C sources are easy--they're always there,
 	# regardless of features.
 	CSOURCES=`find "$SRCDIR" -name '*.c'`
@@ -382,13 +433,16 @@ write_makefile()
 		    -e "s|%%PROGVER%%|$PROGVER|g"	\
 		    -e "s|%%SRCDIR%%|$SRCDIR|g"		\
 		    -e "s|%%BUILDDIR%%|$BUILDDIR|g"	\
-		    -e "s|%%NO_SYS_PORTAUDIOCXX%%|$NO_SYS_PORTAUDIOCXX|g" > Makefile
+		    -e "s|%%CC%%|$CC|g"			\
+		    -e "s|%%CXX%%|$CXX|g"		> Makefile
 }
 
 #
 # Main script
 #
 
+find_progs
+echo
 clean
 find_name_and_version
 echo
@@ -402,5 +456,5 @@ list_packages
 echo
 write_makefile
 echo
-echo "If this is what you wanted, now run GNU make."
+echo "If this is what you wanted, now run ${MAKE}."
 echo "Else, fix any environment problems and re-run $0."

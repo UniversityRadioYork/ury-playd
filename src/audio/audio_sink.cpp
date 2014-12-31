@@ -14,7 +14,7 @@
 #include <memory>
 #include <string>
 
-#include "portaudiocpp/PortAudioCpp.hxx"
+#include "SDL.h"
 
 #include "../errors.hpp"
 #include "../messages.h"
@@ -25,55 +25,78 @@
 
 const size_t AudioSink::RINGBUF_POWER = 16;
 
+/**
+ * The callback used by SDL_Audio.
+ * Trampolines back into vsink, which must point to an AudioSink.
+ */
+static void SDLCallback(void *vsink, std::uint8_t *data, int len)
+{
+	assert(vsink != nullptr);
+	auto sink = static_cast<AudioSink *>(vsink);
+	sink->Callback(data, len);
+}
+
 AudioSink::AudioSink(const AudioSource &source, int device_id)
     : bytes_per_sample(source.BytesPerSample()),
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
       position_sample_count(0),
       just_started(false),
-      source_out(false),
-      sink_out(false)
+      source_out(false)
 {
-	std::uint8_t channel_count = source.ChannelCount();
-	SampleFormat sample_format = source.OutputSampleFormat();
-	double sample_rate = source.SampleRate();
-	const portaudio::Device &device = AudioSink::PaDevice(device_id);
+	const char *name = SDL_GetAudioDeviceName(device_id, 0);
+	if (name == nullptr) {
+		throw ConfigError(std::string("invalid device id: ") + std::to_string(device_id));
+	}
 
-	portaudio::DirectionSpecificStreamParameters out_pars(
-	                device, channel_count,
-	                AudioSink::PaFormat(sample_format), true,
-	                device.defaultLowOutputLatency(), nullptr);
+	SDL_AudioSpec want;
+	SDL_zero(want);
+	want.freq = source.SampleRate();
+	want.format = SDLFormat(source.OutputSampleFormat());
+	want.channels = source.ChannelCount();
+	want.callback = &SDLCallback;
+	want.userdata = (void *)this;
 
-	portaudio::StreamParameters pars(
-	                portaudio::DirectionSpecificStreamParameters::null(),
-	                out_pars, sample_rate, paFramesPerBufferUnspecified,
-	                paClipOff);
+	SDL_AudioSpec have;
+	SDL_zero(have);
 
-	this->stream = std::unique_ptr<portaudio::InterfaceCallbackStream>(
-	                new portaudio::InterfaceCallbackStream(pars, *this));
+	this->device = SDL_OpenAudioDevice(name, 0, &want, &have, 0);
+	if (this->device == 0) {
+		throw ConfigError(std::string("couldn't open device: ") + SDL_GetError());
+	}
+}
+
+AudioSink::~AudioSink()
+{
+	if (this->device == 0) return;
+	SDL_CloseAudioDevice(this->device);
 }
 
 void AudioSink::Start()
 {
+	if (this->state == Audio::State::AT_END) return;
+
 	this->just_started = true;
-	this->stream->start();
+	SDL_PauseAudioDevice(this->device, 0);
+	this->state = Audio::State::PLAYING;
 }
 
 void AudioSink::Stop()
 {
-	if (!this->stream->isStopped()) this->stream->abort();
+	if (this->state == Audio::State::AT_END) return;
+
+	SDL_PauseAudioDevice(this->device, 1);
+	this->state = Audio::State::STOPPED;
 }
 
 Audio::State AudioSink::State()
 {
-	if (this->sink_out) return Audio::State::AT_END;
-	if (this->stream->isActive()) return Audio::State::PLAYING;
-	return Audio::State::STOPPED;
+	return this->state;
 }
 
 void AudioSink::SourceOut()
 {
 	// The sink should only be out if the source is.
-	assert(this->source_out || !this->sink_out);
+	assert(this->source_out || this->state != Audio::State::AT_END);
 
 	this->source_out = true;
 }
@@ -89,7 +112,11 @@ void AudioSink::SetPosition(std::uint64_t samples)
 
 	// We might have been at the end of the file previously.
 	// If so, we might not be now, so clear the out flags.
-	this->source_out = this->sink_out = false;
+	this->source_out = false;
+	if (this->state == Audio::State::AT_END) {
+		this->state = Audio::State::STOPPED;
+		this->Stop();
+	}
 
 	// The ringbuf will have been full of samples from the old
 	// position, so we need to get rid of them.
@@ -126,115 +153,59 @@ void AudioSink::Transfer(AudioSink::TransferIterator &start,
 	assert(start <= end);
 }
 
-int AudioSink::paCallbackFun(const void *, void *out,
-                             unsigned long frames_per_buf,
-                             const PaStreamCallbackTimeInfo *,
-                             PaStreamCallbackFlags)
+void AudioSink::Callback(std::uint8_t *out, int nbytes)
 {
 	assert(out != nullptr);
-	char *cout = static_cast<char *>(out);
 
-	std::pair<PaStreamCallbackResult, unsigned long> result =
-	                std::make_pair(paContinue, 0);
+	assert(0 <= nbytes);
+	unsigned long lnbytes = static_cast<unsigned long>(nbytes);
 
-	while (result.first == paContinue && result.second < frames_per_buf) {
-		result = PlayCallbackStep(cout, frames_per_buf, result);
-	}
-	return static_cast<int>(result.first);
-}
+	// First of all, let's find out how many samples are available in total
+	// to give SDL.
+	auto avail_samples = this->ring_buf.ReadCapacity();
 
-PlayCallbackStepResult AudioSink::PlayCallbackStep(char *out,
-                                                   unsigned long frames_per_buf,
-                                                   PlayCallbackStepResult in)
-{
-	unsigned long avail = this->ring_buf.ReadCapacity();
-	bool empty = avail == 0;
+	// Have we run out of things to feed?
+	if (this->source_out && avail_samples == 0) {
+		// Then we're out too.
+		this->state = Audio::State::AT_END;
 
-	/* If we've just started this stream, we don't want to hand PortAudio
-	   an incomplete frame—we'd rather wait until we have enough in the
-	   ring buffer before starting to play out. */
-	bool wait = this->just_started && (avail < frames_per_buf);
-
-	bool failed = wait || empty;
-	auto fn = failed ? &AudioSink::PlayCallbackFailure
-	                 : &AudioSink::PlayCallbackSuccess;
-	return (this->*fn)(out, avail, frames_per_buf, in);
-}
-
-PlayCallbackStepResult AudioSink::PlayCallbackSuccess(
-                char *out, unsigned long avail, unsigned long frames_per_buf,
-                PlayCallbackStepResult in)
-{
-	this->just_started = false;
-
-	auto samples_pa_wants = frames_per_buf - in.second;
-	auto samples_read = ReadSamplesToOutput(out, avail, samples_pa_wants);
-
-	return std::make_pair(paContinue, in.second + samples_read);
-}
-
-PlayCallbackStepResult AudioSink::PlayCallbackFailure(
-                char *out, unsigned long avail, unsigned long frames_per_buf,
-                PlayCallbackStepResult in)
-{
-	decltype(in) result;
-
-	// We've hit end of file if:
-	// 1) The decoder has said it's run out;
-	// 2) The number of available samples is exactly zero.
-	// End of input is ok: it means the stream can finish.
-	if (this->source_out && avail == 0) {
-		// Make sure future state queries return AT_END.
-		this->sink_out = true;
-
-		return std::make_pair(paComplete, in.second);
+		memset(out, 0, lnbytes);
+		return;
 	}
 
-	// There's been some sort of genuine issue.
-	// Make up some silence to plug the gap.
-	Debug() << "Buffer underflow" << std::endl;
-	memset(out, 0, this->bytes_per_sample * frames_per_buf);
-	return std::make_pair(paContinue, frames_per_buf);
+	// How many samples do we want to pull out of the ring buffer?
+	auto req_samples = lnbytes / this->bytes_per_sample;
+
+	// How many can we pull out?  Send this amount to SDL.
+	auto samples = std::min(req_samples, avail_samples);
+	auto read_samples = this->ring_buf.Read(reinterpret_cast<char *>(out), samples);
+	this->position_sample_count += read_samples;
+
+	// Now, we need to fill any gaps with silence.
+	auto read_bytes = read_samples * this->bytes_per_sample;
+	assert(read_bytes <= lnbytes);
+
+	// I have too little confidence in my own mathematics sometimes.
+	auto silence_bytes = lnbytes - read_bytes;
+	assert(read_bytes + silence_bytes == lnbytes);
+
+	// SILENCE WILL FALL
+	memset(out + read_bytes, 0, silence_bytes);
 }
 
-unsigned long AudioSink::ReadSamplesToOutput(char *&output,
-                                             unsigned long output_capacity,
-                                             unsigned long buffered_count)
-{
-	// Transfer the maximum that we can offer to PortAudio without
-	// overshooting its sample request limit.
-	long transfer_sample_count = static_cast<long>(
-	                std::min({ output_capacity, buffered_count,
-		                   static_cast<unsigned long>(LONG_MAX) }));
-	output += this->ring_buf.Read(output, transfer_sample_count);
-
-	// Update the position count so it reflects the last position that was
-	// sent for playback (*not* the last position decoded).
-	this->position_sample_count += transfer_sample_count;
-	return transfer_sample_count;
-}
-
-/* static */ const portaudio::Device &AudioSink::PaDevice(int id)
-{
-	auto &pa = portaudio::System::instance();
-	if (pa.deviceCount() <= id) throw ConfigError(MSG_DEV_BADID);
-	return pa.deviceByIndex(id);
-}
-
-/// Mappings from SampleFormats to their equivalent PaSampleFormats.
-static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
-	{ SampleFormat::PACKED_UNSIGNED_INT_8, portaudio::UINT8 },
-	{ SampleFormat::PACKED_SIGNED_INT_8, portaudio::INT8 },
-	{ SampleFormat::PACKED_SIGNED_INT_16, portaudio::INT16 },
-	{ SampleFormat::PACKED_SIGNED_INT_24, portaudio::INT24 },
-	{ SampleFormat::PACKED_SIGNED_INT_32, portaudio::INT32 },
-	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
+/// Mappings from SampleFormats to their equivalent SDL_AudioFormats.
+static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
+	{ SampleFormat::PACKED_UNSIGNED_INT_8, AUDIO_U8 },
+	{ SampleFormat::PACKED_SIGNED_INT_8, AUDIO_S8 },
+	{ SampleFormat::PACKED_SIGNED_INT_16, AUDIO_S16 },
+	{ SampleFormat::PACKED_SIGNED_INT_32, AUDIO_S32 },
+	{ SampleFormat::PACKED_FLOAT_32, AUDIO_F32 }
 };
 
-/* static */ portaudio::SampleDataFormat AudioSink::PaFormat(SampleFormat fmt)
+/* static */ SDL_AudioFormat AudioSink::SDLFormat(SampleFormat fmt)
 {
 	try {
-		return pa_from_sf.at(fmt);
+		return sdl_from_sf.at(fmt);
 	} catch (std::out_of_range) {
 		throw FileError(MSG_DECODE_BADRATE);
 	}
@@ -242,33 +213,33 @@ static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
 
 /* static */ std::vector<std::pair<int, std::string>> AudioSink::GetDevicesInfo()
 {
-	auto &pa = portaudio::System::instance();
-
 	decltype(AudioSink::GetDevicesInfo()) list;
 
-	for (auto d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) {
-		if (!d->isInputOnlyDevice()) {
-			list.emplace_back(d->index(), d->name());
-		}
+	// The 0 in SDL_GetNumAudioDevices tells SDL we want playback devices.
+	int is = SDL_GetNumAudioDevices(0);
+	for (int i = 0; i < is; i++) {
+		const char *n = SDL_GetAudioDeviceName(i, 0);
+		if (n == nullptr) continue;
+
+		list.emplace_back(i, std::string(n));
 	}
 	return list;
 }
 
 /* static */ bool AudioSink::IsOutputDevice(int id)
 {
-	auto &pa = portaudio::System::instance();
-	if (id < 0 || pa.deviceCount() <= id) return false;
-
-	auto &dev = pa.deviceByIndex(id);
-	return !dev.isInputOnlyDevice();
+	// See above comment for why this is sufficient.
+	return (0 <= id && id < SDL_GetNumAudioDevices(0));
 }
 
 /* static */ void AudioSink::InitLibrary()
 {
-	portaudio::System::initialize();
+	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
+		throw ConfigError(std::string("could not initialise SDL: ") + SDL_GetError());
+	}
 }
 
 /* static */ void AudioSink::CleanupLibrary()
 {
-	portaudio::System::terminate();
+	SDL_Quit();
 }

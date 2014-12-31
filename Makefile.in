@@ -20,8 +20,8 @@ srcdir ?= %%SRCDIR%%
 WARNS ?= -Wall -Wextra -Werror
 
 # Programs used during building.
-CC         ?= clang
-CXX        ?= clang++
+CC         =  %%CC%%
+CXX        =  %%CXX%%
 GZIP       ?= gzip -9 --stdout
 INSTALL    ?= install
 PKG_CONFIG ?= pkg-config
@@ -66,21 +66,7 @@ OWN_SUBDIRS = audio audio/sources io player
 SUBDIRS     = $(OWN_SUBDIRS) contrib/pa_ringbuffer
 
 # Now we work out which libraries to use, using pkg-config.
-# 'libuv' is always used.
-PKGS = libuv %%PACKAGES%%
-
-# PortAudio's C++ bindings aren't always available, so we bundle them.
-# However, if there is a PortAudioCPP package available, we can make use of it
-# instead.
-NO_SYS_PORTAUDIOCXX ?= %%NO_SYS_PORTAUDIOCXX%%
-ifneq "$(NO_SYS_PORTAUDIOCXX)" ""
-  # Add the bundled bindings to the list of things to compile.
-  PORTAUDIOCPP_DIR  = contrib/portaudiocpp
-  CXXFLAGS         += -I"$(srcdir)/$(PORTAUDIOCPP_DIR)"
-  SUBDIRS          += $(PORTAUDIOCPP_DIR)
-else
-  PKGS += portaudiocpp
-endif
+PKGS = %%PACKAGES%%
 
 # Set up the flags needed to use the packages.
 PKG_CFLAGS  += `$(PKG_CONFIG) --cflags $(PKGS)`
