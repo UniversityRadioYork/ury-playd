@@ -13,7 +13,7 @@ install:
   - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.5; fi
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.5" CC="clang-3.5"; fi
 
-  - sudo apt-get install -y libmpg123-dev libsndfile-dev portaudio19-dev libsdl2-dev
+  - sudo apt-get install -y libmpg123-dev libsndfile-dev libsdl2-dev
   - sudo pip install cpp-coveralls
 
 # Why are we not installing libflac++-dev?
