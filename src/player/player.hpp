@@ -5,8 +5,6 @@
  * @file
  * Declaration of the Player class, and associated types.
  * @see player/player.cpp
- * @see player/player_position.hpp
- * @see player/player_position.cpp
  */
 
 #ifndef PLAYD_PLAYER_HPP
@@ -24,19 +22,16 @@
 #include "../io/io_response.hpp"
 #include "../cmd_result.hpp"
 
-#include "player_position.hpp"
-
 /**
- * A Player contains a loaded audio file and the state of its playback.
- * @see PlayerPosition
- * @see PlayerState
+ * A Player contains a loaded audio file and a command API for manipulating it.
+ * @see Audio
+ * @see AudioSystem
  */
 class Player
 {
 private:
 	AudioSystem &audio;          ///< The system used for loading audio.
 	std::unique_ptr<Audio> file; ///< The currently loaded Audio.
-	PlayerPosition position;     ///< The Player's position subcomponent.
 	bool is_running;             ///< Whether the Player is running.
 	const ResponseSink *sink;    ///< The sink for audio responses.
 
@@ -48,11 +43,8 @@ public:
 	 * Constructs a Player.
 	 * @param sink The sink to which audio notifications are sent.
 	 * @param audio The AudioSystem to be used by the player.
-	 * @param position The player's position component.
 	 */
-	Player(const ResponseSink *sink,
-	       AudioSystem &audio,
-	       PlayerPosition &position);
+	Player(const ResponseSink *sink, AudioSystem &audio);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;

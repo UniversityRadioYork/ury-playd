@@ -92,7 +92,7 @@ public:
 	 * @param sink The ResponseSink to which the response shall be sent.
 	 *   May be nullptr, in which case Emit should be a no-operation.
 	 */
-	virtual void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const = 0;
+	virtual void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) = 0;
 
 	/**
 	 * This Audio's current position.
@@ -119,7 +119,7 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const override;
+	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) override;
 
 	// The following all raise an exception:
 
@@ -156,7 +156,7 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const override;
+	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) override;
 	std::uint64_t Position() const override;
 
 private:
@@ -171,6 +171,12 @@ private:
 
 	/// The current position in the current decoded frame.
 	AudioSource::DecodeVector::iterator frame_iterator;
+
+	/**
+	 * A map of response sink pointers to their last emitted position, in
+	 * seconds.
+	 */
+	std::map<const ResponseSink *, std::uint64_t> last_times;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();

@@ -5,7 +5,6 @@
  * @file player/player.cpp
  * Main implementation file for the Player class.
  * @see player/player.hpp
- * @see player/player_position.cpp
  */
 
 #include <cassert>
@@ -26,8 +25,8 @@
 const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 	                                         "Seek", "TimeReport" };
 
-Player::Player(const ResponseSink *sink, AudioSystem &audio, PlayerPosition &position)
-    : audio(audio), file(audio.Null()), position(position), is_running(true), sink(sink)
+Player::Player(const ResponseSink *sink, AudioSystem &audio)
+    : audio(audio), file(audio.Null()), is_running(true), sink(sink)
 {
 }
 
@@ -40,7 +39,7 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->position.Update(this->file->Position());
+		this->file->Emit({ Response::Code::TIME }, this->sink);
 	}
 
 	return this->is_running;
@@ -54,8 +53,7 @@ void Player::WelcomeClient(ResponseSink &client) const
 	for (auto &f : FEATURES) features.Arg(f);
 	client.Respond(features);
 
-	this->file->Emit({ Response::Code::FILE, Response::Code::STATE }, &client);
-	this->position.Emit(client);
+	this->file->Emit({ Response::Code::FILE, Response::Code::TIME, Response::Code::STATE }, &client);
 }
 
 void Player::End()
@@ -97,10 +95,8 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		this->file->Emit({ Response::Code::FILE, Response::Code::STATE }, this->sink);
+		this->file->Emit({ Response::Code::FILE, Response::Code::TIME, Response::Code::STATE }, this->sink);
 		assert(this->file != nullptr);
-
-		this->position.Reset();
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
 		this->Eject();
@@ -177,10 +173,7 @@ void Player::SeekRaw(std::uint64_t pos)
 {
 	assert(this->file != nullptr);
 	this->file->Seek(pos);
-
-	// Clean out the position tracker, as the position has abruptly changed.
-	this->position.Reset();
-	this->position.Update(this->file->Position());
+	this->file->Emit({ Response::Code::TIME }, this->sink);
 }
 
 CommandResult Player::Stop()

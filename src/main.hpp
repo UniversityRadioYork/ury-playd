@@ -15,7 +15,6 @@
 #include "io/io_core.hpp"
 #include "io/io_response.hpp"
 #include "player/player.hpp"
-#include "player/player_position.hpp"
 
 /**
  * The playd application.
@@ -43,23 +42,14 @@ public:
 	int Run();
 
 private:
-	/**
-	 * The period between position announcements from the Player object.
-	 * This is given in microseconds, so eg. 500000 = 0.5sec = 2Hz.
-	 */
-	static const std::uint64_t POSITION_PERIOD = 500000;
-
 	/// The ID returned by GetDeviceID if something goes wrong.
 	static const int INVALID_ID = -1;
 
 	std::vector<std::string> argv; ///< The argument vector.
 	PaAudioSystem audio;           ///< The audio subsystem.
-
-	PlayerPosition pposition; ///< The player-position subsystem.
-	Player player;            ///< The player subsystem.
-
-	CommandHandler handler;     ///< The command handler.
-	std::unique_ptr<IoCore> io; ///< The I/O handler.
+	Player player;                 ///< The player subsystem.
+	CommandHandler handler;        ///< The command handler.
+	std::unique_ptr<IoCore> io;    ///< The I/O handler.
 
 	void Respond(const Response &response) const override;
 

@@ -23,7 +23,7 @@ DummyAudio::DummyAudio(DummyAudioSystem &sys) : sys(sys)
 {
 }
 
-void DummyAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const
+void DummyAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink)
 {
 	if (sink == nullptr) return;
 

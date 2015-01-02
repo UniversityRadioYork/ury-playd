@@ -30,7 +30,7 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-void NoAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const
+void NoAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink)
 {
 	if (sink == nullptr) return;
 
@@ -70,7 +70,7 @@ PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const
+void PipeAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink)
 {
 	if (sink == nullptr) return;
 
@@ -85,6 +85,32 @@ void PipeAudio::Emit(std::initializer_list<Response::Code> codes, const Response
 			r.Arg(playing ? "Playing" : "Stopped");
 		} else if (code == Response::Code::FILE) {
 			r.Arg(this->src->Path());
+		} else if (code == Response::Code::TIME) {
+			// To prevent spewing massive amounts of TIME
+			// responses, we only send one if the number of seconds
+			// has changed since the last request for this
+			// response on this sink.
+			std::uint64_t micros = this->Position();
+			std::uint64_t secs = micros / 1000 / 1000;
+
+			auto last_entry = this->last_times.find(sink);
+
+			// We can announce if we haven't got a record for this
+			// sink, or if the last record was in a previous
+			// second.
+			bool can_announce = true;
+			if (last_entry != this->last_times.end()) {
+				can_announce = (last_entry->second < secs);
+
+				// This is so as to allow the emplace below to
+				// work--it fails if there's already a value
+				// under the same key.
+				if (can_announce) this->last_times.erase(last_entry);
+			}
+
+			if (!can_announce) continue;
+			this->last_times.emplace(sink, secs);
+			r.Arg(std::to_string(micros));
 		} else {
 			continue;
 		}
@@ -121,6 +147,9 @@ void PipeAudio::Seek(std::uint64_t position)
 	auto in_samples = this->src->SamplesFromMicros(position);
 	auto out_samples = this->src->Seek(in_samples);
 	this->sink->SetPosition(out_samples);
+
+	// Make sure we always announce the new position to all response sinks.
+	this->last_times.clear();
 
 	// We might still have decoded samples from the old position in
 	// our frame, so clear them out.
