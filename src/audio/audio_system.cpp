@@ -66,14 +66,14 @@ std::unique_ptr<Audio> PaAudioSystem::Null() const
 
 std::unique_ptr<Audio> PaAudioSystem::Load(const std::string &path) const
 {
-	AudioSource *source = this->LoadSource(path);
+	std::unique_ptr<AudioSource> source = this->LoadSource(path);
 	assert(source != nullptr);
 
-	auto sink = new AudioSink(*source, this->device_id);
-	return std::unique_ptr<Audio>(new PipeAudio(source, sink));
+	auto sink = std::unique_ptr<AudioSink>(new AudioSink(*source, this->device_id));
+	return std::unique_ptr<Audio>(new PipeAudio(std::move(source), std::move(sink)));
 }
 
-AudioSource *PaAudioSystem::LoadSource(const std::string &path) const
+std::unique_ptr<AudioSource> PaAudioSystem::LoadSource(const std::string &path) const
 {
 	size_t extpoint = path.find_last_of('.');
 	std::string ext = path.substr(extpoint + 1);
@@ -81,20 +81,20 @@ AudioSource *PaAudioSystem::LoadSource(const std::string &path) const
 #ifdef WITH_FLAC
 	if (ext == "flac") {
 		Debug() << "Using FlacAudioSource" << std::endl;
-		return new FlacAudioSource(path);
+		return std::unique_ptr<AudioSource>(new FlacAudioSource(path));
 	}
 #endif // WITH_FLAC
 
 #ifdef WITH_MP3
 	if (ext == "mp3") {
 		Debug() << "Using Mp3AudioSource" << std::endl;
-		return new Mp3AudioSource(path);
+		return std::unique_ptr<AudioSource>(new Mp3AudioSource(path));
 	}
 #endif // WITH_MP3
 
 #ifdef WITH_SNDFILE
 	Debug() << "Using SndfileAudioSource" << std::endl;
-	return new SndfileAudioSource(path);
+	return std::unique_ptr<AudioSource>(new SndfileAudioSource(path));
 #endif // WITH_SNDFILE
 
 	throw FileError("Unknown file format: " + ext);

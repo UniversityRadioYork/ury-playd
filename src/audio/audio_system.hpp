@@ -108,7 +108,7 @@ private:
 	 *   and suitable AudioSource was found).
 	 * @see Load
 	 */
-	AudioSource *LoadSource(const std::string &path) const;
+	std::unique_ptr<AudioSource> LoadSource(const std::string &path) const;
 };
 
 #endif // PLAYD_AUDIO_SYSTEM_HPP

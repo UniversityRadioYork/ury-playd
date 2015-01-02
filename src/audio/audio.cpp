@@ -65,7 +65,8 @@ std::uint64_t NoAudio::Position() const
 // PipeAudio
 //
 
-PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
+PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src, std::unique_ptr<AudioSink> &&sink)
+    : src(std::move(src)), sink(std::move(sink))
 {
 	this->ClearFrame();
 }
