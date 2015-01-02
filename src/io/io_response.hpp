@@ -81,14 +81,6 @@ private:
 
 /**
  * Abstract class for anything that can be sent a response.
- *
- * This class automatically provides the Respond() and RespondArgs() methods,
- * given an implementation on the subclass of RespondRaw().
- *
- * Usually the responses come from a ResponseSource, but anything may send a
- * ResponseSink a response.
- *
- * @see ResponseSource
  */
 class ResponseSink
 {
@@ -98,48 +90,6 @@ public:
 	 * @param response The Response to output.
 	 */
 	virtual void Respond(const Response &response) const;
-};
-
-/**
- * Abstract helper class for sources of responses.
- *
- * A ResponseSource can both 'push' responses to a registered ResponseSink and
- * be 'polled' from outside to dump its current response to an external
- * ResponseSink.
- *
- * @see ResponseSink
- */
-class ResponseSource
-{
-public:
-	/**
-	 * Constructs a ResponseSource.
-	 * @param push_sink A pointer to the ResponseSink to which Push()
-	 *   notifications shall be sent.  May be nullptr, in which case said
-	 *   notifications are discarded.
-	 */
-	ResponseSource(const ResponseSink *push_sink);
-
-	/**
-	 * Emits a response to a given ResponseSink.
-	 * @param sink The ResponseSink to which this ResponseSource's current
-	 * response should be emitted.
-	 */
-	virtual void Emit(const ResponseSink &sink) const = 0;
-
-protected:
-	/**
-	 * Calls an Emit on the registered ResponseSink.
-	 * If there is no registered ResponseSink, the response is dropped.
-	 */
-	void Push() const;
-
-private:
-	/**
-	 * A ResponseSink to which 'push' responses are emitted.
-	 * If the ResponseSink is not present, responses are not emitted.
-	 */
-	const ResponseSink *push_sink;
 };
 
 #endif // PLAYD_IO_RESPONSE_HPP

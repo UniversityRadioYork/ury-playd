@@ -75,19 +75,3 @@ void ResponseSink::Respond(const Response &) const
 {
 	// By default, do nothing.
 }
-
-//
-// ResponseSource
-//
-
-ResponseSource::ResponseSource(const ResponseSink *push_sink)
-    : push_sink(push_sink)
-{
-}
-
-void ResponseSource::Push() const
-{
-	// Having no push_sink is entirely normal, and implies that the
-	// ResponseSource's responses are to be ignored.
-	if (this->push_sink != nullptr) this->Emit(*this->push_sink);
-}
