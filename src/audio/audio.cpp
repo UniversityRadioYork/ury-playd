@@ -30,14 +30,15 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-void NoAudio::EmitFile(const ResponseSink &) const
+void NoAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const
 {
-	// Intentionally left blank.
-}
+	if (sink == nullptr) return;
 
-void NoAudio::EmitState(const ResponseSink &sink) const
-{
-	sink.Respond(Response(Response::Code::STATE).Arg("Ejected"));
+	for (auto &code : codes) {
+		if (code == Response::Code::STATE) {
+			sink->Respond(Response(Response::Code::STATE).Arg("Ejected"));
+		}
+	}
 }
 
 void NoAudio::Start()
@@ -69,20 +70,27 @@ PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
 	this->ClearFrame();
 }
 
-void PipeAudio::EmitFile(const ResponseSink &sink) const
+void PipeAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const
 {
+	if (sink == nullptr) return;
+
 	assert(this->src != nullptr);
-	sink.Respond(Response(Response::Code::FILE).Arg(this->src->Path()));
-}
-
-void PipeAudio::EmitState(const ResponseSink &sink) const
-{
-	auto r = Response(Response::Code::STATE);
 	assert(this->sink != nullptr);
-	auto playing = this->sink->State() == Audio::State::PLAYING;
 
-	r.Arg(playing ? "Playing" : "Stopped");
-	sink.Respond(r);
+	for (auto &code : codes) {
+		auto r = Response(code);
+
+		if (code == Response::Code::STATE) {
+			auto playing = this->sink->State() == Audio::State::PLAYING;
+			r.Arg(playing ? "Playing" : "Stopped");
+		} else if (code == Response::Code::FILE) {
+			r.Arg(this->src->Path());
+		} else {
+			continue;
+		}
+
+		sink->Respond(r);
+	}
 }
 
 void PipeAudio::Start()

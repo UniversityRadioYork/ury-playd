@@ -86,21 +86,13 @@ public:
 	//
 
 	/**
-	 * Emits a FILE response containing this Audio's path.
+	 * Emits the requested responses.
 	 *
-	 * This is usually literally the absolute file-path, but depends
-	 * on the implementation.
-	 *
+	 * @param responses The set of responses to emit, if possible.
 	 * @param sink The ResponseSink to which the response shall be sent.
+	 *   May be nullptr, in which case Emit should be a no-operation.
 	 */
-	virtual void EmitFile(const ResponseSink &sink) const = 0;
-
-	/**
-	 * Emits a STATE response containing the current playback state.
-	 *
-	 * @param sink The ResponseSink to which the response shall be sent.
-	 */
-	virtual void EmitState(const ResponseSink &sink) const = 0;
+	virtual void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const = 0;
 
 	/**
 	 * This Audio's current position.
@@ -127,8 +119,7 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	void EmitFile(const ResponseSink &sink) const override;
-	void EmitState(const ResponseSink &sink) const override;
+	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const override;
 
 	// The following all raise an exception:
 
@@ -165,8 +156,7 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void EmitFile(const ResponseSink &sink) const override;
-	void EmitState(const ResponseSink &sink) const override;
+	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) const override;
 	std::uint64_t Position() const override;
 
 private:

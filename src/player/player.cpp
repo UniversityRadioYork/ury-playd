@@ -26,8 +26,8 @@
 const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 	                                         "Seek", "TimeReport" };
 
-Player::Player(const ResponseSink *end_sink, AudioSystem &audio, PlayerPosition &position)
-    : audio(audio), file(audio.Null()), position(position), is_running(true), end_sink(end_sink)
+Player::Player(const ResponseSink *sink, AudioSystem &audio, PlayerPosition &position)
+    : audio(audio), file(audio.Null()), position(position), is_running(true), sink(sink)
 {
 }
 
@@ -54,22 +54,27 @@ void Player::WelcomeClient(ResponseSink &client) const
 	for (auto &f : FEATURES) features.Arg(f);
 	client.Respond(features);
 
-	this->file->EmitFile(client);
-	this->file->EmitState(client);
+	this->file->Emit({ Response::Code::FILE, Response::Code::STATE }, &client);
 	this->position.Emit(client);
 }
 
 void Player::End()
 {
-	if (this->end_sink != nullptr) {
-		this->end_sink->Respond(Response(Response::Code::END));
-	}
 	this->Stop();
 
 	// Rewind the file back to the start.  We can't use Player::Seek() here
 	// in case End() is called from Seek(); a seek failure could start an
 	// infinite loop.
 	this->SeekRaw(0);
+
+	// Let upstream know that the file ended by itself.
+	// This is needed for auto-advancing playlists, etc.
+	this->Respond(Response(Response::Code::END));
+}
+
+void Player::Respond(const Response &response) const
+{
+	if (this->sink != nullptr) this->sink->Respond(response);
 }
 
 //
@@ -80,7 +85,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	if (this->end_sink != nullptr) this->file->EmitState(*this->end_sink);
+	this->file->Emit({ Response::Code::STATE }, this->sink);
 
 	return CommandResult::Success();
 }
@@ -92,10 +97,7 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		if (this->end_sink != nullptr) {
-			this->file->EmitFile(*this->end_sink);
-			this->file->EmitState(*this->end_sink);
-		}
+		this->file->Emit({ Response::Code::FILE, Response::Code::STATE }, this->sink);
 		assert(this->file != nullptr);
 
 		this->position.Reset();
@@ -119,7 +121,7 @@ CommandResult Player::Play()
 
 	try {
 		this->file->Start();
-		if (this->end_sink != nullptr) this->file->EmitState(*this->end_sink);
+		this->file->Emit({ Response::Code::STATE }, this->sink);
 	} catch (NoAudioError &e) {
 		return CommandResult::Invalid(e.Message());
 	}
@@ -187,7 +189,7 @@ CommandResult Player::Stop()
 
 	try {
 		this->file->Stop();
-		if (this->end_sink != nullptr) this->file->EmitState(*this->end_sink);
+		this->file->Emit({ Response::Code::STATE }, this->sink);
 	} catch (NoAudioError &e) {
 		return CommandResult::Invalid(e.Message());
 	}

@@ -38,9 +38,7 @@ private:
 	std::unique_ptr<Audio> file; ///< The currently loaded Audio.
 	PlayerPosition position;     ///< The Player's position subcomponent.
 	bool is_running;             ///< Whether the Player is running.
-
-	/// The sink to which END responses shall be sent.
-	const ResponseSink *end_sink;
+	const ResponseSink *sink;    ///< The sink for audio responses.
 
 	/// The set of features playd implements.
 	const static std::vector<std::string> FEATURES;
@@ -48,11 +46,11 @@ private:
 public:
 	/**
 	 * Constructs a Player.
-	 * @param end_sink The sink to which END notifications are sent.
+	 * @param sink The sink to which audio notifications are sent.
 	 * @param audio The AudioSystem to be used by the player.
 	 * @param position The player's position component.
 	 */
-	Player(const ResponseSink *end_sink,
+	Player(const ResponseSink *sink,
 	       AudioSystem &audio,
 	       PlayerPosition &position);
 
@@ -160,6 +158,13 @@ private:
 
 	/// Handles ending a file (stopping and rewinding).
 	void End();
+
+	/**
+	 * Sends a response to the Player's response sink.
+	 * This is a no-op if there is no response sink.
+	 * @param response The response to send.
+	 */
+	void Respond(const Response &response) const;
 };
 
 #endif // PLAYD_PLAYER_HPP
