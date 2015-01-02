@@ -65,7 +65,7 @@ do weird things in the presence of Telnet-isms.
 ### Requirements
 
 * [libuv] 0.10+
-* [PortAudio] 19_20140130
+* [SDL2] 2.0.3
 * A C++11 compiler (recent versions of [clang], [gcc], and Visual Studio
   work)
 
@@ -85,9 +85,9 @@ build instructions below.
 GNU-compatible Makefile that can be used both to make and install.
 
 To use the Makefile, you'll need [GNU Make] and `pkg-config` (or equivalent),
-and pkg-config packages for PortAudio, libsox and libuv.  We've tested building
-playd on Gentoo, FreeBSD 10, and OS X, but other POSIX-style operating systems
-should work.
+and pkg-config packages for SDL2, libuv, and any needed decoder libraries.
+We've tested building playd on Gentoo, FreeBSD 10, and OS X, but other
+POSIX-style operating systems should work.
 
 Using the Makefile is straightforward:
 
@@ -113,11 +113,9 @@ and package repositories.
 You will need `gmake`, as `Makefile` is incompatible with BSD make.  Sorry!
 
 All of `playd`'s dependencies are available through both the FreeBSD Ports
-Collection and standard package repository.  (The FreeBSD port for PortAudio
-doesn't build C++ bindings, but we bundle them anyway.)  To install them as
-packages:
+Collection and standard package repository.  To install them as packages:
 
-    root@freebsd:/ # pkg install gmake libmpg123 libsndfile libflac libuv portaudio2 pkgconf
+    root@freebsd:/ # pkg install gmake libmpg123 libsndfile libflac libuv sdl2 pkgconf
 
 Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
 `playd` (as root):
@@ -139,16 +137,6 @@ Studio project is provided, but will need tweaking for your environment.
 
 We haven't managed ourselves, but assuming you can build all the dependencies,
 (libsox is the difficult one), it should work fine.
-
-### PortAudio C++ Bindings
-
-If you have the PortAudio C++ bindings available, those may be used in place of
-the bundled bindings.  Usually, `config.sh` will detect them and use them.
-
-__Visual Studio users:__ The Visual Studio 7.1 project supplied in the
-PortAudio source distribution for building the C++ bindings
-(`\bindings\cpp\build\vc7_1\static_library.vcproj`) should work.  If not, then
-use the bundled bindings.
 
 
 ## Contributing
@@ -176,6 +164,6 @@ as well as [CATCH] (see LICENSE.catch).
 [libuv]:                 https://github.com/joyent/libuv
 [MIT licence]:           http://opensource.org/licenses/MIT
 [netcat]:                http://nc110.sourceforge.net
-[PortAudio]:             http://www.portaudio.com
+[SDL2]:                  https://www.libsdl.org
 [PuTTY]:                 http://www.chiark.greenend.org.uk/~sgtatham/putty/
 [University Radio York]: http://ury.org.uk
