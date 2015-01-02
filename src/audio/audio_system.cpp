@@ -59,13 +59,18 @@ void PaAudioSystem::SetDeviceID(int id)
 	this->device_id = id;
 }
 
-Audio *PaAudioSystem::Load(const std::string &path) const
+std::unique_ptr<Audio> PaAudioSystem::Null() const
+{
+	return std::unique_ptr<Audio>(new NoAudio());
+}
+
+std::unique_ptr<Audio> PaAudioSystem::Load(const std::string &path) const
 {
 	AudioSource *source = this->LoadSource(path);
 	assert(source != nullptr);
 
 	auto sink = new AudioSink(*source, this->device_id);
-	return new PipeAudio(source, sink);
+	return std::unique_ptr<Audio>(new PipeAudio(source, sink));
 }
 
 AudioSource *PaAudioSystem::LoadSource(const std::string &path) const

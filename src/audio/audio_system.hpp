@@ -36,11 +36,17 @@ public:
 	typedef std::pair<int, std::string> Device;
 
 	/**
+	 * Creates an Audio for a lack of audio.
+	 * @return A unique pointer to a dummy Audio.
+	 */
+	virtual std::unique_ptr<Audio> Null() const = 0;
+
+	/**
 	 * Loads a file, creating an Audio for it.
 	 * @param path The path to a file.
-	 * @return The Audio for that file.
+	 * @return A unique pointer to the Audio for that file.
 	 */
-	virtual Audio *Load(const std::string &path) const = 0;
+	virtual std::unique_ptr<Audio> Load(const std::string &path) const = 0;
 
 	/**
 	 * Sets the current device ID.
@@ -86,7 +92,8 @@ public:
 	virtual ~PaAudioSystem();
 
 	// AudioSystem implementation
-	Audio *Load(const std::string &path) const override;
+	std::unique_ptr<Audio> Null() const override;
+	std::unique_ptr<Audio> Load(const std::string &path) const override;
 	void SetDeviceID(int id) override;
 	std::vector<AudioSystem::Device> GetDevicesInfo() override;
 	bool IsOutputDevice(int id) override;

@@ -58,10 +58,9 @@ int Playd::GetDeviceID()
 
 Playd::Playd(int argc, char *argv[])
     : audio(),
-      pfile(this, audio),
       pposition(this, Playd::POSITION_PERIOD),
       pstate(this),
-      player(this, pfile, pposition, pstate),
+      player(this, audio, pposition, pstate),
       handler(player)
 {
 	for (int i = 0; i < argc; i++) {

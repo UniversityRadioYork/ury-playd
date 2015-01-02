@@ -108,9 +108,32 @@ public:
 };
 
 /**
+ * A dummy Audio implementation representing a lack of file.
+ *
+ * NoAudio throws exceptions if any attempt is made to change, start, or stop
+ * the audio, and returns Audio::State::NONE during any attempt to Update.
+ * If asked to emit the audio file, NoAudio does nothing.
+ *
+ * @see Audio
+ */
+class NoAudio : public Audio
+{
+public:
+	Audio::State Update() override;
+	void Emit(const ResponseSink &sink) const override;
+
+	// The following all raise an exception:
+
+	void Start() override;
+	void Stop() override;
+	void Seek(std::uint64_t position) override;
+	std::uint64_t Position() const override;
+};
+
+/**
  * A concrete implementation of Audio as a 'pipe'.
  *
- * AudioPipe is comprised of a 'source', which decodes frames from a
+ * PipeAudio is comprised of a 'source', which decodes frames from a
  * file, and a 'sink', which plays out the decoded frames.  Updating
  * consists of shifting frames from the source to the sink.
  *

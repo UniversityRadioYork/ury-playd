@@ -28,20 +28,22 @@
 const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 	                                         "Seek", "TimeReport" };
 
-Player::Player(const ResponseSink *end_sink, PlayerFile &file,
+Player::Player(const ResponseSink *end_sink, AudioSystem &audio,
                PlayerPosition &position, PlayerState &state)
-    : file(file), position(position), state(state), end_sink(end_sink)
+    : audio(audio), file(audio.Null()), position(position), state(state), end_sink(end_sink)
 {
 }
 
 bool Player::Update()
 {
-	auto as = this->file.Update();
+	assert(this->file != nullptr);
+	auto as = this->file->Update();
+
 	if (as == Audio::State::AT_END) this->End();
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->position.Update(this->file.Position());
+		this->position.Update(this->file->Position());
 	}
 
 	return this->state.IsRunning();
@@ -55,7 +57,7 @@ void Player::WelcomeClient(ResponseSink &client) const
 	for (auto &f : FEATURES) features.Arg(f);
 	client.Respond(features);
 
-	this->file.Emit(client);
+	this->file->Emit(client);
 	this->position.Emit(client);
 	this->state.Emit(client);
 }
@@ -83,7 +85,10 @@ CommandResult Player::Eject()
 		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
 	}
 
-	this->file.Eject();
+	assert(this->file != nullptr);
+	this->file = this->audio.Null();
+	assert(this->file != nullptr);
+
 	this->state.Set(PlayerState::State::EJECTED);
 
 	return CommandResult::Success();
@@ -94,7 +99,11 @@ CommandResult Player::Load(const std::string &path)
 	if (path.empty()) return CommandResult::Invalid(MSG_LOAD_EMPTY_PATH);
 
 	try {
-		this->file.Load(path);
+		assert(this->file != nullptr);
+		this->file = this->audio.Load(path);
+		if (this->end_sink != nullptr) this->file->Emit(*this->end_sink);
+		assert(this->file != nullptr);
+
 		this->position.Reset();
 		this->state.Set(PlayerState::State::STOPPED);
 	} catch (FileError &e) {
@@ -117,7 +126,9 @@ CommandResult Player::Play()
 		return CommandResult::Invalid(MSG_CMD_NEEDS_STOPPED);
 	}
 
-	this->file.Start();
+	assert(this->file != nullptr);
+	this->file->Start();
+
 	this->state.Set(PlayerState::State::PLAYING);
 
 	return CommandResult::Success();
@@ -171,11 +182,12 @@ CommandResult Player::Seek(const std::string &time_str)
 
 void Player::SeekRaw(std::uint64_t pos)
 {
-	this->file.Seek(pos);
+	assert(this->file != nullptr);
+	this->file->Seek(pos);
 
 	// Clean out the position tracker, as the position has abruptly changed.
 	this->position.Reset();
-	this->position.Update(this->file.Position());
+	this->position.Update(this->file->Position());
 }
 
 CommandResult Player::Stop()
@@ -184,7 +196,9 @@ CommandResult Player::Stop()
 		return CommandResult::Invalid(MSG_CMD_NEEDS_PLAYING);
 	}
 
-	this->file.Stop();
+	assert(this->file != nullptr);
+	this->file->Stop();
+
 	this->state.Set(PlayerState::State::STOPPED);
 
 	return CommandResult::Success();

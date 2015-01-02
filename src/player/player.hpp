@@ -20,11 +20,11 @@
 #include <utility>
 #include <vector>
 
+#include "../audio/audio_system.hpp"
 #include "../audio/audio.hpp"
 #include "../io/io_response.hpp"
 #include "../cmd_result.hpp"
 
-#include "player_file.hpp"
 #include "player_position.hpp"
 #include "player_state.hpp"
 
@@ -36,9 +36,10 @@
 class Player
 {
 private:
-	PlayerFile &file;         ///< The file subcomponent of the Player.
-	PlayerPosition &position; ///< The position subcomponent of the Player.
-	PlayerState &state;       ///< The state subcomponent of the Player.
+	AudioSystem &audio;          ///< The system used for loading audio.
+	std::unique_ptr<Audio> file; ///< The currently loaded Audio.
+	PlayerPosition position;     ///< The Player's position subcomponent.
+	PlayerState state;           ///< The Player's state subcomponent.
 
 	/// The sink to which END responses shall be sent.
 	const ResponseSink *end_sink;
@@ -50,11 +51,12 @@ public:
 	/**
 	 * Constructs a Player.
 	 * @param end_sink The sink to which END notifications are sent.
-	 * @param file The player's audio-file component.
+	 * @param audio The AudioSystem to be used by the player.
 	 * @param position The player's position component.
 	 * @param state The player's state component.
 	 */
-	Player(const ResponseSink *end_sink, PlayerFile &file,
+	Player(const ResponseSink *end_sink,
+	       AudioSystem &audio,
 	       PlayerPosition &position, PlayerState &state);
 
 	/// Deleted copy constructor.

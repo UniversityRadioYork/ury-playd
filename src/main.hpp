@@ -15,7 +15,6 @@
 #include "io/io_core.hpp"
 #include "io/io_response.hpp"
 #include "player/player.hpp"
-#include "player/player_file.hpp"
 #include "player/player_position.hpp"
 #include "player/player_state.hpp"
 
@@ -57,7 +56,6 @@ private:
 	std::vector<std::string> argv; ///< The argument vector.
 	PaAudioSystem audio;           ///< The audio subsystem.
 
-	PlayerFile pfile;         ///< The player-file subsystem.
 	PlayerPosition pposition; ///< The player-position subsystem.
 	PlayerState pstate;       ///< The player-state subsystem.
 	Player player;            ///< The player subsystem.

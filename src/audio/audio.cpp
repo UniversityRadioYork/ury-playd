@@ -21,6 +21,44 @@
 #include "audio_source.hpp"
 #include "sample_formats.hpp"
 
+//
+// NoAudio
+//
+
+Audio::State NoAudio::Update()
+{
+	return Audio::State::NONE;
+}
+
+void NoAudio::Emit(const ResponseSink &) const
+{
+	// Intentionally left blank.
+}
+
+void NoAudio::Start()
+{
+	throw InternalError("called Start() with no audio");
+}
+
+void NoAudio::Stop()
+{
+	throw InternalError("called Stop() with no audio");
+}
+
+void NoAudio::Seek(std::uint64_t)
+{
+	throw InternalError("called Seek() with no audio");
+}
+
+std::uint64_t NoAudio::Position() const
+{
+	throw InternalError("called Position() with no audio");
+}
+
+//
+// PipeAudio
+//
+
 PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
 {
 	this->ClearFrame();

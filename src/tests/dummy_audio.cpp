@@ -61,13 +61,18 @@ DummyAudioSystem::DummyAudioSystem() : path(""), pos(0), state(Audio::State::STO
 {
 }
 
-Audio *DummyAudioSystem::Load(const std::string &path) const
+std::unique_ptr<Audio> DummyAudioSystem::Null() const
+{
+	return std::unique_ptr<Audio>(new NoAudio());
+}
+
+std::unique_ptr<Audio> DummyAudioSystem::Load(const std::string &path) const
 {
 	// Kids, don't try this at home.
 	// Were this not a test mock, I'd shoot myself for this!  ~ Matt
 	DummyAudioSystem &notconst = const_cast<DummyAudioSystem &>(*this);
 	notconst.path = path;
-	return new DummyAudio(notconst);
+	return std::unique_ptr<Audio>(new DummyAudio(notconst));
 }
 
 void DummyAudioSystem::SetDeviceID(int)
