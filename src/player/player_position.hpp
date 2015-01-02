@@ -19,7 +19,6 @@
 /**
  * Tracker and broadcaster for the Player's current position in a song.
  * @see Player
- * @see PlayerState
  */
 class PlayerPosition : public ResponseSource
 {

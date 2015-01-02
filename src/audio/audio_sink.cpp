@@ -41,7 +41,8 @@ AudioSink::AudioSink(const AudioSource &source, int device_id)
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
       position_sample_count(0),
       just_started(false),
-      source_out(false)
+      source_out(false),
+      state(Audio::State::STOPPED)
 {
 	const char *name = SDL_GetAudioDeviceName(device_id, 0);
 	if (name == nullptr) {
@@ -73,7 +74,7 @@ AudioSink::~AudioSink()
 
 void AudioSink::Start()
 {
-	if (this->state == Audio::State::AT_END) return;
+	if (this->state != Audio::State::STOPPED) return;
 
 	this->just_started = true;
 	SDL_PauseAudioDevice(this->device, 0);
@@ -82,7 +83,7 @@ void AudioSink::Start()
 
 void AudioSink::Stop()
 {
-	if (this->state == Audio::State::AT_END) return;
+	if (this->state == Audio::State::STOPPED) return;
 
 	SDL_PauseAudioDevice(this->device, 1);
 	this->state = Audio::State::STOPPED;

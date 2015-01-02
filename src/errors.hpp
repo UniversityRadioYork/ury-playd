@@ -114,6 +114,22 @@ public:
 	}
 };
 
+/**
+ * An Error signifying that no audio is loaded.
+ */
+class NoAudioError : public Error
+{
+public:
+	/**
+	 * Constructs an NoAudioError.
+	 * @param msg The human-readable message of the error.
+	 */
+	NoAudioError(const std::string &msg) : Error(msg)
+	{
+	}
+};
+
+
 /** Class for telling the human what playd is doing. */
 class Debug
 {

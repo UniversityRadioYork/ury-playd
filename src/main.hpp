@@ -16,7 +16,6 @@
 #include "io/io_response.hpp"
 #include "player/player.hpp"
 #include "player/player_position.hpp"
-#include "player/player_state.hpp"
 
 /**
  * The playd application.
@@ -57,7 +56,6 @@ private:
 	PaAudioSystem audio;           ///< The audio subsystem.
 
 	PlayerPosition pposition; ///< The player-position subsystem.
-	PlayerState pstate;       ///< The player-state subsystem.
 	Player player;            ///< The player subsystem.
 
 	CommandHandler handler;     ///< The command handler.

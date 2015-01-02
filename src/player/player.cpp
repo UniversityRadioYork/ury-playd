@@ -6,7 +6,6 @@
  * Main implementation file for the Player class.
  * @see player/player.hpp
  * @see player/player_position.cpp
- * @see player/player_state.cpp
  */
 
 #include <cassert>
@@ -22,15 +21,13 @@
 #include "../errors.hpp"
 #include "../io/io_response.hpp"
 #include "../messages.h"
-#include "player_state.hpp"
 #include "player.hpp"
 
 const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 	                                         "Seek", "TimeReport" };
 
-Player::Player(const ResponseSink *end_sink, AudioSystem &audio,
-               PlayerPosition &position, PlayerState &state)
-    : audio(audio), file(audio.Null()), position(position), state(state), end_sink(end_sink)
+Player::Player(const ResponseSink *end_sink, AudioSystem &audio, PlayerPosition &position)
+    : audio(audio), file(audio.Null()), position(position), is_running(true), end_sink(end_sink)
 {
 }
 
@@ -46,7 +43,7 @@ bool Player::Update()
 		this->position.Update(this->file->Position());
 	}
 
-	return this->state.IsRunning();
+	return this->is_running;
 }
 
 void Player::WelcomeClient(ResponseSink &client) const
@@ -57,9 +54,9 @@ void Player::WelcomeClient(ResponseSink &client) const
 	for (auto &f : FEATURES) features.Arg(f);
 	client.Respond(features);
 
-	this->file->Emit(client);
+	this->file->EmitFile(client);
+	this->file->EmitState(client);
 	this->position.Emit(client);
-	this->state.Emit(client);
 }
 
 void Player::End()
@@ -81,15 +78,9 @@ void Player::End()
 
 CommandResult Player::Eject()
 {
-	if (!this->state.In(PlayerState::AUDIO_LOADED_STATES)) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
-	}
-
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	assert(this->file != nullptr);
-
-	this->state.Set(PlayerState::State::EJECTED);
+	if (this->end_sink != nullptr) this->file->EmitState(*this->end_sink);
 
 	return CommandResult::Success();
 }
@@ -101,11 +92,13 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		if (this->end_sink != nullptr) this->file->Emit(*this->end_sink);
+		if (this->end_sink != nullptr) {
+			this->file->EmitFile(*this->end_sink);
+			this->file->EmitState(*this->end_sink);
+		}
 		assert(this->file != nullptr);
 
 		this->position.Reset();
-		this->state.Set(PlayerState::State::STOPPED);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
 		this->Eject();
@@ -122,14 +115,14 @@ CommandResult Player::Load(const std::string &path)
 
 CommandResult Player::Play()
 {
-	if (!this->state.In({ PlayerState::State::STOPPED })) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_STOPPED);
-	}
-
 	assert(this->file != nullptr);
-	this->file->Start();
 
-	this->state.Set(PlayerState::State::PLAYING);
+	try {
+		this->file->Start();
+		if (this->end_sink != nullptr) this->file->EmitState(*this->end_sink);
+	} catch (NoAudioError &e) {
+		return CommandResult::Invalid(e.Message());
+	}
 
 	return CommandResult::Success();
 }
@@ -137,17 +130,13 @@ CommandResult Player::Play()
 CommandResult Player::Quit()
 {
 	this->Eject();
-	this->state.Set(PlayerState::State::QUITTING);
-
-	// Quitting is always a valid command.
+	this->is_running = false;
 	return CommandResult::Success();
 }
 
 CommandResult Player::Seek(const std::string &time_str)
 {
-	if (!this->state.In(PlayerState::AUDIO_LOADED_STATES)) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
-	}
+	assert(this->file != nullptr);
 
 	std::uint64_t pos = 0;
 	size_t cpos = 0;
@@ -169,6 +158,8 @@ CommandResult Player::Seek(const std::string &time_str)
 
 	try {
 		this->SeekRaw(pos);
+	} catch (NoAudioError) {
+		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
 	} catch (SeekError) {
 		Debug() << "Seek failure" << std::endl;
 
@@ -192,14 +183,14 @@ void Player::SeekRaw(std::uint64_t pos)
 
 CommandResult Player::Stop()
 {
-	if (!this->state.In(PlayerState::AUDIO_PLAYING_STATES)) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_PLAYING);
-	}
-
 	assert(this->file != nullptr);
-	this->file->Stop();
 
-	this->state.Set(PlayerState::State::STOPPED);
+	try {
+		this->file->Stop();
+		if (this->end_sink != nullptr) this->file->EmitState(*this->end_sink);
+	} catch (NoAudioError &e) {
+		return CommandResult::Invalid(e.Message());
+	}
 
 	return CommandResult::Success();
 }

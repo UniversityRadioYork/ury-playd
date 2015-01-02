@@ -93,7 +93,14 @@ public:
 	 *
 	 * @param sink The ResponseSink to which the response shall be sent.
 	 */
-	virtual void Emit(const ResponseSink &sink) const = 0;
+	virtual void EmitFile(const ResponseSink &sink) const = 0;
+
+	/**
+	 * Emits a STATE response containing the current playback state.
+	 *
+	 * @param sink The ResponseSink to which the response shall be sent.
+	 */
+	virtual void EmitState(const ResponseSink &sink) const = 0;
 
 	/**
 	 * This Audio's current position.
@@ -120,7 +127,8 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	void Emit(const ResponseSink &sink) const override;
+	void EmitFile(const ResponseSink &sink) const override;
+	void EmitState(const ResponseSink &sink) const override;
 
 	// The following all raise an exception:
 
@@ -157,7 +165,8 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(const ResponseSink &sink) const override;
+	void EmitFile(const ResponseSink &sink) const override;
+	void EmitState(const ResponseSink &sink) const override;
 	std::uint64_t Position() const override;
 
 private:

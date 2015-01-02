@@ -23,9 +23,16 @@ DummyAudio::DummyAudio(DummyAudioSystem &sys) : sys(sys)
 {
 }
 
-void DummyAudio::Emit(const ResponseSink &sink) const
+void DummyAudio::EmitFile(const ResponseSink &sink) const
 {
 	sink.Respond(Response(Response::Code::FILE).Arg(this->sys.path));
+}
+
+void DummyAudio::EmitState(const ResponseSink &sink) const
+{
+	auto r = Response(Response::Code::STATE);
+	r.Arg(this->sys.started ? "Playing" : "Stopped");
+	sink.Respond(r);
 }
 
 void DummyAudio::Start()

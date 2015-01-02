@@ -30,29 +30,34 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-void NoAudio::Emit(const ResponseSink &) const
+void NoAudio::EmitFile(const ResponseSink &) const
 {
 	// Intentionally left blank.
 }
 
+void NoAudio::EmitState(const ResponseSink &sink) const
+{
+	sink.Respond(Response(Response::Code::STATE).Arg("Ejected"));
+}
+
 void NoAudio::Start()
 {
-	throw InternalError("called Start() with no audio");
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
 void NoAudio::Stop()
 {
-	throw InternalError("called Stop() with no audio");
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
 void NoAudio::Seek(std::uint64_t)
 {
-	throw InternalError("called Seek() with no audio");
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
 std::uint64_t NoAudio::Position() const
 {
-	throw InternalError("called Position() with no audio");
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
 //
@@ -64,10 +69,20 @@ PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(const ResponseSink &sink) const
+void PipeAudio::EmitFile(const ResponseSink &sink) const
 {
 	assert(this->src != nullptr);
 	sink.Respond(Response(Response::Code::FILE).Arg(this->src->Path()));
+}
+
+void PipeAudio::EmitState(const ResponseSink &sink) const
+{
+	auto r = Response(Response::Code::STATE);
+	assert(this->sink != nullptr);
+	auto playing = this->sink->State() == Audio::State::PLAYING;
+
+	r.Arg(playing ? "Playing" : "Stopped");
+	sink.Respond(r);
 }
 
 void PipeAudio::Start()

@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Tests for the PlayerState class.
+ * Tests for the PlayerPosition class.
  */
 
 #include "catch.hpp"
