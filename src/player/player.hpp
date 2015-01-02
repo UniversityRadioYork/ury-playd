@@ -150,13 +150,6 @@ private:
 
 	/// Handles ending a file (stopping and rewinding).
 	void End();
-
-	/**
-	 * Sends a response to the Player's response sink.
-	 * This is a no-op if there is no response sink.
-	 * @param response The response to send.
-	 */
-	void Respond(const Response &response) const;
 };
 
 #endif // PLAYD_PLAYER_HPP

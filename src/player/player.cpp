@@ -67,12 +67,8 @@ void Player::End()
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
-	this->Respond(Response(Response::Code::END));
-}
-
-void Player::Respond(const Response &response) const
-{
-	if (this->sink != nullptr) this->sink->Respond(response);
+	if (this->sink == nullptr) return;
+	this->sink->Respond(Response(Response::Code::END));
 }
 
 //
