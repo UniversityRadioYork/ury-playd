@@ -31,16 +31,6 @@ PaAudioSystem::PaAudioSystem() : sink([](const AudioSource &) -> std::unique_ptr
 	throw InternalError("No audio sink!");
 }) {}
 
-std::vector<AudioSystem::Device> PaAudioSystem::GetDevicesInfo()
-{
-	return AudioSink::GetDevicesInfo();
-}
-
-bool PaAudioSystem::IsOutputDevice(int id)
-{
-	return AudioSink::IsOutputDevice(id);
-}
-
 std::unique_ptr<Audio> PaAudioSystem::Null() const
 {
 	return std::unique_ptr<Audio>(new NoAudio());

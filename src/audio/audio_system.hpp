@@ -33,9 +33,6 @@
 class AudioSystem
 {
 public:
-	/// Type for device entries.
-	using Device = std::pair<int, std::string>;
-
 	/**
 	 * Creates an Audio for a lack of audio.
 	 * @return A unique pointer to a dummy Audio.
@@ -48,20 +45,6 @@ public:
 	 * @return A unique pointer to the Audio for that file.
 	 */
 	virtual std::unique_ptr<Audio> Load(const std::string &path) const = 0;
-
-	/**
-	 * Gets the number and name of each output device entry in the
-	 * AudioSystem.
-	 * @return List of output devices, as strings.
-	 */
-	virtual std::vector<AudioSystem::Device> GetDevicesInfo() = 0;
-
-	/**
-	 * Can a sound device output sound?
-	 * @param id Device ID.
-	 * @return If the device can handle outputting sound.
-	 */
-	virtual bool IsOutputDevice(int id) = 0;
 };
 
 /**
@@ -86,8 +69,6 @@ public:
 	// AudioSystem implementation
 	std::unique_ptr<Audio> Null() const override;
 	std::unique_ptr<Audio> Load(const std::string &path) const override;
-	std::vector<AudioSystem::Device> GetDevicesInfo() override;
-	bool IsOutputDevice(int id) override;
 
 	/**
 	 * Sets the sink to use for outputting sound.

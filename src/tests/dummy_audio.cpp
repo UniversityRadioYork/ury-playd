@@ -89,18 +89,3 @@ std::unique_ptr<Audio> DummyAudioSystem::Load(const std::string &path) const
 	notconst.path = path;
 	return std::unique_ptr<Audio>(new DummyAudio(notconst));
 }
-
-void DummyAudioSystem::SetDeviceID(int)
-{
-	// Deliberately ignore
-}
-
-std::vector<AudioSystem::Device> DummyAudioSystem::GetDevicesInfo()
-{
-	return std::vector<AudioSystem::Device>();
-}
-
-bool DummyAudioSystem::IsOutputDevice(int)
-{
-	return false;
-}

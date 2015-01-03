@@ -61,7 +61,7 @@ int Playd::GetDeviceID()
 	}
 
 	// Only allow valid, outputtable devices; reject input-only devices.
-	if (!this->audio.IsOutputDevice(id)) return this->INVALID_ID;
+	if (!AudioSink::IsOutputDevice(id)) return this->INVALID_ID;
 
 	return id;
 }
@@ -88,7 +88,7 @@ int Playd::Run()
 	int id = this->GetDeviceID();
 	if (id == INVALID_ID) {
 		// Show the user the valid device IDs they can use.
-		auto device_list = this->audio.GetDevicesInfo();
+		auto device_list = AudioSink::GetDevicesInfo();
 		for (const auto &device : device_list) {
 			std::cout << device.first << ": " << device.second
 			          << std::endl;
