@@ -109,12 +109,12 @@ CommandResult Player::Load(const std::string &path)
 
 CommandResult Player::Play()
 {
-	this->SetPlaying(true);
+	return this->SetPlaying(true);
 }
 
 CommandResult Player::Stop()
 {
-	this->SetPlaying(false);
+	return this->SetPlaying(false);
 }
 
 CommandResult Player::SetPlaying(bool playing)
@@ -184,6 +184,8 @@ std::uint64_t Player::SeekParse(const std::string &time_str)
 	// the end of the string.
 	auto sl = time_str.length();
 	if (cpos != sl) throw SeekError(MSG_SEEK_INVALID_VALUE);
+
+	return pos;
 }
 
 void Player::SeekRaw(std::uint64_t pos)
