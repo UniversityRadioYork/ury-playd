@@ -51,16 +51,10 @@ public:
 	//
 
 	/**
-	 * Starts playback of this Audio.
-	 * @see Stop
+	 * Sets whether this Audio should be playing or not.
+	 * @param playing True for playing; false for stopped.
 	 */
-	virtual void Start() = 0;
-
-	/**
-	 * Stops playback of this Audio.
-	 * @see Start
-	 */
-	virtual void Stop() = 0;
+	virtual void SetPlaying(bool playing) = 0;
 
 	/**
 	 * Attempts to seek to the given position.
@@ -123,8 +117,7 @@ public:
 
 	// The following all raise an exception:
 
-	void Start() override;
-	void Stop() override;
+	void SetPlaying(bool playing) override;
 	void Seek(std::uint64_t position) override;
 	std::uint64_t Position() const override;
 };
@@ -151,8 +144,7 @@ public:
 	 */
 	PipeAudio(std::unique_ptr<AudioSource> &&src, std::unique_ptr<AudioSink> &&sink);
 
-	void Start() override;
-	void Stop() override;
+	void SetPlaying(bool playing) override;
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 

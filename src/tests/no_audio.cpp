@@ -70,15 +70,15 @@ SCENARIO("NoAudio throws exceptions when asked to do audio-type things", "[no-au
 	GIVEN("A NoAudio object") {
 		NoAudio n;
 
-		WHEN("Start() is called") {
+		WHEN("SetPlaying(true) is called") {
 			THEN("NoAudioError is thrown") {
-				REQUIRE_THROWS_AS(n.Start(), NoAudioError);
+				REQUIRE_THROWS_AS(n.SetPlaying(true), NoAudioError);
 			}
 		}
 
-		WHEN("Stop() is called") {
+		WHEN("SetPlaying(false) is called") {
 			THEN("NoAudioError is thrown") {
-				REQUIRE_THROWS_AS(n.Stop(), NoAudioError);
+				REQUIRE_THROWS_AS(n.SetPlaying(false), NoAudioError);
 			}
 		}
 

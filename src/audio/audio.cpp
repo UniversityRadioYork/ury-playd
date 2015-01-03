@@ -41,12 +41,7 @@ void NoAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSi
 	}
 }
 
-void NoAudio::Start()
-{
-	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
-}
-
-void NoAudio::Stop()
+void NoAudio::SetPlaying(bool)
 {
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
@@ -120,16 +115,15 @@ void PipeAudio::Emit(std::initializer_list<Response::Code> codes, const Response
 	}
 }
 
-void PipeAudio::Start()
+void PipeAudio::SetPlaying(bool playing)
 {
 	assert(this->sink != nullptr);
-	this->sink->Start();
-}
 
-void PipeAudio::Stop()
-{
-	assert(this->sink != nullptr);
-	this->sink->Stop();
+	if (playing) {
+		this->sink->Start();
+	} else {
+		this->sink->Stop();
+	}
 }
 
 std::uint64_t PipeAudio::Position() const

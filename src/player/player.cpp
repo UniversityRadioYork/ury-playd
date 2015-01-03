@@ -109,14 +109,31 @@ CommandResult Player::Load(const std::string &path)
 
 CommandResult Player::Play()
 {
+	this->SetPlaying(true);
+}
+
+CommandResult Player::Stop()
+{
+	this->SetPlaying(false);
+}
+
+CommandResult Player::SetPlaying(bool playing)
+{
+	// Why is SetPlaying not split between Start() and Stop()?, I hear the
+	// best practices purists amongst you say.  Quite simply, there is a
+	// large amount of fiddly exception boilerplate here that would
+	// otherwise be duplicated between the two methods.  The 'public'
+	// interface Player gives is Start()/Stop(), anyway.
+
 	assert(this->file != nullptr);
 
 	try {
-		this->file->Start();
-		this->file->Emit({ Response::Code::STATE }, this->sink);
+		this->file->SetPlaying(playing);
 	} catch (NoAudioError &e) {
 		return CommandResult::Invalid(e.Message());
 	}
+
+	this->file->Emit({ Response::Code::STATE }, this->sink);
 
 	return CommandResult::Success();
 }
@@ -130,25 +147,13 @@ CommandResult Player::Quit()
 
 CommandResult Player::Seek(const std::string &time_str)
 {
-	assert(this->file != nullptr);
-
 	std::uint64_t pos = 0;
-	size_t cpos = 0;
+
 	try {
-		// In previous versions, this used to parse a unit at the end.
-		// This was removed for simplicity--use baps3-cli etc. instead.
-		pos = std::stoull(time_str, &cpos);
+		pos = SeekParse(time_str);
 	} catch (...) {
-		// Should catch std::out_of_range and std::invalid_argument.
-		// http://www.cplusplus.com/reference/string/stoull/#exceptions
 		return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 	}
-
-	// cpos will point to the first character in pos that wasn't a number.
-	// We don't want any characters here, so bail if the position isn't at
-	// the end of the string.
-	auto sl = time_str.length();
-	if (cpos != sl) return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 
 	try {
 		this->SeekRaw(pos);
@@ -162,26 +167,30 @@ CommandResult Player::Seek(const std::string &time_str)
 		this->End();
 	}
 
+	// If we've made it all the way down here, we deserve to succeed.
 	return CommandResult::Success();
+}
+
+std::uint64_t Player::SeekParse(const std::string &time_str)
+{
+	size_t cpos = 0;
+
+	// In previous versions, this used to parse a unit at the end.
+	// This was removed for simplicity--use baps3-cli etc. instead.
+	std::uint64_t pos = std::stoull(time_str, &cpos);
+
+	// cpos will point to the first character in pos that wasn't a number.
+	// We don't want any characters here, so bail if the position isn't at
+	// the end of the string.
+	auto sl = time_str.length();
+	if (cpos != sl) throw SeekError(MSG_SEEK_INVALID_VALUE);
 }
 
 void Player::SeekRaw(std::uint64_t pos)
 {
 	assert(this->file != nullptr);
+
 	this->file->Seek(pos);
 	this->file->Emit({ Response::Code::TIME }, this->sink);
 }
 
-CommandResult Player::Stop()
-{
-	assert(this->file != nullptr);
-
-	try {
-		this->file->Stop();
-		this->file->Emit({ Response::Code::STATE }, this->sink);
-	} catch (NoAudioError &e) {
-		return CommandResult::Invalid(e.Message());
-	}
-
-	return CommandResult::Success();
-}

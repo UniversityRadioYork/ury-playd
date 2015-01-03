@@ -43,14 +43,9 @@ void DummyAudio::Emit(std::initializer_list<Response::Code> codes, const Respons
 	}
 }
 
-void DummyAudio::Start()
+void DummyAudio::SetPlaying(bool playing)
 {
-	this->sys.started = true;
-}
-
-void DummyAudio::Stop()
-{
-	this->sys.started = false;
+	this->sys.started = playing;
 }
 
 Audio::State DummyAudio::Update()

@@ -59,8 +59,7 @@ public:
 	 */
 	DummyAudio(DummyAudioSystem &sys);
 
-	void Start() override;
-	void Stop() override;
+	void SetPlaying(bool playing) override;
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 

@@ -139,6 +139,27 @@ public:
 
 private:
 	/**
+	 * Tells the audio file to start or stop playing.
+	 * @param playing True if playing; false otherwise.
+	 * @see Play
+	 * @see Stop
+	 */
+	CommandResult SetPlaying(bool playing);
+
+	/**
+	 * Parses time_str as a seek timestamp.
+	 * @param time_str The time string to be parsed.
+	 * @return The parsed time.
+	 * @exception std::out_of_range
+	 *   See http://www.cplusplus.com/reference/string/stoull/#exceptions
+	 * @exception std::invalid_argument
+	 *   See http://www.cplusplus.com/reference/string/stoull/#exceptions
+	 * @exception SeekError
+	 *   Raised if checks beyond those done by stoull fail.
+	 */
+	std::uint64_t SeekParse(const std::string &time_str);
+
+	/**
 	 * Performs an actual seek.
 	 * This does not do any EOF handling.
 	 * @param pos The new position, in microseconds.
