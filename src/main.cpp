@@ -38,8 +38,13 @@
  */
 int main(int argc, char *argv[])
 {
+	SdlAudioSink::InitLibrary();
+
 	Playd ps(argc, argv);
-	return ps.Run();
+	auto res = ps.Run();
+
+	SdlAudioSink::CleanupLibrary();
+	return res;
 }
 
 //
@@ -73,8 +78,6 @@ Playd::Playd(int argc, char *argv[]) : audio(), player(this, audio), handler(pla
 
 int Playd::Run()
 {
-	SdlAudioSink::InitLibrary();
-
 	// Fill in some default arguments.
 	// Note that we don't have a default device ID; if the user doesn't
 	// supply an ID, we treat it as if they had supplied an invalid one.
@@ -93,7 +96,6 @@ int Playd::Run()
 			std::cout << device.first << ": " << device.second
 			          << std::endl;
 		}
-		SdlAudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
 	this->audio.SetSink(&SdlAudioSink::Build, id);
@@ -119,7 +121,6 @@ int Playd::Run()
 		std::cerr << "Network error: " << e.Message() << std::endl;
 		std::cerr << "Is " << addr << ":" << port << " available?"
 		          << std::endl;
-		SdlAudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
 
@@ -128,11 +129,9 @@ int Playd::Run()
 	} catch (Error &error) {
 		std::cerr << "Unhandled exception in main loop: "
 		          << error.Message() << std::endl;
-		SdlAudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
 
-	SdlAudioSink::CleanupLibrary();
 	return EXIT_SUCCESS;
 }
 

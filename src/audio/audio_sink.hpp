@@ -167,10 +167,6 @@ public:
 	/// Cleans up the AudioSink's libraries, if not cleaned up already.
 	static void CleanupLibrary();
 private:
-	/// Count of library initialisations.
-	/// Used to ensure library init/termination happens.
-	static uint64_t instances;
-
 	/// The SDL device to which we are outputting sound.
 	SDL_AudioDeviceID device;
 

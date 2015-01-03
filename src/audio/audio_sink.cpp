@@ -23,8 +23,6 @@
 #include "ringbuffer.hpp"
 #include "sample_formats.hpp"
 
-std::uint64_t SdlAudioSink::instances = 0;
-
 const size_t SdlAudioSink::RINGBUF_POWER = 16;
 
 /**
@@ -83,20 +81,14 @@ SdlAudioSink::~SdlAudioSink()
 
 /* static */ void SdlAudioSink::InitLibrary()
 {
-	if (SdlAudioSink::instances++ == 0) {
-		Debug() << "initialising SDL\n";
-		if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-			throw ConfigError(std::string("could not initialise SDL: ") + SDL_GetError());
-		}
+	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
+		throw ConfigError(std::string("could not initialise SDL: ") + SDL_GetError());
 	}
 }
 
 /* static */ void SdlAudioSink::CleanupLibrary()
 {
-	if (--SdlAudioSink::instances == 0) {
-		Debug() << "quitting SDL\n";
-		SDL_Quit();
-	}
+	SDL_Quit();
 }
 
 void SdlAudioSink::Start()
@@ -241,8 +233,6 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 
 /* static */ std::vector<std::pair<int, std::string>> SdlAudioSink::GetDevicesInfo()
 {
-	SdlAudioSink::InitLibrary();
-
 	decltype(SdlAudioSink::GetDevicesInfo()) list;
 
 	// The 0 in SDL_GetNumAudioDevices tells SDL we want playback devices.
@@ -254,15 +244,12 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 		list.emplace_back(i, std::string(n));
 	}
 
-	SdlAudioSink::CleanupLibrary();
 	return list;
 }
 
 /* static */ bool SdlAudioSink::IsOutputDevice(int id)
 {
-	SdlAudioSink::InitLibrary();
 	int ids = SDL_GetNumAudioDevices(0);
-	SdlAudioSink::CleanupLibrary();
 
 	// See above comment for why this is sufficient.
 	return (0 <= id && id < ids);
