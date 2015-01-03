@@ -61,7 +61,7 @@ int Playd::GetDeviceID()
 	}
 
 	// Only allow valid, outputtable devices; reject input-only devices.
-	if (!AudioSink::IsOutputDevice(id)) return this->INVALID_ID;
+	if (!SdlAudioSink::IsOutputDevice(id)) return this->INVALID_ID;
 
 	return id;
 }
@@ -73,7 +73,7 @@ Playd::Playd(int argc, char *argv[]) : audio(), player(this, audio), handler(pla
 
 int Playd::Run()
 {
-	AudioSink::InitLibrary();
+	SdlAudioSink::InitLibrary();
 
 	// Fill in some default arguments.
 	// Note that we don't have a default device ID; if the user doesn't
@@ -88,15 +88,15 @@ int Playd::Run()
 	int id = this->GetDeviceID();
 	if (id == INVALID_ID) {
 		// Show the user the valid device IDs they can use.
-		auto device_list = AudioSink::GetDevicesInfo();
+		auto device_list = SdlAudioSink::GetDevicesInfo();
 		for (const auto &device : device_list) {
 			std::cout << device.first << ": " << device.second
 			          << std::endl;
 		}
-		AudioSink::CleanupLibrary();
+		SdlAudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
-	this->audio.SetSink(&AudioSink::Build, id);
+	this->audio.SetSink(&SdlAudioSink::Build, id);
 
 	// Now set up the available sources.
 #ifdef WITH_FLAC
@@ -119,7 +119,7 @@ int Playd::Run()
 		std::cerr << "Network error: " << e.Message() << std::endl;
 		std::cerr << "Is " << addr << ":" << port << " available?"
 		          << std::endl;
-		AudioSink::CleanupLibrary();
+		SdlAudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
 
@@ -128,11 +128,11 @@ int Playd::Run()
 	} catch (Error &error) {
 		std::cerr << "Unhandled exception in main loop: "
 		          << error.Message() << std::endl;
-		AudioSink::CleanupLibrary();
+		SdlAudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
 
-	AudioSink::CleanupLibrary();
+	SdlAudioSink::CleanupLibrary();
 	return EXIT_SUCCESS;
 }
 

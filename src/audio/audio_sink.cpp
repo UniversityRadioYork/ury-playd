@@ -23,27 +23,27 @@
 #include "ringbuffer.hpp"
 #include "sample_formats.hpp"
 
-std::uint64_t AudioSink::instances = 0;
+std::uint64_t SdlAudioSink::instances = 0;
 
-const size_t AudioSink::RINGBUF_POWER = 16;
+const size_t SdlAudioSink::RINGBUF_POWER = 16;
 
 /**
  * The callback used by SDL_Audio.
- * Trampolines back into vsink, which must point to an AudioSink.
+ * Trampolines back into vsink, which must point to an SdlAudioSink.
  */
 static void SDLCallback(void *vsink, std::uint8_t *data, int len)
 {
 	assert(vsink != nullptr);
-	auto sink = static_cast<AudioSink *>(vsink);
+	auto sink = static_cast<SdlAudioSink *>(vsink);
 	sink->Callback(data, len);
 }
 
-/* static */ std::unique_ptr<AudioSink> AudioSink::Build(const AudioSource &source, int device_id)
+/* static */ std::unique_ptr<AudioSink> SdlAudioSink::Build(const AudioSource &source, int device_id)
 {
-	return std::unique_ptr<AudioSink>(new AudioSink(source, device_id));
+	return std::unique_ptr<AudioSink>(new SdlAudioSink(source, device_id));
 }
 
-AudioSink::AudioSink(const AudioSource &source, int device_id)
+SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
     : bytes_per_sample(source.BytesPerSample()),
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
       position_sample_count(0),
@@ -51,8 +51,6 @@ AudioSink::AudioSink(const AudioSource &source, int device_id)
       source_out(false),
       state(Audio::State::STOPPED)
 {
-	AudioSink::InitLibrary();
-
 	const char *name = SDL_GetAudioDeviceName(device_id, 0);
 	if (name == nullptr) {
 		throw ConfigError(std::string("invalid device id: ") + std::to_string(device_id));
@@ -75,17 +73,17 @@ AudioSink::AudioSink(const AudioSource &source, int device_id)
 	}
 }
 
-AudioSink::~AudioSink()
+SdlAudioSink::~SdlAudioSink()
 {
 	if (this->device == 0) return;
 	SDL_CloseAudioDevice(this->device);
 
-	AudioSink::CleanupLibrary();
+	SdlAudioSink::CleanupLibrary();
 }
 
-/* static */ void AudioSink::InitLibrary()
+/* static */ void SdlAudioSink::InitLibrary()
 {
-	if (AudioSink::instances++ == 0) {
+	if (SdlAudioSink::instances++ == 0) {
 		Debug() << "initialising SDL\n";
 		if (SDL_Init(SDL_INIT_AUDIO) != 0) {
 			throw ConfigError(std::string("could not initialise SDL: ") + SDL_GetError());
@@ -93,15 +91,15 @@ AudioSink::~AudioSink()
 	}
 }
 
-/* static */ void AudioSink::CleanupLibrary()
+/* static */ void SdlAudioSink::CleanupLibrary()
 {
-	if (--AudioSink::instances == 0) {
+	if (--SdlAudioSink::instances == 0) {
 		Debug() << "quitting SDL\n";
 		SDL_Quit();
 	}
 }
 
-void AudioSink::Start()
+void SdlAudioSink::Start()
 {
 	if (this->state != Audio::State::STOPPED) return;
 
@@ -110,7 +108,7 @@ void AudioSink::Start()
 	this->state = Audio::State::PLAYING;
 }
 
-void AudioSink::Stop()
+void SdlAudioSink::Stop()
 {
 	if (this->state == Audio::State::STOPPED) return;
 
@@ -118,12 +116,12 @@ void AudioSink::Stop()
 	this->state = Audio::State::STOPPED;
 }
 
-Audio::State AudioSink::State()
+Audio::State SdlAudioSink::State()
 {
 	return this->state;
 }
 
-void AudioSink::SourceOut()
+void SdlAudioSink::SourceOut()
 {
 	// The sink should only be out if the source is.
 	assert(this->source_out || this->state != Audio::State::AT_END);
@@ -131,12 +129,12 @@ void AudioSink::SourceOut()
 	this->source_out = true;
 }
 
-std::uint64_t AudioSink::Position()
+std::uint64_t SdlAudioSink::Position()
 {
 	return this->position_sample_count;
 }
 
-void AudioSink::SetPosition(std::uint64_t samples)
+void SdlAudioSink::SetPosition(std::uint64_t samples)
 {
 	this->position_sample_count = samples;
 
@@ -153,7 +151,7 @@ void AudioSink::SetPosition(std::uint64_t samples)
 	this->ring_buf.Flush();
 }
 
-void AudioSink::Transfer(AudioSink::TransferIterator &start,
+void SdlAudioSink::Transfer(AudioSink::TransferIterator &start,
                          const AudioSink::TransferIterator &end)
 {
 	assert(start <= end);
@@ -183,7 +181,7 @@ void AudioSink::Transfer(AudioSink::TransferIterator &start,
 	assert(start <= end);
 }
 
-void AudioSink::Callback(std::uint8_t *out, int nbytes)
+void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 {
 	assert(out != nullptr);
 
@@ -232,7 +230,7 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 	{ SampleFormat::PACKED_FLOAT_32, AUDIO_F32 }
 };
 
-/* static */ SDL_AudioFormat AudioSink::SDLFormat(SampleFormat fmt)
+/* static */ SDL_AudioFormat SdlAudioSink::SDLFormat(SampleFormat fmt)
 {
 	try {
 		return sdl_from_sf.at(fmt);
@@ -241,11 +239,11 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 	}
 }
 
-/* static */ std::vector<std::pair<int, std::string>> AudioSink::GetDevicesInfo()
+/* static */ std::vector<std::pair<int, std::string>> SdlAudioSink::GetDevicesInfo()
 {
-	AudioSink::InitLibrary();
+	SdlAudioSink::InitLibrary();
 
-	decltype(AudioSink::GetDevicesInfo()) list;
+	decltype(SdlAudioSink::GetDevicesInfo()) list;
 
 	// The 0 in SDL_GetNumAudioDevices tells SDL we want playback devices.
 	int is = SDL_GetNumAudioDevices(0);
@@ -256,15 +254,15 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 		list.emplace_back(i, std::string(n));
 	}
 
-	AudioSink::CleanupLibrary();
+	SdlAudioSink::CleanupLibrary();
 	return list;
 }
 
-/* static */ bool AudioSink::IsOutputDevice(int id)
+/* static */ bool SdlAudioSink::IsOutputDevice(int id)
 {
-	AudioSink::InitLibrary();
+	SdlAudioSink::InitLibrary();
 	int ids = SDL_GetNumAudioDevices(0);
-	AudioSink::CleanupLibrary();
+	SdlAudioSink::CleanupLibrary();
 
 	// See above comment for why this is sufficient.
 	return (0 <= id && id < ids);

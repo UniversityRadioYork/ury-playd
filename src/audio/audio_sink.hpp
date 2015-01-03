@@ -23,58 +23,32 @@
 #include "ringbuffer.hpp"
 #include "sample_formats.hpp"
 
-/**
- * An output stream for an Audio file.
- *
- * An AudioSink consists of a PortAudio output stream and a buffer that
- * stores decoded samples from the Audio object.  While active, the AudioSink
- * periodically transfers samples from its buffer to PortAudio in a separate
- * thread.
- */
-class AudioSink
-{
+/// Abstract class for audio output sinks.
+class AudioSink {
 public:
 	/// Type of iterators used in the Transfer() method.
-	typedef AudioSource::DecodeVector::iterator TransferIterator;
-
-	/**
-	 * Helper function for creating uniquely pointed-to AudioSinks.
-	 * @param source The source from which this sink will receive audio.
-	 * @param device_id The device ID to which this sink will output.
-	 * @return A unique pointer to an AudioSink.
-	 */
-	static std::unique_ptr<AudioSink> Build(const AudioSource &source, int device_id);
-
-	/**
-	 * Constructs an AudioSink.
-	 * @param source The source from which this sink will receive audio.
-	 * @param device_id The device ID to which this sink will output.
-	 */
-	AudioSink(const AudioSource &source, int device_id);
-
-	/// Destructs an AudioSink.
-	~AudioSink();
+	using TransferIterator = AudioSource::DecodeVector::iterator;
 
 	/**
 	 * Starts the audio stream.
 	 * @see Stop
 	 * @see IsHalted
 	 */
-	void Start();
+	virtual void Start() = 0;
 
 	/**
 	 * Stops the audio stream.
 	 * @see Start
 	 * @see IsHalted
 	 */
-	void Stop();
+	virtual void Stop() = 0;
 
 	/**
 	 * Gets this AudioSink's current state (playing/stopped/at end).
 	 * @return The Audio::State representing this AudioSink's state.
 	 * @see Audio::State
 	 */
-	Audio::State State();
+	virtual Audio::State State() = 0;
 
 	/**
 	 * Gets the current played position in the song, in samples.
@@ -82,7 +56,7 @@ public:
 	 * do not expect it to be highly accurate.
 	 * @return The current position, as a count of elapsed samples.
 	 */
-	std::uint64_t Position();
+	virtual std::uint64_t Position() = 0;
 
 	/**
 	 * Sets the current played position, given a position in samples.
@@ -91,7 +65,7 @@ public:
 	 * @param samples The new position, as a count of elapsed samples.
 	 * @see Position
 	 */
-	void SetPosition(std::uint64_t samples);
+	virtual void SetPosition(std::uint64_t samples) = 0;
 
 	/**
 	 * Tells this AudioSink that the source has run out.
@@ -99,7 +73,7 @@ public:
 	 * When this occurs, the next time the ringbuf goes empty, the sink has
 	 * also run out and should stop.
 	 */
-	void SourceOut();
+	virtual void SourceOut() = 0;
 
 	/**
 	 * Transfers a range of sample bytes into the AudioSink.
@@ -115,7 +89,55 @@ public:
 	 *   iterator will be advanced by the number of bytes accepted.
 	 * @param end An iterator denoting the end of the range.
 	 */
-	void Transfer(TransferIterator &start, const TransferIterator &end);
+	virtual void Transfer(TransferIterator &start, const TransferIterator &end) = 0;
+};
+
+/**
+ * An output stream for audio, using SDL.
+ *
+ * An SdlAudioSink consists of an SDL output device and a buffer that stores
+ * decoded samples from the Audio object.  While active, the SdlAudioSink
+ * periodically transfers samples from its buffer to SDL2 in a separate thread.
+ */
+class SdlAudioSink : public AudioSink {
+public:
+
+	/**
+	 * Helper function for creating uniquely pointed-to AudioSinks.
+	 * @param source The source from which this sink will receive audio.
+	 * @param device_id The device ID to which this sink will output.
+	 * @return A unique pointer to an AudioSink.
+	 */
+	static std::unique_ptr<AudioSink> Build(const AudioSource &source, int device_id);
+
+	/**
+	 * Constructs an SdlAudioSink.
+	 * @param source The source from which this sink will receive audio.
+	 * @param device_id The device ID to which this sink will output.
+	 */
+	SdlAudioSink(const AudioSource &source, int device_id);
+
+	/// Destructs an SdlAudioSink.
+	~SdlAudioSink();
+
+	void Start() override;
+	void Stop() override;
+	Audio::State State() override;
+	std::uint64_t Position() override;
+	void SetPosition(std::uint64_t samples) override;
+	void SourceOut() override;
+	void Transfer(TransferIterator &start, const TransferIterator &end) override;
+
+	/**
+	 * The callback proper.
+	 * This is executed in a separate thread by SDL once a stream is
+	 * playing with the callback registered to it.
+	 * @param outputBuffer The output buffer to which our samples should
+	 *   be written.
+	 * @param numFrames The number of samples PortAudio wants to read from
+	 *   @a outputBuffer.
+	 */
+	void Callback(std::uint8_t *inputBuffer, int numFrames);
 
 	/**
 	 * Converts a sample format identifier from playd to SDL.
@@ -130,17 +152,6 @@ public:
 	 * @return List of output devices, as strings.
 	 */
 	static std::vector<std::pair<int, std::string>> GetDevicesInfo();
-
-	/**
-	 * The callback proper.
-	 * This is executed in a separate thread by PortAudio once a stream is
-	 * playing with the callback registered to it.
-	 * @param outputBuffer The output buffer to which our samples should
-	 *   be written.
-	 * @param numFrames The number of samples PortAudio wants to read from
-	 *   @a outputBuffer.
-	 */
-	void Callback(std::uint8_t *inputBuffer, int numFrames);
 
 	/**
 	 * Can a sound device output sound?
