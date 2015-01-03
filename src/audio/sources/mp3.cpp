@@ -27,6 +27,8 @@ extern "C" {
 #include "../sample_formats.hpp"
 #include "mp3.hpp"
 
+std::uint64_t Mp3AudioSource::instances = 0;
+
 // Fix for the ancient 2010 version of mpg123 carried by Ubuntu 12.04 and pals,
 // which doesn't have 24-bit support
 // See http://www.mpg123.de/cgi-bin/scm/mpg123/trunk/NEWS?pathrev=2791
@@ -42,9 +44,16 @@ extern "C" {
 // used by ffmpeg, so it's probably sensible.
 const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 
+/* static */ std::unique_ptr<AudioSource> Mp3AudioSource::Build(const std::string &path)
+{
+	return std::unique_ptr<AudioSource>(new Mp3AudioSource(path));
+}
+
 Mp3AudioSource::Mp3AudioSource(const std::string &path)
     : AudioSource(path), buffer(BUFFER_SIZE), context(nullptr)
 {
+	if (Mp3AudioSource::instances++ == 0) mpg123_init();
+
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
 
@@ -74,6 +83,8 @@ Mp3AudioSource::~Mp3AudioSource()
 {
 	mpg123_delete(this->context);
 	this->context = nullptr;
+
+	if (--Mp3AudioSource::instances == 0) mpg123_exit();
 }
 
 void Mp3AudioSource::AddFormat(long rate)

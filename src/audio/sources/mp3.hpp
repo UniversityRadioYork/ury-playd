@@ -25,6 +25,14 @@ class Mp3AudioSource : public AudioSource
 {
 public:
 	/**
+	 * Helper function for creating uniquely pointed-to Mp3AudioSources.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 * @return A unique pointer to a Mp3AudioSource for the given path.
+	 */
+	static std::unique_ptr<AudioSource> Build(const std::string &path);
+
+	/**
 	 * Constructs an Mp3AudioSource.
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.
@@ -42,10 +50,14 @@ public:
 	SampleFormat OutputSampleFormat() const override;
 
 private:
+	/// Count of Mp3AudioSource instances.
+	/// Used to ensure library init/termination happens.
+	static uint64_t instances;
+
 	/// The size of the internal decoding buffer, in bytes.
 	static const size_t BUFFER_SIZE;
 
-	std::vector<uint8_t> buffer; ///< The decoding buffer.
+	std::vector<std::uint8_t> buffer; ///< The decoding buffer.
 
 	/// Pointer to the mpg123 context associated with this source.
 	mpg123_handle *context;

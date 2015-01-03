@@ -10,6 +10,7 @@
 #ifndef PLAYD_AUDIO_SYSTEM_HPP
 #define PLAYD_AUDIO_SYSTEM_HPP
 
+#include <functional>
 #include <string>
 #include <utility>
 
@@ -33,7 +34,7 @@ class AudioSystem
 {
 public:
 	/// Type for device entries.
-	typedef std::pair<int, std::string> Device;
+	using Device = std::pair<int, std::string>;
 
 	/**
 	 * Creates an Audio for a lack of audio.
@@ -47,12 +48,6 @@ public:
 	 * @return A unique pointer to the Audio for that file.
 	 */
 	virtual std::unique_ptr<Audio> Load(const std::string &path) const = 0;
-
-	/**
-	 * Sets the current device ID.
-	 * @param id The device ID to use for subsequent Audios.
-	 */
-	virtual void SetDeviceID(int id) = 0;
 
 	/**
 	 * Gets the number and name of each output device entry in the
@@ -79,27 +74,44 @@ public:
 class PaAudioSystem : public AudioSystem
 {
 public:
-	/**
-	 * Constructs a PaAudioSystem, initialising its libraries.
-	 * This sets the current device ID to a sane default; use SetDeviceID
-	 * to change it.
-	 */
-	PaAudioSystem();
+	/// Type for functions that construct sinks.
+	using SinkBuilder = std::function<std::unique_ptr<AudioSink>(const AudioSource &, int)>;
 
-	/**
-	 * Destructs an PaAudioSystem, uninitialising its libraries.
-	 */
-	virtual ~PaAudioSystem();
+	/// Type for functions that construct sources.
+	using SourceBuilder = std::function<std::unique_ptr<AudioSource>(const std::string &)>;
+
+	/// Constructs a PaAudioSystem.
+	PaAudioSystem();
 
 	// AudioSystem implementation
 	std::unique_ptr<Audio> Null() const override;
 	std::unique_ptr<Audio> Load(const std::string &path) const override;
-	void SetDeviceID(int id) override;
 	std::vector<AudioSystem::Device> GetDevicesInfo() override;
 	bool IsOutputDevice(int id) override;
 
+	/**
+	 * Sets the sink to use for outputting sound.
+	 * @param sink The function to use when building sinks.
+	 * @param device_id The device ID to pass to any constructed sinks.
+	 */
+	void SetSink(SinkBuilder sink, int device_id);
+
+	/**
+	 * Assign an AudioSource for a series of file extensions.
+	 * @param exts The list of file extensions to associate with this
+	 *   source.
+	 * @param source The function to use when building source.
+	 * @note If two AddSource invocations name the first file extension,
+	 *   the first is used for said extension.
+	 */
+	void AddSource(std::initializer_list<std::string> exts, SourceBuilder source);
+
 private:
-	int device_id; ///< The current device ID.
+	/// The current sink builder.
+	std::function<std::unique_ptr<AudioSink>(const AudioSource &)> sink;
+
+	/// Map from file extensions to source builders.
+	std::map<std::string, SourceBuilder> sources;
 
 	/**
 	 * Loads a file, creating an AudioSource.

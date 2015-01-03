@@ -20,6 +20,16 @@
 
 #include "main.hpp"
 
+#ifdef WITH_FLAC
+#include "audio/sources/flac.hpp"
+#endif // WITH_FLAC
+#ifdef WITH_MP3
+#include "audio/sources/mp3.hpp"
+#endif // WITH_MP3
+#ifdef WITH_SNDFILE
+#include "audio/sources/sndfile.hpp"
+#endif // WITH_SNDFILE
+
 /**
  * The main entry point.
  * @param argc Program argument count.
@@ -63,6 +73,8 @@ Playd::Playd(int argc, char *argv[]) : audio(), player(this, audio), handler(pla
 
 int Playd::Run()
 {
+	AudioSink::InitLibrary();
+
 	// Fill in some default arguments.
 	// Note that we don't have a default device ID; if the user doesn't
 	// supply an ID, we treat it as if they had supplied an invalid one.
@@ -81,9 +93,23 @@ int Playd::Run()
 			std::cout << device.first << ": " << device.second
 			          << std::endl;
 		}
+		AudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
-	this->audio.SetDeviceID(id);
+	this->audio.SetSink(&AudioSink::Build, id);
+
+	// Now set up the available sources.
+#ifdef WITH_FLAC
+	this->audio.AddSource({ "flac" }, PaAudioSystem::SourceBuilder(&FlacAudioSource::Build));
+#endif // WITH_FLAC
+
+#ifdef WITH_MP3
+	this->audio.AddSource({ "mp3" }, PaAudioSystem::SourceBuilder(&Mp3AudioSource::Build));
+#endif // WITH_MP3
+
+#ifdef WITH_SNDFILE
+	this->audio.AddSource({ "flac", "ogg", "wav" }, PaAudioSystem::SourceBuilder(&SndfileAudioSource::Build));
+#endif // WITH_SNDFILE
 
 	// Now set up all the IO (network socket and event loop).
 	try {
@@ -93,6 +119,7 @@ int Playd::Run()
 		std::cerr << "Network error: " << e.Message() << std::endl;
 		std::cerr << "Is " << addr << ":" << port << " available?"
 		          << std::endl;
+		AudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
 
@@ -101,9 +128,11 @@ int Playd::Run()
 	} catch (Error &error) {
 		std::cerr << "Unhandled exception in main loop: "
 		          << error.Message() << std::endl;
+		AudioSink::CleanupLibrary();
 		return EXIT_FAILURE;
 	}
 
+	AudioSink::CleanupLibrary();
 	return EXIT_SUCCESS;
 }
 

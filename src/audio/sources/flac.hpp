@@ -25,6 +25,14 @@ class FlacAudioSource : public AudioSource, protected FLAC::Decoder::File
 {
 public:
 	/**
+	 * Helper function for creating uniquely pointed-to FlacAudioSources.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 * @return A unique pointer to an AudioSource for the given path.
+	 */
+	static std::unique_ptr<AudioSource> Build(const std::string &path);
+
+	/**
 	 * Constructs a FlacAudioSource.
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.

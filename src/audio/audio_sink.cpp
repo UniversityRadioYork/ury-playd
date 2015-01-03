@@ -23,6 +23,8 @@
 #include "ringbuffer.hpp"
 #include "sample_formats.hpp"
 
+std::uint64_t AudioSink::instances = 0;
+
 const size_t AudioSink::RINGBUF_POWER = 16;
 
 /**
@@ -36,6 +38,11 @@ static void SDLCallback(void *vsink, std::uint8_t *data, int len)
 	sink->Callback(data, len);
 }
 
+/* static */ std::unique_ptr<AudioSink> AudioSink::Build(const AudioSource &source, int device_id)
+{
+	return std::unique_ptr<AudioSink>(new AudioSink(source, device_id));
+}
+
 AudioSink::AudioSink(const AudioSource &source, int device_id)
     : bytes_per_sample(source.BytesPerSample()),
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
@@ -44,6 +51,8 @@ AudioSink::AudioSink(const AudioSource &source, int device_id)
       source_out(false),
       state(Audio::State::STOPPED)
 {
+	AudioSink::InitLibrary();
+
 	const char *name = SDL_GetAudioDeviceName(device_id, 0);
 	if (name == nullptr) {
 		throw ConfigError(std::string("invalid device id: ") + std::to_string(device_id));
@@ -70,6 +79,26 @@ AudioSink::~AudioSink()
 {
 	if (this->device == 0) return;
 	SDL_CloseAudioDevice(this->device);
+
+	AudioSink::CleanupLibrary();
+}
+
+/* static */ void AudioSink::InitLibrary()
+{
+	if (AudioSink::instances++ == 0) {
+		Debug() << "initialising SDL\n";
+		if (SDL_Init(SDL_INIT_AUDIO) != 0) {
+			throw ConfigError(std::string("could not initialise SDL: ") + SDL_GetError());
+		}
+	}
+}
+
+/* static */ void AudioSink::CleanupLibrary()
+{
+	if (--AudioSink::instances == 0) {
+		Debug() << "quitting SDL\n";
+		SDL_Quit();
+	}
 }
 
 void AudioSink::Start()
@@ -214,6 +243,8 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 
 /* static */ std::vector<std::pair<int, std::string>> AudioSink::GetDevicesInfo()
 {
+	AudioSink::InitLibrary();
+
 	decltype(AudioSink::GetDevicesInfo()) list;
 
 	// The 0 in SDL_GetNumAudioDevices tells SDL we want playback devices.
@@ -224,23 +255,18 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 
 		list.emplace_back(i, std::string(n));
 	}
+
+	AudioSink::CleanupLibrary();
 	return list;
 }
 
 /* static */ bool AudioSink::IsOutputDevice(int id)
 {
+	AudioSink::InitLibrary();
+	int ids = SDL_GetNumAudioDevices(0);
+	AudioSink::CleanupLibrary();
+
 	// See above comment for why this is sufficient.
-	return (0 <= id && id < SDL_GetNumAudioDevices(0));
+	return (0 <= id && id < ids);
 }
 
-/* static */ void AudioSink::InitLibrary()
-{
-	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-		throw ConfigError(std::string("could not initialise SDL: ") + SDL_GetError());
-	}
-}
-
-/* static */ void AudioSink::CleanupLibrary()
-{
-	SDL_Quit();
-}

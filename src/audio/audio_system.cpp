@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include <map>
 #include <sstream>
 #include <stdexcept>
@@ -26,23 +27,9 @@
 #include "sources/mp3.hpp"
 #include "sources/sndfile.hpp"
 
-PaAudioSystem::PaAudioSystem() : device_id(-1)
-{
-	AudioSink::InitLibrary();
-
-#ifdef WITH_MP3
-	mpg123_init();
-#endif // WITH_MP3
-}
-
-PaAudioSystem::~PaAudioSystem()
-{
-	AudioSink::CleanupLibrary();
-
-#ifdef WITH_MP3
-	mpg123_exit();
-#endif // WITH_MP3
-}
+PaAudioSystem::PaAudioSystem() : sink([](const AudioSource &) -> std::unique_ptr<AudioSink> {
+	throw InternalError("No audio sink!");
+}) {}
 
 std::vector<AudioSystem::Device> PaAudioSystem::GetDevicesInfo()
 {
@@ -52,11 +39,6 @@ std::vector<AudioSystem::Device> PaAudioSystem::GetDevicesInfo()
 bool PaAudioSystem::IsOutputDevice(int id)
 {
 	return AudioSink::IsOutputDevice(id);
-}
-
-void PaAudioSystem::SetDeviceID(int id)
-{
-	this->device_id = id;
 }
 
 std::unique_ptr<Audio> PaAudioSystem::Null() const
@@ -69,7 +51,7 @@ std::unique_ptr<Audio> PaAudioSystem::Load(const std::string &path) const
 	std::unique_ptr<AudioSource> source = this->LoadSource(path);
 	assert(source != nullptr);
 
-	auto sink = std::unique_ptr<AudioSink>(new AudioSink(*source, this->device_id));
+	auto sink = this->sink(*source);
 	return std::unique_ptr<Audio>(new PipeAudio(std::move(source), std::move(sink)));
 }
 
@@ -78,24 +60,20 @@ std::unique_ptr<AudioSource> PaAudioSystem::LoadSource(const std::string &path) 
 	size_t extpoint = path.find_last_of('.');
 	std::string ext = path.substr(extpoint + 1);
 
-#ifdef WITH_FLAC
-	if (ext == "flac") {
-		Debug() << "Using FlacAudioSource" << std::endl;
-		return std::unique_ptr<AudioSource>(new FlacAudioSource(path));
+	auto ibuilder = this->sources.find(ext);
+	if (ibuilder == this->sources.end()) {
+		throw FileError("Unknown file format: " + ext);
 	}
-#endif // WITH_FLAC
 
-#ifdef WITH_MP3
-	if (ext == "mp3") {
-		Debug() << "Using Mp3AudioSource" << std::endl;
-		return std::unique_ptr<AudioSource>(new Mp3AudioSource(path));
-	}
-#endif // WITH_MP3
+	return (ibuilder->second)(path);
+}
 
-#ifdef WITH_SNDFILE
-	Debug() << "Using SndfileAudioSource" << std::endl;
-	return std::unique_ptr<AudioSource>(new SndfileAudioSource(path));
-#endif // WITH_SNDFILE
+void PaAudioSystem::SetSink(PaAudioSystem::SinkBuilder sink, int device_id)
+{
+	this->sink = std::bind(sink, std::placeholders::_1, device_id);
+}
 
-	throw FileError("Unknown file format: " + ext);
+void PaAudioSystem::AddSource(std::initializer_list<std::string> exts, PaAudioSystem::SourceBuilder source)
+{
+	for (auto &ext : exts) this->sources.emplace(ext, source);
 }

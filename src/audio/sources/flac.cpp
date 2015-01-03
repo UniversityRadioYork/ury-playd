@@ -24,6 +24,11 @@
 #include "../audio_source.hpp"
 #include "flac.hpp"
 
+/* static */ std::unique_ptr<AudioSource> FlacAudioSource::Build(const std::string &path)
+{
+	return std::unique_ptr<AudioSource>(new FlacAudioSource(path));
+}
+
 FlacAudioSource::FlacAudioSource(const std::string &path)
     : AudioSource(path), buffer()
 {

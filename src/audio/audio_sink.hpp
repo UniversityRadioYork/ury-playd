@@ -38,6 +38,14 @@ public:
 	typedef AudioSource::DecodeVector::iterator TransferIterator;
 
 	/**
+	 * Helper function for creating uniquely pointed-to AudioSinks.
+	 * @param source The source from which this sink will receive audio.
+	 * @param device_id The device ID to which this sink will output.
+	 * @return A unique pointer to an AudioSink.
+	 */
+	static std::unique_ptr<AudioSink> Build(const AudioSource &source, int device_id);
+
+	/**
 	 * Constructs an AudioSink.
 	 * @param source The source from which this sink will receive audio.
 	 * @param device_id The device ID to which this sink will output.
@@ -141,13 +149,17 @@ public:
 	 */
 	static bool IsOutputDevice(int id);
 
-	/// Initialises the AudioSink's library.
+	/// Initialises the AudioSink's libraries, if not initialised already.
 	static void InitLibrary();
 
-	/// Cleans up the AudioSink's library.
-	static void CleanupLibrary();
 
+	/// Cleans up the AudioSink's libraries, if not cleaned up already.
+	static void CleanupLibrary();
 private:
+	/// Count of library initialisations.
+	/// Used to ensure library init/termination happens.
+	static uint64_t instances;
+
 	/// The SDL device to which we are outputting sound.
 	SDL_AudioDeviceID device;
 
