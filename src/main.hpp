@@ -46,7 +46,7 @@ private:
 	static const int INVALID_ID = -1;
 
 	std::vector<std::string> argv; ///< The argument vector.
-	PaAudioSystem audio;           ///< The audio subsystem.
+	PipeAudioSystem audio;         ///< The audio subsystem.
 	Player player;                 ///< The player subsystem.
 	CommandHandler handler;        ///< The command handler.
 	std::unique_ptr<IoCore> io;    ///< The I/O handler.

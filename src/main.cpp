@@ -100,15 +100,15 @@ int Playd::Run()
 
 	// Now set up the available sources.
 #ifdef WITH_FLAC
-	this->audio.AddSource({ "flac" }, PaAudioSystem::SourceBuilder(&FlacAudioSource::Build));
+	this->audio.AddSource({ "flac" }, PipeAudioSystem::SourceBuilder(&FlacAudioSource::Build));
 #endif // WITH_FLAC
 
 #ifdef WITH_MP3
-	this->audio.AddSource({ "mp3" }, PaAudioSystem::SourceBuilder(&Mp3AudioSource::Build));
+	this->audio.AddSource({ "mp3" }, PipeAudioSystem::SourceBuilder(&Mp3AudioSource::Build));
 #endif // WITH_MP3
 
 #ifdef WITH_SNDFILE
-	this->audio.AddSource({ "flac", "ogg", "wav" }, PaAudioSystem::SourceBuilder(&SndfileAudioSource::Build));
+	this->audio.AddSource({ "flac", "ogg", "wav" }, PipeAudioSystem::SourceBuilder(&SndfileAudioSource::Build));
 #endif // WITH_SNDFILE
 
 	// Now set up all the IO (network socket and event loop).

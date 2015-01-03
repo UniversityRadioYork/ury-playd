@@ -25,9 +25,9 @@
  * enumerating and resolving device IDs, and initialising and terminating the
  * audio libraries.
  *
- * This is an abstract class, implemented primarily by SoxPaAudioSystem.
+ * This is an abstract class, implemented primarily by PipeAudioSystem.
  *
- * @see PaAudioSystem
+ * @see PipeAudioSystem
  * @see Audio
  */
 class AudioSystem
@@ -48,13 +48,16 @@ public:
 };
 
 /**
- * Implementation of AudioSystem using PortAudio and friends.
+ * A modular AudioSystem that constructs PipeAudio.
  *
- * PaAudioSystem is a RAII-style class: it loads the audio libraries on
- * construction and unloads them on termination.  As such, it's probably not
- * wise to construct multiple AudioSystem instances.
+ * PipeAudioSystem creates Audio by chaining together audio _sources_, selected
+ * by file extension, and an audio _sink_.
+ *
+ * @see PipeAudio
+ * @see AudioSink
+ * @see AudioSource
  */
-class PaAudioSystem : public AudioSystem
+class PipeAudioSystem : public AudioSystem
 {
 public:
 	/// Type for functions that construct sinks.
@@ -63,8 +66,8 @@ public:
 	/// Type for functions that construct sources.
 	using SourceBuilder = std::function<std::unique_ptr<AudioSource>(const std::string &)>;
 
-	/// Constructs a PaAudioSystem.
-	PaAudioSystem();
+	/// Constructs a PipeAudioSystem.
+	PipeAudioSystem();
 
 	// AudioSystem implementation
 	std::unique_ptr<Audio> Null() const override;
