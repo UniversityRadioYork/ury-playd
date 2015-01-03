@@ -78,4 +78,28 @@ private:
 	DummyAudioSystem &sys;
 };
 
+/// Dummy AudioSource for testing.
+class DummyAudioSource : public AudioSource
+{
+public:
+	/// Constructs a DummyAudioSource.
+	DummyAudioSource(const std::string &path) : AudioSource(path) {};
+
+	/**
+	 * Helper function for creating uniquely pointed-to Mp3AudioSources.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 * @return A unique pointer to a Mp3AudioSource for the given path.
+	 */
+	static std::unique_ptr<AudioSource> Build(const std::string &path);
+
+	DecodeResult Decode() override;
+	std::uint64_t Seek(std::uint64_t position) override;
+
+	std::uint8_t ChannelCount() const override;
+	std::uint32_t SampleRate() const override;
+	SampleFormat OutputSampleFormat() const override;
+};
+
+
 #endif // PLAYD_DUMMY_AUDIO_HPP
