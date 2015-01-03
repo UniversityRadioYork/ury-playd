@@ -29,17 +29,6 @@ extern "C" {
 
 std::uint64_t Mp3AudioSource::instances = 0;
 
-// Fix for the ancient 2010 version of mpg123 carried by Ubuntu 12.04 and pals,
-// which doesn't have 24-bit support
-// See http://www.mpg123.de/cgi-bin/scm/mpg123/trunk/NEWS?pathrev=2791
-#if MPG123_API_VERSION < 28
-// Let us be able to omit the check for 24-bit formats later.
-#define HAVE_MPG123_24BIT 1
-
-// Make the use of this when divining formats a no-op.
-#define MPG123_ENC_SIGNED_24 0
-#endif
-
 // This value is somewhat arbitrary, but corresponds to the minimum buffer size
 // used by ffmpeg, so it's probably sensible.
 const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
@@ -93,8 +82,7 @@ void Mp3AudioSource::AddFormat(long rate)
 	// the SampleFormat enum.
 	if (mpg123_format(this->context, rate, MPG123_STEREO | MPG123_MONO,
 	                  (MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_8 |
-	                   MPG123_ENC_SIGNED_16 | MPG123_ENC_SIGNED_24 |
-	                   MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32)) ==
+	                   MPG123_ENC_SIGNED_16 | MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32)) ==
 	    MPG123_ERR) {
 		// Ignore the error for now -- another sample rate may be
 		// available.
@@ -198,10 +186,6 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 			return SampleFormat::PACKED_SIGNED_INT_8;
 		case MPG123_ENC_SIGNED_16:
 			return SampleFormat::PACKED_SIGNED_INT_16;
-#ifdef HAVE_MPG123_24BIT
-		case MPG123_ENC_SIGNED_24:
-			return SampleFormat::PACKED_SIGNED_INT_24;
-#endif
 		case MPG123_ENC_SIGNED_32:
 			return SampleFormat::PACKED_SIGNED_INT_32;
 		case MPG123_ENC_FLOAT_32:
