@@ -30,13 +30,15 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-void NoAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink)
+void NoAudio::Emit(std::initializer_list<Response::Code> codes,
+                   const ResponseSink *sink)
 {
 	if (sink == nullptr) return;
 
 	for (auto &code : codes) {
 		if (code == Response::Code::STATE) {
-			sink->Respond(Response(Response::Code::STATE).Arg("Ejected"));
+			sink->Respond(Response(Response::Code::STATE)
+			                              .Arg("Ejected"));
 		}
 	}
 }
@@ -60,13 +62,15 @@ std::uint64_t NoAudio::Position() const
 // PipeAudio
 //
 
-PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src, std::unique_ptr<AudioSink> &&sink)
+PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
+                     std::unique_ptr<AudioSink> &&sink)
     : src(std::move(src)), sink(std::move(sink))
 {
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink)
+void PipeAudio::Emit(std::initializer_list<Response::Code> codes,
+                     const ResponseSink *sink)
 {
 	if (sink == nullptr) return;
 
@@ -77,7 +81,8 @@ void PipeAudio::Emit(std::initializer_list<Response::Code> codes, const Response
 		auto r = Response(code);
 
 		if (code == Response::Code::STATE) {
-			auto playing = this->sink->State() == Audio::State::PLAYING;
+			auto playing = this->sink->State() ==
+			               Audio::State::PLAYING;
 			r.Arg(playing ? "Playing" : "Stopped");
 		} else if (code == Response::Code::FILE) {
 			r.Arg(this->src->Path());
@@ -101,7 +106,8 @@ void PipeAudio::Emit(std::initializer_list<Response::Code> codes, const Response
 				// This is so as to allow the emplace below to
 				// work--it fails if there's already a value
 				// under the same key.
-				if (can_announce) this->last_times.erase(last_entry);
+				if (can_announce)
+					this->last_times.erase(last_entry);
 			}
 
 			if (!can_announce) continue;

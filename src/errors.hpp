@@ -129,7 +129,6 @@ public:
 	}
 };
 
-
 /** Class for telling the human what playd is doing. */
 class Debug
 {

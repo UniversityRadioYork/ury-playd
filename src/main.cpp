@@ -71,7 +71,8 @@ int Playd::GetDeviceID()
 	return id;
 }
 
-Playd::Playd(int argc, char *argv[]) : audio(), player(this, audio), handler(player)
+Playd::Playd(int argc, char *argv[])
+    : audio(), player(this, audio), handler(player)
 {
 	for (int i = 0; i < argc; i++) this->argv.emplace_back(argv[i]);
 }
@@ -100,7 +101,7 @@ int Playd::Run()
 	}
 	this->audio.SetSink(&SdlAudioSink::Build, id);
 
-	// Now set up the available sources.
+// Now set up the available sources.
 #ifdef WITH_FLAC
 	this->audio.AddSource({ "flac" }, &FlacAudioSource::Build);
 #endif // WITH_FLAC
@@ -110,7 +111,8 @@ int Playd::Run()
 #endif // WITH_MP3
 
 #ifdef WITH_SNDFILE
-	this->audio.AddSource({ "flac", "ogg", "wav" }, &SndfileAudioSource::Build);
+	this->audio.AddSource({ "flac", "ogg", "wav" },
+	                      &SndfileAudioSource::Build);
 #endif // WITH_SNDFILE
 
 	// Now set up all the IO (network socket and event loop).

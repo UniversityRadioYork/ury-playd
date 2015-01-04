@@ -24,7 +24,8 @@
 #include "sample_formats.hpp"
 
 /// Abstract class for audio output sinks.
-class AudioSink {
+class AudioSink
+{
 public:
 	/// Type of iterators used in the Transfer() method.
 	using TransferIterator = AudioSource::DecodeVector::iterator;
@@ -89,7 +90,8 @@ public:
 	 *   iterator will be advanced by the number of bytes accepted.
 	 * @param end An iterator denoting the end of the range.
 	 */
-	virtual void Transfer(TransferIterator &start, const TransferIterator &end) = 0;
+	virtual void Transfer(TransferIterator &start,
+	                      const TransferIterator &end) = 0;
 };
 
 /**
@@ -99,16 +101,17 @@ public:
  * decoded samples from the Audio object.  While active, the SdlAudioSink
  * periodically transfers samples from its buffer to SDL2 in a separate thread.
  */
-class SdlAudioSink : public AudioSink {
+class SdlAudioSink : public AudioSink
+{
 public:
-
 	/**
 	 * Helper function for creating uniquely pointed-to AudioSinks.
 	 * @param source The source from which this sink will receive audio.
 	 * @param device_id The device ID to which this sink will output.
 	 * @return A unique pointer to an AudioSink.
 	 */
-	static std::unique_ptr<AudioSink> Build(const AudioSource &source, int device_id);
+	static std::unique_ptr<AudioSink> Build(const AudioSource &source,
+	                                        int device_id);
 
 	/**
 	 * Constructs an SdlAudioSink.
@@ -126,7 +129,8 @@ public:
 	std::uint64_t Position() override;
 	void SetPosition(std::uint64_t samples) override;
 	void SourceOut() override;
-	void Transfer(TransferIterator &start, const TransferIterator &end) override;
+	void Transfer(TransferIterator &start,
+	              const TransferIterator &end) override;
 
 	/**
 	 * The callback proper.
@@ -163,9 +167,9 @@ public:
 	/// Initialises the AudioSink's libraries, if not initialised already.
 	static void InitLibrary();
 
-
 	/// Cleans up the AudioSink's libraries, if not cleaned up already.
 	static void CleanupLibrary();
+
 private:
 	/// The SDL device to which we are outputting sound.
 	SDL_AudioDeviceID device;

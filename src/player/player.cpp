@@ -53,7 +53,9 @@ void Player::WelcomeClient(ResponseSink &client) const
 	for (auto &f : FEATURES) features.Arg(f);
 	client.Respond(features);
 
-	this->file->Emit({ Response::Code::FILE, Response::Code::TIME, Response::Code::STATE }, &client);
+	this->file->Emit({ Response::Code::FILE, Response::Code::TIME,
+		           Response::Code::STATE },
+	                 &client);
 }
 
 void Player::End()
@@ -91,7 +93,9 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		this->file->Emit({ Response::Code::FILE, Response::Code::TIME, Response::Code::STATE }, this->sink);
+		this->file->Emit({ Response::Code::FILE, Response::Code::TIME,
+			           Response::Code::STATE },
+		                 this->sink);
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
@@ -195,4 +199,3 @@ void Player::SeekRaw(std::uint64_t pos)
 	this->file->Seek(pos);
 	this->file->Emit({ Response::Code::TIME }, this->sink);
 }
-

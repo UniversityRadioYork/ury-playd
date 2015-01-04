@@ -86,7 +86,8 @@ public:
 	 * @param sink The ResponseSink to which the response shall be sent.
 	 *   May be nullptr, in which case Emit should be a no-operation.
 	 */
-	virtual void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) = 0;
+	virtual void Emit(std::initializer_list<Response::Code> codes,
+	                  const ResponseSink *sink) = 0;
 
 	/**
 	 * This Audio's current position.
@@ -113,7 +114,8 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) override;
+	void Emit(std::initializer_list<Response::Code> codes,
+	          const ResponseSink *sink) override;
 
 	// The following all raise an exception:
 
@@ -142,13 +144,15 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	PipeAudio(std::unique_ptr<AudioSource> &&src, std::unique_ptr<AudioSink> &&sink);
+	PipeAudio(std::unique_ptr<AudioSource> &&src,
+	          std::unique_ptr<AudioSink> &&sink);
 
 	void SetPlaying(bool playing) override;
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) override;
+	void Emit(std::initializer_list<Response::Code> codes,
+	          const ResponseSink *sink) override;
 	std::uint64_t Position() const override;
 
 private:

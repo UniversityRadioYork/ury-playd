@@ -36,7 +36,8 @@ static void SDLCallback(void *vsink, std::uint8_t *data, int len)
 	sink->Callback(data, len);
 }
 
-/* static */ std::unique_ptr<AudioSink> SdlAudioSink::Build(const AudioSource &source, int device_id)
+/* static */ std::unique_ptr<AudioSink> SdlAudioSink::Build(
+                const AudioSource &source, int device_id)
 {
 	return std::unique_ptr<AudioSink>(new SdlAudioSink(source, device_id));
 }
@@ -51,7 +52,8 @@ SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
 {
 	const char *name = SDL_GetAudioDeviceName(device_id, 0);
 	if (name == nullptr) {
-		throw ConfigError(std::string("invalid device id: ") + std::to_string(device_id));
+		throw ConfigError(std::string("invalid device id: ") +
+		                  std::to_string(device_id));
 	}
 
 	SDL_AudioSpec want;
@@ -67,7 +69,8 @@ SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
 
 	this->device = SDL_OpenAudioDevice(name, 0, &want, &have, 0);
 	if (this->device == 0) {
-		throw ConfigError(std::string("couldn't open device: ") + SDL_GetError());
+		throw ConfigError(std::string("couldn't open device: ") +
+		                  SDL_GetError());
 	}
 }
 
@@ -82,7 +85,8 @@ SdlAudioSink::~SdlAudioSink()
 /* static */ void SdlAudioSink::InitLibrary()
 {
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-		throw ConfigError(std::string("could not initialise SDL: ") + SDL_GetError());
+		throw ConfigError(std::string("could not initialise SDL: ") +
+		                  SDL_GetError());
 	}
 }
 
@@ -144,7 +148,7 @@ void SdlAudioSink::SetPosition(std::uint64_t samples)
 }
 
 void SdlAudioSink::Transfer(AudioSink::TransferIterator &start,
-                         const AudioSink::TransferIterator &end)
+                            const AudioSink::TransferIterator &end)
 {
 	assert(start <= end);
 
@@ -198,7 +202,8 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 
 	// How many can we pull out?  Send this amount to SDL.
 	auto samples = std::min(req_samples, avail_samples);
-	auto read_samples = this->ring_buf.Read(reinterpret_cast<char *>(out), samples);
+	auto read_samples = this->ring_buf.Read(reinterpret_cast<char *>(out),
+	                                        samples);
 	this->position_sample_count += read_samples;
 
 	// Now, we need to fill any gaps with silence.
@@ -254,4 +259,3 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 	// See above comment for why this is sufficient.
 	return (0 <= id && id < ids);
 }
-

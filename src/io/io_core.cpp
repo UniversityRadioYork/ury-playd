@@ -108,7 +108,7 @@ void UvRespondCallback(uv_write_t *req, int status)
 	auto *wr = reinterpret_cast<WriteReq *>(req);
 	assert(wr != nullptr);
 
-	delete[] wr->buf.base;
+	delete[] wr -> buf.base;
 	delete wr;
 }
 

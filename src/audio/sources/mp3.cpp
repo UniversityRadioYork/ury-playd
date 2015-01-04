@@ -33,7 +33,8 @@ std::uint64_t Mp3AudioSource::instances = 0;
 // used by ffmpeg, so it's probably sensible.
 const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 
-/* static */ std::unique_ptr<AudioSource> Mp3AudioSource::Build(const std::string &path)
+/* static */ std::unique_ptr<AudioSource> Mp3AudioSource::Build(
+                const std::string &path)
 {
 	return std::unique_ptr<AudioSource>(new Mp3AudioSource(path));
 }
@@ -82,8 +83,8 @@ void Mp3AudioSource::AddFormat(long rate)
 	// the SampleFormat enum.
 	if (mpg123_format(this->context, rate, MPG123_STEREO | MPG123_MONO,
 	                  (MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_8 |
-	                   MPG123_ENC_SIGNED_16 | MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32)) ==
-	    MPG123_ERR) {
+	                   MPG123_ENC_SIGNED_16 | MPG123_ENC_SIGNED_32 |
+	                   MPG123_ENC_FLOAT_32)) == MPG123_ERR) {
 		// Ignore the error for now -- another sample rate may be
 		// available.
 		// If no sample rates work, loading a file will fail anyway.

@@ -61,10 +61,12 @@ class PipeAudioSystem : public AudioSystem
 {
 public:
 	/// Type for functions that construct sinks.
-	using SinkBuilder = std::function<std::unique_ptr<AudioSink>(const AudioSource &, int)>;
+	using SinkBuilder = std::function<
+	                std::unique_ptr<AudioSink>(const AudioSource &, int)>;
 
 	/// Type for functions that construct sources.
-	using SourceBuilder = std::function<std::unique_ptr<AudioSource>(const std::string &)>;
+	using SourceBuilder = std::function<
+	                std::unique_ptr<AudioSource>(const std::string &)>;
 
 	/// Constructs a PipeAudioSystem.
 	PipeAudioSystem();
@@ -88,7 +90,8 @@ public:
 	 * @note If two AddSource invocations name the first file extension,
 	 *   the first is used for said extension.
 	 */
-	void AddSource(std::initializer_list<std::string> exts, SourceBuilder source);
+	void AddSource(std::initializer_list<std::string> exts,
+	               SourceBuilder source);
 
 private:
 	/// The current sink builder.
