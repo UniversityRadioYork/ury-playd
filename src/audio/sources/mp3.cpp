@@ -27,8 +27,6 @@ extern "C" {
 #include "../sample_formats.hpp"
 #include "mp3.hpp"
 
-std::uint64_t Mp3AudioSource::instances = 0;
-
 // This value is somewhat arbitrary, but corresponds to the minimum buffer size
 // used by ffmpeg, so it's probably sensible.
 const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
@@ -42,8 +40,6 @@ const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 Mp3AudioSource::Mp3AudioSource(const std::string &path)
     : AudioSource(path), buffer(BUFFER_SIZE), context(nullptr)
 {
-	if (Mp3AudioSource::instances++ == 0) mpg123_init();
-
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
 
@@ -73,8 +69,6 @@ Mp3AudioSource::~Mp3AudioSource()
 {
 	mpg123_delete(this->context);
 	this->context = nullptr;
-
-	if (--Mp3AudioSource::instances == 0) mpg123_exit();
 }
 
 void Mp3AudioSource::AddFormat(long rate)

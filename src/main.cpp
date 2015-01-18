@@ -28,6 +28,12 @@
 #include "audio/sources/sndfile.hpp"
 #endif // WITH_SNDFILE
 
+/// The default IP hostname on which playd will bind.
+static const std::string DEFAULT_HOST = "0.0.0.0";
+
+/// The default TCP port on which playd will bind.
+static const std::string DEFAULT_PORT = "1350";
+
 /**
  * Creates a vector of strings from a C-style argument vector.
  * @param argc Program argument count.
@@ -79,6 +85,8 @@ void SetupAudioSystem(PipeAudioSystem &audio) {
 #endif // WITH_FLAC
 
 #ifdef WITH_MP3
+	mpg123_init();
+	atexit(mpg123_exit);
 	audio.AddSource("mp3", &Mp3AudioSource::Build);
 #endif // WITH_MP3
 
@@ -95,15 +103,18 @@ void SetupAudioSystem(PipeAudioSystem &audio) {
  */
  [[noreturn]] void ExitWithUsage(const std::string &progname) {
 	std::cerr << "usage: " << progname << " ID [HOST] [PORT]\n";
-	std::cerr << "  where ID is one of:\n";
+	std::cerr << "where ID is one of the following numbers:\n";
 
 	// Show the user the valid device IDs they can use.
 	auto device_list = SdlAudioSink::GetDevicesInfo();
 	for (const auto &device : device_list) {
-		std::cout << "    "
+		std::cerr << "\t"
 			  << device.first << ": " << device.second
 			  << "\n";
 	}
+
+	std::cerr << "default HOST: " << DEFAULT_HOST << "\n";
+	std::cerr << "default PORT: " << DEFAULT_PORT << "\n";
 
 	exit(EXIT_FAILURE);
 }
@@ -117,8 +128,8 @@ void SetupAudioSystem(PipeAudioSystem &audio) {
 std::pair<std::string, std::string> GetHostAndPort(const std::vector<std::string> &args) {
 	auto size = args.size();
 	return std::make_pair(
-		size > 2 ? args.at(2) : "0.0.0.0",
-		size > 3 ? args.at(3) : "1350"
+		size > 2 ? args.at(2) : DEFAULT_HOST,
+		size > 3 ? args.at(3) : DEFAULT_PORT
 	);
 }
 
@@ -152,6 +163,9 @@ std::pair<std::string, std::string> GetHostAndPort(const std::vector<std::string
  */
 int main(int argc, char *argv[])
 {
+	// This call needs to happen before GetDeviceID, otherwise no device
+	// IDs will be recognised.  (This is why it's here, and not in
+	// SetupAudioSystem.)
 	SdlAudioSink::InitLibrary();
 	atexit(SdlAudioSink::CleanupLibrary);
 

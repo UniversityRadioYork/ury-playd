@@ -15,7 +15,9 @@
 #include <string>
 #include <vector>
 
+extern "C" {
 #include <mpg123.h>
+}
 
 #include "../audio_source.hpp"
 #include "../sample_formats.hpp"
@@ -50,10 +52,6 @@ public:
 	SampleFormat OutputSampleFormat() const override;
 
 private:
-	/// Count of Mp3AudioSource instances.
-	/// Used to ensure library init/termination happens.
-	static uint64_t instances;
-
 	/// The size of the internal decoding buffer, in bytes.
 	static const size_t BUFFER_SIZE;
 
