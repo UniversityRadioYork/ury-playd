@@ -41,16 +41,21 @@ private:
 public:
 	/**
 	 * Constructs a Player.
-	 * @param sink The sink to which audio notifications are sent.
 	 * @param audio The AudioSystem to be used by the player.
 	 */
-	Player(const ResponseSink *sink, AudioSystem &audio);
+	Player(AudioSystem &audio);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;
 
 	/// Deleted copy-assignment constructor.
 	Player &operator=(const Player &) = delete;
+
+	/**
+	 * Sets the sink to which this Player shall send responses.
+	 * @param sink The response sink.
+	 */
+	void SetSink(ResponseSink &sink);
 
 	//
 	// Commands

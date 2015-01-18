@@ -21,12 +21,10 @@
 #include <sstream>
 #include <string>
 
-extern "C" {
 // If UNICODE is defined on Windows, it'll select the wide-char gai_strerror.
 // We don't want this.
 #undef UNICODE
 #include <uv.h>
-}
 
 #include "../cmd.hpp"
 #include "../errors.hpp"
@@ -124,7 +122,7 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 
 	// If the player is ready to terminate, we need to kill the event loop
 	// in order to disconnect clients and stop the updating.
-	if (!running) IoCore::End();
+	if (!running) uv_stop(uv_default_loop());
 }
 
 //
@@ -178,16 +176,15 @@ void ConnectionPool::Respond(const Response &response) const
 // IoCore
 //
 
-IoCore::IoCore(Player &player, CommandHandler &handler,
-               const std::string &address, const std::string &port)
+IoCore::IoCore(Player &player, CommandHandler &handler)
     : player(player), pool(player, handler)
 {
-	this->InitAcceptor(address, port);
-	this->DoUpdateTimer();
 }
 
-/* static */ void IoCore::Run()
+void IoCore::Run(const std::string &host, const std::string &port)
 {
+	this->InitAcceptor(host, port);
+	this->DoUpdateTimer();
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
@@ -223,11 +220,6 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 void IoCore::Respond(const Response &response) const
 {
 	this->pool.Respond(response);
-}
-
-/* static */ void IoCore::End()
-{
-	uv_stop(uv_default_loop());
 }
 
 //

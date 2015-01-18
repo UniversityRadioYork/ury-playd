@@ -27,8 +27,9 @@
 #include "sources/mp3.hpp"
 #include "sources/sndfile.hpp"
 
-PipeAudioSystem::PipeAudioSystem()
-    : sink([](const AudioSource &) -> std::unique_ptr<AudioSink> {
+PipeAudioSystem::PipeAudioSystem(int device_id)
+    : device_id(device_id),
+      sink([](const AudioSource &, int) -> std::unique_ptr<AudioSink> {
 	      throw InternalError("No audio sink!");
       })
 {
@@ -44,7 +45,7 @@ std::unique_ptr<Audio> PipeAudioSystem::Load(const std::string &path) const
 	std::unique_ptr<AudioSource> source = this->LoadSource(path);
 	assert(source != nullptr);
 
-	auto sink = this->sink(*source);
+	auto sink = this->sink(*source, this->device_id);
 	return std::unique_ptr<Audio>(
 	                new PipeAudio(std::move(source), std::move(sink)));
 }
@@ -63,13 +64,13 @@ std::unique_ptr<AudioSource> PipeAudioSystem::LoadSource(
 	return (ibuilder->second)(path);
 }
 
-void PipeAudioSystem::SetSink(PipeAudioSystem::SinkBuilder sink, int device_id)
+void PipeAudioSystem::SetSink(PipeAudioSystem::SinkBuilder sink)
 {
-	this->sink = std::bind(sink, std::placeholders::_1, device_id);
+	this->sink = sink;
 }
 
-void PipeAudioSystem::AddSource(std::initializer_list<std::string> exts,
+void PipeAudioSystem::AddSource(const std::string &ext,
                                 PipeAudioSystem::SourceBuilder source)
 {
-	for (auto &ext : exts) this->sources.emplace(ext, source);
+	this->sources.emplace(ext, source);
 }

@@ -68,8 +68,11 @@ public:
 	using SourceBuilder = std::function<
 	                std::unique_ptr<AudioSource>(const std::string &)>;
 
-	/// Constructs a PipeAudioSystem.
-	PipeAudioSystem();
+	/**
+	 * Constructs a PipeAudioSystem.
+	 * @param device_id The device ID to which sinks shall output.
+	 */
+	PipeAudioSystem(int device_id);
 
 	// AudioSystem implementation
 	std::unique_ptr<Audio> Null() const override;
@@ -78,24 +81,24 @@ public:
 	/**
 	 * Sets the sink to use for outputting sound.
 	 * @param sink The function to use when building sinks.
-	 * @param device_id The device ID to pass to any constructed sinks.
 	 */
-	void SetSink(SinkBuilder sink, int device_id);
+	void SetSink(SinkBuilder sink);
 
 	/**
-	 * Assign an AudioSource for a series of file extensions.
-	 * @param exts The list of file extensions to associate with this
-	 *   source.
+	 * Assign an AudioSource for a file extension.
+	 * @param exts The file extension to associate with this source.
 	 * @param source The function to use when building source.
 	 * @note If two AddSource invocations name the first file extension,
 	 *   the first is used for said extension.
 	 */
-	void AddSource(std::initializer_list<std::string> exts,
-	               SourceBuilder source);
+	void AddSource(const std::string &ext, SourceBuilder source);
 
 private:
+	/// The device ID for the sink.
+	int device_id;
+
 	/// The current sink builder.
-	std::function<std::unique_ptr<AudioSink>(const AudioSource &)> sink;
+	SinkBuilder sink;
 
 	/// Map from file extensions to source builders.
 	std::map<std::string, SourceBuilder> sources;

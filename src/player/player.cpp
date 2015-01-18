@@ -25,9 +25,14 @@
 const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
 	                                         "Seek", "TimeReport" };
 
-Player::Player(const ResponseSink *sink, AudioSystem &audio)
-    : audio(audio), file(audio.Null()), is_running(true), sink(sink)
+Player::Player(AudioSystem &audio)
+    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr)
 {
+}
+
+void Player::SetSink(ResponseSink &sink)
+{
+	this->sink = &sink;
 }
 
 bool Player::Update()

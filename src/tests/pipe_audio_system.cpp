@@ -15,7 +15,7 @@
 
 SCENARIO("PipeAudioSystem can provide null implementations of Audio", "[pipe-audio-system][no-audio]") {
 	GIVEN("a fresh PipeAudioSystem") {
-		PipeAudioSystem sys;
+		PipeAudioSystem sys(0);
 
 		WHEN("Null() is invoked") {
 			std::unique_ptr<Audio> au = sys.Null();
@@ -29,8 +29,8 @@ SCENARIO("PipeAudioSystem can provide null implementations of Audio", "[pipe-aud
 
 SCENARIO("PipeAudioSystem cannot create Audio without a registered Sink", "[pipe-audio-system]") {
 	GIVEN("a PipeAudioSystem with dummy source loaded") {
-		PipeAudioSystem sys;
-		sys.AddSource({ "bar" }, &DummyAudioSource::Build);
+		PipeAudioSystem sys(0);
+		sys.AddSource("bar", &DummyAudioSource::Build);
 
 		WHEN("Load() is invoked") {
 			THEN("an InternalError is thrown") {

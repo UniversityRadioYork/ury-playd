@@ -13,9 +13,7 @@
 #include <ostream>
 #include <set>
 
-extern "C" {
 #include <uv.h>
-}
 
 #include "../cmd.hpp"
 #include "../player/player.hpp"
@@ -165,11 +163,8 @@ public:
 	 * @param player The player to which periodic update requests shall be
 	 * sent.
 	 * @param handler The handler to which command inputs shall be sent.
-	 * @param address The address to which IoCore will bind.
-	 * @param port The port on which IoCore will listen for clients.
 	 */
-	explicit IoCore(Player &player, CommandHandler &handler,
-	                const std::string &address, const std::string &port);
+	explicit IoCore(Player &player, CommandHandler &handler);
 
 	/// Deleted copy constructor.
 	IoCore(const IoCore &) = delete;
@@ -179,16 +174,13 @@ public:
 
 	/**
 	 * Runs the reactor.
-	 * It will block until terminated.
+	 * It will block until it terminates.
+	 * @param host The IP host to which IoCore will bind.
+	 * @param port The TCP port to which IoCore will bind.
+	 * @exception NetError Thrown if IoCore cannot bind to @a host or @a
+	 *   port.
 	 */
-	static void Run();
-
-	/**
-	 * Ends the reactor.
-	 * This should be called by the parent object when the player is
-	 * quitting.
-	 */
-	static void End();
+	void Run(const std::string &host, const std::string &port);
 
 	void Respond(const Response &response) const override;
 
