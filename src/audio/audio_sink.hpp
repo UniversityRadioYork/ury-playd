@@ -187,10 +187,6 @@ private:
 	/// The current position, in samples.
 	std::uint64_t position_sample_count;
 
-	/// Whether the current run of the audio playback stream has not yet
-	/// successfully read its first set of samples from the buffer.
-	bool just_started;
-
 	/// Whether the source has run out of things to feed the sink.
 	bool source_out;
 

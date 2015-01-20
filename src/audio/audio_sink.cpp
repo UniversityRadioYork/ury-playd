@@ -46,7 +46,6 @@ SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
     : bytes_per_sample(source.BytesPerSample()),
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
       position_sample_count(0),
-      just_started(false),
       source_out(false),
       state(Audio::State::STOPPED)
 {
@@ -99,7 +98,6 @@ void SdlAudioSink::Start()
 {
 	if (this->state != Audio::State::STOPPED) return;
 
-	this->just_started = true;
 	SDL_PauseAudioDevice(this->device, 0);
 	this->state = Audio::State::PLAYING;
 }
