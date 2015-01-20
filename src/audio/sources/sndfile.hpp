@@ -37,6 +37,7 @@ public:
 	 * Constructs a SndfileAudioSource.
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.
+	 * @see http://www.mega-nerd.com/libsndfile/api.html#open
 	 */
 	SndfileAudioSource(const std::string &path);
 

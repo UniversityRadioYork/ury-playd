@@ -35,8 +35,6 @@ SndfileAudioSource::SndfileAudioSource(const std::string &path)
 {
 	this->info.format = 0;
 
-	// See http://www.mega-nerd.com/libsndfile/api.html#open
-	// for more details.
 	this->file = sf_open(path.c_str(), SFM_READ, &this->info);
 	if (this->file == nullptr) {
 		throw FileError("sndfile: can't open " + path + ": " +
