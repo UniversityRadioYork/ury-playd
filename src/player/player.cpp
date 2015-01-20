@@ -157,11 +157,12 @@ CommandResult Player::Quit()
 CommandResult Player::Seek(const std::string &time_str)
 {
 	std::uint64_t pos = 0;
-
 	try {
 		pos = SeekParse(time_str);
-	} catch (...) {
-		return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
+	} catch (SeekError &e) {
+		// Seek errors here are a result of clients sending weird times.
+		// Thus, we tell them off.
+		return CommandResult::Invalid(e.Message());
 	}
 
 	try {
@@ -169,6 +170,10 @@ CommandResult Player::Seek(const std::string &time_str)
 	} catch (NoAudioError) {
 		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
 	} catch (SeekError) {
+		// Seek failures here are a result of the decoder not liking the
+		// seek position (usually because it's outside the audio file!).
+		// Thus, unlike above, we try to recover.
+
 		Debug() << "Seek failure" << std::endl;
 
 		// Make it look to the client as if the seek ran off the end of
@@ -186,11 +191,16 @@ std::uint64_t Player::SeekParse(const std::string &time_str)
 
 	// In previous versions, this used to parse a unit at the end.
 	// This was removed for simplicity--use baps3-cli etc. instead.
-	std::uint64_t pos = std::stoull(time_str, &cpos);
+	std::uint64_t pos;
+	try {
+		pos = std::stoull(time_str, &cpos);
+	} catch (...) {
+		throw SeekError(MSG_SEEK_INVALID_VALUE);
+	}
 
 	// cpos will point to the first character in pos that wasn't a number.
-	// We don't want any characters here, so bail if the position isn't at
-	// the end of the string.
+	// We don't want any such characters here, so bail if the position isn't
+	// at the end of the string.
 	auto sl = time_str.length();
 	if (cpos != sl) throw SeekError(MSG_SEEK_INVALID_VALUE);
 
