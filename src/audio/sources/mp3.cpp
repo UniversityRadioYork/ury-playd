@@ -180,7 +180,6 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 		default:
 			// We shouldn't get here, if the format was set up
 			// correctly earlier.
-			assert(false);
-			return SampleFormat::PACKED_UNSIGNED_INT_8;
+			throw InternalError("unsupported sample rate, should not happen");
 	}
 }
