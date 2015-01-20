@@ -42,7 +42,7 @@ static const std::string DEFAULT_PORT = "1350";
  */
 std::vector<std::string> MakeArgVector(int argc, char *argv[])
 {
-	decltype(MakeArgVector(argc, argv)) args;
+	std::vector<std::string> args;
 	for (int i = 0; i < argc; i++) args.emplace_back(argv[i]);
 	return args;
 }
