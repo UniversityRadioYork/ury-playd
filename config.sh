@@ -47,10 +47,8 @@
 #   - lack of pkgconf/pkg-config or SDL2 is fatal.
 
 # Runs `make clean`, if a Makefile is present.
-clean()
-{
-	if [ -f "Makefile" ]
-	then
+clean() {
+	if [ -f "Makefile" ]; then
 		echo 'running `'$MAKE' clean` first...'
 		$MAKE clean >/dev/null
 		echo 'removing existing Makefile...'
@@ -64,15 +62,12 @@ clean()
 #
 
 # Populates $PROGNAME and $PROGVER if not already set up.
-find_name_and_version()
-{
+find_name_and_version() {
 	if [ -z "$PROGNAME" ]; then PROGNAME="playd"; fi
 
-	if [ -z "$PROGVER" ]
-	then
+	if [ -z "$PROGVER" ]; then
 		PROGVER=`git describe --tags --always`
-		if [ "$?" -ne 0 ]
-		then
+		if [ "$?" -ne 0 ]; then
 			echo "not a git clone, need to set 'PROGVER'."
 			echo "cannot continue"
 			exit 1
@@ -82,8 +77,7 @@ find_name_and_version()
 	echo "Configuring build for $PROGNAME-$PROGVER"
 }
 
-find_dirs()
-{
+find_dirs() {
 	echo "DIRECTORIES:"
 
 	if [ -z "$SRCDIR" ]; then SRCDIR="`pwd`/src"; fi
@@ -103,10 +97,8 @@ find_dirs()
 
 # $1: name of package variable, sans _PKG
 # $2: name of package to attempt to use
-try_use_pkg()
-{
-	if [ -z `eval echo '"$'${1}'_PKG"'` ]
-	then
+try_use_pkg() {
+	if [ -z `eval echo '"$'${1}'_PKG"'` ]; then
 		if $PKGCONF --exists "$2"
 		then
 			echo "$2"
@@ -119,18 +111,15 @@ try_use_pkg()
 #
 # $1: name of package variable, sans _PKG
 # $2: name of feature to disable if $1 empty
-disable_if_no_pkg()
-{
-	if [ -z `eval echo '"$'${1}'_PKG"'` ]
-	then
+disable_if_no_pkg() {
+	if [ -z `eval echo '"$'${1}'_PKG"'` ]; then
 		echo "no package; disabling ${2}"
 		eval "NO_${2}='1'"
 	fi
 }
 
 # Tries to find needed programs.
-find_progs()
-{
+find_progs() {
 	echo "PROGRAMS:"
 	find_cc
 	find_cxx
@@ -139,10 +128,8 @@ find_progs()
 }
 
 # If $2 exists, sets $1 to it.
-find_prog()
-{
-	if [ -z `eval echo '"$'${1}'"'` ]
-	then
+find_prog() {
+	if [ -z `eval echo '"$'${1}'"'` ]; then
 		if which "${2}" >/dev/null
 		then
 			eval "${1}=`which ${2}`"
@@ -154,14 +141,12 @@ find_prog()
 #
 # Stores the result in $CC if successful.
 # Halts the script on failure.
-find_cc()
-{
+find_cc() {
 	echo -n "  C compiler:    "
 	find_prog CC clang
 	find_prog CC gcc
 
-	if [ -n "$CC" ]
-	then
+	if [ -n "$CC" ]; then
 		echo "$CC"
 	else
 		echo "not found"
@@ -173,14 +158,12 @@ find_cc()
 #
 # Stores the result in $CXX if successful.
 # Halts the script on failure.
-find_cxx()
-{
+find_cxx() {
 	echo -n "  C++ compiler:  "
 	find_prog CXX clang++
 	find_prog CXX g++
 
-	if [ -n "$CXX" ]
-	then
+	if [ -n "$CXX" ]; then
 		echo "$CXX"
 	else
 		echo "not found"
@@ -192,14 +175,12 @@ find_cxx()
 #
 # Stores the result in $PKGCONF if successful.
 # Halts the script on failure.
-find_pkgconf()
-{
+find_pkgconf() {
 	echo -n "  pkgconf:       "
 	find_prog PKGCONF pkgconf
 	find_prog PKGCONF pkg-config
 
-	if [ -n "$PKGCONF" ]
-	then
+	if [ -n "$PKGCONF" ]; then
 		echo "$PKGCONF"
 	else
 		echo "not found"
@@ -211,15 +192,13 @@ find_pkgconf()
 #
 # Stores the result in $MAKE if successful.
 # Halts the script on failure.
-find_gnumake()
-{
+find_gnumake() {
 	echo -n "  GNU Make:      "
 	find_prog MAKE gmake
 	find_prog MAKE gnumake
 	find_prog MAKE make
 
-	if [ -n "$MAKE" ]
-	then
+	if [ -n "$MAKE" ]; then
 		echo "$MAKE"
 	else
 		echo "not found"
@@ -228,8 +207,7 @@ find_gnumake()
 }
 
 # Tries to find all dependencies.
-find_deps()
-{
+find_deps() {
 	echo "DEPENDENCIES:"
 	find_flac
 	find_mp3
@@ -239,12 +217,10 @@ find_deps()
 }
 
 # Finds FLAC++ to provide FLAC support, if requested.
-find_flac()
-{
+find_flac() {
 	echo -n "  FLAC++:        "
 
-	if [ -n "$NO_FLAC" ]
-	then
+	if [ -n "$NO_FLAC" ]; then
 		echo "FLAC disabled; skipping"
 		return
 	fi
@@ -255,12 +231,10 @@ find_flac()
 }
 
 # Finds libmpg123 to provide MP3 support, if requested.
-find_mp3()
-{
+find_mp3() {
 	echo -n "  libmpg123:     "
 
-	if [ -n "$NO_MP3" ]
-	then
+	if [ -n "$NO_MP3" ]; then
 		echo "MP3 disabled; skipping"
 		return
 	fi
@@ -270,12 +244,10 @@ find_mp3()
 }
 
 # Finds libsndfile, if requested.
-find_sndfile()
-{
+find_sndfile() {
 	echo -n "  libsndfile:    "
 
-	if [ -n "$NO_SNDFILE" ]
-	then
+	if [ -n "$NO_SNDFILE" ]; then
 		echo "sndfile disabled; skipping"
 		return
 	fi
@@ -286,28 +258,24 @@ find_sndfile()
 }
 
 # Finds SDL2
-find_sdl2()
-{
+find_sdl2() {
 	echo -n "  SDL2:          "
 
 	try_use_pkg SDL2 "sdl2"
 
-	if [ -z "$SDL2_PKG" ]
-	then
+	if [ -z "$SDL2_PKG" ]; then
 		echo "not found; cannot continue"
 		exit 2
 	fi
 }
 
 # Finds libuv
-find_libuv()
-{
+find_libuv() {
 	echo -n "  libuv:         "
 
 	try_use_pkg LIBUV "libuv"
 
-	if [ -z "$LIBUV_PKG" ]
-	then
+	if [ -z "$LIBUV_PKG" ]; then
 		echo "not found; cannot continue"
 		exit 2
 	fi
@@ -318,10 +286,8 @@ find_libuv()
 #
 
 # If $2 is not set, adds $1 to $FORMATS and $3 as a compile flag to $FCFLAGS.
-add_format_to_lists()
-{
-	if [ -z `eval echo '$'"$2"` ]
-	then
+add_format_to_lists() {
+	if [ -z `eval echo '$'"$2"` ]; then
 		FORMATS=`printf "%s\n%s" "$FORMATS" "$1"`
 		FCFLAGS=`printf "%s\n%s" "$FCFLAGS" "-D$3"`
 	fi
@@ -329,8 +295,7 @@ add_format_to_lists()
 }
 
 # Lists features on stdout.
-list_features()
-{
+list_features() {
 	FORMATS=""
 	FCFLAGS=""
 
@@ -345,8 +310,7 @@ list_features()
 	FCFLAGS=`echo "$FCFLAGS" | sort | uniq | tr -s "\n" " " | sed -e 's/^ //g' -e 's/ $//g'`
 
 	# No point building playd with no file formats!
-	if [ -z "$FORMATS" ]
-	then
+	if [ -z "$FORMATS" ]; then
 		echo "no file formats available; cannot continue"
 		exit 3
 	fi
@@ -359,8 +323,7 @@ list_features()
 
 # Collates the pkg-config packages into $PACKAGES.
 # Also lists on stdout.
-list_packages()
-{
+list_packages() {
 	PACKAGES=`echo "$FLACXX_PKG $LIBMPG123_PKG $LIBSNDFILE_PKG $SDL2_PKG $LIBUV_PKG" | sed 's/  */ /g'`
 	echo "PACKAGES USED:"
 	echo "  $PACKAGES"
@@ -372,18 +335,15 @@ list_packages()
 #
 
 # If $1 is non-empty, adds to cxx_expr a rule removing filenames containing $2.
-disable_feature_files()
-{
-	if [ -n "$1" ]
-	then
+disable_feature_files() {
+	if [ -n "$1" ]; then
 		cxx_expr="${cxx_expr} -a \( \! -name '*"$2"*' \)"
 	fi
 }
 
 # Finds all relevant sources.
 # Outputs to the variables $CXXSOURCES and $CSOURCES.
-find_sources()
-{
+find_sources() {
 	# Start off by looking for all cpp or cxx files.
 	cxx_expr="\( -name "*.cpp" -o -name "*.cxx" \)"
 
@@ -405,8 +365,7 @@ find_sources()
 	CSOURCES=`find "$SRCDIR" -name '*.c'`
 }
 
-write_makefile()
-{
+write_makefile() {
 	echo "Now making the Makefile."
 
 	find_sources
