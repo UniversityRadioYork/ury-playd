@@ -143,7 +143,6 @@ Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()
 	DecodeState decode_state;
 
 	if (err == MPG123_DONE) {
-		Debug() << "mp3: end of file" << std::endl;
 		decode_state = DecodeState::END_OF_FILE;
 	} else if (err != MPG123_OK && err != MPG123_NEW_FORMAT) {
 		Debug() << "mp3: decode error:" << mpg123_strerror(this->context)
