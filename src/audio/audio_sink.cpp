@@ -238,7 +238,7 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 
 /* static */ std::vector<std::pair<int, std::string>> SdlAudioSink::GetDevicesInfo()
 {
-	decltype(SdlAudioSink::GetDevicesInfo()) list;
+	std::vector<std::pair<int, std::string>> list;
 
 	// The 0 in SDL_GetNumAudioDevices tells SDL we want playback devices.
 	int is = SDL_GetNumAudioDevices(0);
