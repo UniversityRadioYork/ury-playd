@@ -45,15 +45,6 @@ FlacAudioSource::FlacAudioSource(const std::string &path)
 	do {
 		this->process_single();
 	} while (this->get_sample_rate() == 0);
-
-	Debug() << "flac: sample rate:" << this->SampleRate() << std::endl;
-	Debug() << "flac: bytes per sample:" << this->BytesPerSample()
-	        << std::endl;
-	Debug() << "flac: mono bytes per sample:"
-	        << (this->get_bits_per_sample() / 8) << std::endl;
-	Debug() << "flac: channels:" << (int)this->ChannelCount() << std::endl;
-	Debug() << "flac: playd format:" << (int)this->OutputSampleFormat()
-	        << std::endl;
 }
 
 FlacAudioSource::~FlacAudioSource()
