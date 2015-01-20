@@ -56,13 +56,6 @@ Mp3AudioSource::Mp3AudioSource(const std::string &path)
 		throw FileError("mp3: can't open " + path + ": " +
 		                mpg123_strerror(this->context));
 	}
-
-	Debug() << "mp3: sample rate:" << this->SampleRate() << std::endl;
-	Debug() << "mp3: bytes per sample:" << this->BytesPerSample()
-	        << std::endl;
-	Debug() << "mp3: channels:" << (int)this->ChannelCount() << std::endl;
-	Debug() << "mp3: playd format:" << (int)this->OutputSampleFormat()
-	        << std::endl;
 }
 
 Mp3AudioSource::~Mp3AudioSource()
