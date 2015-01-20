@@ -77,7 +77,8 @@ int GetDeviceID(const std::vector<std::string> &args)
  * Sets up the audio system with the desired sources and sinks.
  * @param audio The audio system to configure.
  */
-void SetupAudioSystem(PipeAudioSystem &audio) {
+void SetupAudioSystem(PipeAudioSystem &audio)
+{
 	audio.SetSink(&SdlAudioSink::Build);
 
 // Now set up the available sources.
@@ -102,16 +103,16 @@ void SetupAudioSystem(PipeAudioSystem &audio) {
  * Reports usage information and exits.
  * @param progname The name of the program as executed.
  */
- [[noreturn]] void ExitWithUsage(const std::string &progname) {
+[[noreturn]] void ExitWithUsage(const std::string &progname)
+{
 	std::cerr << "usage: " << progname << " ID [HOST] [PORT]\n";
 	std::cerr << "where ID is one of the following numbers:\n";
 
 	// Show the user the valid device IDs they can use.
 	auto device_list = SdlAudioSink::GetDevicesInfo();
 	for (const auto &device : device_list) {
-		std::cerr << "\t"
-			  << device.first << ": " << device.second
-			  << "\n";
+		std::cerr << "\t" << device.first << ": " << device.second
+		          << "\n";
 	}
 
 	std::cerr << "default HOST: " << DEFAULT_HOST << "\n";
@@ -126,12 +127,12 @@ void SetupAudioSystem(PipeAudioSystem &audio) {
  * @param args The program argument vector.
  * @return A pair of strings representing the hostname and port.
  */
-std::pair<std::string, std::string> GetHostAndPort(const std::vector<std::string> &args) {
+std::pair<std::string, std::string> GetHostAndPort(
+                const std::vector<std::string> &args)
+{
 	auto size = args.size();
-	return std::make_pair(
-		size > 2 ? args.at(2) : DEFAULT_HOST,
-		size > 3 ? args.at(3) : DEFAULT_PORT
-	);
+	return std::make_pair(size > 2 ? args.at(2) : DEFAULT_HOST,
+	                      size > 3 ? args.at(3) : DEFAULT_PORT);
 }
 
 /**
@@ -140,7 +141,10 @@ std::pair<std::string, std::string> GetHostAndPort(const std::vector<std::string
  * @param port The TCP port to which playd tried to bind.
  * @param msg The exception's error message.
  */
-[[noreturn]] void ExitWithNetError(const std::string &host, const std::string &port, const std::string &msg) {
+[[noreturn]] void ExitWithNetError(const std::string &host,
+                                   const std::string &port,
+                                   const std::string &msg)
+{
 	std::cerr << "Network error: " << msg << "\n";
 	std::cerr << "Is " << host << ":" << port << " available?\n";
 	exit(EXIT_FAILURE);
@@ -150,9 +154,9 @@ std::pair<std::string, std::string> GetHostAndPort(const std::vector<std::string
  * Exits with an error message for an unhandled exception.
  * @param msg The exception's error message.
  */
-[[noreturn]] void ExitWithError(const std::string &msg) {
-	std::cerr << "Unhandled exception in main loop: "
-		  << msg << std::endl;
+[[noreturn]] void ExitWithError(const std::string &msg)
+{
+	std::cerr << "Unhandled exception in main loop: " << msg << std::endl;
 	exit(EXIT_FAILURE);
 }
 
