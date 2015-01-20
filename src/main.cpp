@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
+#include <tuple>
 
 #include "audio/audio_system.hpp"
 #include "io/io_core.hpp"
@@ -185,9 +186,9 @@ int main(int argc, char *argv[])
 	player.SetSink(io);
 
 	// Now, actually run the IO loop.
-	auto host_and_port = GetHostAndPort(args);
-	auto host = host_and_port.first;
-	auto port = host_and_port.second;
+	std::string host;
+	std::string port;
+	std::tie(host, port) = GetHostAndPort(args);
 	try {
 		io.Run(host, port);
 	} catch (NetError &e) {
