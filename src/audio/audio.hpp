@@ -171,6 +171,13 @@ private:
 	/**
 	 * A map of response sink pointers to their last emitted position, in
 	 * seconds.
+	 *
+	 * The pointers are not actually used in any way other than as a
+	 * convenient identifier for each individual ResponseSink.  As such,
+	 * the ResponseSinks are not owned by this object.
+	 *
+	 * @todo (CaptainHayashi) This could cause memory leaks if not emptied
+	 *   regularly--need to check.
 	 */
 	std::map<const ResponseSink *, std::uint64_t> last_times;
 
