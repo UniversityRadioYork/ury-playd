@@ -100,6 +100,15 @@ SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()
 	}
 
 	// Else, we're good to go (hopefully).
+	//
+	// The buffer on our side is addressed as ints (32-bit), because this is
+	// easier for sndfile.  However, the DecodeVector is addressed as bytes
+	// (8-bit) as the sample length could vary between files and decoders
+	// (from 8-bit up to 32-bit, and maybe even 32-bit float)!
+	//
+	// So, we reinterpret the decoded bits as a vector of bytes, which is
+	// relatively safe--they'll be interpreted by the AudioSink in the exact
+	// same way once we tell it how long the samples really are.
 	uint8_t *begin = reinterpret_cast<uint8_t *>(&*this->buffer.begin());
 
 	// The end is 'read' 32-bit items--read*4 bytes--after.
