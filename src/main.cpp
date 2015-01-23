@@ -128,7 +128,7 @@ void SetupAudioSystem(PipeAudioSystem &audio)
  * @return A pair of strings representing the hostname and port.
  */
 std::pair<std::string, std::string> GetHostAndPort(
-                const std::vector<std::string> &args)
+        const std::vector<std::string> &args)
 {
 	auto size = args.size();
 	return std::make_pair(size > 2 ? args.at(2) : DEFAULT_HOST,

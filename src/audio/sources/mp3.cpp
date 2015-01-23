@@ -32,7 +32,7 @@ extern "C" {
 const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 
 /* static */ std::unique_ptr<AudioSource> Mp3AudioSource::Build(
-                const std::string &path)
+        const std::string &path)
 {
 	return std::unique_ptr<AudioSource>(new Mp3AudioSource(path));
 }
@@ -181,7 +181,7 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 			// We shouldn't get here, if the format was set up
 			// correctly earlier.
 			throw InternalError(
-			                "unsupported sample rate, should not "
-			                "happen");
+			        "unsupported sample rate, should not "
+			        "happen");
 	}
 }

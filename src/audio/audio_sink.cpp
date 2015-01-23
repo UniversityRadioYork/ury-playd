@@ -37,7 +37,7 @@ static void SDLCallback(void *vsink, std::uint8_t *data, int len)
 }
 
 /* static */ std::unique_ptr<AudioSink> SdlAudioSink::Build(
-                const AudioSource &source, int device_id)
+        const AudioSource &source, int device_id)
 {
 	return std::unique_ptr<AudioSink>(new SdlAudioSink(source, device_id));
 }
@@ -200,8 +200,8 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 
 	// How many can we pull out?  Send this amount to SDL.
 	auto samples = std::min(req_samples, avail_samples);
-	auto read_samples = this->ring_buf.Read(reinterpret_cast<char *>(out),
-	                                        samples);
+	auto read_samples =
+	        this->ring_buf.Read(reinterpret_cast<char *>(out), samples);
 	this->position_sample_count += read_samples;
 
 	// Now, we need to fill any gaps with silence.
@@ -218,12 +218,11 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 
 /// Mappings from SampleFormats to their equivalent SDL_AudioFormats.
 static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
-	{ SampleFormat::PACKED_UNSIGNED_INT_8, AUDIO_U8 },
-	{ SampleFormat::PACKED_SIGNED_INT_8, AUDIO_S8 },
-	{ SampleFormat::PACKED_SIGNED_INT_16, AUDIO_S16 },
-	{ SampleFormat::PACKED_SIGNED_INT_32, AUDIO_S32 },
-	{ SampleFormat::PACKED_FLOAT_32, AUDIO_F32 }
-};
+        {SampleFormat::PACKED_UNSIGNED_INT_8, AUDIO_U8},
+        {SampleFormat::PACKED_SIGNED_INT_8, AUDIO_S8},
+        {SampleFormat::PACKED_SIGNED_INT_16, AUDIO_S16},
+        {SampleFormat::PACKED_SIGNED_INT_32, AUDIO_S32},
+        {SampleFormat::PACKED_FLOAT_32, AUDIO_F32}};
 
 /* static */ SDL_AudioFormat SdlAudioSink::SDLFormat(SampleFormat fmt)
 {

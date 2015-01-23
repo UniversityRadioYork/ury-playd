@@ -25,7 +25,7 @@
 #include "sndfile.hpp"
 
 /* static */ std::unique_ptr<AudioSource> SndfileAudioSource::Build(
-                const std::string &path)
+        const std::string &path)
 {
 	return std::unique_ptr<AudioSource>(new SndfileAudioSource(path));
 }

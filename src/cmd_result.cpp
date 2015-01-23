@@ -14,9 +14,9 @@
 #include "cmd_result.hpp"
 
 /* static */ const Response::Code CommandResult::TYPE_CODES[] = {
-	Response::Code::OK,   // Type::SUCCESS
-	Response::Code::WHAT, // Type::INVALID
-	Response::Code::FAIL, // Type::FAILURE
+        Response::Code::OK,   // Type::SUCCESS
+        Response::Code::WHAT, // Type::INVALID
+        Response::Code::FAIL, // Type::FAILURE
 };
 
 CommandResult CommandResult::Success()

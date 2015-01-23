@@ -58,8 +58,8 @@ public:
 
 protected:
 	FLAC__StreamDecoderWriteStatus write_callback(
-	                const FLAC__Frame *frame,
-	                const FLAC__int32 *const buffer[]) override;
+	        const FLAC__Frame *frame,
+	        const FLAC__int32 *const buffer[]) override;
 	void error_callback(FLAC__StreamDecoderErrorStatus status) override;
 
 private:

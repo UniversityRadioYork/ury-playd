@@ -147,7 +147,7 @@ void ConnectionPool::Accept(uv_stream_t *server)
 	}
 
 	this->connections.emplace_back(
-	                new Connection(*this, client, this->handler));
+	        new Connection(*this, client, this->handler));
 
 	this->player.WelcomeClient(*this->connections.back());
 	client->data = static_cast<void *>(this->connections.back().get());
@@ -158,10 +158,10 @@ void ConnectionPool::Accept(uv_stream_t *server)
 void ConnectionPool::Remove(Connection &conn)
 {
 	this->connections.erase(std::remove_if(
-	                this->connections.begin(), this->connections.end(),
-	                [&](const std::unique_ptr<Connection> &p) {
-		                return p.get() == &conn;
-		        }));
+	        this->connections.begin(), this->connections.end(),
+	        [&](const std::unique_ptr<Connection> &p) {
+		        return p.get() == &conn;
+		}));
 }
 
 void ConnectionPool::Respond(const Response &response) const

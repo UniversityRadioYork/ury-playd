@@ -38,7 +38,7 @@ void NoAudio::Emit(std::initializer_list<Response::Code> codes,
 	for (auto &code : codes) {
 		if (code == Response::Code::STATE) {
 			sink->Respond(Response(Response::Code::STATE)
-			                              .AddArg("Ejected"));
+			                      .AddArg("Ejected"));
 		}
 	}
 }
@@ -104,15 +104,15 @@ void PipeAudio::Emit(std::initializer_list<Response::Code> codes,
 				// previous second.
 				bool can_announce = true;
 				if (last_entry != this->last_times.end()) {
-					can_announce = (last_entry->second <
-					                secs);
+					can_announce =
+					        (last_entry->second < secs);
 
 					// This is so as to allow the emplace
 					// below to work--it fails if there's
 					// already a value under the same key.
 					if (can_announce)
 						this->last_times.erase(
-						                last_entry);
+						        last_entry);
 				}
 
 				if (!can_announce) continue;

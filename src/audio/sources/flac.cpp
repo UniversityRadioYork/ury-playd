@@ -25,7 +25,7 @@
 #include "flac.hpp"
 
 /* static */ std::unique_ptr<AudioSource> FlacAudioSource::Build(
-                const std::string &path)
+        const std::string &path)
 {
 	return std::unique_ptr<AudioSource>(new FlacAudioSource(path));
 }
@@ -159,7 +159,7 @@ SampleFormat FlacAudioSource::OutputSampleFormat() const
 }
 
 FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(
-                const FLAC__Frame *frame, const FLAC__int32 *const buf[])
+        const FLAC__Frame *frame, const FLAC__int32 *const buf[])
 {
 	// Each buffer index contains a full sample, padded up to 32 bits.
 	// These are in planar (per-channel) format.

@@ -61,12 +61,12 @@ class PipeAudioSystem : public AudioSystem
 {
 public:
 	/// Type for functions that construct sinks.
-	using SinkBuilder = std::function<
-	                std::unique_ptr<AudioSink>(const AudioSource &, int)>;
+	using SinkBuilder =
+	        std::function<std::unique_ptr<AudioSink>(const AudioSource &, int)>;
 
 	/// Type for functions that construct sources.
-	using SourceBuilder = std::function<
-	                std::unique_ptr<AudioSource>(const std::string &)>;
+	using SourceBuilder =
+	        std::function<std::unique_ptr<AudioSource>(const std::string &)>;
 
 	/**
 	 * Constructs a PipeAudioSystem.
