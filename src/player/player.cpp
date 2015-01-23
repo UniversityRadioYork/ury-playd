@@ -52,10 +52,10 @@ bool Player::Update()
 
 void Player::WelcomeClient(ResponseSink &client) const
 {
-	client.Respond(Response(Response::Code::OHAI).Arg(MSG_OHAI));
+	client.Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI));
 
 	auto features = Response(Response::Code::FEATURES);
-	for (auto &f : FEATURES) features.Arg(f);
+	for (auto &f : FEATURES) features.AddArg(f);
 	client.Respond(features);
 
 	this->file->Emit({ Response::Code::FILE, Response::Code::TIME,

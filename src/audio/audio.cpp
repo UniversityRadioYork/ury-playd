@@ -38,7 +38,7 @@ void NoAudio::Emit(std::initializer_list<Response::Code> codes,
 	for (auto &code : codes) {
 		if (code == Response::Code::STATE) {
 			sink->Respond(Response(Response::Code::STATE)
-			                              .Arg("Ejected"));
+			                              .AddArg("Ejected"));
 		}
 	}
 }
@@ -84,10 +84,10 @@ void PipeAudio::Emit(std::initializer_list<Response::Code> codes,
 			case Response::Code::STATE: {
 				auto playing = this->sink->State() ==
 				               Audio::State::PLAYING;
-				r.Arg(playing ? "Playing" : "Stopped");
+				r.AddArg(playing ? "Playing" : "Stopped");
 			} break;
 			case Response::Code::FILE: {
-				r.Arg(this->src->Path());
+				r.AddArg(this->src->Path());
 			} break;
 			case Response::Code::TIME: {
 				// To prevent spewing massive amounts of TIME
@@ -117,7 +117,7 @@ void PipeAudio::Emit(std::initializer_list<Response::Code> codes,
 
 				if (!can_announce) continue;
 				this->last_times.emplace(sink, secs);
-				r.Arg(std::to_string(micros));
+				r.AddArg(std::to_string(micros));
 			} break;
 			default:
 				continue;

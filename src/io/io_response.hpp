@@ -51,7 +51,7 @@ public:
 	 * @param arg The argument to add.  The argument must not be escaped.
 	 * @return A reference to this Response, for chaining.
 	 */
-	Response &Arg(const std::string &arg);
+	Response &AddArg(const std::string &arg);
 
 	/**
 	 * Packs the Response, converting it to a BAPS3 protocol message.
@@ -69,10 +69,10 @@ private:
 
 	/**
 	 * Escapes a single response argument.
-	 * @param argument The argument to escape.
+	 * @param arg The argument to escape.
 	 * @return The escaped argument.
 	 */
-	static std::string EscapeArgument(const std::string &argument);
+	static std::string EscapeArg(const std::string &arg);
 
 	/// The current packed form of the response.
 	/// @see Pack

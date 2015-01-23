@@ -31,9 +31,9 @@ Response::Response(Response::Code code)
 	this->string = Response::STRINGS[static_cast<int>(code)];
 }
 
-Response &Response::Arg(const std::string &arg)
+Response &Response::AddArg(const std::string &arg)
 {
-	this->string += " " + Response::EscapeArgument(arg);
+	this->string += " " + Response::EscapeArg(arg);
 	return *this;
 }
 
@@ -42,12 +42,12 @@ std::string Response::Pack() const
 	return this->string;
 }
 
-/* static */ std::string Response::EscapeArgument(const std::string &argument)
+/* static */ std::string Response::EscapeArg(const std::string &arg)
 {
 	bool escaping = false;
 	std::string escaped;
 
-	for (unsigned char c : argument) {
+	for (unsigned char c : arg) {
 		// These are the characters (including all whitespace, via
 		// isspace())  whose presence means we need to single-quote
 		// escape the argument.

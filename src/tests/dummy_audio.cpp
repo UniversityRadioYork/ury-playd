@@ -32,9 +32,9 @@ void DummyAudio::Emit(std::initializer_list<Response::Code> codes, const Respons
 
 		if (code == Response::Code::STATE) {
 			auto playing = this->sys.started;
-			r.Arg(playing ? "Playing" : "Stopped");
+			r.AddArg(playing ? "Playing" : "Stopped");
 		} else if (code == Response::Code::FILE) {
-			r.Arg(this->sys.path);
+			r.AddArg(this->sys.path);
 		} else {
 			continue;
 		}

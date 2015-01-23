@@ -23,7 +23,7 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed a single argument with no quotes") {
-		auto r = Response(Response::Code::OHAI).Arg("ulyoath");
+		auto r = Response(Response::Code::OHAI).AddArg("ulyoath");
 
 		THEN("the emitted response's argument is not quoted") {
 			REQUIRE(r.Pack() == "OHAI ulyoath");
@@ -31,7 +31,7 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed a single argument with single quotes") {
-		auto r = Response(Response::Code::OHAI).Arg("chattur'gha");
+		auto r = Response(Response::Code::OHAI).AddArg("chattur'gha");
 
 		THEN("the emitted response's argument is single-quoted") {
 			REQUIRE(r.Pack() == R"(OHAI 'chattur'\''gha')");
@@ -39,7 +39,7 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed two arguments, both with single quotes") {
-		auto r = Response(Response::Code::OHAI).Arg("chattur'gha").Arg("xel'lotath");
+		auto r = Response(Response::Code::OHAI).AddArg("chattur'gha").AddArg("xel'lotath");
 
 		THEN("the emitted response's arguments are both single-quoted") {
 			REQUIRE(r.Pack() == R"(OHAI 'chattur'\''gha' 'xel'\''lotath')");
@@ -47,7 +47,7 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed two arguments, one quoted, one unquoted") {
-		auto r = Response(Response::Code::OHAI).Arg("chattur'gha").Arg("ulyoath");
+		auto r = Response(Response::Code::OHAI).AddArg("chattur'gha").AddArg("ulyoath");
 
 		THEN("the emitted response's arguments are quoted accordingly") {
 			REQUIRE(r.Pack() == R"(OHAI 'chattur'\''gha' ulyoath)");
@@ -55,7 +55,7 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed a single argument with double quotes") {
-		auto r = Response(Response::Code::FILE).Arg(R"("scare"-quotes)");
+		auto r = Response(Response::Code::FILE).AddArg(R"("scare"-quotes)");
 
 		THEN("the emitted response's argument is single-quoted") {
 			REQUIRE(r.Pack() == R"(FILE '"scare"-quotes')");
@@ -63,7 +63,7 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed a single argument with whitespace") {
-		auto r = Response(Response::Code::END).Arg("pargon pargon pargon");
+		auto r = Response(Response::Code::END).AddArg("pargon pargon pargon");
 
 		THEN("the emitted response's argument is single-quoted") {
 			REQUIRE(r.Pack() == R"(END 'pargon pargon pargon')");
@@ -71,7 +71,7 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed several arguments with differing whitespace") {
-		auto r = Response(Response::Code::END).Arg("a space").Arg("new\nline").Arg("tab\tstop");
+		auto r = Response(Response::Code::END).AddArg("a space").AddArg("new\nline").AddArg("tab\tstop");
 
 		THEN("the emitted response's argument is single-quoted") {
 			REQUIRE(r.Pack() == "END 'a space' 'new\nline' 'tab\tstop'");
@@ -79,7 +79,7 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed a representative example with backslashes and spaces") {
-		auto r = Response(Response::Code::FILE).Arg(R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
+		auto r = Response(Response::Code::FILE).AddArg(R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
 
 		THEN("the emitted response's argument is single-quoted") {
 			REQUIRE(r.Pack() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
