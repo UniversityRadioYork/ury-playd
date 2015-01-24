@@ -17,9 +17,8 @@
 #include <sstream>
 #include <string>
 
-extern "C" {
-#include <mpg123.h>
-}
+// We don't include mpg123.h directly here, because mp3.hpp does some polyfills
+// before including it.
 
 #include "../../errors.hpp"
 #include "../../messages.h"

@@ -31,3 +31,4 @@ playd.tgz
 # Sublime Text
 *.sublime-project
 *.sublime-workspace
+*.nupkg

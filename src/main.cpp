@@ -103,7 +103,7 @@ void SetupAudioSystem(PipeAudioSystem &audio)
  * Reports usage information and exits.
  * @param progname The name of the program as executed.
  */
-[[noreturn]] void ExitWithUsage(const std::string &progname)
+void ExitWithUsage(const std::string &progname)
 {
 	std::cerr << "usage: " << progname << " ID [HOST] [PORT]\n";
 	std::cerr << "where ID is one of the following numbers:\n";
@@ -141,9 +141,9 @@ std::pair<std::string, std::string> GetHostAndPort(
  * @param port The TCP port to which playd tried to bind.
  * @param msg The exception's error message.
  */
-[[noreturn]] void ExitWithNetError(const std::string &host,
-                                   const std::string &port,
-                                   const std::string &msg)
+void ExitWithNetError(const std::string &host,
+                      const std::string &port,
+                      const std::string &msg)
 {
 	std::cerr << "Network error: " << msg << "\n";
 	std::cerr << "Is " << host << ":" << port << " available?\n";
@@ -154,7 +154,7 @@ std::pair<std::string, std::string> GetHostAndPort(
  * Exits with an error message for an unhandled exception.
  * @param msg The exception's error message.
  */
-[[noreturn]] void ExitWithError(const std::string &msg)
+void ExitWithError(const std::string &msg)
 {
 	std::cerr << "Unhandled exception in main loop: " << msg << std::endl;
 	exit(EXIT_FAILURE);
