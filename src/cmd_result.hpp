@@ -93,10 +93,10 @@ private:
 
 	/**
 	 * Map of types to their response codes.
-	 * @see ResponseCode
+	 * @see Response::Code
 	 * @see Type
 	 */
-	static const ResponseCode TYPE_CODES[];
+	static const Response::Code TYPE_CODES[];
 };
 
 #endif // PLAYD_CMD_RESULT

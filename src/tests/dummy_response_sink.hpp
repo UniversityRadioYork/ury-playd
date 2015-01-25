@@ -23,7 +23,7 @@ public:
 	DummyResponseSink(std::ostream &os);
 
 protected:
-	virtual void RespondRaw(const std::string &string) const;
+	virtual void Respond(const Response &response) const override;
 
 private:
 	/// Reference to the output stream.

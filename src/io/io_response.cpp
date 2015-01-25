@@ -14,40 +14,40 @@
 #include "../errors.hpp"
 #include "io_response.hpp"
 
-const std::string ResponseSink::STRINGS[] = {
-	"OK",       // ResponseCode::OK
-	"WHAT",     // ResponseCode::WHAT
-	"FAIL",     // ResponseCode::FAIL
-	"OHAI",     // ResponseCode::OHAI
-	"STATE",    // ResponseCode::STATE
-	"TIME",     // ResponseCode::TIME
-	"FILE",     // ResponseCode::FILE
-	"FEATURES", // ResponseCode::FEATURES
-	"END"       // ResponseCode::END
+const std::string Response::STRINGS[] = {
+        "OK",       // Code::OK
+        "WHAT",     // Code::WHAT
+        "FAIL",     // Code::FAIL
+        "OHAI",     // Code::OHAI
+        "STATE",    // Code::STATE
+        "TIME",     // Code::TIME
+        "FILE",     // Code::FILE
+        "FEATURES", // Code::FEATURES
+        "END"       // Code::END
 };
 
-void ResponseSink::Respond(ResponseCode code, const std::string &message) const
+Response::Response(Response::Code code)
 {
-	this->RespondArgs(code, std::vector<std::string>(1, message));
+	this->string = Response::STRINGS[static_cast<int>(code)];
 }
 
-void ResponseSink::RespondArgs(ResponseCode code,
-                               const std::vector<std::string> &arguments) const
+Response &Response::AddArg(const std::string &arg)
 {
-	std::ostringstream os;
-	os << ResponseSink::STRINGS[static_cast<int>(code)];
-	for (auto argument : arguments) {
-		os << " " << this->EscapeArgument(argument);
-	}
-	this->RespondRaw(os.str());
+	this->string += " " + Response::EscapeArg(arg);
+	return *this;
 }
 
-/* static */ std::string ResponseSink::EscapeArgument(const std::string &argument)
+std::string Response::Pack() const
+{
+	return this->string;
+}
+
+/* static */ std::string Response::EscapeArg(const std::string &arg)
 {
 	bool escaping = false;
 	std::string escaped;
 
-	for (unsigned char c : argument) {
+	for (unsigned char c : arg) {
 		// These are the characters (including all whitespace, via
 		// isspace())  whose presence means we need to single-quote
 		// escape the argument.
@@ -68,17 +68,10 @@ void ResponseSink::RespondArgs(ResponseCode code,
 }
 
 //
-// ResponseSource
+// ResponseSink
 //
 
-ResponseSource::ResponseSource(const ResponseSink *push_sink)
-    : push_sink(push_sink)
+void ResponseSink::Respond(const Response &) const
 {
-}
-
-void ResponseSource::Push() const
-{
-	// Having no push_sink is entirely normal, and implies that the
-	// ResponseSource's responses are to be ignored.
-	if (this->push_sink != nullptr) this->Emit(*this->push_sink);
+	// By default, do nothing.
 }

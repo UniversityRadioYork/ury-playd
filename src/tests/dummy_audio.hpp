@@ -30,10 +30,8 @@ public:
 	/// Constructs a new DummyAudioSystem.
 	DummyAudioSystem();
 
-	Audio *Load(const std::string &path) const override;
-	void SetDeviceID(int id) override;
-	std::vector<AudioSystem::Device> GetDevicesInfo() override;
-	bool IsOutputDevice(int id) override;
+	std::unique_ptr<Audio> Null() const override;
+	std::unique_ptr<Audio> Load(const std::string &path) const override;
 
 	// These fields left public for purposes of easy testing.
 
@@ -61,12 +59,11 @@ public:
 	 */
 	DummyAudio(DummyAudioSystem &sys);
 
-	void Start() override;
-	void Stop() override;
+	void SetPlaying(bool playing) override;
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(const ResponseSink &sink) const override;
+	void Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink) override;
 	std::uint64_t Position() const override;
 
 private:
@@ -80,5 +77,29 @@ private:
 	 */
 	DummyAudioSystem &sys;
 };
+
+/// Dummy AudioSource for testing.
+class DummyAudioSource : public AudioSource
+{
+public:
+	/// Constructs a DummyAudioSource.
+	DummyAudioSource(const std::string &path) : AudioSource(path) {};
+
+	/**
+	 * Helper function for creating uniquely pointed-to Mp3AudioSources.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 * @return A unique pointer to a Mp3AudioSource for the given path.
+	 */
+	static std::unique_ptr<AudioSource> Build(const std::string &path);
+
+	DecodeResult Decode() override;
+	std::uint64_t Seek(std::uint64_t position) override;
+
+	std::uint8_t ChannelCount() const override;
+	std::uint32_t SampleRate() const override;
+	SampleFormat OutputSampleFormat() const override;
+};
+
 
 #endif // PLAYD_DUMMY_AUDIO_HPP

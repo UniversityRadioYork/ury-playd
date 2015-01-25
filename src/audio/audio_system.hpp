@@ -10,21 +10,13 @@
 #ifndef PLAYD_AUDIO_SYSTEM_HPP
 #define PLAYD_AUDIO_SYSTEM_HPP
 
+#include <functional>
 #include <string>
 #include <utility>
 
-#include "portaudiocpp/SampleDataFormat.hxx"
-#include "portaudiocpp/Stream.hxx"
-namespace portaudio
-{
-class CallbackInterface;
-class Device;
-}
-
-#include "../sample_formats.hpp"
+#include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
-#include "audio.hpp"
 
 /**
  * An AudioSystem represents the entire audio stack used by playd.
@@ -33,94 +25,92 @@ class Device;
  * enumerating and resolving device IDs, and initialising and terminating the
  * audio libraries.
  *
- * This is an abstract class, implemented primarily by SoxPaAudioSystem.
+ * This is an abstract class, implemented primarily by PipeAudioSystem.
  *
- * @see SoxPaAudioSystem
+ * @see PipeAudioSystem
  * @see Audio
  */
 class AudioSystem
 {
 public:
-	/// Type for device entries.
-	typedef std::pair<int, std::string> Device;
+	/**
+	 * Creates an Audio for a lack of audio.
+	 * @return A unique pointer to a dummy Audio.
+	 */
+	virtual std::unique_ptr<Audio> Null() const = 0;
 
 	/**
 	 * Loads a file, creating an Audio for it.
 	 * @param path The path to a file.
-	 * @return The Audio for that file.
+	 * @return A unique pointer to the Audio for that file.
 	 */
-	virtual Audio *Load(const std::string &path) const = 0;
-
-	/**
-	 * Sets the current device ID.
-	 * @param id The device ID to use for subsequent Audios.
-	 */
-	virtual void SetDeviceID(int id) = 0;
-
-	/**
-	 * Gets the number and name of each output device entry in the
-	 * AudioSystem.
-	 * @return List of output devices, as strings.
-	 */
-	virtual std::vector<AudioSystem::Device> GetDevicesInfo() = 0;
-
-	/**
-	 * Can a sound device output sound?
-	 * @param id Device ID.
-	 * @return If the device can handle outputting sound.
-	 */
-	virtual bool IsOutputDevice(int id) = 0;
+	virtual std::unique_ptr<Audio> Load(const std::string &path) const = 0;
 };
 
 /**
- * Implementation of AudioSystem using libsox and PortAudio.
+ * A modular AudioSystem that constructs PipeAudio.
  *
- * PaSoxAudioSystem is a RAII-style class: it loads the audio libraries on
- * construction and unloads them on termination.  As such, it's probably not
- * wise to construct multiple AudioSystem instances.
+ * PipeAudioSystem creates Audio by chaining together audio _sources_, selected
+ * by file extension, and an audio _sink_.
+ *
+ * @see PipeAudio
+ * @see AudioSink
+ * @see AudioSource
  */
-class PaSoxAudioSystem : public AudioSystem, public AudioSinkConfigurator
+class PipeAudioSystem : public AudioSystem
 {
 public:
-	/**
-	 * Constructs a PaSoxAudioSystem, initialising its libraries.
-	 * This sets the current device ID to a sane default; use SetDeviceID
-	 * to change it.
-	 */
-	PaSoxAudioSystem();
+	/// Type for functions that construct sinks.
+	using SinkBuilder =
+	        std::function<std::unique_ptr<AudioSink>(const AudioSource &, int)>;
+
+	/// Type for functions that construct sources.
+	using SourceBuilder =
+	        std::function<std::unique_ptr<AudioSource>(const std::string &)>;
 
 	/**
-	 * Destructs an PaSoxAudioSystem, uninitialising its libraries.
+	 * Constructs a PipeAudioSystem.
+	 * @param device_id The device ID to which sinks shall output.
 	 */
-	virtual ~PaSoxAudioSystem();
+	PipeAudioSystem(int device_id);
 
 	// AudioSystem implementation
-	Audio *Load(const std::string &path) const override;
-	void SetDeviceID(int id) override;
-	std::vector<AudioSystem::Device> GetDevicesInfo() override;
-	bool IsOutputDevice(int id) override;
+	std::unique_ptr<Audio> Null() const override;
+	std::unique_ptr<Audio> Load(const std::string &path) const override;
 
-	// AudioSinkConfigurator implementation
-	portaudio::Stream *Configure(
-	                const AudioSource &source,
-	                portaudio::CallbackInterface &cb) const override;
+	/**
+	 * Sets the sink to use for outputting sound.
+	 * @param sink The function to use when building sinks.
+	 */
+	void SetSink(SinkBuilder sink);
+
+	/**
+	 * Assign an AudioSource for a file extension.
+	 * @param exts The file extension to associate with this source.
+	 * @param source The function to use when building source.
+	 * @note If two AddSource invocations name the first file extension,
+	 *   the first is used for said extension.
+	 */
+	void AddSource(const std::string &ext, SourceBuilder source);
 
 private:
-	std::string device_id; ///< The current device ID.
+	/// The device ID for the sink.
+	int device_id;
+
+	/// The current sink builder.
+	SinkBuilder sink;
+
+	/// Map from file extensions to source builders.
+	std::map<std::string, SourceBuilder> sources;
 
 	/**
-	 * Converts a string device ID to a PortAudio device.
-	 * @param id_string The device ID, as a string.
-	 * @return The device.
+	 * Loads a file, creating an AudioSource.
+	 * @param path The path to the file to load.
+	 * @return An AudioSource pointer (may be nullptr, if no available
+	 *   and suitable AudioSource was found).
+	 * @see Load
 	 */
-	static const portaudio::Device &PaDevice(const std::string &id_string);
-
-	/**
-	 * Converts a sample format identifier from playd to PortAudio.
-	 * @param fmt The playd sample format identifier.
-	 * @return The PortAudio equivalent of the given SampleFormat.
-	 */
-	static portaudio::SampleDataFormat PaFormat(SampleFormat fmt);
+	std::unique_ptr<AudioSource> LoadSource(const std::string &path) const;
 };
 
 #endif // PLAYD_AUDIO_SYSTEM_HPP

@@ -1,129 +1,162 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\audio\audio.cpp" />
-    <ClCompile Include="src\audio\audio_sink.cpp" />
-    <ClCompile Include="src\audio\audio_source.cpp" />
-    <ClCompile Include="src\audio\audio_system.cpp" />
-    <ClCompile Include="src\audio\ringbuffer.cpp" />
-    <ClCompile Include="src\cmd.cpp" />
-    <ClCompile Include="src\cmd_result.cpp" />
-    <ClCompile Include="src\contrib\pa_ringbuffer\pa_ringbuffer.c" />
-    <ClCompile Include="src\errors.cpp" />
-    <ClCompile Include="src\io\io_core.cpp" />
-    <ClCompile Include="src\io\io_response.cpp" />
-    <ClCompile Include="src\io\tokeniser.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\player\player.cpp" />
-    <ClCompile Include="src\player\player_file.cpp" />
-    <ClCompile Include="src\player\player_position.cpp" />
-    <ClCompile Include="src\player\player_state.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\audio\audio.hpp" />
-    <ClInclude Include="src\audio\audio_sink.hpp" />
-    <ClInclude Include="src\audio\audio_source.hpp" />
-    <ClInclude Include="src\audio\audio_system.hpp" />
-    <ClInclude Include="src\audio\ringbuffer.hpp" />
-    <ClInclude Include="src\cmd.hpp" />
-    <ClInclude Include="src\cmd_result.hpp" />
-    <ClInclude Include="src\contrib\pa_ringbuffer\pa_memorybarrier.h" />
-    <ClInclude Include="src\contrib\pa_ringbuffer\pa_ringbuffer.h" />
-    <ClInclude Include="src\errors.hpp" />
-    <ClInclude Include="src\io\io_core.hpp" />
-    <ClInclude Include="src\io\io_response.hpp" />
-    <ClInclude Include="src\io\tokeniser.hpp" />
-    <ClInclude Include="src\main.hpp" />
-    <ClInclude Include="src\messages.h" />
-    <ClInclude Include="src\player\player.hpp" />
-    <ClInclude Include="src\player\player_file.hpp" />
-    <ClInclude Include="src\player\player_position.hpp" />
-    <ClInclude Include="src\player\player_state.hpp" />
-    <ClInclude Include="src\resource.h" />
-    <ClInclude Include="src\sample_formats.hpp" />
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectGuid>{625EC8F2-633C-4666-BC4B-25F6BECABA31}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
-    <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="Debug|Win32">
+			<Configuration>Debug</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|Win32">
+			<Configuration>Release</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<ItemGroup>
+		<ClCompile Include="src\audio\audio.cpp" />
+		<ClCompile Include="src\audio\audio_sink.cpp" />
+		<ClCompile Include="src\audio\audio_source.cpp" />
+		<ClCompile Include="src\audio\audio_system.cpp" />
+		<ClCompile Include="src\audio\ringbuffer.cpp" />
+		<ClCompile Include="src\audio\sample_formats.cpp" />
+		<ClCompile Include="src\audio\sources\flac.cpp" />
+		<ClCompile Include="src\audio\sources\mp3.cpp" />
+		<ClCompile Include="src\audio\sources\sndfile.cpp" />
+		<ClCompile Include="src\cmd.cpp" />
+		<ClCompile Include="src\cmd_result.cpp" />
+		<ClCompile Include="src\contrib\pa_ringbuffer\pa_ringbuffer.c" />
+		<ClCompile Include="src\errors.cpp" />
+		<ClCompile Include="src\io\io_core.cpp" />
+		<ClCompile Include="src\io\io_response.cpp" />
+		<ClCompile Include="src\io\tokeniser.cpp" />
+		<ClCompile Include="src\main.cpp" />
+		<ClCompile Include="src\player\player.cpp" />
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\audio\audio.hpp" />
+		<ClInclude Include="src\audio\audio_sink.hpp" />
+		<ClInclude Include="src\audio\audio_source.hpp" />
+		<ClInclude Include="src\audio\audio_system.hpp" />
+		<ClInclude Include="src\audio\ringbuffer.hpp" />
+		<ClInclude Include="src\audio\sample_formats.hpp" />
+		<ClInclude Include="src\audio\sources\flac.hpp" />
+		<ClInclude Include="src\audio\sources\mp3.hpp" />
+		<ClInclude Include="src\audio\sources\sndfile.hpp" />
+		<ClInclude Include="src\cmd.hpp" />
+		<ClInclude Include="src\cmd_result.hpp" />
+		<ClInclude Include="src\contrib\pa_ringbuffer\pa_memorybarrier.h" />
+		<ClInclude Include="src\contrib\pa_ringbuffer\pa_ringbuffer.h" />
+		<ClInclude Include="src\errors.hpp" />
+		<ClInclude Include="src\io\io_core.hpp" />
+		<ClInclude Include="src\io\io_response.hpp" />
+		<ClInclude Include="src\io\tokeniser.hpp" />
+		<ClInclude Include="src\main.hpp" />
+		<ClInclude Include="src\messages.h" />
+		<ClInclude Include="src\player\player.hpp" />
+		<ClInclude Include="src\resource.h" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="packages.config">
+			<SubType>Designer</SubType>
+		</None>
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<ProjectGuid>{625EC8F2-633C-4666-BC4B-25F6BECABA31}</ProjectGuid>
+		<Keyword>Win32Proj</Keyword>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v120</PlatformToolset>
+		<UseOfMfc>false</UseOfMfc>
+		<CharacterSet>Unicode</CharacterSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<PlatformToolset>v120</PlatformToolset>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings">
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Label="UserMacros">
+		<NuGetPackageImportStamp>33725eb4</NuGetPackageImportStamp>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<LinkIncremental>true</LinkIncremental>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<LinkIncremental>true</LinkIncremental>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<ClCompile>
+			<PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WITH_FLAC;WITH_MP3;WITH_SNDFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+			<WarningLevel>Level3</WarningLevel>
+			<DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+			<Optimization>Disabled</Optimization>
+			<AdditionalIncludeDirectories>
 				include;
 				%(AdditionalIncludeDirectories)
 			</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>
+		</ClCompile>
+		<Link>
+			<TargetMachine>MachineX86</TargetMachine>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+			<SubSystem>Console</SubSystem>
+			<AdditionalLibraryDirectories>
 				lib;
 				%(AdditionalLibraryDirectories)
 			</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Ws2_32.lib;libsox.lib;portaudio_x86.lib;portaudiocpp-vc7_1-d.lib;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <Link>
-      <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
-  </ItemDefinitionGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+			<AdditionalDependencies>Ws2_32.lib;
+				libsndfile-1.lib;
+				libFLAC++_dynamic.lib;
+				libmpg123-0.lib
+;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<ClCompile>
+			<PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WITH_FLAC;WITH_MP3;WITH_SNDFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+			<WarningLevel>Level3</WarningLevel>
+			<DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+			<Optimization>Disabled</Optimization>
+			<AdditionalIncludeDirectories>
+				include;
+				%(AdditionalIncludeDirectories)
+			</AdditionalIncludeDirectories>
+		</ClCompile>
+		<Link>
+			<TargetMachine>MachineX86</TargetMachine>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+			<SubSystem>Console</SubSystem>
+			<AdditionalLibraryDirectories>
+				lib;
+				%(AdditionalLibraryDirectories)
+			</AdditionalLibraryDirectories>
+			<AdditionalDependencies>Ws2_32.lib;
+				libsndfile-1.lib;
+				libFLAC++_dynamic.lib;
+				libmpg123-0.lib
+;libuv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+	</ItemDefinitionGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets">
+		<Import Project="packages\sdl2.redist.2.0.3\build\native\sdl2.redist.targets" Condition="Exists('packages\sdl2.redist.2.0.3\build\native\sdl2.redist.targets')" />
+		<Import Project="packages\sdl2.2.0.3\build\native\sdl2.targets" Condition="Exists('packages\sdl2.2.0.3\build\native\sdl2.targets')" />
+	</ImportGroup>
+	<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+		<PropertyGroup>
+			<ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+		</PropertyGroup>
+		<Error Condition="!Exists('packages\sdl2.redist.2.0.3\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\sdl2.redist.2.0.3\build\native\sdl2.redist.targets'))" />
+		<Error Condition="!Exists('packages\sdl2.2.0.3\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\sdl2.2.0.3\build\native\sdl2.targets'))" />
+	</Target>
 </Project>

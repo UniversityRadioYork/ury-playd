@@ -3,134 +3,74 @@
 
 /**
  * @file
- * Implementation of the PaSoxAudioSystem class.
+ * Implementation of the PipeAudioSystem class.
  * @see audio/audio_system.hpp
  */
 
 #include <algorithm>
+#include <cassert>
+#include <functional>
 #include <map>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
-extern "C" {
-#include <sox.h>
-#include "portaudio.h"
-}
-
-#include "portaudiocpp/Device.hxx"
-#include "portaudiocpp/DirectionSpecificStreamParameters.hxx"
-#include "portaudiocpp/InterfaceCallbackStream.hxx"
-#include "portaudiocpp/SampleDataFormat.hxx"
-#include "portaudiocpp/Stream.hxx"
-#include "portaudiocpp/StreamParameters.hxx"
-#include "portaudiocpp/System.hxx"
-#include "portaudiocpp/SystemDeviceIterator.hxx"
-namespace portaudio
-{
-class CallbackInterface;
-}
-
 #include "../errors.hpp"
 #include "../messages.h"
-#include "../sample_formats.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
 #include "audio_system.hpp"
+#include "sample_formats.hpp"
 
-PaSoxAudioSystem::PaSoxAudioSystem()
+#include "sources/flac.hpp"
+#include "sources/mp3.hpp"
+#include "sources/sndfile.hpp"
+
+PipeAudioSystem::PipeAudioSystem(int device_id)
+    : device_id(device_id),
+      sink([](const AudioSource &, int) -> std::unique_ptr<AudioSink> {
+	      throw InternalError("No audio sink!");
+      })
 {
-	portaudio::System::initialize();
-	sox_format_init();
-
-	this->device_id = -1;
 }
 
-PaSoxAudioSystem::~PaSoxAudioSystem()
+std::unique_ptr<Audio> PipeAudioSystem::Null() const
 {
-	portaudio::System::terminate();
-	sox_format_quit();
+	return std::unique_ptr<Audio>(new NoAudio());
 }
 
-std::vector<AudioSystem::Device> PaSoxAudioSystem::GetDevicesInfo()
+std::unique_ptr<Audio> PipeAudioSystem::Load(const std::string &path) const
 {
-	auto &pa = portaudio::System::instance();
-	std::vector<AudioSystem::Device> list;
+	std::unique_ptr<AudioSource> source = this->LoadSource(path);
+	assert(source != nullptr);
 
-	for (auto d = pa.devicesBegin(); d != pa.devicesEnd(); ++d) {
-		if (!(*d).isInputOnlyDevice()) {
-			list.push_back(std::make_pair((*d).index(), (*d).name()));
-		}
+	auto sink = this->sink(*source, this->device_id);
+	return std::unique_ptr<Audio>(
+	        new PipeAudio(std::move(source), std::move(sink)));
+}
+
+std::unique_ptr<AudioSource> PipeAudioSystem::LoadSource(
+        const std::string &path) const
+{
+	size_t extpoint = path.find_last_of('.');
+	std::string ext = path.substr(extpoint + 1);
+
+	auto ibuilder = this->sources.find(ext);
+	if (ibuilder == this->sources.end()) {
+		throw FileError("Unknown file format: " + ext);
 	}
-	return list;
+
+	return (ibuilder->second)(path);
 }
 
-bool PaSoxAudioSystem::IsOutputDevice(int id)
+void PipeAudioSystem::SetSink(PipeAudioSystem::SinkBuilder sink)
 {
-	auto &pa = portaudio::System::instance();
-	if (id < 0 || id >= pa.deviceCount()) return false;
-
-	portaudio::Device &dev = pa.deviceByIndex(id);
-	return !dev.isInputOnlyDevice();
+	this->sink = sink;
 }
 
-void PaSoxAudioSystem::SetDeviceID(int id)
+void PipeAudioSystem::AddSource(const std::string &ext,
+                                PipeAudioSystem::SourceBuilder source)
 {
-	this->device_id = std::to_string(id);
-}
-
-Audio *PaSoxAudioSystem::Load(const std::string &path) const
-{
-	auto source = new AudioSource(path);
-	auto sink = new AudioSink(*source, *this);
-	return new PipeAudio(source, sink);
-}
-
-portaudio::Stream *PaSoxAudioSystem::Configure(const AudioSource &source,
-                                               portaudio::CallbackInterface &cb) const
-{
-	std::uint8_t channel_count = source.ChannelCount();
-	SampleFormat sample_format = source.OutputSampleFormat();
-	double sample_rate = source.SampleRate();
-	size_t buffer_size = source.BufferSampleCapacity();
-	const portaudio::Device &device = PaDevice(this->device_id);
-
-	portaudio::DirectionSpecificStreamParameters out_pars(
-	                device, channel_count, PaFormat(sample_format), true,
-	                device.defaultLowOutputLatency(), nullptr);
-
-	portaudio::StreamParameters pars(
-	                portaudio::DirectionSpecificStreamParameters::null(),
-	                out_pars, sample_rate, buffer_size, paClipOff);
-
-	return new portaudio::InterfaceCallbackStream(pars, cb);
-}
-
-/* static */ const portaudio::Device &PaSoxAudioSystem::PaDevice(
-                const std::string &id)
-{
-	auto &pa = portaudio::System::instance();
-
-	PaDeviceIndex id_pa = std::stoi(id);
-	if (pa.deviceCount() <= id_pa) throw ConfigError(MSG_DEV_BADID);
-	return pa.deviceByIndex(id_pa);
-}
-
-/// Mappings from SampleFormats to their equivalent PaSampleFormats.
-static const std::map<SampleFormat, portaudio::SampleDataFormat> pa_from_sf = {
-	{ SampleFormat::PACKED_UNSIGNED_INT_8, portaudio::UINT8 },
-	{ SampleFormat::PACKED_SIGNED_INT_16, portaudio::INT16 },
-	{ SampleFormat::PACKED_SIGNED_INT_32, portaudio::INT32 },
-	{ SampleFormat::PACKED_FLOAT_32, portaudio::FLOAT32 }
-};
-
-/* static */ portaudio::SampleDataFormat PaSoxAudioSystem::PaFormat(
-                SampleFormat fmt)
-{
-	try {
-		return pa_from_sf.at(fmt);
-	} catch (std::out_of_range) {
-		throw FileError(MSG_DECODE_BADRATE);
-	}
+	this->sources.emplace(ext, source);
 }

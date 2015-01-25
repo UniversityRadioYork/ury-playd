@@ -10,22 +10,28 @@
 #ifndef PLAYD_AUDIO_SOURCE_HPP
 #define PLAYD_AUDIO_SOURCE_HPP
 
-#include <array>
 #include <cstdint>
 #include <string>
 #include <vector>
 
-#include <sox.h>
-
 #include "../errors.hpp"
-#include "../sample_formats.hpp"
+#include "sample_formats.hpp"
 
 /**
  * An object responsible for decoding an audio file.
  *
- * The AudioSource is an interface to the ffmpeg library, which represents all
- * the ffmpeg state associated with one file.  It can be polled to decode
- * frames of audio data, which are returned as byte vectors.
+ * AudioSource is an abstract base class, implemented separately for each
+ * supported audio file format.
+ *
+ * @see FlacAudioSource
+ * @see Mp3AudioSource
+ * @see OggAudioSource
+ *
+ * @note When we refer to 'samples' in this class, this usually refers to
+ *   the smallest unit of data for *all* channels.  Some audio decoders
+ *   call the smallest unit of data for one channel a 'sample'--so that
+ *   there are exactly ChannelCount() of their samples to one of ours.
+ *   We usually call this a 'mono sample'.
  */
 class AudioSource
 {
@@ -46,24 +52,16 @@ public:
 	/// Type of the result of Decode().
 	typedef std::pair<DecodeState, DecodeVector> DecodeResult;
 
-	/// Type for the count of bytes per sample.
-	typedef int SampleByteCount;
-
 	/**
 	 * Constructs an AudioSource.
-	 * @param path The path to the file to load and decode using this
-	 *   decoder.
+	 * @param path The path to the file from which this AudioSource is
+	 *   decoding.
 	 */
 	AudioSource(const std::string &path);
 
-	/// Destructs an AudioSource.
-	~AudioSource();
-
-	/**
-	 * Gets the file-path of this audio source's audio file.
-	 * @return The audio file's path.
-	 */
-	std::string Path() const;
+	//
+	// Methods that must be overridden
+	//
 
 	/**
 	 * Performs a round of decoding.
@@ -71,48 +69,53 @@ public:
 	 *   round and the vector of bytes decoded.  The vector may be empty,
 	 *   if the decoding round did not finish off a frame.
 	 */
-	DecodeResult Decode();
+	virtual DecodeResult Decode() = 0;
 
 	/**
 	 * Returns the channel count.
 	 * @return The number of channels this AudioSource is decoding.
 	 */
-	std::uint8_t ChannelCount() const;
+	virtual std::uint8_t ChannelCount() const = 0;
 
 	/**
 	 * Returns the sample rate.
-	 * @return The output sample rate (Hz) as a double-precision floating
-	 * point.
+	 * Should fail if, for some peculiar reason, the sample rate is above
+	 * ((2^31) - 1)Hz; this probably implies something is wrong anyway.
+	 * @return The output sample rate (Hz) as a 32-bit unsigned integer.
 	 */
-	double SampleRate() const;
+	virtual std::uint32_t SampleRate() const = 0;
 
 	/**
 	 * Returns the output sample format.
 	 * @return The output sample format, as a SampleFormat.
 	 */
-	static SampleFormat OutputSampleFormat();
+	virtual SampleFormat OutputSampleFormat() const = 0;
 
 	/**
-	 * Returns the number of samples this decoder's buffer can store.
-	 * @return The buffer sample capacity, in samples.
+	 * Seeks to the given position, in samples.
+	 * For convenience, the new position (in terms of samples) is returned.
+	 * @param in_samples  The new position in the file, in samples.
+	 * @return The new position in the file, in samples.
 	 */
-	size_t BufferSampleCapacity() const;
+	virtual std::uint64_t Seek(std::uint64_t position) = 0;
+
+	//
+	// Methods provided 'for free'
+	//
 
 	/**
 	 * Returns the number of bytes for each sample this decoder outputs.
 	 * As the decoder returns packed samples, this includes the channel
-	 *   count as a factor.
+	 * count as a factor.
 	 * @return The number of bytes per sample.
 	 */
 	size_t BytesPerSample() const;
 
 	/**
-	 * Seeks to the given position, in microseconds.
-	 * For convenience, the new position (in terms of samples) is returned.
-	 * @param position  The new position in the file, in microseconds.
-	 * @return The new position in the file, in samples.
+	 * Gets the file-path of this audio source's audio file.
+	 * @return The audio file's path.
 	 */
-	std::uint64_t Seek(std::uint64_t position);
+	const std::string &Path() const;
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
@@ -128,27 +131,9 @@ public:
 	 */
 	std::uint64_t MicrosFromSamples(std::uint64_t samples) const;
 
-private:
-	/// The size of the internal decoding buffer, in bytes.
-	static const size_t BUFFER_SIZE;
-
-	/// The current state of decoding.
-	/// @see DecodeState
-	DecodeState decode_state;
-
-	std::vector<uint8_t> buffer; ///< The decoding buffer.
-
-	/// Pointer to the SoX context associated with this source.
-	sox_format_t *context;
-
-	/**
-	 * Opens a new file for this AudioSource.
-	 * @param path The absolute path to the audio file to load.
-	 */
-	void Open(const std::string &path);
-
-	/// Closes the AudioSource's current file.
-	void Close();
+protected:
+	/// The file-path of this AudioSource's audio file.
+	std::string path;
 };
 
 #endif // PLAYD_AUDIO_SOURCE_HPP

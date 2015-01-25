@@ -5,9 +5,6 @@
  * @file
  * Declaration of the Player class, and associated types.
  * @see player/player.cpp
- * @see player/player_position.hpp
- * @see player/player_position.cpp
- * @see player/player_state.cpp
  */
 
 #ifndef PLAYD_PLAYER_HPP
@@ -20,28 +17,23 @@
 #include <utility>
 #include <vector>
 
+#include "../audio/audio_system.hpp"
 #include "../audio/audio.hpp"
 #include "../io/io_response.hpp"
 #include "../cmd_result.hpp"
 
-#include "player_file.hpp"
-#include "player_position.hpp"
-#include "player_state.hpp"
-
 /**
- * A Player contains a loaded audio file and the state of its playback.
- * @see PlayerPosition
- * @see PlayerState
+ * A Player contains a loaded audio file and a command API for manipulating it.
+ * @see Audio
+ * @see AudioSystem
  */
 class Player
 {
 private:
-	PlayerFile &file;         ///< The file subcomponent of the Player.
-	PlayerPosition &position; ///< The position subcomponent of the Player.
-	PlayerState &state;       ///< The state subcomponent of the Player.
-
-	/// The sink to which END responses shall be sent.
-	const ResponseSink *end_sink;
+	AudioSystem &audio;          ///< The system used for loading audio.
+	std::unique_ptr<Audio> file; ///< The currently loaded Audio.
+	bool is_running;             ///< Whether the Player is running.
+	const ResponseSink *sink;    ///< The sink for audio responses.
 
 	/// The set of features playd implements.
 	const static std::vector<std::string> FEATURES;
@@ -49,19 +41,21 @@ private:
 public:
 	/**
 	 * Constructs a Player.
-	 * @param end_sink The sink to which END notifications are sent.
-	 * @param file The player's audio-file component.
-	 * @param position The player's position component.
-	 * @param state The player's state component.
+	 * @param audio The AudioSystem to be used by the player.
 	 */
-	Player(const ResponseSink *end_sink, PlayerFile &file,
-	       PlayerPosition &position, PlayerState &state);
+	Player(AudioSystem &audio);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;
 
 	/// Deleted copy-assignment constructor.
 	Player &operator=(const Player &) = delete;
+
+	/**
+	 * Sets the sink to which this Player shall send responses.
+	 * @param sink The response sink.
+	 */
+	void SetSink(ResponseSink &sink);
 
 	//
 	// Commands
@@ -150,12 +144,25 @@ public:
 
 private:
 	/**
-	 * Parses a time string into a pair of unit prefix and timestamp.
-	 * @param time_str The time string to parse.
-	 * @return A pair of unit prefix and timestamp.
+	 * Tells the audio file to start or stop playing.
+	 * @param playing True if playing; false otherwise.
+	 * @see Play
+	 * @see Stop
 	 */
-	std::pair<std::string, std::uint64_t> ParseSeekTime(
-	                const std::string &time_str) const;
+	CommandResult SetPlaying(bool playing);
+
+	/**
+	 * Parses time_str as a seek timestamp.
+	 * @param time_str The time string to be parsed.
+	 * @return The parsed time.
+	 * @exception std::out_of_range
+	 *   See http://www.cplusplus.com/reference/string/stoull/#exceptions
+	 * @exception std::invalid_argument
+	 *   See http://www.cplusplus.com/reference/string/stoull/#exceptions
+	 * @exception SeekError
+	 *   Raised if checks beyond those done by stoull fail.
+	 */
+	std::uint64_t SeekParse(const std::string &time_str);
 
 	/**
 	 * Performs an actual seek.

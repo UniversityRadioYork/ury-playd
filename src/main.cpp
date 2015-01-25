@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
+#include <tuple>
 
 #include "audio/audio_system.hpp"
 #include "io/io_core.hpp"
@@ -18,7 +19,146 @@
 #include "cmd.hpp"
 #include "messages.h"
 
-#include "main.hpp"
+#ifdef WITH_FLAC
+#include "audio/sources/flac.hpp"
+#endif // WITH_FLAC
+#ifdef WITH_MP3
+#include "audio/sources/mp3.hpp"
+#endif // WITH_MP3
+#ifdef WITH_SNDFILE
+#include "audio/sources/sndfile.hpp"
+#endif // WITH_SNDFILE
+
+/// The default IP hostname on which playd will bind.
+static const std::string DEFAULT_HOST = "0.0.0.0";
+
+/// The default TCP port on which playd will bind.
+static const std::string DEFAULT_PORT = "1350";
+
+/**
+ * Creates a vector of strings from a C-style argument vector.
+ * @param argc Program argument count.
+ * @param argv Program argument vector.
+ * @return The argument vector, as a C++ string vector.
+ */
+std::vector<std::string> MakeArgVector(int argc, char *argv[])
+{
+	std::vector<std::string> args;
+	for (int i = 0; i < argc; i++) args.emplace_back(argv[i]);
+	return args;
+}
+
+/**
+ * Tries to get the output device ID from program arguments.
+ * @param args The program argument vector.
+ * @return The device ID, -1 if invalid selection (or none).
+ */
+int GetDeviceID(const std::vector<std::string> &args)
+{
+	// Did the user provide an ID at all?
+	if (args.size() < 2) return -1;
+
+	// Only accept valid numbers (stoi will throw for invalid ones).
+	int id;
+	try {
+		id = std::stoi(args.at(1));
+	} catch (...) {
+		// Only std::{invalid_argument,out_of_range} are thrown here.
+		return -1;
+	}
+
+	// Only allow valid, outputtable devices; reject input-only devices.
+	if (!SdlAudioSink::IsOutputDevice(id)) return -1;
+
+	return id;
+}
+
+/**
+ * Sets up the audio system with the desired sources and sinks.
+ * @param audio The audio system to configure.
+ */
+void SetupAudioSystem(PipeAudioSystem &audio)
+{
+	audio.SetSink(&SdlAudioSink::Build);
+
+// Now set up the available sources.
+#ifdef WITH_FLAC
+	audio.AddSource("flac", &FlacAudioSource::Build);
+#endif // WITH_FLAC
+
+#ifdef WITH_MP3
+	mpg123_init();
+	atexit(mpg123_exit);
+	audio.AddSource("mp3", &Mp3AudioSource::Build);
+#endif // WITH_MP3
+
+#ifdef WITH_SNDFILE
+	audio.AddSource("flac", &SndfileAudioSource::Build);
+	audio.AddSource("ogg", &SndfileAudioSource::Build);
+	audio.AddSource("wav", &SndfileAudioSource::Build);
+#endif // WITH_SNDFILE
+}
+
+/**
+ * Reports usage information and exits.
+ * @param progname The name of the program as executed.
+ */
+void ExitWithUsage(const std::string &progname)
+{
+	std::cerr << "usage: " << progname << " ID [HOST] [PORT]\n";
+	std::cerr << "where ID is one of the following numbers:\n";
+
+	// Show the user the valid device IDs they can use.
+	auto device_list = SdlAudioSink::GetDevicesInfo();
+	for (const auto &device : device_list) {
+		std::cerr << "\t" << device.first << ": " << device.second
+		          << "\n";
+	}
+
+	std::cerr << "default HOST: " << DEFAULT_HOST << "\n";
+	std::cerr << "default PORT: " << DEFAULT_PORT << "\n";
+
+	exit(EXIT_FAILURE);
+}
+
+/**
+ * Gets the host and port from the program arguments.
+ * The default arguments are used if the host and/or port are not supplied.
+ * @param args The program argument vector.
+ * @return A pair of strings representing the hostname and port.
+ */
+std::pair<std::string, std::string> GetHostAndPort(
+        const std::vector<std::string> &args)
+{
+	auto size = args.size();
+	return std::make_pair(size > 2 ? args.at(2) : DEFAULT_HOST,
+	                      size > 3 ? args.at(3) : DEFAULT_PORT);
+}
+
+/**
+ * Exits with an error message for a network error.
+ * @param host The IP host to which playd tried to bind.
+ * @param port The TCP port to which playd tried to bind.
+ * @param msg The exception's error message.
+ */
+void ExitWithNetError(const std::string &host,
+                      const std::string &port,
+                      const std::string &msg)
+{
+	std::cerr << "Network error: " << msg << "\n";
+	std::cerr << "Is " << host << ":" << port << " available?\n";
+	exit(EXIT_FAILURE);
+}
+
+/**
+ * Exits with an error message for an unhandled exception.
+ * @param msg The exception's error message.
+ */
+void ExitWithError(const std::string &msg)
+{
+	std::cerr << "Unhandled exception in main loop: " << msg << std::endl;
+	exit(EXIT_FAILURE);
+}
 
 /**
  * The main entry point.
@@ -28,94 +168,38 @@
  */
 int main(int argc, char *argv[])
 {
-	Playd ps(argc, argv);
-	return ps.Run();
-}
+	// This call needs to happen before GetDeviceID, otherwise no device
+	// IDs will be recognised.  (This is why it's here, and not in
+	// SetupAudioSystem.)
+	SdlAudioSink::InitLibrary();
+	atexit(SdlAudioSink::CleanupLibrary);
 
-//
-// Playd
-//
+	auto args = MakeArgVector(argc, argv);
 
-int Playd::GetDeviceID()
-{
-	// Did the user provide an ID at all?
-	if (this->argv.size() < 2) return this->INVALID_ID;
+	auto device_id = GetDeviceID(args);
+	if (device_id < 0) ExitWithUsage(args.at(0));
 
-	// Only accept valid numbers (stoi will throw for invalid ones).
-	int id;
+	// Set up all of the components of playd in one fell swoop.
+	PipeAudioSystem audio(device_id);
+	SetupAudioSystem(audio);
+	Player player(audio);
+	CommandHandler handler(player);
+	IoCore io(player, handler);
+
+	// Make sure the player broadcasts its responses back to the IoCore.
+	player.SetSink(io);
+
+	// Now, actually run the IO loop.
+	std::string host;
+	std::string port;
+	std::tie(host, port) = GetHostAndPort(args);
 	try {
-		id = std::stoi(this->argv.at(1));
-	} catch (...) {
-		// Only std::{invalid_argument,out_of_range} are thrown here.
-		return this->INVALID_ID;
-	}
-
-	// Only allow valid, outputtable devices; reject input-only devices.
-	if (!this->audio.IsOutputDevice(id)) return this->INVALID_ID;
-
-	return id;
-}
-
-Playd::Playd(int argc, char *argv[])
-    : audio(),
-      pfile(this, audio),
-      pposition(this, Playd::POSITION_PERIOD),
-      pstate(this),
-      player(this, pfile, pposition, pstate),
-      handler(player)
-{
-	for (int i = 0; i < argc; i++) {
-		this->argv.emplace_back(argv[i]);
-	}
-}
-
-int Playd::Run()
-{
-	// Fill in some default arguments.
-	// Note that we don't have a default device ID; if the user doesn't
-	// supply an ID, we treat it as if they had supplied an invalid one.
-	auto size = this->argv.size();
-	std::string addr = size > 2 ? this->argv.at(2) : "0.0.0.0";
-	std::string port = size > 3 ? this->argv.at(3) : "1350";
-
-	// Now set up the device ID.
-	// Do this now, so that an invalid ID is caught before we start trying
-	// to acquire the network socket.
-	int id = this->GetDeviceID();
-	if (id == INVALID_ID) {
-		// Show the user the valid device IDs they can use.
-		auto device_list = this->audio.GetDevicesInfo();
-		for (const auto &device : device_list) {
-			std::cout << device.first << ": " << device.second
-			          << std::endl;
-		}
-		return EXIT_FAILURE;
-	}
-	this->audio.SetDeviceID(id);
-
-	// Now set up all the IO (network socket and event loop).
-	try {
-		this->io = decltype(this->io)(new IoCore(
-		                this->player, this->handler, addr, port));
+		io.Run(host, port);
 	} catch (NetError &e) {
-		std::cerr << "Network error: " << e.Message() << std::endl;
-		std::cerr << "Is " << addr << ":" << port << " available?"
-		          << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	try {
-		this->io->Run();
-	} catch (Error &error) {
-		std::cerr << "Unhandled exception in main loop: "
-		          << error.Message() << std::endl;
-		return EXIT_FAILURE;
+		ExitWithNetError(host, port, e.Message());
+	} catch (Error &e) {
+		ExitWithError(e.Message());
 	}
 
 	return EXIT_SUCCESS;
-}
-
-void Playd::RespondRaw(const std::string &string) const
-{
-	if (this->io != nullptr) this->io->Broadcast(string);
 }

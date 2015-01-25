@@ -25,9 +25,8 @@ RingBuffer::RingBuffer(int power, int size)
 	this->buffer = new char[(1 << power) * size];
 
 	if (PaUtil_InitializeRingBuffer(
-	                    this->rb, size,
-	                    static_cast<ring_buffer_size_t>(1 << power),
-	                    this->buffer) != 0) {
+	            this->rb, size, static_cast<ring_buffer_size_t>(1 << power),
+	            this->buffer) != 0) {
 		throw new InternalError(MSG_OUTPUT_RINGINIT);
 	}
 
@@ -60,7 +59,7 @@ unsigned long RingBuffer::Write(char *start, unsigned long count)
 	assert(count <= WriteCapacity());
 
 	return CountCast(PaUtil_WriteRingBuffer(
-	                this->rb, start, static_cast<ring_buffer_size_t>(count)));
+	        this->rb, start, static_cast<ring_buffer_size_t>(count)));
 }
 
 unsigned long RingBuffer::Read(char *start, unsigned long count)
@@ -69,12 +68,13 @@ unsigned long RingBuffer::Read(char *start, unsigned long count)
 	assert(count <= ReadCapacity());
 
 	return CountCast(PaUtil_ReadRingBuffer(
-	                this->rb, start, static_cast<ring_buffer_size_t>(count)));
+	        this->rb, start, static_cast<ring_buffer_size_t>(count)));
 }
 
 void RingBuffer::Flush()
 {
 	PaUtil_FlushRingBuffer(this->rb);
+	assert(this->ReadCapacity() == 0);
 }
 
 /* static */ unsigned long RingBuffer::CountCast(ring_buffer_size_t count)

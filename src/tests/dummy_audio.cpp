@@ -23,19 +23,29 @@ DummyAudio::DummyAudio(DummyAudioSystem &sys) : sys(sys)
 {
 }
 
-void DummyAudio::Emit(const ResponseSink &sink) const
+void DummyAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink)
 {
-	sink.Respond(ResponseCode::FILE, this->sys.path);
+	if (sink == nullptr) return;
+
+	for (auto &code : codes) {
+		auto r = Response(code);
+
+		if (code == Response::Code::STATE) {
+			auto playing = this->sys.started;
+			r.AddArg(playing ? "Playing" : "Stopped");
+		} else if (code == Response::Code::FILE) {
+			r.AddArg(this->sys.path);
+		} else {
+			continue;
+		}
+
+		sink->Respond(r);
+	}
 }
 
-void DummyAudio::Start()
+void DummyAudio::SetPlaying(bool playing)
 {
-	this->sys.started = true;
-}
-
-void DummyAudio::Stop()
-{
-	this->sys.started = false;
+	this->sys.started = playing;
 }
 
 Audio::State DummyAudio::Update()
@@ -61,26 +71,46 @@ DummyAudioSystem::DummyAudioSystem() : path(""), pos(0), state(Audio::State::STO
 {
 }
 
-Audio *DummyAudioSystem::Load(const std::string &path) const
+std::unique_ptr<Audio> DummyAudioSystem::Null() const
+{
+	return std::unique_ptr<Audio>(new NoAudio());
+}
+
+std::unique_ptr<Audio> DummyAudioSystem::Load(const std::string &path) const
 {
 	// Kids, don't try this at home.
 	// Were this not a test mock, I'd shoot myself for this!  ~ Matt
 	DummyAudioSystem &notconst = const_cast<DummyAudioSystem &>(*this);
 	notconst.path = path;
-	return new DummyAudio(notconst);
+	return std::unique_ptr<Audio>(new DummyAudio(notconst));
 }
 
-void DummyAudioSystem::SetDeviceID(int)
+/* static */ std::unique_ptr<AudioSource> DummyAudioSource::Build(const std::string &path)
 {
-	// Deliberately ignore
+	return std::unique_ptr<AudioSource>(new DummyAudioSource(path));
 }
 
-std::vector<AudioSystem::Device> DummyAudioSystem::GetDevicesInfo()
+std::uint8_t DummyAudioSource::ChannelCount() const
 {
-	return std::vector<AudioSystem::Device>();
+	return 2;
 }
 
-bool DummyAudioSystem::IsOutputDevice(int)
+std::uint32_t DummyAudioSource::SampleRate() const
 {
-	return false;
+	return 44100;
+}
+
+std::uint64_t DummyAudioSource::Seek(std::uint64_t in_samples)
+{
+	return in_samples;
+}
+
+DummyAudioSource::DecodeResult DummyAudioSource::Decode()
+{
+	return std::make_pair(DecodeState::DECODING, DecodeVector());
+}
+
+SampleFormat DummyAudioSource::OutputSampleFormat() const
+{
+	return SampleFormat::PACKED_UNSIGNED_INT_8;
 }

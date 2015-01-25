@@ -5,8 +5,6 @@
  * @file player/player.cpp
  * Main implementation file for the Player class.
  * @see player/player.hpp
- * @see player/player_position.cpp
- * @see player/player_state.cpp
  */
 
 #include <cassert>
@@ -22,51 +20,62 @@
 #include "../errors.hpp"
 #include "../io/io_response.hpp"
 #include "../messages.h"
-#include "player_state.hpp"
 #include "player.hpp"
 
-const std::vector<std::string> Player::FEATURES{ "End", "FileLoad", "PlayStop",
-	                                         "Seek", "TimeReport" };
+const std::vector<std::string> Player::FEATURES{"End", "FileLoad", "PlayStop",
+                                                "Seek", "TimeReport"};
 
-Player::Player(const ResponseSink *end_sink, PlayerFile &file,
-               PlayerPosition &position, PlayerState &state)
-    : file(file), position(position), state(state), end_sink(end_sink)
+Player::Player(AudioSystem &audio)
+    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr)
 {
+}
+
+void Player::SetSink(ResponseSink &sink)
+{
+	this->sink = &sink;
 }
 
 bool Player::Update()
 {
-	auto as = this->file.Update();
+	assert(this->file != nullptr);
+	auto as = this->file->Update();
+
 	if (as == Audio::State::AT_END) this->End();
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->position.Update(this->file.Position());
+		this->file->Emit({Response::Code::TIME}, this->sink);
 	}
 
-	return this->state.IsRunning();
+	return this->is_running;
 }
 
 void Player::WelcomeClient(ResponseSink &client) const
 {
-	client.Respond(ResponseCode::OHAI, MSG_OHAI);
-	client.RespondArgs(ResponseCode::FEATURES, FEATURES);
-	this->file.Emit(client);
-	this->position.Emit(client);
-	this->state.Emit(client);
+	client.Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI));
+
+	auto features = Response(Response::Code::FEATURES);
+	for (auto &f : FEATURES) features.AddArg(f);
+	client.Respond(features);
+
+	this->file->Emit({Response::Code::FILE, Response::Code::TIME,
+	                  Response::Code::STATE},
+	                 &client);
 }
 
 void Player::End()
 {
-	if (this->end_sink != nullptr) {
-		this->end_sink->RespondArgs(ResponseCode::END, {});
-	}
 	this->Stop();
 
 	// Rewind the file back to the start.  We can't use Player::Seek() here
 	// in case End() is called from Seek(); a seek failure could start an
 	// infinite loop.
 	this->SeekRaw(0);
+
+	// Let upstream know that the file ended by itself.
+	// This is needed for auto-advancing playlists, etc.
+	if (this->sink == nullptr) return;
+	this->sink->Respond(Response(Response::Code::END));
 }
 
 //
@@ -75,12 +84,9 @@ void Player::End()
 
 CommandResult Player::Eject()
 {
-	if (!this->state.In(PlayerState::AUDIO_LOADED_STATES)) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
-	}
-
-	this->file.Eject();
-	this->state.Set(PlayerState::State::EJECTED);
+	assert(this->file != nullptr);
+	this->file = this->audio.Null();
+	this->file->Emit({Response::Code::STATE}, this->sink);
 
 	return CommandResult::Success();
 }
@@ -90,9 +96,12 @@ CommandResult Player::Load(const std::string &path)
 	if (path.empty()) return CommandResult::Invalid(MSG_LOAD_EMPTY_PATH);
 
 	try {
-		this->file.Load(path);
-		this->position.Reset();
-		this->state.Set(PlayerState::State::STOPPED);
+		assert(this->file != nullptr);
+		this->file = this->audio.Load(path);
+		this->file->Emit({Response::Code::FILE, Response::Code::TIME,
+		                  Response::Code::STATE},
+		                 this->sink);
+		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
 		this->Eject();
@@ -109,12 +118,31 @@ CommandResult Player::Load(const std::string &path)
 
 CommandResult Player::Play()
 {
-	if (!this->state.In({ PlayerState::State::STOPPED })) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_STOPPED);
+	return this->SetPlaying(true);
+}
+
+CommandResult Player::Stop()
+{
+	return this->SetPlaying(false);
+}
+
+CommandResult Player::SetPlaying(bool playing)
+{
+	// Why is SetPlaying not split between Start() and Stop()?, I hear the
+	// best practices purists amongst you say.  Quite simply, there is a
+	// large amount of fiddly exception boilerplate here that would
+	// otherwise be duplicated between the two methods.  The 'public'
+	// interface Player gives is Start()/Stop(), anyway.
+
+	assert(this->file != nullptr);
+
+	try {
+		this->file->SetPlaying(playing);
+	} catch (NoAudioError &e) {
+		return CommandResult::Invalid(e.Message());
 	}
 
-	this->file.Start();
-	this->state.Set(PlayerState::State::PLAYING);
+	this->file->Emit({Response::Code::STATE}, this->sink);
 
 	return CommandResult::Success();
 }
@@ -122,39 +150,30 @@ CommandResult Player::Play()
 CommandResult Player::Quit()
 {
 	this->Eject();
-	this->state.Set(PlayerState::State::QUITTING);
-
-	// Quitting is always a valid command.
+	this->is_running = false;
 	return CommandResult::Success();
 }
 
 CommandResult Player::Seek(const std::string &time_str)
 {
-	if (!this->state.In(PlayerState::AUDIO_LOADED_STATES)) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
-	}
-
 	std::uint64_t pos = 0;
-	size_t cpos = 0;
 	try {
-		// In previous versions, this used to parse a unit at the end.
-		// This was removed for simplicity--use baps3-cli etc. instead.
-		pos = std::stoull(time_str, &cpos);
-	} catch (...) {
-		// Should catch std::out_of_range and std::invalid_argument.
-		// http://www.cplusplus.com/reference/string/stoull/#exceptions
-		return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
+		pos = SeekParse(time_str);
+	} catch (SeekError &e) {
+		// Seek errors here are a result of clients sending weird times.
+		// Thus, we tell them off.
+		return CommandResult::Invalid(e.Message());
 	}
-
-	// cpos will point to the first character in pos that wasn't a number.
-	// We don't want any characters here, so bail if the position isn't at
-	// the end of the string.
-	auto sl = time_str.length();
-	if (cpos != sl) return CommandResult::Invalid(MSG_SEEK_INVALID_VALUE);
 
 	try {
 		this->SeekRaw(pos);
+	} catch (NoAudioError) {
+		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
 	} catch (SeekError) {
+		// Seek failures here are a result of the decoder not liking the
+		// seek position (usually because it's outside the audio file!).
+		// Thus, unlike above, we try to recover.
+
 		Debug() << "Seek failure" << std::endl;
 
 		// Make it look to the client as if the seek ran off the end of
@@ -162,26 +181,36 @@ CommandResult Player::Seek(const std::string &time_str)
 		this->End();
 	}
 
+	// If we've made it all the way down here, we deserve to succeed.
 	return CommandResult::Success();
+}
+
+std::uint64_t Player::SeekParse(const std::string &time_str)
+{
+	size_t cpos = 0;
+
+	// In previous versions, this used to parse a unit at the end.
+	// This was removed for simplicity--use baps3-cli etc. instead.
+	std::uint64_t pos;
+	try {
+		pos = std::stoull(time_str, &cpos);
+	} catch (...) {
+		throw SeekError(MSG_SEEK_INVALID_VALUE);
+	}
+
+	// cpos will point to the first character in pos that wasn't a number.
+	// We don't want any such characters here, so bail if the position isn't
+	// at the end of the string.
+	auto sl = time_str.length();
+	if (cpos != sl) throw SeekError(MSG_SEEK_INVALID_VALUE);
+
+	return pos;
 }
 
 void Player::SeekRaw(std::uint64_t pos)
 {
-	this->file.Seek(pos);
+	assert(this->file != nullptr);
 
-	// Clean out the position tracker, as the position has abruptly changed.
-	this->position.Reset();
-	this->position.Update(this->file.Position());
-}
-
-CommandResult Player::Stop()
-{
-	if (!this->state.In(PlayerState::AUDIO_PLAYING_STATES)) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_PLAYING);
-	}
-
-	this->file.Stop();
-	this->state.Set(PlayerState::State::STOPPED);
-
-	return CommandResult::Success();
+	this->file->Seek(pos);
+	this->file->Emit({Response::Code::TIME}, this->sink);
 }

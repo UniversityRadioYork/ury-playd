@@ -16,88 +16,48 @@
 #include <utility>
 #include <vector>
 
-#include "portaudio.h"
-#include "portaudiocpp/CallbackInterface.hxx"
-#include "portaudiocpp/Stream.hxx"
+#include "SDL.h"
 
+#include "audio.hpp"
 #include "audio_source.hpp"
 #include "ringbuffer.hpp"
+#include "sample_formats.hpp"
 
-/// Type of results emitted during the play callback step.
-typedef std::pair<PaStreamCallbackResult, unsigned long> PlayCallbackStepResult;
-
-/**
- * Interface for objects that can configure a PortAudio stream from an
- * AudioSource.
- */
-class AudioSinkConfigurator
+/// Abstract class for audio output sinks.
+class AudioSink
 {
 public:
-	/**
-	 * Configures and returns a PortAudio stream.
-	 * @param source The audio source to use to configure the stream.
-	 * @param cb The object that PortAudio will call to receive audio.
-	 * @return The configured PortAudio stream.
-	 */
-	virtual portaudio::Stream *Configure(
-	                const AudioSource &source,
-	                portaudio::CallbackInterface &cb) const = 0;
-};
-
-/**
- * An output stream for an Audio file.
- *
- * An AudioSink consists of a PortAudio output stream and a buffer that
- * stores decoded samples from the Audio object.  While active, the AudioSink
- * periodically transfers samples from its buffer to PortAudio in a separate
- * thread.
- */
-class AudioSink : portaudio::CallbackInterface
-{
-public:
-	/// Type of positions measured in samples.
-	typedef std::uint64_t SamplePosition;
-
 	/// Type of iterators used in the Transfer() method.
-	typedef AudioSource::DecodeVector::iterator TransferIterator;
-
-	/**
-	 * Constructs an AudioSink.
-	 * @param source The source from which this sink will receive audio.
-	 * @param conf The configurator to use to create streams for this sink.
-	 */
-	AudioSink(const AudioSource &source, const AudioSinkConfigurator &conf);
+	using TransferIterator = AudioSource::DecodeVector::iterator;
 
 	/**
 	 * Starts the audio stream.
 	 * @see Stop
 	 * @see IsHalted
 	 */
-	void Start();
+	virtual void Start() = 0;
 
 	/**
 	 * Stops the audio stream.
 	 * @see Start
 	 * @see IsHalted
 	 */
-	void Stop();
+	virtual void Stop() = 0;
 
 	/**
-	 * Checks to see if audio playback has stopped.
-	 * @return True if the audio stream is inactive; false otherwise.
-	 * @see Start
-	 * @see Stop
+	 * Gets this AudioSink's current state (playing/stopped/at end).
+	 * @return The Audio::State representing this AudioSink's state.
+	 * @see Audio::State
 	 */
-	bool IsStopped();
+	virtual Audio::State State() = 0;
 
 	/**
 	 * Gets the current played position in the song, in samples.
 	 * As this may be executing whilst the playing callback is running,
 	 * do not expect it to be highly accurate.
 	 * @return The current position, as a count of elapsed samples.
-	 * @see SamplePosition
 	 */
-	SamplePosition Position();
+	virtual std::uint64_t Position() = 0;
 
 	/**
 	 * Sets the current played position, given a position in samples.
@@ -106,21 +66,15 @@ public:
 	 * @param samples The new position, as a count of elapsed samples.
 	 * @see Position
 	 */
-	void SetPosition(SamplePosition samples);
+	virtual void SetPosition(std::uint64_t samples) = 0;
 
 	/**
-	 * Gets whether this AudioSink is expecting input.
-	 * @return Whether the input-ready flag has been set.
-	 * @see SetInputReady
+	 * Tells this AudioSink that the source has run out.
+	 *
+	 * When this occurs, the next time the ringbuf goes empty, the sink has
+	 * also run out and should stop.
 	 */
-	bool InputReady();
-
-	/**
-	 * Set whether this AudioSink can expect input.
-	 * @param ready True if there is input ready; false otherwise.
-	 * @see InputReady
-	 */
-	void SetInputReady(bool ready);
+	virtual void SourceOut() = 0;
 
 	/**
 	 * Transfers a range of sample bytes into the AudioSink.
@@ -136,109 +90,108 @@ public:
 	 *   iterator will be advanced by the number of bytes accepted.
 	 * @param end An iterator denoting the end of the range.
 	 */
-	void Transfer(TransferIterator &start, const TransferIterator &end);
+	virtual void Transfer(TransferIterator &start,
+	                      const TransferIterator &end) = 0;
+};
+
+/**
+ * An output stream for audio, using SDL.
+ *
+ * An SdlAudioSink consists of an SDL output device and a buffer that stores
+ * decoded samples from the Audio object.  While active, the SdlAudioSink
+ * periodically transfers samples from its buffer to SDL2 in a separate thread.
+ */
+class SdlAudioSink : public AudioSink
+{
+public:
+	/**
+	 * Helper function for creating uniquely pointed-to AudioSinks.
+	 * @param source The source from which this sink will receive audio.
+	 * @param device_id The device ID to which this sink will output.
+	 * @return A unique pointer to an AudioSink.
+	 */
+	static std::unique_ptr<AudioSink> Build(const AudioSource &source,
+	                                        int device_id);
+
+	/**
+	 * Constructs an SdlAudioSink.
+	 * @param source The source from which this sink will receive audio.
+	 * @param device_id The device ID to which this sink will output.
+	 */
+	SdlAudioSink(const AudioSource &source, int device_id);
+
+	/// Destructs an SdlAudioSink.
+	~SdlAudioSink();
+
+	void Start() override;
+	void Stop() override;
+	Audio::State State() override;
+	std::uint64_t Position() override;
+	void SetPosition(std::uint64_t samples) override;
+	void SourceOut() override;
+	void Transfer(TransferIterator &start,
+	              const TransferIterator &end) override;
+
+	/**
+	 * The callback proper.
+	 * This is executed in a separate thread by SDL once a stream is
+	 * playing with the callback registered to it.
+	 * @param outputBuffer The output buffer to which our samples should
+	 *   be written.
+	 * @param numFrames The number of samples PortAudio wants to read from
+	 *   @a outputBuffer.
+	 */
+	void Callback(std::uint8_t *inputBuffer, int numFrames);
+
+	/**
+	 * Converts a sample format identifier from playd to SDL.
+	 * @param fmt The playd sample format identifier.
+	 * @return The SDL equivalent of the given SampleFormat.
+	 */
+	static SDL_AudioFormat SDLFormat(SampleFormat fmt);
+
+	/**
+	 * Gets the number and name of each output device entry in the
+	 * AudioSystem.
+	 * @return List of output devices, as strings.
+	 */
+	static std::vector<std::pair<int, std::string>> GetDevicesInfo();
+
+	/**
+	 * Can a sound device output sound?
+	 * @param id Device ID.
+	 * @return If the device can handle outputting sound.
+	 */
+	static bool IsOutputDevice(int id);
+
+	/// Initialises the AudioSink's libraries, if not initialised already.
+	static void InitLibrary();
+
+	/// Cleans up the AudioSink's libraries, if not cleaned up already.
+	static void CleanupLibrary();
 
 private:
+	/// The SDL device to which we are outputting sound.
+	SDL_AudioDeviceID device;
+
 	/// n, where 2^n is the capacity of the Audio ring buffer.
 	/// @see RINGBUF_SIZE
 	static const size_t RINGBUF_POWER;
 
 	/// Number of bytes in one sample.
-	AudioSource::SampleByteCount bytes_per_sample;
+	size_t bytes_per_sample;
 
 	/// The ring buffer used to transfer samples to the playing callback.
 	RingBuffer ring_buf;
 
-	/// The PortAudio stream to which this AudioSink outputs.
-	std::unique_ptr<portaudio::Stream> stream;
-
 	/// The current position, in samples.
 	std::uint64_t position_sample_count;
 
-	/// Whether the current run of the audio playback stream has not yet
-	/// successfully read its first set of samples from the buffer.
-	bool just_started;
+	/// Whether the source has run out of things to feed the sink.
+	bool source_out;
 
-	/// Whether there is input ready for this sink.
-	bool input_ready;
-
-	/**
-	 * The callback proper.
-	 * This is executed in a separate thread by PortAudio once a stream is
-	 * playing with the callback registered to it.
-	 * @param inputBuffer The buffer containing input data; ignored.
-	 * @param outputBuffer The output buffer to which our samples should
-	 *   be written.
-	 * @param numFrames The number of samples PortAudio wants to read from
-	 *   @a outputBuffer.
-	 * @param timeInfo The time information from PortAudio; ignored.
-	 * @param statusFlags The PortAudio status flags; ignored.
-	 * @return The number of samples written to the output buffer.
-	 */
-	int paCallbackFun(const void *inputBuffer, void *outputBuffer,
-	                  unsigned long numFrames,
-	                  const PaStreamCallbackTimeInfo *timeInfo,
-	                  PaStreamCallbackFlags statusFlags) override;
-
-	/**
-	 * Performs one step in the callback.
-	 * @param out The output buffer to which our samples should be written.
-	 * @param frames_per_buf The number of samples PortAudio wants to read
-	 *   @a out.
-	 * @param in The result from the previous PlayCallbackStep.
-	 * @return A PlayCallbackStepResult containing the status code and
-	 *   number of samples written as of the end of this step.
-	 */
-	PlayCallbackStepResult PlayCallbackStep(char *out,
-	                                        unsigned long frames_per_buf,
-	                                        PlayCallbackStepResult in);
-
-	/**
-	 * Performs a successful play callback step.
-	 * This ensures that the appropriate number of samples are read into
-	 * PortAudio's buffer.
-	 * @param out The output buffer to which our samples should be written.
-	 * @param avail The number of samples available in the ring buffer.
-	 * @param frames_per_buf The number of samples PortAudio wants to read
-	 *   @a out.
-	 * @param in The result from the previous PlayCallbackStep.
-	 * @return A PlayCallbackStepResult containing the status code and
-	 *   number of samples written as of the end of this step.
-	 */
-	PlayCallbackStepResult PlayCallbackSuccess(char *out,
-	                                           unsigned long avail,
-	                                           unsigned long frames_per_buf,
-	                                           PlayCallbackStepResult in);
-
-	/**
-	 * Performs error cleanup for a failed play callback step.
-	 * This ensures that the output buffer is filled with silence and the
-	 * correct error code is returned.
-	 * @param out The output buffer to which our samples should be written.
-	 * @param avail The number of samples available in the ring buffer.
-	 * @param frames_per_buf The number of samples PortAudio wants to read
-	 *   @a out.
-	 * @param in The result from the previous PlayCallbackStep.
-	 * @return A PlayCallbackStepResult containing the status code and
-	 *   number of samples written as of the end of this step.
-	 */
-	PlayCallbackStepResult PlayCallbackFailure(char *out,
-	                                           unsigned long avail,
-	                                           unsigned long frames_per_buf,
-	                                           PlayCallbackStepResult in);
-
-	/**
-	 * Reads from the ringbuffer to output, updating the used samples count.
-	 * @param output A reference to the output buffer's current pointer.
-	 * @param output_capacity The capacity of the output buffer, in samples.
-	 * @param buffered_count The number of samples available in the ring
-	 *   buffer.
-	 * @return The number of samples successfully written to the output
-	 *   buffer.
-	 */
-	unsigned long ReadSamplesToOutput(char *&output,
-	                                  unsigned long output_capacity,
-	                                  unsigned long buffered_count);
+	/// The decoder's current state.
+	Audio::State state;
 };
 
 #endif // PLAYD_AUDIO_SINK_HPP

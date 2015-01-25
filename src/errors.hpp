@@ -21,9 +21,9 @@ class Error
 public:
 	/**
 	 * Constructs an Error.
-	 * @param message The human-readable message of the error.
+	 * @param msg The human-readable message of the error.
 	 */
-	Error(const std::string &message);
+	Error(const std::string &msg);
 
 	/**
 	 * The human-readable message for this error.
@@ -47,9 +47,9 @@ class ConfigError : public Error
 public:
 	/**
 	 * Constructs an ConfigError.
-	 * @param message The human-readable message of the error.
+	 * @param msg The human-readable message of the error.
 	 */
-	ConfigError(const std::string &message) : Error(message)
+	ConfigError(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -62,9 +62,9 @@ class InternalError : public Error
 public:
 	/**
 	 * Constructs an InternalError.
-	 * @param message The human-readable message of the error.
+	 * @param msg The human-readable message of the error.
 	 */
-	InternalError(const std::string &message) : Error(message)
+	InternalError(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -77,9 +77,9 @@ class FileError : public Error
 public:
 	/**
 	 * Constructs a FileError.
-	 * @param message The human-readable message of the error.
+	 * @param msg The human-readable message of the error.
 	 */
-	FileError(const std::string &message) : Error(message)
+	FileError(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -92,9 +92,9 @@ class SeekError : public Error
 public:
 	/**
 	 * Constructs a SeekError.
-	 * @param message The human-readable message of the error.
+	 * @param msg The human-readable message of the error.
 	 */
-	SeekError(const std::string &message) : Error(message)
+	SeekError(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -107,9 +107,24 @@ class NetError : public Error
 public:
 	/**
 	 * Constructs a NetError.
-	 * @param message The human-readable message of the error.
+	 * @param msg The human-readable message of the error.
 	 */
-	NetError(const std::string &message) : Error(message)
+	NetError(const std::string &msg) : Error(msg)
+	{
+	}
+};
+
+/**
+ * An Error signifying that no audio is loaded.
+ */
+class NoAudioError : public Error
+{
+public:
+	/**
+	 * Constructs an NoAudioError.
+	 * @param msg The human-readable message of the error.
+	 */
+	NoAudioError(const std::string &msg) : Error(msg)
 	{
 	}
 };

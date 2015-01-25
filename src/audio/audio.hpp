@@ -16,13 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include "portaudio.h"
-#include "portaudiocpp/CallbackInterface.hxx"
-namespace portaudio
-{
-class Stream;
-}
-
 #include "../io/io_response.hpp"
 #include "audio_source.hpp"
 
@@ -58,16 +51,10 @@ public:
 	//
 
 	/**
-	 * Starts playback of this Audio.
-	 * @see Stop
+	 * Sets whether this Audio should be playing or not.
+	 * @param playing True for playing; false for stopped.
 	 */
-	virtual void Start() = 0;
-
-	/**
-	 * Stops playback of this Audio.
-	 * @see Start
-	 */
-	virtual void Stop() = 0;
+	virtual void SetPlaying(bool playing) = 0;
 
 	/**
 	 * Attempts to seek to the given position.
@@ -93,14 +80,14 @@ public:
 	//
 
 	/**
-	 * Emits a FILE response containing this Audio's path.
+	 * Emits the requested responses.
 	 *
-	 * This is usually literally the absolute file-path, but depends
-	 * on the implementation.
-	 *
+	 * @param responses The set of responses to emit, if possible.
 	 * @param sink The ResponseSink to which the response shall be sent.
+	 *   May be nullptr, in which case Emit should be a no-operation.
 	 */
-	virtual void Emit(const ResponseSink &sink) const = 0;
+	virtual void Emit(std::initializer_list<Response::Code> codes,
+	                  const ResponseSink *sink) = 0;
 
 	/**
 	 * This Audio's current position.
@@ -115,9 +102,32 @@ public:
 };
 
 /**
+ * A dummy Audio implementation representing a lack of file.
+ *
+ * NoAudio throws exceptions if any attempt is made to change, start, or stop
+ * the audio, and returns Audio::State::NONE during any attempt to Update.
+ * If asked to emit the audio file, NoAudio does nothing.
+ *
+ * @see Audio
+ */
+class NoAudio : public Audio
+{
+public:
+	Audio::State Update() override;
+	void Emit(std::initializer_list<Response::Code> codes,
+	          const ResponseSink *sink) override;
+
+	// The following all raise an exception:
+
+	void SetPlaying(bool playing) override;
+	void Seek(std::uint64_t position) override;
+	std::uint64_t Position() const override;
+};
+
+/**
  * A concrete implementation of Audio as a 'pipe'.
  *
- * AudioPipe is comprised of a 'source', which decodes frames from a
+ * PipeAudio is comprised of a 'source', which decodes frames from a
  * file, and a 'sink', which plays out the decoded frames.  Updating
  * consists of shifting frames from the source to the sink.
  *
@@ -134,14 +144,15 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	PipeAudio(AudioSource *src, AudioSink *sink);
+	PipeAudio(std::unique_ptr<AudioSource> &&src,
+	          std::unique_ptr<AudioSink> &&sink);
 
-	void Start() override;
-	void Stop() override;
+	void SetPlaying(bool playing) override;
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(const ResponseSink &sink) const override;
+	void Emit(std::initializer_list<Response::Code> codes,
+	          const ResponseSink *sink) override;
 	std::uint64_t Position() const override;
 
 private:
@@ -151,14 +162,24 @@ private:
 	/// The sink to which audio data is sent.
 	std::unique_ptr<AudioSink> sink;
 
-	/// Whether the current file has stopped decoding.
-	bool file_ended;
-
 	/// The current decoded frame.
 	AudioSource::DecodeVector frame;
 
 	/// The current position in the current decoded frame.
 	AudioSource::DecodeVector::iterator frame_iterator;
+
+	/**
+	 * A map of response sink pointers to their last emitted position, in
+	 * seconds.
+	 *
+	 * The pointers are not actually used in any way other than as a
+	 * convenient identifier for each individual ResponseSink.  As such,
+	 * the ResponseSinks are not owned by this object.
+	 *
+	 * @todo (CaptainHayashi) This could cause memory leaks if not emptied
+	 *   regularly--need to check.
+	 */
+	std::map<const ResponseSink *, std::uint64_t> last_times;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();

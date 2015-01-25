@@ -5,7 +5,7 @@ AllowShortBlocksOnASingleLine:       false
 AllowShortFunctionsOnASingleLine:    None
 AllowShortIfStatementsOnASingleLine: true
 BreakBeforeBraces:                   Linux
-Cpp11BracedListStyle:                false
+Cpp11BracedListStyle:                true
 Language:                            Cpp
 PointerAlignment:                    Right
 Standard:                            Cpp11
@@ -16,5 +16,5 @@ ColumnLimit:                  80
 SpacesBeforeTrailingComments:  1
 IndentWidth:                   8
 TabWidth:                      8
-ContinuationIndentWidth:      16
+ContinuationIndentWidth:       8
 PenaltyExcessCharacter:       20

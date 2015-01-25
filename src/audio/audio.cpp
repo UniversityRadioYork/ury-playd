@@ -3,8 +3,8 @@
 
 /**
  * @file
- * Implementation of the Audio class.
- * @see audio/audio.hpp
+ * Implementation of the PipeAudio class.
+ * @see audio/pipe_audio.hpp
  */
 
 #include <algorithm>
@@ -14,34 +14,128 @@
 #include <string>
 
 #include "../errors.hpp"
-#include "../sample_formats.hpp"
 #include "../messages.h"
 #include "../io/io_response.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
+#include "sample_formats.hpp"
 
-PipeAudio::PipeAudio(AudioSource *src, AudioSink *sink) : src(src), sink(sink)
+//
+// NoAudio
+//
+
+Audio::State NoAudio::Update()
+{
+	return Audio::State::NONE;
+}
+
+void NoAudio::Emit(std::initializer_list<Response::Code> codes,
+                   const ResponseSink *sink)
+{
+	if (sink == nullptr) return;
+
+	for (auto &code : codes) {
+		if (code == Response::Code::STATE) {
+			sink->Respond(Response(Response::Code::STATE)
+			                      .AddArg("Ejected"));
+		}
+	}
+}
+
+void NoAudio::SetPlaying(bool)
+{
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
+}
+
+void NoAudio::Seek(std::uint64_t)
+{
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
+}
+
+std::uint64_t NoAudio::Position() const
+{
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
+}
+
+//
+// PipeAudio
+//
+
+PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
+                     std::unique_ptr<AudioSink> &&sink)
+    : src(std::move(src)), sink(std::move(sink))
 {
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(const ResponseSink &sink) const
+void PipeAudio::Emit(std::initializer_list<Response::Code> codes,
+                     const ResponseSink *sink)
 {
+	if (sink == nullptr) return;
+
 	assert(this->src != nullptr);
-	sink.Respond(ResponseCode::FILE, this->src->Path());
+	assert(this->sink != nullptr);
+
+	for (auto &code : codes) {
+		Response r(code);
+
+		switch (code) {
+			case Response::Code::STATE: {
+				auto playing = this->sink->State() ==
+				               Audio::State::PLAYING;
+				r.AddArg(playing ? "Playing" : "Stopped");
+			} break;
+			case Response::Code::FILE: {
+				r.AddArg(this->src->Path());
+			} break;
+			case Response::Code::TIME: {
+				// To prevent spewing massive amounts of TIME
+				// responses, we only send one if the number of
+				// seconds has changed since the last request
+				// for this response on this sink.
+				std::uint64_t micros = this->Position();
+				std::uint64_t secs = micros / 1000 / 1000;
+
+				auto last_entry = this->last_times.find(sink);
+
+				// We can announce if we haven't got a record
+				// for this sink, or if the last record was in a
+				// previous second.
+				bool can_announce = true;
+				if (last_entry != this->last_times.end()) {
+					can_announce =
+					        (last_entry->second < secs);
+
+					// This is so as to allow the emplace
+					// below to work--it fails if there's
+					// already a value under the same key.
+					if (can_announce)
+						this->last_times.erase(
+						        last_entry);
+				}
+
+				if (!can_announce) continue;
+				this->last_times.emplace(sink, secs);
+				r.AddArg(std::to_string(micros));
+			} break;
+			default:
+				continue;
+		}
+
+		sink->Respond(r);
+	}
 }
 
-void PipeAudio::Start()
+void PipeAudio::SetPlaying(bool playing)
 {
 	assert(this->sink != nullptr);
-	this->sink->Start();
-}
 
-void PipeAudio::Stop()
-{
-	assert(this->sink != nullptr);
-	this->sink->Stop();
+	if (playing) {
+		this->sink->Start();
+	} else {
+		this->sink->Stop();
+	}
 }
 
 std::uint64_t PipeAudio::Position() const
@@ -57,8 +151,12 @@ void PipeAudio::Seek(std::uint64_t position)
 	assert(this->sink != nullptr);
 	assert(this->src != nullptr);
 
-	auto samples = this->src->Seek(position);
-	this->sink->SetPosition(samples);
+	auto in_samples = this->src->SamplesFromMicros(position);
+	auto out_samples = this->src->Seek(in_samples);
+	this->sink->SetPosition(out_samples);
+
+	// Make sure we always announce the new position to all response sinks.
+	this->last_times.clear();
 
 	// We might still have decoded samples from the old position in
 	// our frame, so clear them out.
@@ -69,7 +167,6 @@ void PipeAudio::ClearFrame()
 {
 	this->frame.clear();
 	this->frame_iterator = this->frame.end();
-	this->file_ended = false;
 }
 
 Audio::State PipeAudio::Update()
@@ -77,16 +174,12 @@ Audio::State PipeAudio::Update()
 	assert(this->sink != nullptr);
 	assert(this->src != nullptr);
 
-	bool more_frames_available = this->DecodeIfFrameEmpty();
+	bool more_available = this->DecodeIfFrameEmpty();
+	if (!more_available) this->sink->SourceOut();
 
 	if (!this->FrameFinished()) this->TransferFrame();
 
-	this->sink->SetInputReady(more_frames_available);
-	this->file_ended = !more_frames_available;
-
-	if (this->file_ended) return Audio::State::AT_END;
-	if (this->sink->IsStopped()) return Audio::State::STOPPED;
-	return Audio::State::PLAYING;
+	return this->sink->State();
 }
 
 void PipeAudio::TransferFrame()

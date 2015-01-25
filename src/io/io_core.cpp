@@ -15,17 +15,16 @@
  */
 
 #include <algorithm>
+#include <cassert>
 #include <csignal>
 #include <cstring>
 #include <sstream>
 #include <string>
 
-extern "C" {
 // If UNICODE is defined on Windows, it'll select the wide-char gai_strerror.
 // We don't want this.
 #undef UNICODE
 #include <uv.h>
-}
 
 #include "../cmd.hpp"
 #include "../errors.hpp"
@@ -69,13 +68,18 @@ void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 /// The callback fired when a client connection closes.
 void UvCloseCallback(uv_handle_t *handle)
 {
+	assert(handle != nullptr);
 	delete handle;
 }
 
 /// The callback fired when some bytes are read from a client connection.
 void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
+	assert(stream != nullptr);
+
 	Connection *tcp = static_cast<Connection *>(stream->data);
+	assert(tcp != nullptr);
+
 	tcp->Read(nread, buf);
 }
 
@@ -83,8 +87,11 @@ void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 void UvListenCallback(uv_stream_t *server, int status)
 {
 	if (status < 0) return;
+	assert(server != nullptr);
 
 	ConnectionPool *pool = static_cast<ConnectionPool *>(server->data);
+	assert(pool != nullptr);
+
 	pool->Accept(server);
 }
 
@@ -96,7 +103,9 @@ void UvRespondCallback(uv_write_t *req, int status)
 		        << std::endl;
 	}
 
-	WriteReq *wr = reinterpret_cast<WriteReq *>(req);
+	auto *wr = reinterpret_cast<WriteReq *>(req);
+	assert(wr != nullptr);
+
 	delete[] wr -> buf.base;
 	delete wr;
 }
@@ -104,12 +113,16 @@ void UvRespondCallback(uv_write_t *req, int status)
 /// The callback fired when the update timer fires.
 void UvUpdateTimerCallback(uv_timer_t *handle)
 {
+	assert(handle != nullptr);
+
 	Player *player = static_cast<Player *>(handle->data);
+	assert(player != nullptr);
+
 	bool running = player->Update();
 
 	// If the player is ready to terminate, we need to kill the event loop
 	// in order to disconnect clients and stop the updating.
-	if (!running) IoCore::End();
+	if (!running) uv_stop(uv_default_loop());
 }
 
 //
@@ -123,59 +136,55 @@ ConnectionPool::ConnectionPool(Player &player, CommandHandler &handler)
 
 void ConnectionPool::Accept(uv_stream_t *server)
 {
-	uv_tcp_t *client = new uv_tcp_t();
+	assert(server != nullptr);
+
+	auto client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
 
-	if (uv_accept(server, (uv_stream_t *)client) == 0) {
-		this->connections.emplace_back(
-		                new Connection(*this, client, this->handler));
-
-		this->player.WelcomeClient(*this->connections.back());
-		client->data = static_cast<void *>(
-		                this->connections.back().get());
-
-		uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
-	} else {
+	if (uv_accept(server, (uv_stream_t *)client)) {
 		uv_close((uv_handle_t *)client, UvCloseCallback);
+		return;
 	}
+
+	this->connections.emplace_back(
+	        new Connection(*this, client, this->handler));
+
+	this->player.WelcomeClient(*this->connections.back());
+	client->data = static_cast<void *>(this->connections.back().get());
+
+	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 }
 
 void ConnectionPool::Remove(Connection &conn)
 {
 	this->connections.erase(std::remove_if(
-	                this->connections.begin(), this->connections.end(),
-	                [&](const std::unique_ptr<Connection> &p) {
-		                return p.get() == &conn;
-		        }));
+	        this->connections.begin(), this->connections.end(),
+	        [&](const std::unique_ptr<Connection> &p) {
+		        return p.get() == &conn;
+		}));
 }
 
-void ConnectionPool::Broadcast(const std::string &message) const
+void ConnectionPool::Respond(const Response &response) const
 {
 	if (this->connections.empty()) return;
 
-	Debug() << "Sending command:" << message << std::endl;
-	for (const auto &conn : this->connections) conn->RespondRaw(message);
-}
-
-void ConnectionPool::RespondRaw(const std::string &string) const
-{
-	this->Broadcast(string);
+	Debug() << "Sending command:" << response.Pack() << std::endl;
+	for (const auto &conn : this->connections) conn->Respond(response);
 }
 
 //
 // IoCore
 //
 
-IoCore::IoCore(Player &player, CommandHandler &handler,
-               const std::string &address, const std::string &port)
+IoCore::IoCore(Player &player, CommandHandler &handler)
     : player(player), pool(player, handler)
 {
-	this->InitAcceptor(address, port);
-	this->DoUpdateTimer();
 }
 
-/* static */ void IoCore::Run()
+void IoCore::Run(const std::string &host, const std::string &port)
 {
+	this->InitAcceptor(host, port);
+	this->DoUpdateTimer();
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
@@ -193,6 +202,7 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 
 	uv_tcp_init(uv_default_loop(), &this->server);
 	this->server.data = static_cast<void *>(&this->pool);
+	assert(this->server.data != nullptr);
 
 	struct sockaddr_in bind_addr;
 	uv_ip4_addr(address.c_str(), uport, &bind_addr);
@@ -207,14 +217,9 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoCore::Broadcast(const std::string &string) const
+void IoCore::Respond(const Response &response) const
 {
-	this->pool.Broadcast(string);
-}
-
-/* static */ void IoCore::End()
-{
-	uv_stop(uv_default_loop());
+	this->pool.Respond(response);
 }
 
 //
@@ -234,13 +239,17 @@ Connection::~Connection()
 	uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
 }
 
-void Connection::RespondRaw(const std::string &string) const
+void Connection::Respond(const Response &response) const
 {
+	auto string = response.Pack();
+
 	unsigned int l = string.length();
 	const char *s = string.c_str();
+	assert(s != nullptr);
 
-	WriteReq *req = new WriteReq;
+	auto req = new WriteReq;
 	req->buf = uv_buf_init(new char[l + 1], l + 1);
+	assert(req->buf.base != nullptr);
 	memcpy(req->buf.base, s, l);
 	req->buf.base[l] = '\n';
 
@@ -284,6 +293,8 @@ std::string Connection::Name()
 
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 {
+	assert(buf != nullptr);
+
 	// Did the connection hang up?  If so, de-pool it.
 	// De-pooling the connection will usually lead to the connection being
 	// destroyed.
