@@ -23,24 +23,22 @@ DummyAudio::DummyAudio(DummyAudioSystem &sys) : sys(sys)
 {
 }
 
-void DummyAudio::Emit(std::initializer_list<Response::Code> codes, const ResponseSink *sink)
+void DummyAudio::Emit(Response::Code code, const ResponseSink *sink)
 {
 	if (sink == nullptr) return;
 
-	for (auto &code : codes) {
-		auto r = Response(code);
+	auto r = Response(code);
 
-		if (code == Response::Code::STATE) {
-			auto playing = this->sys.started;
-			r.AddArg(playing ? "Playing" : "Stopped");
-		} else if (code == Response::Code::FILE) {
-			r.AddArg(this->sys.path);
-		} else {
-			continue;
-		}
-
-		sink->Respond(r);
+	if (code == Response::Code::STATE) {
+		auto playing = this->sys.started;
+		r.AddArg(playing ? "Playing" : "Stopped");
+	} else if (code == Response::Code::FILE) {
+		r.AddArg(this->sys.path);
+	} else {
+		return;
 	}
+
+	sink->Respond(r);
 }
 
 void DummyAudio::SetPlaying(bool playing)

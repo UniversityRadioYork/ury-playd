@@ -176,6 +176,15 @@ private:
 
 	/// Handles ending a file (stopping and rewinding).
 	void End();
+
+	/**
+	 * Asks the current file to dump all of its state to the given sink.
+	 * @param sink The sink to which the state responses shall be sent.
+	 * @note This is a pointer, not a reference, so as to allow nullptr
+	 *   (which means no sink is assigned).  When `optional` becomes
+	 *   standard, perhaps use that.
+	 */
+	void EmitAllAudioState(const ResponseSink *sink) const;
 };
 
 #endif // PLAYD_PLAYER_HPP

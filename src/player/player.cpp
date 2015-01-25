@@ -44,10 +44,17 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->file->Emit({Response::Code::TIME}, this->sink);
+		this->file->Emit(Response::Code::TIME, this->sink);
 	}
 
 	return this->is_running;
+}
+
+void Player::EmitAllAudioState(const ResponseSink *sink) const
+{
+	this->file->Emit(Response::Code::FILE, sink);
+	this->file->Emit(Response::Code::TIME, sink);
+	this->file->Emit(Response::Code::STATE, sink);
 }
 
 void Player::WelcomeClient(ResponseSink &client) const
@@ -58,9 +65,7 @@ void Player::WelcomeClient(ResponseSink &client) const
 	for (auto &f : FEATURES) features.AddArg(f);
 	client.Respond(features);
 
-	this->file->Emit({Response::Code::FILE, Response::Code::TIME,
-	                  Response::Code::STATE},
-	                 &client);
+	this->EmitAllAudioState(&client);
 }
 
 void Player::End()
@@ -86,7 +91,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	this->file->Emit({Response::Code::STATE}, this->sink);
+	this->file->Emit(Response::Code::STATE, this->sink);
 
 	return CommandResult::Success();
 }
@@ -98,9 +103,7 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		this->file->Emit({Response::Code::FILE, Response::Code::TIME,
-		                  Response::Code::STATE},
-		                 this->sink);
+		this->EmitAllAudioState(this->sink);
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
@@ -142,7 +145,7 @@ CommandResult Player::SetPlaying(bool playing)
 		return CommandResult::Invalid(e.Message());
 	}
 
-	this->file->Emit({Response::Code::STATE}, this->sink);
+	this->file->Emit(Response::Code::STATE, this->sink);
 
 	return CommandResult::Success();
 }
@@ -212,5 +215,5 @@ void Player::SeekRaw(std::uint64_t pos)
 	assert(this->file != nullptr);
 
 	this->file->Seek(pos);
-	this->file->Emit({Response::Code::TIME}, this->sink);
+	this->file->Emit(Response::Code::TIME, this->sink);
 }

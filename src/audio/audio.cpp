@@ -30,16 +30,13 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-void NoAudio::Emit(std::initializer_list<Response::Code> codes,
-                   const ResponseSink *sink)
+void NoAudio::Emit(Response::Code code, const ResponseSink *sink)
 {
 	if (sink == nullptr) return;
 
-	for (auto &code : codes) {
-		if (code == Response::Code::STATE) {
-			sink->Respond(Response(Response::Code::STATE)
-			                      .AddArg("Ejected"));
-		}
+	if (code == Response::Code::STATE) {
+		sink->Respond(Response(Response::Code::STATE)
+				      .AddArg("Ejected"));
 	}
 }
 
@@ -69,62 +66,57 @@ PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(std::initializer_list<Response::Code> codes,
-                     const ResponseSink *sink)
+void PipeAudio::Emit(Response::Code code, const ResponseSink *sink)
 {
 	if (sink == nullptr) return;
 
 	assert(this->src != nullptr);
 	assert(this->sink != nullptr);
 
-	for (auto &code : codes) {
-		Response r(code);
+	Response r(code);
 
-		switch (code) {
-			case Response::Code::STATE: {
-				auto playing = this->sink->State() ==
-				               Audio::State::PLAYING;
-				r.AddArg(playing ? "Playing" : "Stopped");
-			} break;
-			case Response::Code::FILE: {
-				r.AddArg(this->src->Path());
-			} break;
-			case Response::Code::TIME: {
-				// To prevent spewing massive amounts of TIME
-				// responses, we only send one if the number of
-				// seconds has changed since the last request
-				// for this response on this sink.
-				std::uint64_t micros = this->Position();
-				std::uint64_t secs = micros / 1000 / 1000;
+	switch (code) {
+		case Response::Code::STATE: {
+			auto playing = this->sink->State() ==
+				       Audio::State::PLAYING;
+			r.AddArg(playing ? "Playing" : "Stopped");
+		} break;
+		case Response::Code::FILE: {
+			r.AddArg(this->src->Path());
+		} break;
+		case Response::Code::TIME: {
+			// To prevent spewing massive amounts of TIME
+			// responses, we only send one if the number of seconds
+			// has changed since the last request for this response
+			// on this sink.
+			std::uint64_t micros = this->Position();
+			std::uint64_t secs = micros / 1000 / 1000;
 
-				auto last_entry = this->last_times.find(sink);
+			auto last_entry = this->last_times.find(sink);
 
-				// We can announce if we haven't got a record
-				// for this sink, or if the last record was in a
-				// previous second.
-				bool can_announce = true;
-				if (last_entry != this->last_times.end()) {
-					can_announce =
-					        (last_entry->second < secs);
+			// We can announce if we haven't got a record for this
+			// sink, or if the last record was in a previous
+			// second.
+			bool can_announce = true;
+			if (last_entry != this->last_times.end()) {
+				can_announce = (last_entry->second < secs);
 
-					// This is so as to allow the emplace
-					// below to work--it fails if there's
-					// already a value under the same key.
-					if (can_announce)
-						this->last_times.erase(
-						        last_entry);
-				}
+				// This is so as to allow the emplace below to
+				// work--it fails if there's already a value
+				// under the same key.
+				if (can_announce)
+					this->last_times.erase(last_entry);
+			}
 
-				if (!can_announce) continue;
-				this->last_times.emplace(sink, secs);
-				r.AddArg(std::to_string(micros));
-			} break;
-			default:
-				continue;
-		}
-
-		sink->Respond(r);
+			if (!can_announce) return;
+			this->last_times.emplace(sink, secs);
+			r.AddArg(std::to_string(micros));
+		} break;
+		default:
+			return;
 	}
+
+	sink->Respond(r);
 }
 
 void PipeAudio::SetPlaying(bool playing)
