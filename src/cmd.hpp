@@ -10,8 +10,7 @@
 #ifndef PLAYD_CMD_HPP
 #define PLAYD_CMD_HPP
 
-#include <map>
-#include <memory>
+#include <string>
 #include <vector>
 
 #include "cmd_result.hpp"
