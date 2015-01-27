@@ -22,9 +22,6 @@
 class CommandHandler
 {
 public:
-	/// The type of lists of command words.
-	typedef std::vector<std::string> WordList;
-
 	/**
 	 * Constructs a CommandHandler.
 	 * @param player A reference to the Player on which the playd
@@ -37,7 +34,7 @@ public:
 	 * @param words A reference to the list of words in the command.
 	 * @return Whether the command succeeded.
 	 */
-	CommandResult Handle(const WordList &words);
+	CommandResult Handle(const std::vector<std::string> &words);
 
 private:
 	/// Reference to the Player on which commands run.
