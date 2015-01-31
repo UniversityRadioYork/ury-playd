@@ -184,6 +184,14 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 
 	// First of all, let's find out how many samples are available in total
 	// to give SDL.
+	//
+	// Note: Since we run concurrently with the decoder, which is also
+	// trying to modify the read capacity of the ringbuf (by adding
+	// things), this technically causes a race condition when we try to
+	// read `avail_samples` number of samples later.  Not to fear: the
+	// actual read capacity can only be greater than or equal to
+	// `avail_samples`, as this is the only place where we can *decrease*
+	// it.
 	auto avail_samples = this->ring_buf.ReadCapacity();
 
 	// Have we run out of things to feed?
