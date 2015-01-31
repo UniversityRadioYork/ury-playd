@@ -195,10 +195,12 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	auto avail_samples = this->ring_buf.ReadCapacity();
 
 	// Have we run out of things to feed?
-	if (this->source_out && avail_samples == 0) {
-		// Then we're out too.
-		this->state = Audio::State::AT_END;
+	if (avail_samples == 0) {
+		// Is this a temporary condition, or have we genuinely played
+		// out all we can?  If the latter, we're now out too.
+		if (this->source_out) this->state = Audio::State::AT_END;
 
+		// Don't even bother reading from the ring buffer.
 		memset(out, 0, lnbytes);
 		return;
 	}
