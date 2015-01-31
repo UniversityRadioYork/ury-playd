@@ -180,8 +180,15 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	assert(0 <= nbytes);
 	unsigned long lnbytes = static_cast<unsigned long>(nbytes);
 
-	// First of all, let's find out how many samples are available in total
-	// to give SDL.
+	// Make sure anything not filled up with sound later is set to silence.
+	// This is slightly inefficient (two writes to sound-filled regions
+	// instead of one), but more elegant in failure cases.
+	memset(out, 0, lnbytes);
+
+	// If we're not supposed to be playing, don't play anything.
+	if (this->state != Audio::State::PLAYING) return;
+
+	// Let's find out how many samples are available in total to give SDL.
 	//
 	// Note: Since we run concurrently with the decoder, which is also
 	// trying to modify the read capacity of the ringbuf (by adding
@@ -199,7 +206,6 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 		if (this->source_out) this->state = Audio::State::AT_END;
 
 		// Don't even bother reading from the ring buffer.
-		memset(out, 0, lnbytes);
 		return;
 	}
 
@@ -211,17 +217,6 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	auto read_samples =
 	        this->ring_buf.Read(reinterpret_cast<char *>(out), samples);
 	this->position_sample_count += read_samples;
-
-	// Now, we need to fill any gaps with silence.
-	auto read_bytes = read_samples * this->bytes_per_sample;
-	assert(read_bytes <= lnbytes);
-
-	// I have too little confidence in my own mathematics sometimes.
-	auto silence_bytes = lnbytes - read_bytes;
-	assert(read_bytes + silence_bytes == lnbytes);
-
-	// SILENCE WILL FALL
-	memset(out + read_bytes, 0, silence_bytes);
 }
 
 /// Mappings from SampleFormats to their equivalent SDL_AudioFormats.
