@@ -77,8 +77,6 @@ SdlAudioSink::~SdlAudioSink()
 {
 	if (this->device == 0) return;
 	SDL_CloseAudioDevice(this->device);
-
-	SdlAudioSink::CleanupLibrary();
 }
 
 /* static */ void SdlAudioSink::InitLibrary()
