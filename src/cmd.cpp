@@ -20,7 +20,7 @@ CommandHandler::CommandHandler(Player &player) : player(player)
 {
 }
 
-CommandResult CommandHandler::Handle(const CommandHandler::WordList &words)
+CommandResult CommandHandler::Handle(const std::vector<std::string> &words)
 {
 	if (words.size() == 1) return this->RunNullary(words[0]);
 
