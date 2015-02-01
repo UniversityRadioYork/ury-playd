@@ -12,7 +12,6 @@
 #include <cctype>
 #include <cstdint>
 
-#include "../cmd.hpp"
 #include "io_response.hpp"
 #include "tokeniser.hpp"
 

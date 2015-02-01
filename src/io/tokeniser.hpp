@@ -10,7 +10,6 @@
 #ifndef PLAYD_TOKENISER_HPP
 #define PLAYD_TOKENISER_HPP
 
-#include "../cmd.hpp"
 #include "io_response.hpp"
 
 /**

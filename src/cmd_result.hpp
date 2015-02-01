@@ -4,8 +4,6 @@
 /**
  * @file
  * Declaration of the CommandResult class.
- * @see cmd.hpp
- * @see cmd.cpp
  */
 
 #ifndef PLAYD_CMD_RESULT

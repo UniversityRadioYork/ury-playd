@@ -26,7 +26,6 @@
 #undef UNICODE
 #include <uv.h>
 
-#include "../cmd.hpp"
 #include "../errors.hpp"
 #include "../messages.h"
 #include "../player/player.hpp"
@@ -129,8 +128,7 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 // ConnectionPool
 //
 
-ConnectionPool::ConnectionPool(Player &player, CommandHandler &handler)
-    : player(player), handler(handler), connections()
+ConnectionPool::ConnectionPool(Player &player) : player(player), connections()
 {
 }
 
@@ -147,7 +145,7 @@ void ConnectionPool::Accept(uv_stream_t *server)
 	}
 
 	this->connections.emplace_back(
-	        new Connection(*this, client, this->handler));
+	        new Connection(*this, client, this->player));
 
 	this->player.WelcomeClient(*this->connections.back());
 	client->data = static_cast<void *>(this->connections.back().get());
@@ -176,8 +174,7 @@ void ConnectionPool::Respond(const Response &response) const
 // IoCore
 //
 
-IoCore::IoCore(Player &player, CommandHandler &handler)
-    : player(player), pool(player, handler)
+IoCore::IoCore(Player &player) : player(player), pool(player)
 {
 }
 
@@ -226,9 +223,8 @@ void IoCore::Respond(const Response &response) const
 // Connection
 //
 
-Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp,
-                       CommandHandler &handler)
-    : parent(parent), tcp(tcp), tokeniser(), handler(handler)
+Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp, Player &player)
+    : parent(parent), tcp(tcp), tokeniser(), player(player)
 {
 	Debug() << "Opening connection from" << Name() << std::endl;
 }
@@ -317,21 +313,21 @@ void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 	if (chars == nullptr) return;
 
 	// Everything looks okay for reading.
-	auto lines = this->tokeniser.Feed(std::string(chars, nread));
-	for (auto line : lines) HandleCommand(line);
+	auto cmds = this->tokeniser.Feed(std::string(chars, nread));
+	for (auto cmd : cmds) RunCommand(cmd);
 	delete[] chars;
 }
 
-void Connection::HandleCommand(const std::vector<std::string> &words)
+void Connection::RunCommand(const std::vector<std::string> &cmd)
 {
-	if (words.empty()) return;
+	if (cmd.empty()) return;
 
 	Debug() << "Received command:";
-	for (const auto &word : words) std::cerr << ' ' << '"' << word << '"';
+	for (const auto &word : cmd) std::cerr << ' ' << '"' << word << '"';
 	std::cerr << std::endl;
 
-	CommandResult res = this->handler.Handle(words);
-	res.Emit(this->parent, words);
+	CommandResult res = this->player.RunCommand(cmd);
+	res.Emit(this->parent, cmd);
 }
 
 void Connection::Depool()

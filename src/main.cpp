@@ -16,7 +16,6 @@
 #include "io/io_core.hpp"
 #include "io/io_response.hpp"
 #include "player/player.hpp"
-#include "cmd.hpp"
 #include "messages.h"
 
 #ifdef WITH_FLAC
@@ -141,8 +140,7 @@ std::pair<std::string, std::string> GetHostAndPort(
  * @param port The TCP port to which playd tried to bind.
  * @param msg The exception's error message.
  */
-void ExitWithNetError(const std::string &host,
-                      const std::string &port,
+void ExitWithNetError(const std::string &host, const std::string &port,
                       const std::string &msg)
 {
 	std::cerr << "Network error: " << msg << "\n";
@@ -183,8 +181,7 @@ int main(int argc, char *argv[])
 	PipeAudioSystem audio(device_id);
 	SetupAudioSystem(audio);
 	Player player(audio);
-	CommandHandler handler(player);
-	IoCore io(player, handler);
+	IoCore io(player);
 
 	// Make sure the player broadcasts its responses back to the IoCore.
 	player.SetSink(io);

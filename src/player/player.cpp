@@ -87,6 +87,40 @@ void Player::End()
 // Commands
 //
 
+CommandResult Player::RunCommand(const std::vector<std::string> &cmd)
+{
+	switch (cmd.size()) {
+		case 1:
+			return this->RunNullaryCommand(cmd[0]);
+		case 2:
+			if (!cmd[1].empty()) {
+				return this->RunUnaryCommand(cmd[0], cmd[1]);
+			}
+			return CommandResult::Invalid(MSG_CMD_INVALID);
+		default:
+			return CommandResult::Invalid(MSG_CMD_INVALID);
+	}
+}
+
+CommandResult Player::RunNullaryCommand(const std::string &word)
+{
+	if ("play" == word) return this->Play();
+	if ("stop" == word) return this->Stop();
+	if ("eject" == word) return this->Eject();
+	if ("quit" == word) return this->Quit();
+
+	return CommandResult::Invalid(MSG_CMD_INVALID);
+}
+
+CommandResult Player::RunUnaryCommand(const std::string &word,
+                                      const std::string &arg)
+{
+	if ("load" == word) return this->Load(arg);
+	if ("seek" == word) return this->Seek(arg);
+
+	return CommandResult::Invalid(MSG_CMD_INVALID);
+}
+
 CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);

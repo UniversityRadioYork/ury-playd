@@ -62,6 +62,13 @@ public:
 	//
 
 	/**
+	 * Handles a command line.
+	 * @param cmd A reference to the list of words in the command.
+	 * @return Whether the command succeeded.
+	 */
+	CommandResult RunCommand(const std::vector<std::string> &words);
+
+	/**
 	 * Ejects the current loaded song, if any.
 	 * @return Whether the ejection succeeded.
 	 */
@@ -143,6 +150,24 @@ public:
 	void WelcomeClient(ResponseSink &client) const;
 
 private:
+	/**
+	 * Runs a nullary (0-argument) command.
+	 * @param word The command word.
+	 * @return True if the command was successfully found and executed;
+	 *   false otherwise.
+	 */
+	CommandResult RunNullaryCommand(const std::string &word);
+
+	/**
+	 * Runs a unary (1-argument) command.
+	 * @param word The command word.
+	 * @param arg The argument to the command.
+	 * @return True if the command was successfully found and executed;
+	 *   false otherwise.
+	 */
+	CommandResult RunUnaryCommand(const std::string &word,
+	                              const std::string &arg);
+
 	/**
 	 * Tells the audio file to start or stop playing.
 	 * @param playing True if playing; false otherwise.
