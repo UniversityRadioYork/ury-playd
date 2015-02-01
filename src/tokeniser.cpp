@@ -21,12 +21,12 @@ Tokeniser::Tokeniser()
 {
 }
 
-std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
+std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 {
 	// The list of ready lines should be cleared by any previous Feed.
 	assert(this->ready_lines.empty());
 
-	for (unsigned char c : raw_string) {
+	for (unsigned char c : raw) {
 		if (this->escape_next) {
 			this->Push(c);
 			continue;
@@ -87,7 +87,7 @@ std::vector<Tokeniser::Line> Tokeniser::Feed(const std::string &raw_string)
 		}
 	}
 
-	std::vector<Line> lines = this->ready_lines;
+	auto lines = this->ready_lines;
 	this->ready_lines.clear();
 
 	return lines;

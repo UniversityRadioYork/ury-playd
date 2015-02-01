@@ -24,21 +24,18 @@
 class Tokeniser
 {
 public:
-	/// A single tokenised line.
-	using Line = std::vector<std::string>;
-
 	/// Constructs a new Tokeniser.
 	Tokeniser();
 
 	/**
 	 * Feeds a string into a Tokeniser.
-	 * @param raw_string Const reference to the raw string to feed.  The
-	 *   string need not contain complete lines.
+	 * @param raw Const reference to the raw string to feed.  The string
+	 *   need not contain complete lines.
 	 * @return The vector of lines that have been successfully tokenised in
 	 *   this tokenising pass.  This vector may be empty.
 	 * @note Escaping a multi-byte UTF-8 character is undefined behaviour.
 	 */
-	std::vector<Line> Feed(const std::string &raw_string);
+	std::vector<std::vector<std::string>> Feed(const std::string &raw);
 
 private:
 	/// Enumeration of quotation types.
@@ -56,11 +53,11 @@ private:
 	QuoteType quote_type;
 
 	/// The current vector of completed, tokenised words.
-	Line words;
+	std::vector<std::string> words;
 
 	/// The current vector of completed, tokenised lines.
 	/// This is cleared at the end of every Tokeniser::Feed.
-	std::vector<Line> ready_lines;
+	std::vector<std::vector<std::string>> ready_lines;
 
 	/// The current, incomplete word to which new characters should be
 	/// added.
