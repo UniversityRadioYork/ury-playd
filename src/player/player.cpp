@@ -102,15 +102,10 @@ CommandResult Player::Load(const std::string &path)
 
 	assert(this->file != nullptr);
 
-	// Silence and bin the current file as soon as possible.
+	// Bin the current file as soon as possible.
 	// This ensures that we don't have any situations where two files are
 	// contending over resources, or the current file spends a second or
 	// two flushing its remaining audio.
-	try {
-		this->file->SetPlaying(false);
-	}
-	catch (NoAudioError) {
-	}
 	this->file = this->audio.Null();
 
 	try {

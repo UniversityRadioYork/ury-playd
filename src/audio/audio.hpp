@@ -46,6 +46,9 @@ public:
 		AT_END,  ///< The Audio has ended and can't play without a seek.
 	};
 
+	/// Virtual, empty destructor for Audio.
+	virtual ~Audio() = default;
+
 	//
 	// Control interface
 	//

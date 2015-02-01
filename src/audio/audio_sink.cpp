@@ -76,6 +76,9 @@ SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
 SdlAudioSink::~SdlAudioSink()
 {
 	if (this->device == 0) return;
+
+	// Silence any currently playing audio.
+	SDL_PauseAudioDevice(this->device, SDL_TRUE);
 	SDL_CloseAudioDevice(this->device);
 }
 
