@@ -28,7 +28,7 @@
 
 #include "../errors.hpp"
 #include "../messages.h"
-#include "../player/player.hpp"
+#include "../player.hpp"
 #include "io_core.hpp"
 #include "io_response.hpp"
 

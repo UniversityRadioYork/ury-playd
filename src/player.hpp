@@ -4,7 +4,7 @@
 /**
  * @file
  * Declaration of the Player class, and associated types.
- * @see player/player.cpp
+ * @see player.cpp
  */
 
 #ifndef PLAYD_PLAYER_HPP
@@ -17,10 +17,10 @@
 #include <utility>
 #include <vector>
 
-#include "../audio/audio_system.hpp"
-#include "../audio/audio.hpp"
-#include "../io/io_response.hpp"
-#include "../cmd_result.hpp"
+#include "audio/audio_system.hpp"
+#include "audio/audio.hpp"
+#include "io/io_response.hpp"
+#include "cmd_result.hpp"
 
 /**
  * A Player contains a loaded audio file and a command API for manipulating it.

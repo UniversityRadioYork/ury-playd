@@ -2,9 +2,9 @@
 // playd is licensed under the MIT licence: see LICENSE.txt.
 
 /**
- * @file player/player.cpp
+ * @file player.cpp
  * Main implementation file for the Player class.
- * @see player/player.hpp
+ * @see player.hpp
  */
 
 #include <cassert>
@@ -14,12 +14,12 @@
 #include <string>
 #include <vector>
 
-#include "../audio/audio_system.hpp"
-#include "../audio/audio.hpp"
-#include "../cmd_result.hpp"
-#include "../errors.hpp"
-#include "../io/io_response.hpp"
-#include "../messages.h"
+#include "audio/audio_system.hpp"
+#include "audio/audio.hpp"
+#include "cmd_result.hpp"
+#include "errors.hpp"
+#include "io/io_response.hpp"
+#include "messages.h"
 #include "player.hpp"
 
 const std::vector<std::string> Player::FEATURES{"End", "FileLoad", "PlayStop",

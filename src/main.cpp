@@ -15,7 +15,7 @@
 #include "audio/audio_system.hpp"
 #include "io/io_core.hpp"
 #include "io/io_response.hpp"
-#include "player/player.hpp"
+#include "player.hpp"
 #include "messages.h"
 
 #ifdef WITH_FLAC
