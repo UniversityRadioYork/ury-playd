@@ -47,10 +47,10 @@ public:
 	};
 
 	/// Type of decoded sample vectors.
-	typedef std::vector<std::uint8_t> DecodeVector;
+	using DecodeVector = std::vector<std::uint8_t>;
 
 	/// Type of the result of Decode().
-	typedef std::pair<DecodeState, DecodeVector> DecodeResult;
+	using DecodeResult = std::pair<DecodeState, DecodeVector>;
 
 	/**
 	 * Constructs an AudioSource.

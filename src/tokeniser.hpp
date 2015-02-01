@@ -25,7 +25,7 @@ class Tokeniser
 {
 public:
 	/// A single tokenised line.
-	typedef std::vector<std::string> Line;
+	using Line = std::vector<std::string>;
 
 	/// Constructs a new Tokeniser.
 	Tokeniser();
