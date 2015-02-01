@@ -4,15 +4,16 @@
 /**
  * @file
  * Implementation of client response classes.
- * @see io/io_response.hpp
+ * @see response.hpp
  */
 
 #include <cctype>
 #include <initializer_list>
 #include <sstream>
 
-#include "../errors.hpp"
-#include "io_response.hpp"
+#include "errors.hpp"
+
+#include "response.hpp"
 
 const std::string Response::STRINGS[] = {
         "OK",       // Code::OK

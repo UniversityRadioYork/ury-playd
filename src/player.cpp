@@ -18,7 +18,7 @@
 #include "audio/audio.hpp"
 #include "cmd_result.hpp"
 #include "errors.hpp"
-#include "io/io_response.hpp"
+#include "response.hpp"
 #include "messages.h"
 #include "player.hpp"
 

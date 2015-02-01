@@ -11,7 +11,7 @@
  * [libuv]: https://github.com/joyent/libuv
  * [the uvbook]: https://nikhilm.github.io/uvbook
  *
- * @see io/io_core.hpp
+ * @see io.hpp
  */
 
 #include <algorithm>
@@ -26,11 +26,12 @@
 #undef UNICODE
 #include <uv.h>
 
-#include "../errors.hpp"
-#include "../messages.h"
-#include "../player.hpp"
-#include "io_core.hpp"
-#include "io_response.hpp"
+#include "errors.hpp"
+#include "messages.h"
+#include "player.hpp"
+#include "response.hpp"
+
+#include "io.hpp"
 
 const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
 

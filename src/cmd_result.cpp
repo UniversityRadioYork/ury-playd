@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "io/io_response.hpp"
+#include "response.hpp"
 #include "cmd_result.hpp"
 
 /* static */ const Response::Code CommandResult::TYPE_CODES[] = {

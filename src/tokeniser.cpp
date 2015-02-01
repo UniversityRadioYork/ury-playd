@@ -4,7 +4,7 @@
 /**
  * @file
  * Definition of the Tokeniser class.
- * @see io/tokeniser.hpp
+ * @see tokeniser.hpp
  */
 
 #include <algorithm>
@@ -12,7 +12,8 @@
 #include <cctype>
 #include <cstdint>
 
-#include "io_response.hpp"
+#include "response.hpp"
+
 #include "tokeniser.hpp"
 
 Tokeniser::Tokeniser()

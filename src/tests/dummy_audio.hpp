@@ -14,7 +14,7 @@
 
 #include "../audio/audio.hpp"
 #include "../audio/audio_system.hpp"
-#include "../io/io_response.hpp"
+#include "../response.hpp"
 
 /**
  * A dummy AudioSystem implementation, for testing.

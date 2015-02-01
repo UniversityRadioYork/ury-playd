@@ -13,8 +13,8 @@
 #include <tuple>
 
 #include "audio/audio_system.hpp"
-#include "io/io_core.hpp"
-#include "io/io_response.hpp"
+#include "io.hpp"
+#include "response.hpp"
 #include "player.hpp"
 #include "messages.h"
 

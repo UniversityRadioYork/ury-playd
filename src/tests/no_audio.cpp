@@ -12,7 +12,7 @@
 
 #include "../audio/audio.hpp"
 #include "../errors.hpp"
-#include "../io/io_response.hpp"
+#include "../response.hpp"
 #include "dummy_response_sink.hpp"
 
 SCENARIO("NoAudio reports the state as NONE", "[no-audio]") {

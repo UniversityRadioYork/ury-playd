@@ -11,7 +11,7 @@
 #include <string>
 
 #include "catch.hpp"
-#include "../io/io_response.hpp"
+#include "../response.hpp"
 
 SCENARIO("Responses correctly escape arguments with single quotes", "[response]") {
 	WHEN("the Response is fed no arguments") {

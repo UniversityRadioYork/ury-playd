@@ -15,7 +15,7 @@
 
 #include "../errors.hpp"
 #include "../messages.h"
-#include "../io/io_response.hpp"
+#include "../response.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"

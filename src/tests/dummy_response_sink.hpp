@@ -11,7 +11,7 @@
 
 #include <ostream>
 
-#include "../io/io_response.hpp"
+#include "../response.hpp"
 
 // A dummy class for testing the ResponseSink abstract class methods.
 class DummyResponseSink : public ResponseSink {

@@ -4,13 +4,13 @@
 /**
  * @file
  * Declaration of the Tokeniser class.
- * @see io/tokeniser.cpp
+ * @see tokeniser.cpp
  */
 
 #ifndef PLAYD_TOKENISER_HPP
 #define PLAYD_TOKENISER_HPP
 
-#include "io_response.hpp"
+#include "response.hpp"
 
 /**
  * A string tokeniser.

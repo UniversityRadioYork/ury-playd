@@ -3,8 +3,8 @@
 
 /**
  * @file
- * Declaration of the IoCore class.
- * @see io/io_core.cpp
+ * Declaration of the I/O classes used in playd.
+ * @see io.cpp
  */
 
 #ifndef PLAYD_IO_CORE_HPP
@@ -15,9 +15,8 @@
 
 #include <uv.h>
 
-#include "../player.hpp"
-#include "io_core.hpp"
-#include "io_response.hpp"
+#include "player.hpp"
+#include "response.hpp"
 #include "tokeniser.hpp"
 
 class Player;

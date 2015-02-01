@@ -4,7 +4,7 @@
 /**
  * @file
  * Declaration of classes pertaining to responses to the client.
- * @see io/io_response.cpp
+ * @see response.cpp
  */
 
 #ifndef PLAYD_IO_RESPONSE_HPP
@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "../errors.hpp"
+#include "errors.hpp"
 
 /// A response.
 class Response
