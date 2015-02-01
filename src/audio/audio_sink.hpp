@@ -30,6 +30,9 @@ public:
 	/// Type of iterators used in the Transfer() method.
 	using TransferIterator = AudioSource::DecodeVector::iterator;
 
+	/// Virtual, empty destructor for AudioSink.
+	virtual ~AudioSink() = default;
+
 	/**
 	 * Starts the audio stream.
 	 * @see Stop
@@ -121,7 +124,7 @@ public:
 	SdlAudioSink(const AudioSource &source, int device_id);
 
 	/// Destructs an SdlAudioSink.
-	~SdlAudioSink();
+	~SdlAudioSink() override;
 
 	void Start() override;
 	void Stop() override;

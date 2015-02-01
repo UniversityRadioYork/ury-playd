@@ -33,6 +33,9 @@
 class AudioSystem
 {
 public:
+	/// Virtual, empty destructor for AudioSystem.
+	virtual ~AudioSystem() = default;
+
 	/**
 	 * Creates an Audio for a lack of audio.
 	 * @return A unique pointer to a dummy Audio.

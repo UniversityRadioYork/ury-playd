@@ -59,6 +59,9 @@ public:
 	 */
 	AudioSource(const std::string &path);
 
+	/// Virtual, empty destructor for AudioSource.
+	virtual ~AudioSource() = default;
+
 	//
 	// Methods that must be overridden
 	//

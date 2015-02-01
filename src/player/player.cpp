@@ -100,6 +100,14 @@ CommandResult Player::Load(const std::string &path)
 {
 	if (path.empty()) return CommandResult::Invalid(MSG_LOAD_EMPTY_PATH);
 
+	assert(this->file != nullptr);
+
+	// Bin the current file as soon as possible.
+	// This ensures that we don't have any situations where two files are
+	// contending over resources, or the current file spends a second or
+	// two flushing its remaining audio.
+	this->file = this->audio.Null();
+
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
