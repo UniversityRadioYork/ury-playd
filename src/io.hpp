@@ -3,8 +3,8 @@
 
 /**
  * @file
- * Declaration of the IoCore class.
- * @see io/io_core.cpp
+ * Declaration of the I/O classes used in playd.
+ * @see io.cpp
  */
 
 #ifndef PLAYD_IO_CORE_HPP
@@ -15,10 +15,8 @@
 
 #include <uv.h>
 
-#include "../cmd.hpp"
-#include "../player/player.hpp"
-#include "io_core.hpp"
-#include "io_response.hpp"
+#include "player.hpp"
+#include "response.hpp"
 #include "tokeniser.hpp"
 
 class Player;
@@ -41,10 +39,9 @@ public:
 	/**
 	 * Constructs a ConnectionPool.
 	 * @param player The player that forms welcome responses for new
-	 *   clients.
-	 * @param handler The handler to which read commands should be sent.
+	 *   clients and handles commands.
 	 */
-	ConnectionPool(Player &player, CommandHandler &handler);
+	ConnectionPool(Player &player);
 
 	/**
 	 * Accepts a new connection.
@@ -70,8 +67,7 @@ public:
 	void Respond(const Response &response) const override;
 
 private:
-	Player &player;          ///< The player.
-	CommandHandler &handler; ///< The command handler.
+	Player &player; ///< The player.
 
 	/// The set of connections inside this ConnectionPool.
 	std::vector<std::unique_ptr<Connection>> connections;
@@ -91,10 +87,9 @@ public:
 	 * Constructs a Connection.
 	 * @param parent The connection pool to which this Connection belongs.
 	 * @param tcp The underlying libuv TCP stream.
-	 * @param handler The handler to which read commands should be sent.
+	 * @param player The player to which read commands should be sent.
 	 */
-	Connection(ConnectionPool &parent, uv_tcp_t *tcp,
-	           CommandHandler &handler);
+	Connection(ConnectionPool &parent, uv_tcp_t *tcp, Player &player);
 
 	/**
 	 * Destructs a Connection.
@@ -141,14 +136,14 @@ private:
 	/// The Tokeniser to which data read on this connection should be sent.
 	Tokeniser tokeniser;
 
-	/// The CommandHandler to which finished commands should be sent.
-	CommandHandler &handler;
+	/// The Player to which finished commands should be sent.
+	Player &player;
 
 	/**
 	 * Handles a tokenised command line.
-	 * @param words A vector of command words representing a command line.
+	 * @param msg A vector of command words representing a command line.
 	 */
-	void HandleCommand(const std::vector<std::string> &words);
+	void RunCommand(const std::vector<std::string> &msg);
 };
 
 /**
@@ -160,11 +155,10 @@ class IoCore : public ResponseSink
 public:
 	/**
 	 * Constructs an IoCore.
-	 * @param player The player to which periodic update requests shall be
-	 * sent.
-	 * @param handler The handler to which command inputs shall be sent.
+	 * @param player The player to which update requests, commands, and new
+	 *   connection state dump requests shall be sent.
 	 */
-	explicit IoCore(Player &player, CommandHandler &handler);
+	explicit IoCore(Player &player);
 
 	/// Deleted copy constructor.
 	IoCore(const IoCore &) = delete;

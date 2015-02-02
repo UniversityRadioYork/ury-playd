@@ -4,8 +4,6 @@
 /**
  * @file
  * Declaration of the CommandResult class.
- * @see cmd.hpp
- * @see cmd.cpp
  */
 
 #ifndef PLAYD_CMD_RESULT
@@ -14,7 +12,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "io/io_response.hpp"
+#include "response.hpp"
 
 /**
  * A result from a command.

@@ -15,7 +15,7 @@
 
 #include "../errors.hpp"
 #include "../messages.h"
-#include "../io/io_response.hpp"
+#include "../response.hpp"
 #include "audio.hpp"
 #include "audio_sink.hpp"
 #include "audio_source.hpp"
@@ -35,8 +35,8 @@ void NoAudio::Emit(Response::Code code, const ResponseSink *sink)
 	if (sink == nullptr) return;
 
 	if (code == Response::Code::STATE) {
-		sink->Respond(Response(Response::Code::STATE)
-				      .AddArg("Ejected"));
+		auto r = Response(Response::Code::STATE).AddArg("Ejected");
+		sink->Respond(r);
 	}
 }
 
@@ -77,8 +77,8 @@ void PipeAudio::Emit(Response::Code code, const ResponseSink *sink)
 
 	switch (code) {
 		case Response::Code::STATE: {
-			auto playing = this->sink->State() ==
-				       Audio::State::PLAYING;
+			auto state = this->sink->State();
+			auto playing = state == Audio::State::PLAYING;
 			r.AddArg(playing ? "Playing" : "Stopped");
 		} break;
 		case Response::Code::FILE: {

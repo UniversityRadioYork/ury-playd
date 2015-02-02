@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include "../io/io_response.hpp"
+#include "../response.hpp"
 #include "audio_source.hpp"
 
 class AudioSink;
