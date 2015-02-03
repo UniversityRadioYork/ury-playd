@@ -87,9 +87,12 @@ class ResponseSink
 public:
 	/**
 	 * Outputs a response.
+	 * @param id The ID, if pertinent, of the sub-component of the
+	 *   ResponseSink to receive a Response, or 0, which signifies that the
+	 *   entire sub-component should receive the Response.
 	 * @param response The Response to output.
 	 */
-	virtual void Respond(const Response &response) const;
+	virtual void Respond(size_t id, const Response &response) const;
 };
 
 #endif // PLAYD_IO_RESPONSE_HPP

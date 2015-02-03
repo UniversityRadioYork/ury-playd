@@ -72,7 +72,7 @@ std::string Response::Pack() const
 // ResponseSink
 //
 
-void ResponseSink::Respond(const Response &) const
+void ResponseSink::Respond(size_t, const Response &) const
 {
 	// By default, do nothing.
 }

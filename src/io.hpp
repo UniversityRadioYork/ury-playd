@@ -60,17 +60,21 @@ public:
 	 * Removes a connection.
 	 * As the ConnectionPool owns the Connection, it will be
 	 * destroyed by this operation.
-	 * @param conn The connection to remove.
+	 * @param id The ID of the connection to remove.
 	 */
-	void Remove(Connection &conn);
+	void Remove(size_t id);
 
-	void Respond(const Response &response) const override;
+	void Respond(size_t id, const Response &response) const override;
 
 private:
 	Player &player; ///< The player.
 
 	/// The set of connections inside this ConnectionPool.
-	std::vector<std::unique_ptr<Connection>> connections;
+	std::vector<std::unique_ptr<Connection>> pool;
+
+	/// A list of free 1-indexed slots inside pool.
+	/// These slots may be re-used instead of creating a new slot.
+	std::vector<size_t> free_list;
 };
 
 /**
@@ -80,7 +84,7 @@ private:
  * allowing it to be sent responses (directly, or via a ConnectionPool
  * Broadcast()), removed from its ConnectionPool, and queried for its name.
  */
-class Connection : public ResponseSink
+class Connection
 {
 public:
 	/**
@@ -88,8 +92,9 @@ public:
 	 * @param parent The connection pool to which this Connection belongs.
 	 * @param tcp The underlying libuv TCP stream.
 	 * @param player The player to which read commands should be sent.
+	 * @param id The ID of this Connection in the ConnectionPool.
 	 */
-	Connection(ConnectionPool &parent, uv_tcp_t *tcp, Player &player);
+	Connection(ConnectionPool &parent, uv_tcp_t *tcp, Player &player, size_t id);
 
 	/**
 	 * Destructs a Connection.
@@ -103,7 +108,11 @@ public:
 	/// Connection cannot be copy-assigned.
 	Connection &operator=(const Connection &) = delete;
 
-	void Respond(const Response &response) const override;
+	/**
+	 * Emits a Response via this Connection.
+	 * @param response The response to send.
+	 */
+	void Respond(const Response &response) const;
 
 	/**
 	 * Processes a data read on this connection.
@@ -138,6 +147,9 @@ private:
 
 	/// The Player to which finished commands should be sent.
 	Player &player;
+
+	/// The Connection's ID in the connection pool.
+	size_t id;
 
 	/**
 	 * Handles a tokenised command line.
@@ -176,7 +188,7 @@ public:
 	 */
 	void Run(const std::string &host, const std::string &port);
 
-	void Respond(const Response &response) const override;
+	void Respond(size_t id, const Response &response) const override;
 
 private:
 	/// The period between player updates.

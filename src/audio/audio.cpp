@@ -30,13 +30,13 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-void NoAudio::Emit(Response::Code code, const ResponseSink *sink)
+void NoAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
 {
 	if (sink == nullptr) return;
 
 	if (code == Response::Code::STATE) {
 		auto r = Response(Response::Code::STATE).AddArg("Ejected");
-		sink->Respond(r);
+		sink->Respond(id, r);
 	}
 }
 
@@ -66,7 +66,7 @@ PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(Response::Code code, const ResponseSink *sink)
+void PipeAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
 {
 	if (sink == nullptr) return;
 
@@ -85,38 +85,42 @@ void PipeAudio::Emit(Response::Code code, const ResponseSink *sink)
 			r.AddArg(this->src->Path());
 		} break;
 		case Response::Code::TIME: {
-			// To prevent spewing massive amounts of TIME
-			// responses, we only send one if the number of seconds
-			// has changed since the last request for this response
-			// on this sink.
 			std::uint64_t micros = this->Position();
-			std::uint64_t secs = micros / 1000 / 1000;
 
-			auto last_entry = this->last_times.find(sink);
+			if (id == 0) {
+				// To prevent spewing massive amounts of TIME
+				// responses, we only send a broadcast if the
+				// number of seconds has changed since the last
+				// request for this response on this sink.
+				std::uint64_t secs = micros / 1000 / 1000;
 
-			// We can announce if we haven't got a record for this
-			// sink, or if the last record was in a previous
-			// second.
-			bool can_announce = true;
-			if (last_entry != this->last_times.end()) {
-				can_announce = (last_entry->second < secs);
+				auto last_entry = this->last_times.find(sink);
 
-				// This is so as to allow the emplace below to
-				// work--it fails if there's already a value
-				// under the same key.
-				if (can_announce)
-					this->last_times.erase(last_entry);
+				// We can announce if we haven't got a record
+				// for this sink, or if the last record was in
+				// a previous second.
+				bool announce = true;
+				if (last_entry != this->last_times.end()) {
+					announce = last_entry->second < secs;
+
+					// This is so as to allow the emplace
+					// below to work--it fails if there's
+					// already a value under the same key.
+					if (announce) {
+						this->last_times.erase(last_entry);
+					}
+				}
+
+				if (!announce) return;
+				this->last_times.emplace(sink, secs);
 			}
-
-			if (!can_announce) return;
-			this->last_times.emplace(sink, secs);
 			r.AddArg(std::to_string(micros));
 		} break;
 		default:
 			return;
 	}
 
-	sink->Respond(r);
+	sink->Respond(id, r);
 }
 
 void PipeAudio::SetPlaying(bool playing)
