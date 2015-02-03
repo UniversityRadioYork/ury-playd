@@ -80,9 +80,12 @@ public:
 	 * response code is most appropriate for the failure.
 	 *
 	 * @param sink The ResponseSink to which the response will be sent.
+	 * @param id The connection ID in the sink to which the response will
+	 *   be sent.
 	 * @param cmd The original command that created this CommandResult.
 	 */
 	void Emit(const ResponseSink &sink,
+	          size_t id,
 	          const std::vector<std::string> &cmd) const;
 
 private:
