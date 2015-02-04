@@ -63,7 +63,7 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(Response::Code code, const ResponseSink *sink) override;
+	void Emit(Response::Code code, const ResponseSink *sink, size_t id) override;
 	std::uint64_t Position() const override;
 
 private:

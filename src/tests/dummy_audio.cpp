@@ -23,7 +23,7 @@ DummyAudio::DummyAudio(DummyAudioSystem &sys) : sys(sys)
 {
 }
 
-void DummyAudio::Emit(Response::Code code, const ResponseSink *sink)
+void DummyAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
 {
 	if (sink == nullptr) return;
 
@@ -38,7 +38,7 @@ void DummyAudio::Emit(Response::Code code, const ResponseSink *sink)
 		return;
 	}
 
-	sink->Respond(r);
+	sink->Respond(id, r);
 }
 
 void DummyAudio::SetPlaying(bool playing)

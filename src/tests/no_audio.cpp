@@ -36,7 +36,7 @@ SCENARIO("NoAudio emits state, but no file or position", "[no-audio]") {
 		WHEN("the NoAudio is asked to emit a STATE") {
 			std::ostringstream os;
 			DummyResponseSink rs(os);
-			n.Emit(Response::Code::STATE, &rs);
+			n.Emit(Response::Code::STATE, &rs, 0);
 
 			THEN("'STATE Ejected' is emitted") {
 				REQUIRE(os.str() == "STATE Ejected\n");
@@ -46,7 +46,7 @@ SCENARIO("NoAudio emits state, but no file or position", "[no-audio]") {
 		WHEN("the NoAudio is asked to emit a FILE") {
 			std::ostringstream os;
 			DummyResponseSink rs(os);
-			n.Emit(Response::Code::FILE, &rs);
+			n.Emit(Response::Code::FILE, &rs, 0);
 
 			THEN("nothing is emitted") {
 				REQUIRE(os.str().empty());
@@ -56,7 +56,7 @@ SCENARIO("NoAudio emits state, but no file or position", "[no-audio]") {
 		WHEN("the NoAudio is asked to emit a TIME") {
 			std::ostringstream os;
 			DummyResponseSink rs(os);
-			n.Emit(Response::Code::TIME, &rs);
+			n.Emit(Response::Code::TIME, &rs, 0);
 
 			THEN("nothing is emitted") {
 				REQUIRE(os.str().empty());
