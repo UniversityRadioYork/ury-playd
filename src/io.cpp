@@ -89,7 +89,7 @@ void UvListenCallback(uv_stream_t *server, int status)
 	if (status < 0) return;
 	assert(server != nullptr);
 
-	ConnectionPool *pool = static_cast<ConnectionPool *>(server->data);
+	IoCore *pool = static_cast<IoCore *>(server->data);
 	assert(pool != nullptr);
 
 	pool->Accept(server);
@@ -126,14 +126,22 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 }
 
 //
-// ConnectionPool
+// IoCore
 //
 
-ConnectionPool::ConnectionPool(Player &player) : player(player), pool()
+IoCore::IoCore(Player &player) : player(player)
 {
 }
 
-void ConnectionPool::Accept(uv_stream_t *server)
+void IoCore::Run(const std::string &host, const std::string &port)
+{
+	this->InitAcceptor(host, port);
+	this->DoUpdateTimer();
+	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+}
+
+
+void IoCore::Accept(uv_stream_t *server)
 {
 	assert(server != nullptr);
 
@@ -185,7 +193,7 @@ void ConnectionPool::Accept(uv_stream_t *server)
 	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 }
 
-void ConnectionPool::Remove(size_t slot)
+void IoCore::Remove(size_t slot)
 {
 	assert(0 < slot && slot <= this->pool.size());
 
@@ -199,7 +207,7 @@ void ConnectionPool::Remove(size_t slot)
 	assert(!this->pool.at(slot - 1));
 }
 
-void ConnectionPool::Respond(size_t id, const Response &response) const
+void IoCore::Respond(size_t id, const Response &response) const
 {
 	if (this->pool.empty()) return;
 
@@ -212,21 +220,6 @@ void ConnectionPool::Respond(size_t id, const Response &response) const
 		assert(0 < id && id <= this->pool.size());
 		if (this->pool.at(id - 1)) this->pool.at(id - 1)->Respond(response);
 	}
-}
-
-//
-// IoCore
-//
-
-IoCore::IoCore(Player &player) : player(player), pool(player)
-{
-}
-
-void IoCore::Run(const std::string &host, const std::string &port)
-{
-	this->InitAcceptor(host, port);
-	this->DoUpdateTimer();
-	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
 void IoCore::DoUpdateTimer()
@@ -242,7 +235,7 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	int uport = std::stoi(port);
 
 	uv_tcp_init(uv_default_loop(), &this->server);
-	this->server.data = static_cast<void *>(&this->pool);
+	this->server.data = static_cast<void *>(this);
 	assert(this->server.data != nullptr);
 
 	struct sockaddr_in bind_addr;
@@ -258,16 +251,11 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoCore::Respond(size_t id, const Response &response) const
-{
-	this->pool.Respond(id, response);
-}
-
 //
 // Connection
 //
 
-Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp, Player &player, size_t id)
+Connection::Connection(IoCore &parent, uv_tcp_t *tcp, Player &player, size_t id)
     : parent(parent), tcp(tcp), tokeniser(), player(player), id(id)
 {
 	Debug() << "Opening connection from" << Name() << std::endl;

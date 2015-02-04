@@ -144,7 +144,7 @@ public:
 
 	/**
 	 * Sends welcome/current status information to a new client.
-	 * @param id The ID inside the ConnectionPool of the new client.
+	 * @param id The ID of the new client inside the IO system.
 	 */
 	void WelcomeClient(size_t id) const;
 
