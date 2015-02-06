@@ -36,7 +36,7 @@ void NoAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
 
 	if (code == Response::Code::STATE) {
 		auto r = Response(Response::Code::STATE).AddArg("Ejected");
-		sink->Respond(id, r);
+		sink->Respond(r, id);
 	}
 }
 
@@ -120,7 +120,7 @@ void PipeAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
 			return;
 	}
 
-	sink->Respond(id, r);
+	sink->Respond(r, id);
 }
 
 void PipeAudio::SetPlaying(bool playing)

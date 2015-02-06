@@ -38,7 +38,7 @@ void DummyAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
 		return;
 	}
 
-	sink->Respond(id, r);
+	sink->Respond(r, id);
 }
 
 void DummyAudio::SetPlaying(bool playing)

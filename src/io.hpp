@@ -81,7 +81,7 @@ public:
 	 */
 	void Remove(size_t id);
 
-	void Respond(size_t id, const Response &response) const override;
+	void Respond(const Response &response, size_t id=0) const override;
 
 private:
 	/// The period between player updates.

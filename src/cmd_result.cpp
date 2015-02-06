@@ -58,5 +58,5 @@ void CommandResult::Emit(const ResponseSink &sink,
 	// Then, add in the original command words.
 	for (auto &cwd : cmd) r.AddArg(cwd);
 
-	sink.Respond(id, r);
+	sink.Respond(r, id);
 }

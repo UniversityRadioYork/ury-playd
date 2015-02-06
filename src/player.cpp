@@ -44,7 +44,7 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->file->Emit(Response::Code::TIME, this->sink, 0);
+		this->file->Emit(Response::Code::TIME, this->sink);
 	}
 
 	return this->is_running;
@@ -59,11 +59,11 @@ void Player::EmitAllAudioState(size_t id) const
 
 void Player::WelcomeClient(size_t id) const
 {
-	this->sink->Respond(id, Response(Response::Code::OHAI).AddArg(MSG_OHAI));
+	this->sink->Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI), id);
 
 	auto features = Response(Response::Code::FEATURES);
 	for (auto &f : FEATURES) features.AddArg(f);
-	this->sink->Respond(id, features);
+	this->sink->Respond(features, id);
 
 	this->EmitAllAudioState(id);
 }
@@ -80,7 +80,7 @@ void Player::End()
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
 	if (this->sink == nullptr) return;
-	this->sink->Respond(0, Response(Response::Code::END));
+	this->sink->Respond(Response(Response::Code::END));
 }
 
 //
@@ -125,7 +125,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	this->file->Emit(Response::Code::STATE, this->sink, 0);
+	this->file->Emit(Response::Code::STATE, this->sink);
 
 	return CommandResult::Success();
 }
@@ -187,7 +187,7 @@ CommandResult Player::SetPlaying(bool playing)
 		return CommandResult::Invalid(e.Message());
 	}
 
-	this->file->Emit(Response::Code::STATE, this->sink, 0);
+	this->file->Emit(Response::Code::STATE, this->sink);
 
 	return CommandResult::Success();
 }
@@ -257,5 +257,5 @@ void Player::SeekRaw(std::uint64_t pos)
 	assert(this->file != nullptr);
 
 	this->file->Seek(pos);
-	this->file->Emit(Response::Code::TIME, this->sink, 0);
+	this->file->Emit(Response::Code::TIME, this->sink);
 }

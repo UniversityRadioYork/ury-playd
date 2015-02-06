@@ -14,7 +14,7 @@ DummyResponseSink::DummyResponseSink(std::ostream &os) : os(os)
 {
 }
 
-void DummyResponseSink::Respond(size_t, const Response &response) const
+void DummyResponseSink::Respond(const Response &response, size_t) const
 {
 	this->os << response.Pack() << std::endl;
 }
