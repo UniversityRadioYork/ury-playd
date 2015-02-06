@@ -203,6 +203,23 @@ private:
 
 	/// Transfers as much of the current frame as possible to the sink.
 	void TransferFrame();
+
+	/**
+	 * Determines whether we can broadcast a TIME response.
+	 *
+	 * To prevent spewing massive amounts of TIME responses, we only send a
+	 * broadcast if the number of seconds has changed since the last
+	 * time CanAnnounceTime() was called for the given sink.
+	 *
+	 * This is *not* idempotent.  A CanAnnounceTime(x) less than one second
+	 * before a CanAnnounceTime(x) will _always_ be false.
+	 *
+	 * @param micros The value of the TIME response, in microseconds.
+	 * @param sink The ResponseSink to which a TIME will be broadcast if
+	 *   this returns true.
+	 * @return Whether it is polite to send TIME to the given sink.
+	 */
+	bool CanAnnounceTime(std::uint64_t micros, const ResponseSink *sink);
 };
 
 #endif // PLAYD_AUDIO_HPP

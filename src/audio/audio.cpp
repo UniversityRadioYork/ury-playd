@@ -66,9 +66,9 @@ PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
+void PipeAudio::Emit(Response::Code code, const ResponseSink *rs, size_t id)
 {
-	if (sink == nullptr) return;
+	if (rs == nullptr) return;
 
 	assert(this->src != nullptr);
 	assert(this->sink != nullptr);
@@ -87,40 +87,17 @@ void PipeAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
 		case Response::Code::TIME: {
 			std::uint64_t micros = this->Position();
 
-			if (id == 0) {
-				// To prevent spewing massive amounts of TIME
-				// responses, we only send a broadcast if the
-				// number of seconds has changed since the last
-				// request for this response on this sink.
-				std::uint64_t secs = micros / 1000 / 1000;
-
-				auto last_entry = this->last_times.find(sink);
-
-				// We can announce if we haven't got a record
-				// for this sink, or if the last record was in
-				// a previous second.
-				bool announce = true;
-				if (last_entry != this->last_times.end()) {
-					announce = last_entry->second < secs;
-
-					// This is so as to allow the emplace
-					// below to work--it fails if there's
-					// already a value under the same key.
-					if (announce) {
-						this->last_times.erase(last_entry);
-					}
-				}
-
-				if (!announce) return;
-				this->last_times.emplace(sink, secs);
-			}
+			// Always announce a broadcast.
+			// Only announce unicasts if CanAnnounceTime(...).
+			bool can = 0 < id || this->CanAnnounceTime(micros, rs);
+			if (!can) return;
 			r.AddArg(std::to_string(micros));
 		} break;
 		default:
 			return;
 	}
 
-	sink->Respond(r, id);
+	rs->Respond(r, id);
 }
 
 void PipeAudio::SetPlaying(bool playing)
@@ -222,4 +199,26 @@ bool PipeAudio::DecodeIfFrameEmpty()
 bool PipeAudio::FrameFinished() const
 {
 	return this->frame.end() <= this->frame_iterator;
+}
+
+bool PipeAudio::CanAnnounceTime(std::uint64_t micros, const ResponseSink *sink)
+{
+	std::uint64_t secs = micros / 1000 / 1000;
+
+	auto last_entry = this->last_times.find(sink);
+
+	// We can announce if we don't have a record for this sink, or if the
+	// last record was in a previous second.
+	bool announce = true;
+	if (last_entry != this->last_times.end()) {
+		announce = last_entry->second < secs;
+
+		// This is so as to allow the emplace below to work--it fails
+		// if there's already a value under the same key.
+		if (announce) this->last_times.erase(last_entry);
+	}
+
+	if (announce) this->last_times.emplace(sink, secs);
+
+	return announce;
 }
