@@ -365,7 +365,7 @@ void Connection::RunCommand(const std::vector<std::string> &cmd)
 	std::cerr << std::endl;
 
 	CommandResult res = this->player.RunCommand(cmd);
-	res.Emit(this->parent, this->id, cmd);
+	res.Emit(this->parent, cmd, this->id);
 }
 
 void Connection::Depool()

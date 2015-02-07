@@ -31,7 +31,7 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			std::vector<std::string> cmd({ "OHAI", "testy test" });
 
 			WHEN("Emit(cmd) is called") {
-				c.Emit(d, 0, cmd);
+				c.Emit(d, cmd);
 
 				THEN("the response is OK followed by the command words") {
 					REQUIRE(os.str() == "OK OHAI 'testy test'\n");
@@ -57,7 +57,7 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			std::vector<std::string> cmd({ "OHAI", "testy test" });
 
 			WHEN("Emit(cmd) is called") {
-				c.Emit(d, 0, cmd);
+				c.Emit(d, cmd);
 
 				THEN("the response is WHAT followed by the failure message and command") {
 					REQUIRE(os.str() == "WHAT 'PEBCAK error' OHAI 'testy test'\n");
@@ -84,7 +84,7 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			std::vector<std::string> cmd({ "OHAI", "testy test" });
 
 			WHEN("Emit(cmd) is called") {
-				c.Emit(d, 0, cmd);
+				c.Emit(d, cmd);
 
 				THEN("the response is FAIL followed by the failure message") {
 					REQUIRE(os.str() == "FAIL 'lp0 on fire' OHAI 'testy test'\n");
