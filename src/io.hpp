@@ -92,7 +92,7 @@ private:
 	Player &player;      ///< The player.
 
 	/// The set of connections inside this IoCore.
-	std::vector<std::unique_ptr<Connection>> pool;
+	std::vector<std::shared_ptr<Connection>> pool;
 
 	/// A list of free 1-indexed slots inside pool.
 	/// These slots may be re-used instead of creating a new slot.

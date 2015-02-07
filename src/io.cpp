@@ -182,7 +182,7 @@ void IoCore::Accept(uv_stream_t *server)
 	assert(0 < client_slot);
 	assert(client_slot <= this->pool.size());
 
-	std::unique_ptr<Connection> conn(new Connection(*this, client, this->player, client_slot));
+	auto conn = std::make_shared<Connection>(*this, client, this->player, client_slot);
 	client->data = static_cast<void *>(conn.get());
 	this->pool[client_slot - 1] = std::move(conn);
 
@@ -213,12 +213,17 @@ void IoCore::Respond(const Response &response, size_t id) const
 
 	if (id == 0) {
 		Debug() << "broadcast:" << response.Pack() << std::endl;
-		for (const auto &conn : this->pool) conn->Respond(response);
+		// Copy the connection by value, so that there's at least one
+		// active reference to it throughout.
+		for (const auto conn : this->pool) {
+			if (conn) conn->Respond(response);
+		}
 	} else {
 		Debug() << "unicast @" << std::to_string(id) << ":" << response.Pack() << std::endl;
 
 		assert(0 < id && id <= this->pool.size());
-		if (this->pool.at(id - 1)) this->pool.at(id - 1)->Respond(response);
+		auto conn = this->pool.at(id - 1);
+		if (conn) conn->Respond(response);
 	}
 }
 
