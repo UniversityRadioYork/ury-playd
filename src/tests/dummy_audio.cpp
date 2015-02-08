@@ -82,33 +82,3 @@ std::unique_ptr<Audio> DummyAudioSystem::Load(const std::string &path) const
 	notconst.path = path;
 	return std::unique_ptr<Audio>(new DummyAudio(notconst));
 }
-
-/* static */ std::unique_ptr<AudioSource> DummyAudioSource::Build(const std::string &path)
-{
-	return std::unique_ptr<AudioSource>(new DummyAudioSource(path));
-}
-
-std::uint8_t DummyAudioSource::ChannelCount() const
-{
-	return 2;
-}
-
-std::uint32_t DummyAudioSource::SampleRate() const
-{
-	return 44100;
-}
-
-std::uint64_t DummyAudioSource::Seek(std::uint64_t in_samples)
-{
-	return in_samples;
-}
-
-DummyAudioSource::DecodeResult DummyAudioSource::Decode()
-{
-	return std::make_pair(DecodeState::DECODING, DecodeVector());
-}
-
-SampleFormat DummyAudioSource::OutputSampleFormat() const
-{
-	return SampleFormat::PACKED_UNSIGNED_INT_8;
-}
