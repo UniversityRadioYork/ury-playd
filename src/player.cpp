@@ -50,22 +50,22 @@ bool Player::Update()
 	return this->is_running;
 }
 
-void Player::EmitAllAudioState(const ResponseSink *sink) const
+void Player::EmitAllAudioState(size_t id) const
 {
-	this->file->Emit(Response::Code::FILE, sink);
-	this->file->Emit(Response::Code::TIME, sink);
-	this->file->Emit(Response::Code::STATE, sink);
+	this->file->Emit(Response::Code::FILE, sink, id);
+	this->file->Emit(Response::Code::TIME, sink, id);
+	this->file->Emit(Response::Code::STATE, sink, id);
 }
 
-void Player::WelcomeClient(ResponseSink &client) const
+void Player::WelcomeClient(size_t id) const
 {
-	client.Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI));
+	this->sink->Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI), id);
 
 	auto features = Response(Response::Code::FEATURES);
 	for (auto &f : FEATURES) features.AddArg(f);
-	client.Respond(features);
+	this->sink->Respond(features, id);
 
-	this->EmitAllAudioState(&client);
+	this->EmitAllAudioState(id);
 }
 
 void Player::End()
@@ -145,7 +145,7 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		this->EmitAllAudioState(this->sink);
+		this->EmitAllAudioState(0);
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.

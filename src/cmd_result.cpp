@@ -45,7 +45,8 @@ bool CommandResult::IsSuccess() const
 }
 
 void CommandResult::Emit(const ResponseSink &sink,
-                         const std::vector<std::string> &cmd) const
+                         const std::vector<std::string> &cmd,
+			 size_t id) const
 {
 	Response r(CommandResult::TYPE_CODES[static_cast<uint8_t>(this->type)]);
 
@@ -57,5 +58,5 @@ void CommandResult::Emit(const ResponseSink &sink,
 	// Then, add in the original command words.
 	for (auto &cwd : cmd) r.AddArg(cwd);
 
-	sink.Respond(r);
+	sink.Respond(r, id);
 }

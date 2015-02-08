@@ -88,8 +88,10 @@ public:
 	 * @param response The response to emit, if possible.
 	 * @param sink The ResponseSink to which the response shall be sent.
 	 *   May be nullptr, in which case Emit should be a no-operation.
+	 * @param id The ID of the connection to which the ResponseSink should
+	 *   route the response.  May be 0 (the default), for all (broadcast).
 	 */
-	virtual void Emit(Response::Code code, const ResponseSink *sink) = 0;
+	virtual void Emit(Response::Code code, const ResponseSink *sink, size_t id=0) = 0;
 
 	/**
 	 * This Audio's current position.
@@ -116,7 +118,7 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	void Emit(Response::Code code, const ResponseSink *sink) override;
+	void Emit(Response::Code code, const ResponseSink *sink, size_t id) override;
 
 	// The following all raise an exception:
 
@@ -152,7 +154,7 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(Response::Code code, const ResponseSink *sink) override;
+	void Emit(Response::Code code, const ResponseSink *sink, size_t id) override;
 	std::uint64_t Position() const override;
 
 private:
@@ -201,6 +203,23 @@ private:
 
 	/// Transfers as much of the current frame as possible to the sink.
 	void TransferFrame();
+
+	/**
+	 * Determines whether we can broadcast a TIME response.
+	 *
+	 * To prevent spewing massive amounts of TIME responses, we only send a
+	 * broadcast if the number of seconds has changed since the last
+	 * time CanAnnounceTime() was called for the given sink.
+	 *
+	 * This is *not* idempotent.  A CanAnnounceTime(x) less than one second
+	 * before a CanAnnounceTime(x) will _always_ be false.
+	 *
+	 * @param micros The value of the TIME response, in microseconds.
+	 * @param sink The ResponseSink to which a TIME will be broadcast if
+	 *   this returns true.
+	 * @return Whether it is polite to send TIME to the given sink.
+	 */
+	bool CanAnnounceTime(std::uint64_t micros, const ResponseSink *sink);
 };
 
 #endif // PLAYD_AUDIO_HPP

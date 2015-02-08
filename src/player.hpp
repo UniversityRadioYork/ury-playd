@@ -144,10 +144,9 @@ public:
 
 	/**
 	 * Sends welcome/current status information to a new client.
-	 * @param client An IO ResponseSink to which messages to the client
-	 *   should be sent.
+	 * @param id The ID of the new client inside the IO system.
 	 */
-	void WelcomeClient(ResponseSink &client) const;
+	void WelcomeClient(size_t id) const;
 
 private:
 	/**
@@ -203,13 +202,14 @@ private:
 	void End();
 
 	/**
-	 * Asks the current file to dump all of its state to the given sink.
-	 * @param sink The sink to which the state responses shall be sent.
+	 * Asks the current file to dump all of its state to the connection
+	 * with the given ID.
+	 * @param id The ID of the connection to receive the dump.
 	 * @note This is a pointer, not a reference, so as to allow nullptr
 	 *   (which means no sink is assigned).  When `optional` becomes
 	 *   standard, perhaps use that.
 	 */
-	void EmitAllAudioState(const ResponseSink *sink) const;
+	void EmitAllAudioState(size_t id) const;
 };
 
 #endif // PLAYD_PLAYER_HPP

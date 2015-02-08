@@ -166,6 +166,13 @@ void ExitWithError(const std::string &msg)
  */
 int main(int argc, char *argv[])
 {
+	// If we don't ignore SIGPIPE, certain classes of connection droppage
+	// will crash our program with it.
+	// TODO(CaptainHayashi): a more rigorous ifndef here.
+#ifndef _MSC_VER
+	signal(SIGPIPE, SIG_IGN);
+#endif
+
 	// This call needs to happen before GetDeviceID, otherwise no device
 	// IDs will be recognised.  (This is why it's here, and not in
 	// SetupAudioSystem.)

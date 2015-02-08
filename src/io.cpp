@@ -89,7 +89,7 @@ void UvListenCallback(uv_stream_t *server, int status)
 	if (status < 0) return;
 	assert(server != nullptr);
 
-	ConnectionPool *pool = static_cast<ConnectionPool *>(server->data);
+	IoCore *pool = static_cast<IoCore *>(server->data);
 	assert(pool != nullptr);
 
 	pool->Accept(server);
@@ -126,14 +126,22 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 }
 
 //
-// ConnectionPool
+// IoCore
 //
 
-ConnectionPool::ConnectionPool(Player &player) : player(player), connections()
+IoCore::IoCore(Player &player) : player(player)
 {
 }
 
-void ConnectionPool::Accept(uv_stream_t *server)
+void IoCore::Run(const std::string &host, const std::string &port)
+{
+	this->InitAcceptor(host, port);
+	this->DoUpdateTimer();
+	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+}
+
+
+void IoCore::Accept(uv_stream_t *server)
 {
 	assert(server != nullptr);
 
@@ -145,45 +153,78 @@ void ConnectionPool::Accept(uv_stream_t *server)
 		return;
 	}
 
-	this->connections.emplace_back(
-	        new Connection(*this, client, this->player));
+	// We'll want to try and use an existing, empty slot in the connection
+	// pool.  If there aren't any (we've exceeded the maximum-so-far number
+	// of simultaneous connections), we expand the pool.
+	//
+	// If we already have SIZE_MAX-1 simultaneous connections, we bail out.
+	// Since this is at least 65,534, and likely to be 2^32-2 or 2^64-2,
+	// this is incredibly unlikely to happen and probably means someone's
+	// trying to denial-of-service an audio player.
+	//
+	// Why -1?  Because slot 0 in the connection pool is reserved for
+	// broadcasts.
+	if (this->free_list.empty()) {
+		if (this->pool.size() == (SIZE_MAX - 1)) {
+			throw InternalError("too many simultaneous connections");
+		}
 
-	this->player.WelcomeClient(*this->connections.back());
-	client->data = static_cast<void *>(this->connections.back().get());
+		this->pool.emplace_back(nullptr);
+		// This isn't an off-by-one error; slots index from 1.
+		this->free_list.push_back(this->pool.size());
+	}
+
+	assert(!this->free_list.empty());
+	size_t client_slot = this->free_list.back();
+	this->free_list.pop_back();
+
+	// client_slot should be at least 1, because of the above.
+	assert(0 < client_slot);
+	assert(client_slot <= this->pool.size());
+
+	auto conn = std::make_shared<Connection>(*this, client, this->player, client_slot);
+	client->data = static_cast<void *>(conn.get());
+	this->pool[client_slot - 1] = std::move(conn);
+
+	// The player will already have been told to send responses to the
+	// IoCore, so all it needs to know is the slot.
+	this->player.WelcomeClient(client_slot);
 
 	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 }
 
-void ConnectionPool::Remove(Connection &conn)
+void IoCore::Remove(size_t slot)
 {
-	this->connections.erase(std::remove_if(
-	        this->connections.begin(), this->connections.end(),
-	        [&](const std::unique_ptr<Connection> &p) {
-		        return p.get() == &conn;
-		}));
+	assert(0 < slot && slot <= this->pool.size());
+
+	// Don't remove if it's already a nullptr, because we'd end up with the
+	// slot on the free list twice.
+	if (this->pool.at(slot - 1)) {
+		this->pool[slot - 1] = nullptr;
+		this->free_list.push_back(slot);
+	}
+
+	assert(!this->pool.at(slot - 1));
 }
 
-void ConnectionPool::Respond(const Response &response) const
+void IoCore::Respond(const Response &response, size_t id) const
 {
-	if (this->connections.empty()) return;
+	if (this->pool.empty()) return;
 
-	Debug() << "Sending command:" << response.Pack() << std::endl;
-	for (const auto &conn : this->connections) conn->Respond(response);
-}
+	if (id == 0) {
+		Debug() << "broadcast:" << response.Pack() << std::endl;
+		// Copy the connection by value, so that there's at least one
+		// active reference to it throughout.
+		for (const auto conn : this->pool) {
+			if (conn) conn->Respond(response);
+		}
+	} else {
+		Debug() << "unicast @" << std::to_string(id) << ":" << response.Pack() << std::endl;
 
-//
-// IoCore
-//
-
-IoCore::IoCore(Player &player) : player(player), pool(player)
-{
-}
-
-void IoCore::Run(const std::string &host, const std::string &port)
-{
-	this->InitAcceptor(host, port);
-	this->DoUpdateTimer();
-	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+		assert(0 < id && id <= this->pool.size());
+		auto conn = this->pool.at(id - 1);
+		if (conn) conn->Respond(response);
+	}
 }
 
 void IoCore::DoUpdateTimer()
@@ -199,7 +240,7 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	int uport = std::stoi(port);
 
 	uv_tcp_init(uv_default_loop(), &this->server);
-	this->server.data = static_cast<void *>(&this->pool);
+	this->server.data = static_cast<void *>(this);
 	assert(this->server.data != nullptr);
 
 	struct sockaddr_in bind_addr;
@@ -215,17 +256,12 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoCore::Respond(const Response &response) const
-{
-	this->pool.Respond(response);
-}
-
 //
 // Connection
 //
 
-Connection::Connection(ConnectionPool &parent, uv_tcp_t *tcp, Player &player)
-    : parent(parent), tcp(tcp), tokeniser(), player(player)
+Connection::Connection(IoCore &parent, uv_tcp_t *tcp, Player &player, size_t id)
+    : parent(parent), tcp(tcp), tokeniser(), player(player), id(id)
 {
 	Debug() << "Opening connection from" << Name() << std::endl;
 }
@@ -285,7 +321,8 @@ std::string Connection::Name()
 	// See comment for above error.
 	if (ne) return "<error@name: " + std::string(gai_strerror(ne)) + ">";
 
-	return host + std::string(":") + serv;
+	auto id = std::to_string(this->id);
+	return id + std::string("!") + host + std::string(":") + serv;
 }
 
 void Connection::Read(ssize_t nread, const uv_buf_t *buf)
@@ -328,10 +365,10 @@ void Connection::RunCommand(const std::vector<std::string> &cmd)
 	std::cerr << std::endl;
 
 	CommandResult res = this->player.RunCommand(cmd);
-	res.Emit(this->parent, cmd);
+	res.Emit(this->parent, cmd, this->id);
 }
 
 void Connection::Depool()
 {
-	this->parent.Remove(*this);
+	this->parent.Remove(this->id);
 }
