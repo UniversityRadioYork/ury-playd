@@ -17,6 +17,15 @@
 class DummyAudioSink : public AudioSink
 {
 public:
+	/**
+	 * Helper function for creating uniquely pointed-to AudioSinks.
+	 * @param source The source from which this sink will receive audio.
+	 * @param device_id The device ID to which this sink will output.
+	 * @return A unique pointer to an AudioSink.
+	 */
+	static std::unique_ptr<AudioSink> Build(const AudioSource &source,
+	                                        int device_id);
+
 	void Start() override;
 	void Stop() override;
 	Audio::State State() override;
