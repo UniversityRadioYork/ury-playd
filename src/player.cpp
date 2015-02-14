@@ -230,7 +230,7 @@ CommandResult Player::Seek(const std::string &time_str)
 	return CommandResult::Success();
 }
 
-std::uint64_t Player::SeekParse(const std::string &time_str)
+/* static */ std::uint64_t Player::SeekParse(const std::string &time_str)
 {
 	size_t cpos = 0;
 

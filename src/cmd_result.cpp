@@ -53,7 +53,7 @@ void CommandResult::Emit(const ResponseSink &sink,
 	// Only display a message if the result wasn't a successful one.
 	// The message goes at the front, as then clients always know it's the
 	// first argument.
-	if (this->type != Type::SUCCESS) r.AddArg(this->msg);
+	if (!this->IsSuccess()) r.AddArg(this->msg);
 
 	// Then, add in the original command words.
 	for (auto &cwd : cmd) r.AddArg(cwd);
