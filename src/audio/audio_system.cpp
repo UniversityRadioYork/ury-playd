@@ -50,8 +50,7 @@ std::unique_ptr<Audio> PipeAudioSystem::Load(const std::string &path) const
 	        new PipeAudio(std::move(source), std::move(sink)));
 }
 
-std::unique_ptr<AudioSource> PipeAudioSystem::LoadSource(
-        const std::string &path) const
+std::unique_ptr<AudioSource> PipeAudioSystem::LoadSource(const std::string &path) const
 {
 	size_t extpoint = path.find_last_of('.');
 	std::string ext = path.substr(extpoint + 1);

@@ -186,7 +186,7 @@ private:
 	 * @exception SeekError
 	 *   Raised if checks beyond those done by stoull fail.
 	 */
-	std::uint64_t SeekParse(const std::string &time_str);
+	static std::uint64_t SeekParse(const std::string &time_str);
 
 	/**
 	 * Performs an actual seek.

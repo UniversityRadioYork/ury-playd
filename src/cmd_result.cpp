@@ -45,15 +45,14 @@ bool CommandResult::IsSuccess() const
 }
 
 void CommandResult::Emit(const ResponseSink &sink,
-                         const std::vector<std::string> &cmd,
-			 size_t id) const
+                         const std::vector<std::string> &cmd, size_t id) const
 {
 	Response r(CommandResult::TYPE_CODES[static_cast<uint8_t>(this->type)]);
 
 	// Only display a message if the result wasn't a successful one.
 	// The message goes at the front, as then clients always know it's the
 	// first argument.
-	if (this->type != Type::SUCCESS) r.AddArg(this->msg);
+	if (!this->IsSuccess()) r.AddArg(this->msg);
 
 	// Then, add in the original command words.
 	for (auto &cwd : cmd) r.AddArg(cwd);

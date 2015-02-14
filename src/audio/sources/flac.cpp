@@ -165,7 +165,6 @@ FLAC__StreamDecoderWriteStatus FlacAudioSource::write_callback(
 	// These are in planar (per-channel) format.
 
 	this->buffer.clear();
-	assert(this->buffer.empty());
 
 	size_t nsamples = frame->header.blocksize;
 	if (nsamples == 0) {

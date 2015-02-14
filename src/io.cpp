@@ -140,7 +140,6 @@ void IoCore::Run(const std::string &host, const std::string &port)
 	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 }
 
-
 void IoCore::Accept(uv_stream_t *server)
 {
 	assert(server != nullptr);
@@ -166,7 +165,8 @@ void IoCore::Accept(uv_stream_t *server)
 	// broadcasts.
 	if (this->free_list.empty()) {
 		if (this->pool.size() == (SIZE_MAX - 1)) {
-			throw InternalError("too many simultaneous connections");
+			throw InternalError(
+			        "too many simultaneous connections");
 		}
 
 		this->pool.emplace_back(nullptr);
@@ -182,7 +182,8 @@ void IoCore::Accept(uv_stream_t *server)
 	assert(0 < client_slot);
 	assert(client_slot <= this->pool.size());
 
-	auto conn = std::make_shared<Connection>(*this, client, this->player, client_slot);
+	auto conn = std::make_shared<Connection>(*this, client, this->player,
+	                                         client_slot);
 	client->data = static_cast<void *>(conn.get());
 	this->pool[client_slot - 1] = std::move(conn);
 
@@ -219,7 +220,8 @@ void IoCore::Respond(const Response &response, size_t id) const
 			if (conn) conn->Respond(response);
 		}
 	} else {
-		Debug() << "unicast @" << std::to_string(id) << ":" << response.Pack() << std::endl;
+		Debug() << "unicast @" << std::to_string(id) << ":"
+		        << response.Pack() << std::endl;
 
 		assert(0 < id && id <= this->pool.size());
 		auto conn = this->pool.at(id - 1);

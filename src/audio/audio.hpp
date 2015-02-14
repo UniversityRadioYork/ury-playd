@@ -91,7 +91,8 @@ public:
 	 * @param id The ID of the connection to which the ResponseSink should
 	 *   route the response.  May be 0 (the default), for all (broadcast).
 	 */
-	virtual void Emit(Response::Code code, const ResponseSink *sink, size_t id=0) = 0;
+	virtual void Emit(Response::Code code, const ResponseSink *sink,
+	                  size_t id = 0) = 0;
 
 	/**
 	 * This Audio's current position.
@@ -118,7 +119,8 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	void Emit(Response::Code code, const ResponseSink *sink, size_t id) override;
+	void Emit(Response::Code code, const ResponseSink *sink,
+	          size_t id) override;
 
 	// The following all raise an exception:
 
@@ -154,7 +156,8 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(Response::Code code, const ResponseSink *sink, size_t id) override;
+	void Emit(Response::Code code, const ResponseSink *sink,
+	          size_t id) override;
 	std::uint64_t Position() const override;
 
 private:

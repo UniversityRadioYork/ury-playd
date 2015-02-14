@@ -81,15 +81,15 @@ public:
 	 */
 	void Remove(size_t id);
 
-	void Respond(const Response &response, size_t id=0) const override;
+	void Respond(const Response &response, size_t id = 0) const override;
 
 private:
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
 
-	uv_tcp_t server;     ///< The libuv handle for the TCP server.
-	uv_timer_t updater;  ///< The libuv handle for the update timer.
-	Player &player;      ///< The player.
+	uv_tcp_t server;    ///< The libuv handle for the TCP server.
+	uv_timer_t updater; ///< The libuv handle for the update timer.
+	Player &player;     ///< The player.
 
 	/// The set of connections inside this IoCore.
 	std::vector<std::shared_ptr<Connection>> pool;
