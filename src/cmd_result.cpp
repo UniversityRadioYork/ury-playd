@@ -45,8 +45,7 @@ bool CommandResult::IsSuccess() const
 }
 
 void CommandResult::Emit(const ResponseSink &sink,
-                         const std::vector<std::string> &cmd,
-			 size_t id) const
+                         const std::vector<std::string> &cmd, size_t id) const
 {
 	Response r(CommandResult::TYPE_CODES[static_cast<uint8_t>(this->type)]);
 

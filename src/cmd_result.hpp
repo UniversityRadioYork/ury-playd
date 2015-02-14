@@ -84,9 +84,8 @@ public:
 	 * @param id The connection ID in the sink to which the response will
 	 *   be sent.  Defaults to 0 (broadcast).
 	 */
-	void Emit(const ResponseSink &sink,
-	          const std::vector<std::string> &cmd,
-	          size_t id=0) const;
+	void Emit(const ResponseSink &sink, const std::vector<std::string> &cmd,
+	          size_t id = 0) const;
 
 private:
 	Type type;       ///< The command result's type.

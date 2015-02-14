@@ -92,7 +92,7 @@ public:
 	 *   ResponseSink to receive a Response, or 0, which signifies that the
 	 *   entire sub-component should receive the Response.  Defaults to 0.
 	 */
-	virtual void Respond(const Response &response, size_t id=0) const;
+	virtual void Respond(const Response &response, size_t id = 0) const;
 };
 
 #endif // PLAYD_IO_RESPONSE_HPP
