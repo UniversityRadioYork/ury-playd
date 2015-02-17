@@ -41,7 +41,6 @@ SCENARIO("PipeAudioSystem cannot create Audio without a registered Sink", "[pipe
 	}
 }
 
-
 SCENARIO("PipeAudio can be constructed from a PipeAudioSystem", "[pipe-audio][pipe-audio-system]") {
 	GIVEN("a fresh PipeAudioSystem") {
 		PipeAudioSystem sys(0);
@@ -58,3 +57,24 @@ SCENARIO("PipeAudio can be constructed from a PipeAudioSystem", "[pipe-audio][pi
 	}
 }
 
+SCENARIO("PipeAudioSystems fail to load audio with an unknown format", "[pipe-audio-system]") {
+	GIVEN("a fresh PipeAudioSystem") {
+		PipeAudioSystem sys(0);
+		WHEN("the PipeAudioSystem is assigned a dummy AudioSink") {
+			sys.SetSink(&DummyAudioSink::Build);
+
+			AND_WHEN("no AudioSource is set") {
+				THEN("an attempt to create audio will fail") {
+					REQUIRE_THROWS_AS(sys.Load("foo.bar"), FileError);
+				}
+			}
+			AND_WHEN("an AudioSource is set") {
+				sys.AddSource("bar", &DummyAudioSource::Build);
+
+				THEN("an attempt to create audio with a different format will fail") {
+					REQUIRE_THROWS_AS(sys.Load("bar.baz"), FileError);
+				}
+			}
+		}
+	}
+}
