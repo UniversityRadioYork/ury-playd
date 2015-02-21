@@ -16,6 +16,28 @@
 #include "dummy_audio_source.hpp"
 #include "dummy_response_sink.hpp"
 
+SCENARIO("Player accurately represents whether it is running", "[player]") {
+	GIVEN("a fresh Player using PipeAudioSystem, DummyAudioSink and DummyAudioSource") {
+		PipeAudioSystem ds(0);
+		Player p(ds);
+
+		ds.SetSink(&DummyAudioSink::Build);
+		ds.AddSource("mp3", &DummyAudioSource::Build);
+
+		WHEN("quit has not been sent") {
+			THEN("Update returns true (the player is running)") {
+				REQUIRE(p.Update());
+			}
+		}
+		WHEN("quit has been sent") {
+			auto res = p.RunCommand(std::vector<std::string>{"quit"});
+			THEN("Update returns false (the player is no longer running)") {
+				REQUIRE_FALSE(p.Update());
+			}
+		}
+	}
+}
+
 SCENARIO("Player interacts correctly with a PipeAudioSystem", "[player][dummy-audio-system]") {
 	GIVEN("a fresh Player using PipeAudioSystem, DummyAudioSink and DummyAudioSource") {
 		PipeAudioSystem ds(0);
