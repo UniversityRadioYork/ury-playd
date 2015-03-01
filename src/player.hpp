@@ -73,31 +73,11 @@ public:
 	//
 
 	/**
-	 * A human-readable string representation of the current state.
-	 * @return The current state, as a human-readable string..
-	 */
-	const std::string &CurrentStateString() const;
-
-	/**
 	 * Instructs the Player to perform a cycle of work.
 	 * This includes decoding the next frame and responding to commands.
 	 * @return Whether the player has more cycles of work to do.
 	 */
 	bool Update();
-
-	/**
-	 * Registers a response sink with the Player.
-	 * The sink is sent information on position, file and state changes
-	 * periodically, as well as being notified when a file ends.
-	 * @param sink The ResponseSink to register with the Player.
-	 */
-	void SetResponseSink(ResponseSink &sink);
-
-	/**
-	 * Sets the period between position responses.
-	 * @param period The period to wait between responses.
-	 */
-	void SetPositionResponsePeriod(std::uint64_t period);
 
 	/**
 	 * Sends welcome/current status information to a new client.
