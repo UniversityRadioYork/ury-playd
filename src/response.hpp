@@ -23,7 +23,7 @@ class Response
 {
 public:
 	/**
-	 * Four-character response codes.
+	 * Enumeration of all possible response codes.
 	 * @note If you're adding new responses here, update
 	 * ResponseSink::STRINGS.
 	 * @see ResponseSink::STRINGS
