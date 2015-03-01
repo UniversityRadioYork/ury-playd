@@ -68,35 +68,6 @@ public:
 	 */
 	CommandResult RunCommand(const std::vector<std::string> &words);
 
-	/**
-	 * Ejects the current loaded song, if any.
-	 * @return Whether the ejection succeeded.
-	 */
-	CommandResult Eject();
-
-	/**
-	 * Quits playd.
-	 * @return Whether the quit succeeded.
-	 */
-	CommandResult Quit();
-
-	/**
-	 * Loads a track.
-	 * @param path The absolute path to a track to load.
-	 * @return Whether the load succeeded.
-	 */
-	CommandResult Load(const std::string &path);
-
-	/**
-	 * Seeks to a given position in the current track.
-	 * @param time_str A string containing a timestamp, followed by the
-	 *   shorthand for the units of time in which the timestamp is measured
-	 *   relative to the start of the track.  If the latter is omitted,
-	 *   microseconds are assumed.
-	 * @return Whether the seek succeeded.
-	 */
-	CommandResult Seek(const std::string &time_str);
-
 	//
 	// Other methods
 	//
@@ -135,6 +106,10 @@ public:
 	void WelcomeClient(size_t id) const;
 
 private:
+	//
+	// Commands
+	//
+
 	/**
 	 * Runs a nullary (0-argument) command.
 	 * @param word The command word.
@@ -153,6 +128,10 @@ private:
 	CommandResult RunUnaryCommand(const std::string &word,
 	                              const std::string &arg);
 
+	//
+	// Playback control
+	//
+
 	/**
 	 * Tells the audio file to start or stop playing.
 	 * @param playing True if playing; false otherwise.
@@ -160,6 +139,36 @@ private:
 	 * @see Stop
 	 */
 	CommandResult SetPlaying(bool playing);
+
+	/**
+	 * Ejects the current loaded song, if any.
+	 * @return Whether the ejection succeeded.
+	 */
+	CommandResult Eject();
+
+	/**
+	 * Loads a track.
+	 * @param path The absolute path to a track to load.
+	 * @return Whether the load succeeded.
+	 */
+	CommandResult Load(const std::string &path);
+
+	/// Handles ending a file (stopping and rewinding).
+	void End();
+
+	//
+	// Seeking
+	//
+
+	/**
+	 * Seeks to a given position in the current track.
+	 * @param time_str A string containing a timestamp, followed by the
+	 *   shorthand for the units of time in which the timestamp is measured
+	 *   relative to the start of the track.  If the latter is omitted,
+	 *   microseconds are assumed.
+	 * @return Whether the seek succeeded.
+	 */
+	CommandResult Seek(const std::string &time_str);
 
 	/**
 	 * Parses time_str as a seek timestamp.
@@ -184,8 +193,15 @@ private:
 	 */
 	void SeekRaw(std::uint64_t pos);
 
-	/// Handles ending a file (stopping and rewinding).
-	void End();
+	//
+	// Other
+	//
+
+	/**
+	 * Quits playd.
+	 * @return Whether the quit succeeded.
+	 */
+	CommandResult Quit();
 
 	/**
 	 * Asks the current file to dump all of its state to the connection
