@@ -70,7 +70,7 @@ void Player::WelcomeClient(size_t id) const
 
 void Player::End()
 {
-	this->Stop();
+	this->SetPlaying(false);
 
 	// Rewind the file back to the start.  We can't use Player::Seek() here
 	// in case End() is called from Seek(); a seek failure could start an
@@ -104,8 +104,8 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd)
 
 CommandResult Player::RunNullaryCommand(const std::string &word)
 {
-	if ("play" == word) return this->Play();
-	if ("stop" == word) return this->Stop();
+	if ("play" == word) return this->SetPlaying(true);
+	if ("stop" == word) return this->SetPlaying(false);
 	if ("eject" == word) return this->Eject();
 	if ("quit" == word) return this->Quit();
 
@@ -159,16 +159,6 @@ CommandResult Player::Load(const std::string &path)
 	}
 
 	return CommandResult::Success();
-}
-
-CommandResult Player::Play()
-{
-	return this->SetPlaying(true);
-}
-
-CommandResult Player::Stop()
-{
-	return this->SetPlaying(false);
 }
 
 CommandResult Player::SetPlaying(bool playing)
