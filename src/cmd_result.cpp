@@ -13,41 +13,35 @@
 #include "response.hpp"
 #include "cmd_result.hpp"
 
-/* static */ const Response::Code CommandResult::TYPE_CODES[] = {
-        Response::Code::OK,   // Type::SUCCESS
-        Response::Code::WHAT, // Type::INVALID
-        Response::Code::FAIL, // Type::FAILURE
-};
-
 CommandResult CommandResult::Success()
 {
-	return CommandResult(Type::SUCCESS, "success");
+	return CommandResult(Response::Code::OK, "success");
 }
 
 CommandResult CommandResult::Invalid(const std::string &msg)
 {
-	return CommandResult(Type::INVALID, msg);
+	return CommandResult(Response::Code::WHAT, msg);
 }
 
 CommandResult CommandResult::Failure(const std::string &msg)
 {
-	return CommandResult(Type::FAILURE, msg);
+	return CommandResult(Response::Code::FAIL, msg);
 }
 
-CommandResult::CommandResult(CommandResult::Type type, const std::string &msg)
+CommandResult::CommandResult(Response::Code type, const std::string &msg)
     : type(type), msg(msg)
 {
 }
 
 bool CommandResult::IsSuccess() const
 {
-	return this->type == Type::SUCCESS;
+	return this->type == Response::Code::OK;
 }
 
 void CommandResult::Emit(const ResponseSink &sink,
                          const std::vector<std::string> &cmd, size_t id) const
 {
-	Response r(CommandResult::TYPE_CODES[static_cast<uint8_t>(this->type)]);
+	Response r(this->type);
 
 	// Only display a message if the result wasn't a successful one.
 	// The message goes at the front, as then clients always know it's the

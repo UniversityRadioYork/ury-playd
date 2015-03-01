@@ -25,18 +25,6 @@ class CommandResult
 {
 public:
 	/**
-	 * Enumeration of possible types of CommandResult.
-	 * @note If changing this, change CommandResult::TYPE_CODES too.
-	 * @see CommandResult::TYPE_CODES
-	 * @todo Investigate whether polymorphism would be better?
-	 */
-	enum class Type : std::uint8_t {
-		SUCCESS, ///< The command was successful.
-		INVALID, ///< The command request was not well-formed.
-		FAILURE  ///< The command request was valid, but failed.
-	};
-
-	/**
 	 * Shortcut for constructing a successful CommandResult.
 	 * @return A CommandResult denoting success.
 	 */
@@ -58,12 +46,13 @@ public:
 
 	/**
 	 * Constructs a CommandResult.
-	 * @param type The type of command result.
+	 * @param type The type of command result, encoded as one of
+	 *   the FAIL, WHAT, or OK response codes.
 	 * @param msg A message providing more information about the result.
 	 *   This will typically only be used for failures.
 	 *   The message will be copied into the CommandResult.
 	 */
-	CommandResult(Type type, const std::string &msg);
+	CommandResult(Response::Code type, const std::string &msg);
 
 	/**
 	 * Determines whether this CommandResult was successful.
@@ -88,15 +77,8 @@ public:
 	          size_t id = 0) const;
 
 private:
-	Type type;       ///< The command result's type.
-	std::string msg; ///< The command result's message.
-
-	/**
-	 * Map of types to their response codes.
-	 * @see Response::Code
-	 * @see Type
-	 */
-	static const Response::Code TYPE_CODES[];
+	Response::Code type; ///< The command result's response code.
+	std::string msg;     ///< The command result's message.
 };
 
 #endif // PLAYD_CMD_RESULT
