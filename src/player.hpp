@@ -75,24 +75,10 @@ public:
 	CommandResult Eject();
 
 	/**
-	 * Plays the current loaded song, if any.
-	 * @return Whether the starting of playback succeeded.
-	 */
-	CommandResult Play();
-
-	/**
 	 * Quits playd.
 	 * @return Whether the quit succeeded.
 	 */
 	CommandResult Quit();
-
-	/**
-	 * Stops the currently playing track, if any.
-	 * This behaves like a pause in other audio players: to reset the track
-	 * to its start, issue a seek command afterwards.
-	 * @return Whether the stop succeeded.
-	 */
-	CommandResult Stop();
 
 	/**
 	 * Loads a track.
