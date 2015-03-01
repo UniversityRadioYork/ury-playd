@@ -47,7 +47,7 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			bool success = c.IsSuccess();
 
 			THEN("the result is false (the result is not a success)") {
-				REQUIRE(!success);
+				REQUIRE_FALSE(success);
 			}
 		}
 
@@ -74,7 +74,7 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			bool success = c.IsSuccess();
 
 			THEN("the result is false (the result is not a success)") {
-				REQUIRE(!success);
+				REQUIRE_FALSE(success);
 			}
 		}
 
