@@ -50,11 +50,13 @@ bool Player::Update()
 	return this->is_running;
 }
 
-void Player::EmitAllAudioState(size_t id) const
+CommandResult Player::EmitAllAudioState(size_t id) const
 {
 	this->file->Emit(Response::Code::FILE, sink, id);
 	this->file->Emit(Response::Code::TIME, sink, id);
 	this->file->Emit(Response::Code::STATE, sink, id);
+
+	return CommandResult::Success();
 }
 
 void Player::WelcomeClient(size_t id) const
@@ -87,14 +89,14 @@ void Player::End()
 // Commands
 //
 
-CommandResult Player::RunCommand(const std::vector<std::string> &cmd)
+CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 {
 	switch (cmd.size()) {
 		case 1:
-			return this->RunNullaryCommand(cmd[0]);
+			return this->RunNullaryCommand(cmd[0], id);
 		case 2:
 			if (!cmd[1].empty()) {
-				return this->RunUnaryCommand(cmd[0], cmd[1]);
+				return this->RunUnaryCommand(cmd[0], cmd[1], id);
 			}
 			return CommandResult::Invalid(MSG_CMD_INVALID);
 		default:
@@ -102,10 +104,11 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd)
 	}
 }
 
-CommandResult Player::RunNullaryCommand(const std::string &word)
+CommandResult Player::RunNullaryCommand(const std::string &word, size_t id)
 {
 	if ("play" == word) return this->SetPlaying(true);
 	if ("stop" == word) return this->SetPlaying(false);
+	if ("dump" == word) return this->EmitAllAudioState(id);
 	if ("eject" == word) return this->Eject();
 	if ("quit" == word) return this->Quit();
 
@@ -113,7 +116,8 @@ CommandResult Player::RunNullaryCommand(const std::string &word)
 }
 
 CommandResult Player::RunUnaryCommand(const std::string &word,
-                                      const std::string &arg)
+                                      const std::string &arg,
+                                      size_t)
 {
 	if ("load" == word) return this->Load(arg);
 	if ("seek" == word) return this->Seek(arg);

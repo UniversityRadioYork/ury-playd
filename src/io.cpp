@@ -366,7 +366,7 @@ void Connection::RunCommand(const std::vector<std::string> &cmd)
 	for (const auto &word : cmd) std::cerr << ' ' << '"' << word << '"';
 	std::cerr << std::endl;
 
-	CommandResult res = this->player.RunCommand(cmd);
+	CommandResult res = this->player.RunCommand(cmd, this->id);
 	res.Emit(this->parent, cmd, this->id);
 }
 
