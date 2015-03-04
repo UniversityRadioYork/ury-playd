@@ -45,9 +45,12 @@ public:
 	/**
 	 * Handles a command line.
 	 * @param cmd A reference to the list of words in the command.
+	 * @param id If present, the ID of the client requesting the
+	 *   command, and, thus, the target of any unicast responses
+	 *   this command generates.
 	 * @return Whether the command succeeded.
 	 */
-	CommandResult RunCommand(const std::vector<std::string> &words);
+	CommandResult RunCommand(const std::vector<std::string> &words, size_t id = 0);
 
 	/**
 	 * Sets the sink to which this Player shall send responses.
@@ -67,6 +70,7 @@ public:
 	/**
 	 * Sends welcome/current status information to a new client.
 	 * @param id The ID of the new client inside the IO system.
+	 * @see DumpState
 	 */
 	void WelcomeClient(size_t id) const;
 
@@ -86,20 +90,22 @@ private:
 	/**
 	 * Runs a nullary (0-argument) command.
 	 * @param word The command word.
+	 * @param id The ID of the client requesting the command.
 	 * @return True if the command was successfully found and executed;
 	 *   false otherwise.
 	 */
-	CommandResult RunNullaryCommand(const std::string &word);
+	CommandResult RunNullaryCommand(const std::string &word, size_t id);
 
 	/**
 	 * Runs a unary (1-argument) command.
 	 * @param word The command word.
 	 * @param arg The argument to the command.
+	 * @param id The ID of the client requesting the command.
 	 * @return True if the command was successfully found and executed;
 	 *   false otherwise.
 	 */
 	CommandResult RunUnaryCommand(const std::string &word,
-	                              const std::string &arg);
+	                              const std::string &arg, size_t id);
 
 	//
 	// Playback control
@@ -180,11 +186,10 @@ private:
 	 * Asks the current file to dump all of its state to the connection
 	 * with the given ID.
 	 * @param id The ID of the connection to receive the dump.
-	 * @note This is a pointer, not a reference, so as to allow nullptr
-	 *   (which means no sink is assigned).  When `optional` becomes
-	 *   standard, perhaps use that.
+	 * @return A successful CommandResult, to allow this function
+	 * to be used in the dump command.
 	 */
-	void EmitAllAudioState(size_t id) const;
+	CommandResult EmitAllAudioState(size_t id) const;
 };
 
 #endif // PLAYD_PLAYER_HPP
