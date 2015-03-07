@@ -31,8 +31,14 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 		}
 		WHEN("quit has been sent") {
 			auto res = p.RunCommand(std::vector<std::string>{"quit"});
+			THEN("The quit was a success") {
+				REQUIRE(res.IsSuccess());
+			}
 			THEN("Update returns false (the player is no longer running)") {
 				REQUIRE_FALSE(p.Update());
+			}
+			THEN("Any future quits fail") {
+				REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"quit"}).IsSuccess());
 			}
 		}
 	}
