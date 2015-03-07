@@ -55,8 +55,9 @@ const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
  */
 struct WriteReq
 {
-	uv_write_t req; ///< The main libuv write handle.
-	uv_buf_t buf;   ///< The associated write buffer.
+	uv_write_t req;   ///< The main libuv write handle.
+	uv_buf_t buf;     ///< The associated write buffer.
+	Connection *conn; ///< The recipient Connection.
 };
 
 /// The function used to allocate and initialise buffers for client reading.
@@ -110,19 +111,24 @@ void UvRespondCallback(uv_write_t *req, int status)
 	delete wr;
 }
 
+/// The callback fired when a response has been sent to a client and
+/// the sending of this response should trigger the client's death.
+void UvFatalRespondCallback(uv_write_t *req, int status)
+{
+	auto conn = reinterpret_cast<WriteReq *>(req)->conn;
+	UvRespondCallback(req, status);
+
+	if (conn != nullptr) conn->Depool();
+}
+
 /// The callback fired when the update timer fires.
 void UvUpdateTimerCallback(uv_timer_t *handle)
 {
 	assert(handle != nullptr);
 
-	Player *player = static_cast<Player *>(handle->data);
-	assert(player != nullptr);
-
-	bool running = player->Update();
-
-	// If the player is ready to terminate, we need to kill the event loop
-	// in order to disconnect clients and stop the updating.
-	if (!running) uv_stop(uv_default_loop());
+	IoCore *io = static_cast<IoCore *>(handle->data);
+	assert(io != nullptr);
+	io->UpdatePlayer();
 }
 
 //
@@ -147,6 +153,7 @@ void IoCore::Accept(uv_stream_t *server)
 	auto client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
 
+	// libuv does the 'nonzero is error' thing here
 	if (uv_accept(server, (uv_stream_t *)client)) {
 		uv_close((uv_handle_t *)client, UvCloseCallback);
 		return;
@@ -206,6 +213,25 @@ void IoCore::Remove(size_t slot)
 	}
 
 	assert(!this->pool.at(slot - 1));
+
+}
+
+void IoCore::UpdatePlayer()
+{
+	bool running = this->player.Update();
+
+	// If the player is ready to terminate, we need to kill the event loop
+	// in order to disconnect clients and stop the updating.
+	if (running) return;
+
+	uv_timer_stop(&this->updater);
+	uv_close(reinterpret_cast<uv_handle_t *>(&this->server), nullptr);
+
+	// Kill off all of the connections with 'fatal' responses.
+	for (const auto conn : this->pool) {
+		if (conn) conn->Respond(Response(Response::Code::STATE)
+		                        .AddArg("Quitting"), true);
+	}
 }
 
 void IoCore::Respond(const Response &response, size_t id) const
@@ -232,7 +258,7 @@ void IoCore::Respond(const Response &response, size_t id) const
 void IoCore::DoUpdateTimer()
 {
 	uv_timer_init(uv_default_loop(), &this->updater);
-	this->updater.data = static_cast<void *>(&this->player);
+	this->updater.data = static_cast<void *>(this);
 	uv_timer_start(&this->updater, UvUpdateTimerCallback, 0,
 	               PLAYER_UPDATE_PERIOD);
 }
@@ -274,7 +300,7 @@ Connection::~Connection()
 	uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
 }
 
-void Connection::Respond(const Response &response) const
+void Connection::Respond(const Response &response, bool fatal)
 {
 	auto string = response.Pack();
 
@@ -283,13 +309,14 @@ void Connection::Respond(const Response &response) const
 	assert(s != nullptr);
 
 	auto req = new WriteReq;
+	req->conn = this;
 	req->buf = uv_buf_init(new char[l + 1], l + 1);
 	assert(req->buf.base != nullptr);
 	memcpy(req->buf.base, s, l);
 	req->buf.base[l] = '\n';
 
 	uv_write((uv_write_t *)req, (uv_stream_t *)this->tcp, &req->buf, 1,
-	         UvRespondCallback);
+	         fatal ? UvFatalRespondCallback : UvRespondCallback);
 }
 
 std::string Connection::Name()

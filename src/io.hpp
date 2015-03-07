@@ -81,6 +81,13 @@ public:
 	 */
 	void Remove(size_t id);
 
+	/**
+	 * Performs a player update cycle.
+	 * If the player is closing, IoCore will announce this fact to
+	 * all current connections, close them, and end the I/O loop.
+	 */
+	void UpdatePlayer();
+
 	void Respond(const Response &response, size_t id = 0) const override;
 
 private:
@@ -145,8 +152,10 @@ public:
 	/**
 	 * Emits a Response via this Connection.
 	 * @param response The response to send.
+	 * @param fatal If true, the Connection will close upon
+	 *   receiving the response.
 	 */
-	void Respond(const Response &response) const;
+	void Respond(const Response &response, bool fatal = false);
 
 	/**
 	 * Processes a data read on this connection.
