@@ -46,6 +46,9 @@ const std::string MSG_CMD_NEEDS_PLAYING = "Command requires a playing file";
  */
 const std::string MSG_CMD_NEEDS_STOPPED = "Command requires a stopped file";
 
+/// Message shown when a command is sent to a closing Player.
+const std::string MSG_CMD_PLAYER_CLOSING = "Server is closing";
+
 //
 // Decoder failures
 //
