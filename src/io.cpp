@@ -58,6 +58,7 @@ struct WriteReq
 	uv_write_t req;   ///< The main libuv write handle.
 	uv_buf_t buf;     ///< The associated write buffer.
 	Connection *conn; ///< The recipient Connection.
+	bool fatal;       ///< Whether the Connection should now close.
 };
 
 /// The function used to allocate and initialise buffers for client reading.
@@ -107,18 +108,12 @@ void UvRespondCallback(uv_write_t *req, int status)
 	auto *wr = reinterpret_cast<WriteReq *>(req);
 	assert(wr != nullptr);
 
+	// Certain requests are intended to signal to the connection that it
+	// should close.  These have the 'fatal' flag set.
+	if (wr->fatal && wr->conn != nullptr) wr->conn->Depool();
+
 	delete[] wr -> buf.base;
 	delete wr;
-}
-
-/// The callback fired when a response has been sent to a client and
-/// the sending of this response should trigger the client's death.
-void UvFatalRespondCallback(uv_write_t *req, int status)
-{
-	auto conn = reinterpret_cast<WriteReq *>(req)->conn;
-	UvRespondCallback(req, status);
-
-	if (conn != nullptr) conn->Depool();
 }
 
 /// The callback fired when the update timer fires.
@@ -338,13 +333,15 @@ void Connection::Respond(const Response &response, bool fatal)
 
 	auto req = new WriteReq;
 	req->conn = this;
+	req->fatal = fatal;
+
 	req->buf = uv_buf_init(new char[l + 1], l + 1);
 	assert(req->buf.base != nullptr);
 	memcpy(req->buf.base, s, l);
 	req->buf.base[l] = '\n';
 
 	uv_write((uv_write_t *)req, (uv_stream_t *)this->tcp, &req->buf, 1,
-	         fatal ? UvFatalRespondCallback : UvRespondCallback);
+	         UvRespondCallback);
 }
 
 std::string Connection::Name()
