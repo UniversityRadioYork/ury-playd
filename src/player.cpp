@@ -91,6 +91,13 @@ void Player::End()
 
 CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 {
+	if (!this->is_running) {
+		// Refuse any and all commands when not running.
+		// This is mainly to prevent the internal state from
+		// going weird, but seems logical anyway.
+		return CommandResult::Failure(MSG_CMD_PLAYER_CLOSING);
+	}
+
 	switch (cmd.size()) {
 		case 1:
 			return this->RunNullaryCommand(cmd[0], id);

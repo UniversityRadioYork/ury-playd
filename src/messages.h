@@ -46,6 +46,9 @@ const std::string MSG_CMD_NEEDS_PLAYING = "Command requires a playing file";
  */
 const std::string MSG_CMD_NEEDS_STOPPED = "Command requires a stopped file";
 
+/// Message shown when a command is sent to a closing Player.
+const std::string MSG_CMD_PLAYER_CLOSING = "Server is closing";
+
 //
 // Decoder failures
 //
@@ -86,5 +89,12 @@ const std::string MSG_SEEK_FAIL = "Seek failed";
 
 /// Message shown when a seek command has an invalid time value.
 const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer";
+
+//
+// IO failures
+//
+
+/// Message shown when too many simultaneous connections are launched.
+const std::string MSG_TOO_MANY_CONNS = "too many simultaneous connections";
 
 #endif // PLAYD_MESSAGES_H

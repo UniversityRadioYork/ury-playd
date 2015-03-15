@@ -55,8 +55,10 @@ const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
  */
 struct WriteReq
 {
-	uv_write_t req; ///< The main libuv write handle.
-	uv_buf_t buf;   ///< The associated write buffer.
+	uv_write_t req;   ///< The main libuv write handle.
+	uv_buf_t buf;     ///< The associated write buffer.
+	Connection *conn; ///< The recipient Connection.
+	bool fatal;       ///< Whether the Connection should now close.
 };
 
 /// The function used to allocate and initialise buffers for client reading.
@@ -106,6 +108,10 @@ void UvRespondCallback(uv_write_t *req, int status)
 	auto *wr = reinterpret_cast<WriteReq *>(req);
 	assert(wr != nullptr);
 
+	// Certain requests are intended to signal to the connection that it
+	// should close.  These have the 'fatal' flag set.
+	if (wr->fatal && wr->conn != nullptr) wr->conn->Depool();
+
 	delete[] wr -> buf.base;
 	delete wr;
 }
@@ -115,14 +121,9 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 {
 	assert(handle != nullptr);
 
-	Player *player = static_cast<Player *>(handle->data);
-	assert(player != nullptr);
-
-	bool running = player->Update();
-
-	// If the player is ready to terminate, we need to kill the event loop
-	// in order to disconnect clients and stop the updating.
-	if (!running) uv_stop(uv_default_loop());
+	IoCore *io = static_cast<IoCore *>(handle->data);
+	assert(io != nullptr);
+	io->UpdatePlayer();
 }
 
 //
@@ -147,15 +148,47 @@ void IoCore::Accept(uv_stream_t *server)
 	auto client = new uv_tcp_t();
 	uv_tcp_init(uv_default_loop(), client);
 
+	// libuv does the 'nonzero is error' thing here
 	if (uv_accept(server, (uv_stream_t *)client)) {
 		uv_close((uv_handle_t *)client, UvCloseCallback);
 		return;
 	}
 
-	// We'll want to try and use an existing, empty slot in the connection
+	auto id = this->NextConnectionID();
+	auto conn = std::make_shared<Connection>(*this, client, this->player,
+	                                         id);
+	client->data = static_cast<void *>(conn.get());
+	this->pool[id - 1] = std::move(conn);
+
+	// The player will already have been told to send responses to the
+	// IoCore, so all it needs to know is the slot.
+	this->player.WelcomeClient(id);
+
+	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
+}
+
+size_t IoCore::NextConnectionID()
+{
+	// We'll want to try and use an existing, empty ID in the connection
 	// pool.  If there aren't any (we've exceeded the maximum-so-far number
 	// of simultaneous connections), we expand the pool.
-	//
+	if (this->free_list.empty()) this->ExpandPool();
+	assert(!this->free_list.empty());
+
+	// Acquire some free ID, and ensure that the ID cannot be re-used until
+	// replaced onto the free list by the connection's removal.
+	size_t id = this->free_list.back();
+	this->free_list.pop_back();
+
+	// client_slot should be at least 1, because of the above.
+	assert(0 < id);
+	assert(id <= this->pool.size());
+
+	return id;
+}
+
+void IoCore::ExpandPool()
+{
 	// If we already have SIZE_MAX-1 simultaneous connections, we bail out.
 	// Since this is at least 65,534, and likely to be 2^32-2 or 2^64-2,
 	// this is incredibly unlikely to happen and probably means someone's
@@ -163,35 +196,12 @@ void IoCore::Accept(uv_stream_t *server)
 	//
 	// Why -1?  Because slot 0 in the connection pool is reserved for
 	// broadcasts.
-	if (this->free_list.empty()) {
-		if (this->pool.size() == (SIZE_MAX - 1)) {
-			throw InternalError(
-			        "too many simultaneous connections");
-		}
+	bool full = this->pool.size() == (SIZE_MAX - 1);
+	if (full) throw InternalError(MSG_TOO_MANY_CONNS);
 
-		this->pool.emplace_back(nullptr);
-		// This isn't an off-by-one error; slots index from 1.
-		this->free_list.push_back(this->pool.size());
-	}
-
-	assert(!this->free_list.empty());
-	size_t client_slot = this->free_list.back();
-	this->free_list.pop_back();
-
-	// client_slot should be at least 1, because of the above.
-	assert(0 < client_slot);
-	assert(client_slot <= this->pool.size());
-
-	auto conn = std::make_shared<Connection>(*this, client, this->player,
-	                                         client_slot);
-	client->data = static_cast<void *>(conn.get());
-	this->pool[client_slot - 1] = std::move(conn);
-
-	// The player will already have been told to send responses to the
-	// IoCore, so all it needs to know is the slot.
-	this->player.WelcomeClient(client_slot);
-
-	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
+	this->pool.emplace_back(nullptr);
+	// This isn't an off-by-one error; slots index from 1.
+	this->free_list.push_back(this->pool.size());
 }
 
 void IoCore::Remove(size_t slot)
@@ -206,6 +216,33 @@ void IoCore::Remove(size_t slot)
 	}
 
 	assert(!this->pool.at(slot - 1));
+
+}
+
+void IoCore::UpdatePlayer()
+{
+	bool running = this->player.Update();
+	if (!running) this->Shutdown();
+}
+
+void IoCore::Shutdown()
+{
+	// If the player is ready to terminate, we need to kill the event loop
+	// in order to disconnect clients and stop the updating.
+	// We do this by stopping everything using the loop.
+
+	// First, the update timer:
+	uv_timer_stop(&this->updater);
+
+	// Then, the TCP server (as far as we can tell, this does *not* close
+	// down the connections):
+	uv_close(reinterpret_cast<uv_handle_t *>(&this->server), nullptr);
+
+	// Finally, kill off all of the connections with 'fatal' responses.
+	for (const auto conn : this->pool) {
+		if (conn) conn->Respond(Response(Response::Code::STATE)
+		                        .AddArg("Quitting"), true);
+	}
 }
 
 void IoCore::Respond(const Response &response, size_t id) const
@@ -213,26 +250,38 @@ void IoCore::Respond(const Response &response, size_t id) const
 	if (this->pool.empty()) return;
 
 	if (id == 0) {
-		Debug() << "broadcast:" << response.Pack() << std::endl;
-		// Copy the connection by value, so that there's at least one
-		// active reference to it throughout.
-		for (const auto conn : this->pool) {
-			if (conn) conn->Respond(response);
-		}
+		this->Broadcast(response);
 	} else {
-		Debug() << "unicast @" << std::to_string(id) << ":"
-		        << response.Pack() << std::endl;
+		this->Unicast(response, id);
+	}
+}
 
-		assert(0 < id && id <= this->pool.size());
-		auto conn = this->pool.at(id - 1);
+void IoCore::Broadcast(const Response &response) const
+{
+	Debug() << "broadcast:" << response.Pack() << std::endl;
+
+	// Copy the connection by value, so that there's at least one
+	// active reference to it throughout.
+	for (const auto conn : this->pool) {
 		if (conn) conn->Respond(response);
 	}
+}
+
+void IoCore::Unicast(const Response &response, size_t id) const
+{
+	assert(0 < id && id <= this->pool.size());
+
+	Debug() << "unicast @" << std::to_string(id) << ":"
+		<< response.Pack() << std::endl;
+
+	auto conn = this->pool.at(id - 1);
+	if (conn) conn->Respond(response);
 }
 
 void IoCore::DoUpdateTimer()
 {
 	uv_timer_init(uv_default_loop(), &this->updater);
-	this->updater.data = static_cast<void *>(&this->player);
+	this->updater.data = static_cast<void *>(this);
 	uv_timer_start(&this->updater, UvUpdateTimerCallback, 0,
 	               PLAYER_UPDATE_PERIOD);
 }
@@ -274,7 +323,7 @@ Connection::~Connection()
 	uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
 }
 
-void Connection::Respond(const Response &response) const
+void Connection::Respond(const Response &response, bool fatal)
 {
 	auto string = response.Pack();
 
@@ -283,6 +332,9 @@ void Connection::Respond(const Response &response) const
 	assert(s != nullptr);
 
 	auto req = new WriteReq;
+	req->conn = this;
+	req->fatal = fatal;
+
 	req->buf = uv_buf_init(new char[l + 1], l + 1);
 	assert(req->buf.base != nullptr);
 	memcpy(req->buf.base, s, l);

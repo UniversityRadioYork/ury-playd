@@ -81,6 +81,13 @@ public:
 	 */
 	void Remove(size_t id);
 
+	/**
+	 * Performs a player update cycle.
+	 * If the player is closing, IoCore will announce this fact to
+	 * all current connections, close them, and end the I/O loop.
+	 */
+	void UpdatePlayer();
+
 	void Respond(const Response &response, size_t id = 0) const override;
 
 private:
@@ -109,6 +116,47 @@ private:
 
 	/// Sets up a periodic timer to run the playd update loop.
 	void DoUpdateTimer();
+
+	/// Shuts down the IoCore by terminating all IO loop tasks.
+	void Shutdown();
+
+	//
+	// Connection pool handling
+	//
+
+	/**
+	 * Acquires the next available connection ID.
+	 * This ID may have been assigned to a connection in the past, but is
+	 * guaranteed not to match any currently assigned IDs.
+	 * @return size_t A fresh ID for use.
+	 */
+	size_t NextConnectionID();
+
+	/**
+	 * Adds a new connection slot to the connection pool.
+	 * This is called by NextConnectionID when the number of currently
+	 * running connections is larger than the number of existing pool
+	 * slots, and will eventually fail (when the number of simultaneous
+	 * connections reaches absurd proportions).
+	 */
+	void ExpandPool();
+
+	//
+	// Response dispatch
+	//
+
+	/**
+	 * Sends the given response to all connections.
+	 * @param response The response to broadcast.
+	 */
+	void Broadcast(const Response &response) const;
+
+	/**
+	 * Sends the given response to the identified connection.
+	 * @param response The response to broadcast.
+	 * @param id The ID of the recipient connection.
+	 */
+	void Unicast(const Response &response, size_t id) const;
 };
 
 /**
@@ -145,8 +193,10 @@ public:
 	/**
 	 * Emits a Response via this Connection.
 	 * @param response The response to send.
+	 * @param fatal If true, the Connection will close upon
+	 *   receiving the response.
 	 */
-	void Respond(const Response &response) const;
+	void Respond(const Response &response, bool fatal = false);
 
 	/**
 	 * Processes a data read on this connection.
