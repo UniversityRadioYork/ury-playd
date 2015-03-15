@@ -159,10 +159,41 @@ void IoCore::Accept(uv_stream_t *server)
 		return;
 	}
 
-	// We'll want to try and use an existing, empty slot in the connection
+	auto id = this->NextConnectionID();
+	auto conn = std::make_shared<Connection>(*this, client, this->player,
+	                                         id);
+	client->data = static_cast<void *>(conn.get());
+	this->pool[id - 1] = std::move(conn);
+
+	// The player will already have been told to send responses to the
+	// IoCore, so all it needs to know is the slot.
+	this->player.WelcomeClient(id);
+
+	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
+}
+
+size_t IoCore::NextConnectionID()
+{
+	// We'll want to try and use an existing, empty ID in the connection
 	// pool.  If there aren't any (we've exceeded the maximum-so-far number
 	// of simultaneous connections), we expand the pool.
-	//
+	if (this->free_list.empty()) this->ExpandPool();
+	assert(!this->free_list.empty());
+
+	// Acquire some free ID, and ensure that the ID cannot be re-used until
+	// replaced onto the free list by the connection's removal.
+	size_t id = this->free_list.back();
+	this->free_list.pop_back();
+
+	// client_slot should be at least 1, because of the above.
+	assert(0 < id);
+	assert(id <= this->pool.size());
+
+	return id;
+}
+
+void IoCore::ExpandPool()
+{
 	// If we already have SIZE_MAX-1 simultaneous connections, we bail out.
 	// Since this is at least 65,534, and likely to be 2^32-2 or 2^64-2,
 	// this is incredibly unlikely to happen and probably means someone's
@@ -170,35 +201,14 @@ void IoCore::Accept(uv_stream_t *server)
 	//
 	// Why -1?  Because slot 0 in the connection pool is reserved for
 	// broadcasts.
-	if (this->free_list.empty()) {
-		if (this->pool.size() == (SIZE_MAX - 1)) {
-			throw InternalError(
-			        "too many simultaneous connections");
-		}
 
-		this->pool.emplace_back(nullptr);
-		// This isn't an off-by-one error; slots index from 1.
-		this->free_list.push_back(this->pool.size());
+	if (this->pool.size() == (SIZE_MAX - 1)) {
+		throw InternalError("too many simultaneous connections");
 	}
 
-	assert(!this->free_list.empty());
-	size_t client_slot = this->free_list.back();
-	this->free_list.pop_back();
-
-	// client_slot should be at least 1, because of the above.
-	assert(0 < client_slot);
-	assert(client_slot <= this->pool.size());
-
-	auto conn = std::make_shared<Connection>(*this, client, this->player,
-	                                         client_slot);
-	client->data = static_cast<void *>(conn.get());
-	this->pool[client_slot - 1] = std::move(conn);
-
-	// The player will already have been told to send responses to the
-	// IoCore, so all it needs to know is the slot.
-	this->player.WelcomeClient(client_slot);
-
-	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
+	this->pool.emplace_back(nullptr);
+	// This isn't an off-by-one error; slots index from 1.
+	this->free_list.push_back(this->pool.size());
 }
 
 void IoCore::Remove(size_t slot)
