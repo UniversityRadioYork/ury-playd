@@ -119,6 +119,44 @@ private:
 
 	/// Shuts down the IoCore by terminating all IO loop tasks.
 	void Shutdown();
+
+	//
+	// Connection pool handling
+	//
+
+	/**
+	 * Acquires the next available connection ID.
+	 * This ID may have been assigned to a connection in the past, but is
+	 * guaranteed not to match any currently assigned IDs.
+	 * @return size_t A fresh ID for use.
+	 */
+	size_t NextConnectionID();
+
+	/**
+	 * Adds a new connection slot to the connection pool.
+	 * This is called by NextConnectionID when the number of currently
+	 * running connections is larger than the number of existing pool
+	 * slots, and will eventually fail (when the number of simultaneous
+	 * connections reaches absurd proportions).
+	 */
+	void ExpandPool();
+
+	//
+	// Response dispatch
+	//
+
+	/**
+	 * Sends the given response to all connections.
+	 * @param response The response to broadcast.
+	 */
+	void Broadcast(const Response &response) const;
+
+	/**
+	 * Sends the given response to the identified connection.
+	 * @param response The response to broadcast.
+	 * @param id The ID of the recipient connection.
+	 */
+	void Unicast(const Response &response, size_t id) const;
 };
 
 /**

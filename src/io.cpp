@@ -247,20 +247,32 @@ void IoCore::Respond(const Response &response, size_t id) const
 	if (this->pool.empty()) return;
 
 	if (id == 0) {
-		Debug() << "broadcast:" << response.Pack() << std::endl;
-		// Copy the connection by value, so that there's at least one
-		// active reference to it throughout.
-		for (const auto conn : this->pool) {
-			if (conn) conn->Respond(response);
-		}
+		this->Broadcast(response);
 	} else {
-		Debug() << "unicast @" << std::to_string(id) << ":"
-		        << response.Pack() << std::endl;
+		this->Unicast(response, id);
+	}
+}
 
-		assert(0 < id && id <= this->pool.size());
-		auto conn = this->pool.at(id - 1);
+void IoCore::Broadcast(const Response &response) const
+{
+	Debug() << "broadcast:" << response.Pack() << std::endl;
+
+	// Copy the connection by value, so that there's at least one
+	// active reference to it throughout.
+	for (const auto conn : this->pool) {
 		if (conn) conn->Respond(response);
 	}
+}
+
+void IoCore::Unicast(const Response &response, size_t id) const
+{
+	assert(0 < id && id <= this->pool.size());
+
+	Debug() << "unicast @" << std::to_string(id) << ":"
+		<< response.Pack() << std::endl;
+
+	auto conn = this->pool.at(id - 1);
+	if (conn) conn->Respond(response);
 }
 
 void IoCore::DoUpdateTimer()
