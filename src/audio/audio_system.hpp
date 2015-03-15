@@ -97,14 +97,14 @@ public:
 	void AddSource(const std::string &ext, SourceBuilder source);
 
 private:
-	/// The device ID for the sink.
-	int device_id;
-
 	/// The current sink builder.
 	SinkBuilder sink;
 
 	/// Map from file extensions to source builders.
 	std::map<std::string, SourceBuilder> sources;
+
+	/// The device ID for the sink.
+	int device_id;
 
 	/**
 	 * Loads a file, creating an AudioSource.
