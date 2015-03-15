@@ -139,12 +139,10 @@ public:
 	 * The callback proper.
 	 * This is executed in a separate thread by SDL once a stream is
 	 * playing with the callback registered to it.
-	 * @param outputBuffer The output buffer to which our samples should
-	 *   be written.
-	 * @param numFrames The number of samples PortAudio wants to read from
-	 *   @a outputBuffer.
+	 * @param out The output buffer to which our samples should be written.
+	 * @param nbytes The number of bytes SDL wants to read from @a out.
 	 */
-	void Callback(std::uint8_t *inputBuffer, int numFrames);
+	void Callback(std::uint8_t *out, int nbytes);
 
 	/**
 	 * Converts a sample format identifier from playd to SDL.

@@ -44,7 +44,7 @@ public:
 
 	/**
 	 * Handles a command line.
-	 * @param cmd A reference to the list of words in the command.
+	 * @param words A reference to the list of words in the command.
 	 * @param id If present, the ID of the client requesting the
 	 *   command, and, thus, the target of any unicast responses
 	 *   this command generates.

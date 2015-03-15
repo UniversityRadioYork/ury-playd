@@ -89,7 +89,7 @@ public:
 
 	/**
 	 * Assign an AudioSource for a file extension.
-	 * @param exts The file extension to associate with this source.
+	 * @param ext The file extension to associate with this source.
 	 * @param source The function to use when building source.
 	 * @note If two AddSource invocations name the first file extension,
 	 *   the first is used for said extension.

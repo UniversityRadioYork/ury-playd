@@ -97,7 +97,7 @@ public:
 	/**
 	 * Seeks to the given position, in samples.
 	 * For convenience, the new position (in terms of samples) is returned.
-	 * @param in_samples  The new position in the file, in samples.
+	 * @param position The requested new position in the file, in samples.
 	 * @return The new position in the file, in samples.
 	 */
 	virtual std::uint64_t Seek(std::uint64_t position) = 0;
@@ -122,7 +122,7 @@ public:
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
-	 * @param position The song position, in microseconds.
+	 * @param micros The song position, in microseconds.
 	 * @return The corresponding number of elapsed samples.
 	 */
 	std::uint64_t SamplesFromMicros(std::uint64_t micros) const;
