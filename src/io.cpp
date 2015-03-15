@@ -219,15 +219,23 @@ void IoCore::Remove(size_t slot)
 void IoCore::UpdatePlayer()
 {
 	bool running = this->player.Update();
+	if (!running) this->Shutdown();
+}
 
+void IoCore::Shutdown()
+{
 	// If the player is ready to terminate, we need to kill the event loop
 	// in order to disconnect clients and stop the updating.
-	if (running) return;
+	// We do this by stopping everything using the loop.
 
+	// First, the update timer:
 	uv_timer_stop(&this->updater);
+
+	// Then, the TCP server (as far as we can tell, this does *not* close
+	// down the connections):
 	uv_close(reinterpret_cast<uv_handle_t *>(&this->server), nullptr);
 
-	// Kill off all of the connections with 'fatal' responses.
+	// Finally, kill off all of the connections with 'fatal' responses.
 	for (const auto conn : this->pool) {
 		if (conn) conn->Respond(Response(Response::Code::STATE)
 		                        .AddArg("Quitting"), true);

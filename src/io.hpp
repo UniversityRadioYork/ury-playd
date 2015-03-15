@@ -116,6 +116,9 @@ private:
 
 	/// Sets up a periodic timer to run the playd update loop.
 	void DoUpdateTimer();
+
+	/// Shuts down the IoCore by terminating all IO loop tasks.
+	void Shutdown();
 };
 
 /**
