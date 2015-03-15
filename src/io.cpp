@@ -237,12 +237,25 @@ void IoCore::Shutdown()
 	uv_close(reinterpret_cast<uv_handle_t *>(&this->server), nullptr);
 
 	// Finally, kill off all of the connections with 'fatal' responses.
-	for (const auto conn : this->pool) {
-		if (conn)
-			conn->Respond(Response(Response::Code::STATE)
-			                      .AddArg("Quitting"),
-			              true);
-	}
+	for (const auto conn : this->pool) this->TryShutdown(conn);
+}
+
+/* static */ void IoCore::TryShutdown(const std::shared_ptr<Connection> conn)
+{
+	if (!conn) return;
+
+	auto response = Response(Response::Code::STATE).AddArg("Quitting");
+
+	// The true at the end is for the 'fatal' argument to
+	// Connection::Respond, telling it to close itself after processing
+	// 'response'.
+	conn->Respond(response, true);
+}
+
+/* static */ void IoCore::TryRespond(const std::shared_ptr<Connection> conn,
+                                     const Response &response)
+{
+	if (conn) conn->Respond(response);
 }
 
 void IoCore::Respond(const Response &response, size_t id) const
@@ -262,9 +275,7 @@ void IoCore::Broadcast(const Response &response) const
 
 	// Copy the connection by value, so that there's at least one
 	// active reference to it throughout.
-	for (const auto conn : this->pool) {
-		if (conn) conn->Respond(response);
-	}
+	for (const auto c : this->pool) IoCore::TryRespond(c, response);
 }
 
 void IoCore::Unicast(const Response &response, size_t id) const
@@ -274,8 +285,7 @@ void IoCore::Unicast(const Response &response, size_t id) const
 	Debug() << "unicast @" << std::to_string(id) << ":" << response.Pack()
 	        << std::endl;
 
-	auto conn = this->pool.at(id - 1);
-	if (conn) conn->Respond(response);
+	IoCore::TryRespond(this->pool.at(id - 1), response);
 }
 
 void IoCore::DoUpdateTimer()
