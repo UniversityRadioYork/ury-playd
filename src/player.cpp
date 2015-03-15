@@ -123,8 +123,7 @@ CommandResult Player::RunNullaryCommand(const std::string &word, size_t id)
 }
 
 CommandResult Player::RunUnaryCommand(const std::string &word,
-                                      const std::string &arg,
-                                      size_t)
+                                      const std::string &arg, size_t)
 {
 	if ("load" == word) return this->Load(arg);
 	if ("seek" == word) return this->Seek(arg);

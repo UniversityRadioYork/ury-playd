@@ -155,8 +155,7 @@ void IoCore::Accept(uv_stream_t *server)
 	}
 
 	auto id = this->NextConnectionID();
-	auto conn = std::make_shared<Connection>(*this, client, this->player,
-	                                         id);
+	auto conn = std::make_shared<Connection>(*this, client, this->player, id);
 	client->data = static_cast<void *>(conn.get());
 	this->pool[id - 1] = std::move(conn);
 
@@ -216,7 +215,6 @@ void IoCore::Remove(size_t slot)
 	}
 
 	assert(!this->pool.at(slot - 1));
-
 }
 
 void IoCore::UpdatePlayer()
@@ -240,8 +238,10 @@ void IoCore::Shutdown()
 
 	// Finally, kill off all of the connections with 'fatal' responses.
 	for (const auto conn : this->pool) {
-		if (conn) conn->Respond(Response(Response::Code::STATE)
-		                        .AddArg("Quitting"), true);
+		if (conn)
+			conn->Respond(Response(Response::Code::STATE)
+			                      .AddArg("Quitting"),
+			              true);
 	}
 }
 
@@ -271,8 +271,8 @@ void IoCore::Unicast(const Response &response, size_t id) const
 {
 	assert(0 < id && id <= this->pool.size());
 
-	Debug() << "unicast @" << std::to_string(id) << ":"
-		<< response.Pack() << std::endl;
+	Debug() << "unicast @" << std::to_string(id) << ":" << response.Pack()
+	        << std::endl;
 
 	auto conn = this->pool.at(id - 1);
 	if (conn) conn->Respond(response);

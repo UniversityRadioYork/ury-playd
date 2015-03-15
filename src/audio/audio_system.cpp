@@ -69,7 +69,7 @@ void AudioSystem::SetSink(AudioSystem::SinkBuilder sink)
 }
 
 void AudioSystem::AddSource(const std::string &ext,
-                                AudioSystem::SourceBuilder source)
+                            AudioSystem::SourceBuilder source)
 {
 	this->sources.emplace(ext, source);
 }

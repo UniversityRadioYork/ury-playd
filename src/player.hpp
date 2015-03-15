@@ -50,7 +50,8 @@ public:
 	 *   this command generates.
 	 * @return Whether the command succeeded.
 	 */
-	CommandResult RunCommand(const std::vector<std::string> &words, size_t id = 0);
+	CommandResult RunCommand(const std::vector<std::string> &words,
+	                         size_t id = 0);
 
 	/**
 	 * Sets the sink to which this Player shall send responses.
