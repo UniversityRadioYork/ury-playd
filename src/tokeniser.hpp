@@ -74,7 +74,7 @@ private:
 	 * This also clears the escape_next flag.
 	 * @param c The character to push onto the current word.
 	 */
-	void Push(unsigned char c);
+	void Push(char c);
 };
 
 #endif // PLAYD_TOKENISER_HPP

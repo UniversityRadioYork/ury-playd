@@ -48,7 +48,7 @@ std::string Response::Pack() const
 	bool escaping = false;
 	std::string escaped;
 
-	for (unsigned char c : arg) {
+	for (char c : arg) {
 		// These are the characters (including all whitespace, via
 		// isspace())  whose presence means we need to single-quote
 		// escape the argument.

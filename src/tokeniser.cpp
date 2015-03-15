@@ -26,7 +26,7 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 	// The list of ready lines should be cleared by any previous Feed.
 	assert(this->ready_lines.empty());
 
-	for (unsigned char c : raw) {
+	for (char c : raw) {
 		if (this->escape_next) {
 			this->Push(c);
 			continue;
@@ -93,7 +93,7 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 	return lines;
 }
 
-void Tokeniser::Push(unsigned char c)
+void Tokeniser::Push(const char c)
 {
 	assert(this->escape_next ||
 	       !(this->quote_type == QuoteType::NONE && isspace(c)));
