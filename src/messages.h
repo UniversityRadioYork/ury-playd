@@ -90,4 +90,11 @@ const std::string MSG_SEEK_FAIL = "Seek failed";
 /// Message shown when a seek command has an invalid time value.
 const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer";
 
+//
+// IO failures
+//
+
+/// Message shown when too many simultaneous connections are launched.
+const std::string MSG_TOO_MANY_CONNS = "too many simultaneous connections";
+
 #endif // PLAYD_MESSAGES_H

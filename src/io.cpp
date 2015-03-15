@@ -201,10 +201,8 @@ void IoCore::ExpandPool()
 	//
 	// Why -1?  Because slot 0 in the connection pool is reserved for
 	// broadcasts.
-
-	if (this->pool.size() == (SIZE_MAX - 1)) {
-		throw InternalError("too many simultaneous connections");
-	}
+	bool full = this->pool.size() == (SIZE_MAX - 1);
+	if (full) throw InternalError(MSG_TOO_MANY_CONNS);
 
 	this->pool.emplace_back(nullptr);
 	// This isn't an off-by-one error; slots index from 1.
