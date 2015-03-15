@@ -98,17 +98,9 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 		return CommandResult::Failure(MSG_CMD_PLAYER_CLOSING);
 	}
 
-	switch (cmd.size()) {
-		case 1:
-			return this->RunNullaryCommand(cmd[0], id);
-		case 2:
-			if (!cmd[1].empty()) {
-				return this->RunUnaryCommand(cmd[0], cmd[1], id);
-			}
-			return CommandResult::Invalid(MSG_CMD_INVALID);
-		default:
-			return CommandResult::Invalid(MSG_CMD_INVALID);
-	}
+	if (cmd.size() == 1) return this->RunNullaryCommand(cmd[0], id);
+	if (cmd.size() == 2) return this->RunUnaryCommand(cmd[0], cmd[1], id);
+	return CommandResult::Invalid(MSG_CMD_INVALID);
 }
 
 CommandResult Player::RunNullaryCommand(const std::string &word, size_t id)
