@@ -237,7 +237,7 @@ void IoCore::Shutdown()
 	uv_close(reinterpret_cast<uv_handle_t *>(&this->server), nullptr);
 
 	// Finally, kill off all of the connections with 'fatal' responses.
-	for (const auto conn : this->pool) this->TryShutdown(conn);
+	for (const auto conn : this->pool) IoCore::TryShutdown(conn);
 }
 
 /* static */ void IoCore::TryShutdown(const std::shared_ptr<Connection> conn)
