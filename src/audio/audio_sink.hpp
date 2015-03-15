@@ -52,7 +52,7 @@ public:
 	 * @return The Audio::State representing this AudioSink's state.
 	 * @see Audio::State
 	 */
-	virtual Audio::State State() = 0;
+	virtual Audio::State State();
 
 	/**
 	 * Gets the current played position in the song, in samples.

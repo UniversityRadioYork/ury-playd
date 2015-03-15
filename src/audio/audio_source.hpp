@@ -112,20 +112,20 @@ public:
 	 * count as a factor.
 	 * @return The number of bytes per sample.
 	 */
-	size_t BytesPerSample() const;
+	virtual size_t BytesPerSample() const;
 
 	/**
 	 * Gets the file-path of this audio source's audio file.
 	 * @return The audio file's path.
 	 */
-	const std::string &Path() const;
+	virtual const std::string &Path() const;
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
 	 * @param micros The song position, in microseconds.
 	 * @return The corresponding number of elapsed samples.
 	 */
-	std::uint64_t SamplesFromMicros(std::uint64_t micros) const;
+	virtual std::uint64_t SamplesFromMicros(std::uint64_t micros) const;
 
 	/**
 	 * Converts an elapsed sample count to a position in microseconds.

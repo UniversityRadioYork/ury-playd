@@ -22,6 +22,15 @@
 #include "sample_formats.hpp"
 
 //
+// Audio
+//
+
+void Audio::Emit(Response::Code, const ResponseSink *, size_t)
+{
+	// By default, emit nothing.  This is an acceptable behaviour.
+}
+
+//
 // NoAudio
 //
 

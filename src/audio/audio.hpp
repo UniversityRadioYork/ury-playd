@@ -92,7 +92,7 @@ public:
 	 *   route the response.  May be 0 (the default), for all (broadcast).
 	 */
 	virtual void Emit(Response::Code code, const ResponseSink *sink,
-	                  size_t id = 0) = 0;
+	                  size_t id = 0);
 
 	/**
 	 * This Audio's current position.
