@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of the PipeAudioSystem class.
+ * Implementation of the AudioSystem class.
  * @see audio/audio_system.hpp
  */
 
@@ -27,20 +27,20 @@
 #include "sources/mp3.hpp"
 #include "sources/sndfile.hpp"
 
-PipeAudioSystem::PipeAudioSystem(int device_id)
-    : device_id(device_id),
-      sink([](const AudioSource &, int) -> std::unique_ptr<AudioSink> {
+AudioSystem::AudioSystem(int device_id)
+    : sink([](const AudioSource &, int) -> std::unique_ptr<AudioSink> {
 	      throw InternalError("No audio sink!");
-      })
+      }),
+      device_id(device_id)
 {
 }
 
-std::unique_ptr<Audio> PipeAudioSystem::Null() const
+std::unique_ptr<Audio> AudioSystem::Null() const
 {
 	return std::unique_ptr<Audio>(new NoAudio());
 }
 
-std::unique_ptr<Audio> PipeAudioSystem::Load(const std::string &path) const
+std::unique_ptr<Audio> AudioSystem::Load(const std::string &path) const
 {
 	std::unique_ptr<AudioSource> source = this->LoadSource(path);
 	assert(source != nullptr);
@@ -50,7 +50,7 @@ std::unique_ptr<Audio> PipeAudioSystem::Load(const std::string &path) const
 	        new PipeAudio(std::move(source), std::move(sink)));
 }
 
-std::unique_ptr<AudioSource> PipeAudioSystem::LoadSource(const std::string &path) const
+std::unique_ptr<AudioSource> AudioSystem::LoadSource(const std::string &path) const
 {
 	size_t extpoint = path.find_last_of('.');
 	std::string ext = path.substr(extpoint + 1);
@@ -63,13 +63,13 @@ std::unique_ptr<AudioSource> PipeAudioSystem::LoadSource(const std::string &path
 	return (ibuilder->second)(path);
 }
 
-void PipeAudioSystem::SetSink(PipeAudioSystem::SinkBuilder sink)
+void AudioSystem::SetSink(AudioSystem::SinkBuilder sink)
 {
 	this->sink = sink;
 }
 
-void PipeAudioSystem::AddSource(const std::string &ext,
-                                PipeAudioSystem::SourceBuilder source)
+void AudioSystem::AddSource(const std::string &ext,
+                                AudioSystem::SourceBuilder source)
 {
 	this->sources.emplace(ext, source);
 }

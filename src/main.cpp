@@ -76,7 +76,7 @@ int GetDeviceID(const std::vector<std::string> &args)
  * Sets up the audio system with the desired sources and sinks.
  * @param audio The audio system to configure.
  */
-void SetupAudioSystem(PipeAudioSystem &audio)
+void SetupAudioSystem(AudioSystem &audio)
 {
 	audio.SetSink(&SdlAudioSink::Build);
 
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 	if (device_id < 0) ExitWithUsage(args.at(0));
 
 	// Set up all of the components of playd in one fell swoop.
-	PipeAudioSystem audio(device_id);
+	AudioSystem audio(device_id);
 	SetupAudioSystem(audio);
 	Player player(audio);
 	IoCore io(player);

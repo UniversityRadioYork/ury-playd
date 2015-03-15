@@ -45,7 +45,7 @@ std::uint64_t DummyAudioSource::Seek(std::uint64_t position)
 	return this->position;
 }
 
-std::string DummyAudioSource::Path() const
+const std::string &DummyAudioSource::Path() const
 {
 	return this->path;
 }
