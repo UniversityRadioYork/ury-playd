@@ -85,6 +85,9 @@ private:
 class ResponseSink
 {
 public:
+	/// Empty virtual destructor for ResponseSink.
+	virtual ~ResponseSink() = default;
+
 	/**
 	 * Outputs a response.
 	 * @param response The Response to output.
