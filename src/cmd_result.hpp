@@ -77,8 +77,8 @@ public:
 	          size_t id = 0) const;
 
 private:
-	Response::Code type; ///< The command result's response code.
 	std::string msg;     ///< The command result's message.
+	Response::Code type; ///< The command result's response code.
 };
 
 #endif // PLAYD_CMD_RESULT
