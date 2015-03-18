@@ -45,23 +45,23 @@ private:
 		DOUBLE  ///< In double quotes ("").
 	};
 
+	/// The current vector of completed, tokenised lines.
+	/// This is cleared at the end of every Tokeniser::Feed.
+	std::vector<std::vector<std::string>> ready_lines;
+
+	/// The current vector of completed, tokenised words.
+	std::vector<std::string> words;
+
+	/// The current, incomplete word to which new characters should be
+	/// added.
+	std::string current_word;
+
 	/// Whether the next character is to be interpreted as an escape code.
 	/// This usually gets set to true when a backslash is detected.
 	bool escape_next;
 
 	/// The type of quotation currently being used in this Tokeniser.
 	QuoteType quote_type;
-
-	/// The current vector of completed, tokenised words.
-	std::vector<std::string> words;
-
-	/// The current vector of completed, tokenised lines.
-	/// This is cleared at the end of every Tokeniser::Feed.
-	std::vector<std::vector<std::string>> ready_lines;
-
-	/// The current, incomplete word to which new characters should be
-	/// added.
-	std::string current_word;
 
 	/// Finishes the current word and sends the line to the CommandHandler.
 	void Emit();
@@ -74,7 +74,7 @@ private:
 	 * This also clears the escape_next flag.
 	 * @param c The character to push onto the current word.
 	 */
-	void Push(unsigned char c);
+	void Push(char c);
 };
 
 #endif // PLAYD_TOKENISER_HPP

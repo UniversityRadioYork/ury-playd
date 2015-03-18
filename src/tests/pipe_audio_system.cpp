@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Tests for PipeAudioSystem.
+ * Tests for AudioSystem.
  */
 
 #include "catch.hpp"
@@ -14,9 +14,9 @@
 #include "dummy_audio_sink.hpp"
 #include "dummy_audio_source.hpp"
 
-SCENARIO("PipeAudioSystem can provide null implementations of Audio", "[pipe-audio-system][no-audio]") {
-	GIVEN("a fresh PipeAudioSystem") {
-		PipeAudioSystem sys(0);
+SCENARIO("AudioSystem can provide null implementations of Audio", "[pipe-audio-system][no-audio]") {
+	GIVEN("a fresh AudioSystem") {
+		AudioSystem sys(0);
 
 		WHEN("Null() is invoked") {
 			std::unique_ptr<Audio> au = sys.Null();
@@ -28,9 +28,9 @@ SCENARIO("PipeAudioSystem can provide null implementations of Audio", "[pipe-aud
 	}
 }
 
-SCENARIO("PipeAudioSystem cannot create Audio without a registered Sink", "[pipe-audio-system]") {
-	GIVEN("a PipeAudioSystem with dummy source loaded") {
-		PipeAudioSystem sys(0);
+SCENARIO("AudioSystem cannot create Audio without a registered Sink", "[pipe-audio-system]") {
+	GIVEN("a AudioSystem with dummy source loaded") {
+		AudioSystem sys(0);
 		sys.AddSource("bar", &DummyAudioSource::Build);
 
 		WHEN("Load() is invoked") {
@@ -41,10 +41,10 @@ SCENARIO("PipeAudioSystem cannot create Audio without a registered Sink", "[pipe
 	}
 }
 
-SCENARIO("PipeAudio can be constructed from a PipeAudioSystem", "[pipe-audio][pipe-audio-system]") {
-	GIVEN("a fresh PipeAudioSystem") {
-		PipeAudioSystem sys(0);
-		WHEN("the PipeAudioSystem is assigned a dummy AudioSink and AudioSource") {
+SCENARIO("PipeAudio can be constructed from a AudioSystem", "[pipe-audio][pipe-audio-system]") {
+	GIVEN("a fresh AudioSystem") {
+		AudioSystem sys(0);
+		WHEN("the AudioSystem is assigned a dummy AudioSink and AudioSource") {
 			sys.SetSink(&DummyAudioSink::Build);
 			sys.AddSource("bar", &DummyAudioSource::Build);
 
@@ -57,10 +57,10 @@ SCENARIO("PipeAudio can be constructed from a PipeAudioSystem", "[pipe-audio][pi
 	}
 }
 
-SCENARIO("PipeAudioSystems fail to load audio with an unknown format", "[pipe-audio-system]") {
-	GIVEN("a fresh PipeAudioSystem") {
-		PipeAudioSystem sys(0);
-		WHEN("the PipeAudioSystem is assigned a dummy AudioSink") {
+SCENARIO("AudioSystems fail to load audio with an unknown format", "[pipe-audio-system]") {
+	GIVEN("a fresh AudioSystem") {
+		AudioSystem sys(0);
+		WHEN("the AudioSystem is assigned a dummy AudioSink") {
 			sys.SetSink(&DummyAudioSink::Build);
 
 			AND_WHEN("no AudioSource is set") {

@@ -85,14 +85,14 @@ public:
 	/**
 	 * Emits the requested response.
 	 *
-	 * @param response The response to emit, if possible.
+	 * @param code The code of the response to emit, if possible.
 	 * @param sink The ResponseSink to which the response shall be sent.
 	 *   May be nullptr, in which case Emit should be a no-operation.
 	 * @param id The ID of the connection to which the ResponseSink should
 	 *   route the response.  May be 0 (the default), for all (broadcast).
 	 */
 	virtual void Emit(Response::Code code, const ResponseSink *sink,
-	                  size_t id = 0) = 0;
+	                  size_t id = 0);
 
 	/**
 	 * This Audio's current position.

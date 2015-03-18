@@ -17,8 +17,8 @@
 #include "dummy_response_sink.hpp"
 
 SCENARIO("Player accurately represents whether it is running", "[player]") {
-	GIVEN("a fresh Player using PipeAudioSystem, DummyAudioSink and DummyAudioSource") {
-		PipeAudioSystem ds(0);
+	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
+		AudioSystem ds(0);
 		Player p(ds);
 
 		ds.SetSink(&DummyAudioSink::Build);
@@ -44,9 +44,9 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 	}
 }
 
-SCENARIO("Player interacts correctly with a PipeAudioSystem", "[player][dummy-audio-system]") {
-	GIVEN("a fresh Player using PipeAudioSystem, DummyAudioSink and DummyAudioSource") {
-		PipeAudioSystem ds(0);
+SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-system]") {
+	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
+		AudioSystem ds(0);
 		Player p(ds);
 
 		ds.SetSink(&DummyAudioSink::Build);

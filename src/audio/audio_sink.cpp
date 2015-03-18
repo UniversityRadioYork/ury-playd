@@ -23,6 +23,19 @@
 #include "ringbuffer.hpp"
 #include "sample_formats.hpp"
 
+//
+// AudioSink
+//
+
+Audio::State AudioSink::State()
+{
+	return Audio::State::NONE;
+}
+
+//
+// SdlAudioSink
+//
+
 const size_t SdlAudioSink::RINGBUF_POWER = 16;
 
 /**

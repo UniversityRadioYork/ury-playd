@@ -44,13 +44,14 @@ public:
 
 	/**
 	 * Handles a command line.
-	 * @param cmd A reference to the list of words in the command.
+	 * @param words A reference to the list of words in the command.
 	 * @param id If present, the ID of the client requesting the
 	 *   command, and, thus, the target of any unicast responses
 	 *   this command generates.
 	 * @return Whether the command succeeded.
 	 */
-	CommandResult RunCommand(const std::vector<std::string> &words, size_t id = 0);
+	CommandResult RunCommand(const std::vector<std::string> &words,
+	                         size_t id = 0);
 
 	/**
 	 * Sets the sink to which this Player shall send responses.

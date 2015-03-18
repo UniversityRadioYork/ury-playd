@@ -37,7 +37,7 @@ public:
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	/// @return The path of the DummyAudioSource.
-	std::string Path() const;
+	const std::string &Path() const;
 
 	/// The position of the AudioSource, in samples.
 	std::uint64_t position;

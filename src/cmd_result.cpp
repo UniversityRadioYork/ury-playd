@@ -29,7 +29,7 @@ CommandResult CommandResult::Failure(const std::string &msg)
 }
 
 CommandResult::CommandResult(Response::Code type, const std::string &msg)
-    : type(type), msg(msg)
+    : msg(msg), type(type)
 {
 }
 

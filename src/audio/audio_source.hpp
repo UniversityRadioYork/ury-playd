@@ -97,7 +97,7 @@ public:
 	/**
 	 * Seeks to the given position, in samples.
 	 * For convenience, the new position (in terms of samples) is returned.
-	 * @param in_samples  The new position in the file, in samples.
+	 * @param position The requested new position in the file, in samples.
 	 * @return The new position in the file, in samples.
 	 */
 	virtual std::uint64_t Seek(std::uint64_t position) = 0;
@@ -112,20 +112,20 @@ public:
 	 * count as a factor.
 	 * @return The number of bytes per sample.
 	 */
-	size_t BytesPerSample() const;
+	virtual size_t BytesPerSample() const;
 
 	/**
 	 * Gets the file-path of this audio source's audio file.
 	 * @return The audio file's path.
 	 */
-	const std::string &Path() const;
+	virtual const std::string &Path() const;
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
-	 * @param position The song position, in microseconds.
+	 * @param micros The song position, in microseconds.
 	 * @return The corresponding number of elapsed samples.
 	 */
-	std::uint64_t SamplesFromMicros(std::uint64_t micros) const;
+	virtual std::uint64_t SamplesFromMicros(std::uint64_t micros) const;
 
 	/**
 	 * Converts an elapsed sample count to a position in microseconds.
