@@ -209,3 +209,219 @@ SCENARIO("Tokenisers can backslash-escape bytes", "[tokeniser]") {
 		}
 	}
 }
+
+// See http://universityradioyork.github.io/baps3-spec/comms/internal/protocol.html
+SCENARIO("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
+	GIVEN("A fresh Tokeniser") {
+		Tokeniser t;
+		WHEN("the Tokeniser is fed E1") {
+			auto lines = t.Feed("");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 0);
+			}
+		}
+		WHEN("the Tokeniser is fed E2") {
+			auto lines = t.Feed("\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 0);
+			}
+		}
+		WHEN("the Tokeniser is fed E3") {
+			auto lines = t.Feed("''\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "");
+			}
+		}
+		WHEN("the Tokeniser is fed E4") {
+			auto lines = t.Feed("\"\"\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "");
+			}
+		}
+		WHEN("the Tokeniser is fed W1") {
+			auto lines = t.Feed("foo bar baz\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 3);
+				REQUIRE(lines[0][0] == "foo");
+				REQUIRE(lines[0][1] == "bar");
+				REQUIRE(lines[0][2] == "baz");
+			}
+		}
+		WHEN("the Tokeniser is fed W2") {
+			auto lines = t.Feed("foo\tbar\tbaz\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 3);
+				REQUIRE(lines[0][0] == "foo");
+				REQUIRE(lines[0][1] == "bar");
+				REQUIRE(lines[0][2] == "baz");
+			}
+		}
+		WHEN("the Tokeniser is fed W3") {
+			auto lines = t.Feed("foo\rbar\rbaz\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 3);
+				REQUIRE(lines[0][0] == "foo");
+				REQUIRE(lines[0][1] == "bar");
+				REQUIRE(lines[0][2] == "baz");
+			}
+		}
+		WHEN("the Tokeniser is fed W4") {
+			auto lines = t.Feed("silly windows\r\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 2);
+				REQUIRE(lines[0][0] == "silly");
+				REQUIRE(lines[0][1] == "windows");
+			}
+		}
+		WHEN("the Tokeniser is fed W5") {
+			auto lines = t.Feed("    abc def\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 2);
+				REQUIRE(lines[0][0] == "abc");
+				REQUIRE(lines[0][1] == "def");
+			}
+		}
+		WHEN("the Tokeniser is fed W6") {
+			auto lines = t.Feed("ghi jkl    \n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 2);
+				REQUIRE(lines[0][0] == "ghi");
+				REQUIRE(lines[0][1] == "jkl");
+			}
+		}
+		WHEN("the Tokeniser is fed W7") {
+			auto lines = t.Feed("    mno pqr    \n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 2);
+				REQUIRE(lines[0][0] == "mno");
+				REQUIRE(lines[0][1] == "pqr");
+			}
+		}
+		WHEN("the Tokeniser is fed Q1") {
+			auto lines = t.Feed("abc\\\ndef\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "abc\ndef");
+			}
+		}
+		WHEN("the Tokeniser is fed Q2") {
+			auto lines = t.Feed("\"abc\ndef\"\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "abc\ndef");
+			}
+		}
+		WHEN("the Tokeniser is fed Q3") {
+			auto lines = t.Feed("\"abc\\\ndef\"\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "abc\ndef");
+			}
+		}
+		WHEN("the Tokeniser is fed Q4") {
+			auto lines = t.Feed("'abc\ndef'\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "abc\ndef");
+			}
+		}
+		WHEN("the Tokeniser is fed Q5") {
+			auto lines = t.Feed("'abc\\\ndef'\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "abc\\\ndef");
+			}
+		}
+		WHEN("the Tokeniser is fed Q6") {
+			auto lines = t.Feed("Scare\\\" quotes\\\"\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 2);
+				REQUIRE(lines[0][0] == "Scare\"");
+				REQUIRE(lines[0][1] == "quotes\"");
+			}
+		}
+		WHEN("the Tokeniser is fed Q7") {
+			auto lines = t.Feed("I\\'m free\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 2);
+				REQUIRE(lines[0][0] == "I'm");
+				REQUIRE(lines[0][1] == "free");
+			}
+		}
+		WHEN("the Tokeniser is fed Q8") {
+			auto lines = t.Feed("'hello, I'\\''m an escaped single quote'\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "hello, I'm an escaped single quote");
+			}
+		}
+		WHEN("the Tokeniser is fed Q9") {
+			auto lines = t.Feed("\"hello, this is an \\\" escaped double quote\"\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "hello, this is an \" escaped double quote");
+			}
+		}
+		WHEN("the Tokeniser is fed M1") {
+			auto lines = t.Feed("first line\nsecond line\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 2);
+				REQUIRE(lines[0].size() == 2);
+				REQUIRE(lines[0][0] == "first");
+				REQUIRE(lines[0][1] == "line");
+				REQUIRE(lines[1].size() == 2);
+				REQUIRE(lines[1][0] == "second");
+				REQUIRE(lines[1][1] == "line");
+			}
+		}
+		WHEN("the Tokeniser is fed U1") {
+			auto lines = t.Feed("北野 武\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 2);
+				REQUIRE(lines[0][0] == "北野");
+				REQUIRE(lines[0][1] == "武");
+			}
+		}
+		WHEN("the Tokeniser is fed U2") {
+			auto lines = t.Feed("f\xfcr\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 1);
+				REQUIRE(lines[0].size() == 1);
+				REQUIRE(lines[0][0] == "f\xef\xbf\xbdr");
+			}
+		}
+		WHEN("the Tokeniser is fed X1") {
+			auto lines = t.Feed("enqueue file \"C:\\\\Users\\\\Test\\\\Artist - Title.mp3\" 1\"\n");
+			THEN ("the Tokeniser returns the specified result") {
+				REQUIRE(lines.size() == 0);
+				REQUIRE(lines[0].size() == 4);
+				REQUIRE(lines[0][0] == "enqueue");
+				REQUIRE(lines[0][1] == "file");
+				REQUIRE(lines[0][2] == "C:\\Users\\Test\\Artist - Title.mp3");
+				REQUIRE(lines[0][3] == "1");
+			}
+		}
+	}
+}
