@@ -17,7 +17,7 @@
 #include "tokeniser.hpp"
 
 Tokeniser::Tokeniser()
-    : escape_next(false), quote_type(Tokeniser::QuoteType::NONE)
+    : quote_type(Tokeniser::QuoteType::NONE)
 {
 }
 
@@ -65,11 +65,13 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 						break;
 
 					case '\'':
+						this->in_word = true;
 						this->quote_type =
 						        QuoteType::SINGLE;
 						break;
 
 					case '\"':
+						this->in_word = true;
 						this->quote_type =
 						        QuoteType::DOUBLE;
 						break;
@@ -97,6 +99,7 @@ void Tokeniser::Push(const char c)
 {
 	assert(this->escape_next ||
 	       !(this->quote_type == QuoteType::NONE && isspace(c)));
+	this->in_word = true;
 	this->current_word.push_back(c);
 	this->escape_next = false;
 	assert(!this->current_word.empty());
@@ -104,8 +107,9 @@ void Tokeniser::Push(const char c)
 
 void Tokeniser::EndWord()
 {
-	// Ignore consecutive runs of whitespace.
-	if (this->current_word.empty()) return;
+	// Don't add a word unless we're in one.
+	if (!this->in_word) return;
+	this->in_word = false;
 
 	this->words.push_back(this->current_word);
 
