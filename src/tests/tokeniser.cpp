@@ -415,9 +415,9 @@ SCENARIO("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 		//	}
 		//}
 		WHEN("the Tokeniser is fed X1") {
-			auto lines = t.Feed("enqueue file \"C:\\\\Users\\\\Test\\\\Artist - Title.mp3\" 1\"\n");
+			auto lines = t.Feed("enqueue file \"C:\\\\Users\\\\Test\\\\Artist - Title.mp3\" 1\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 0);
+				REQUIRE(lines.size() == 1);
 				REQUIRE(lines[0].size() == 4);
 				REQUIRE(lines[0][0] == "enqueue");
 				REQUIRE(lines[0][1] == "file");
