@@ -217,202 +217,209 @@ SCENARIO("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 		WHEN("the Tokeniser is fed E1") {
 			auto lines = t.Feed("");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 0);
+				std::vector<std::vector<std::string>> want = {};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed E2") {
 			auto lines = t.Feed("\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 0);
+				std::vector<std::vector<std::string>> want = {
+					{}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed E3") {
 			auto lines = t.Feed("''\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "");
+				std::vector<std::vector<std::string>> want = {
+					{""}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed E4") {
 			auto lines = t.Feed("\"\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "");
+				std::vector<std::vector<std::string>> want = {
+					{""}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed W1") {
 			auto lines = t.Feed("foo bar baz\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 3);
-				REQUIRE(lines[0][0] == "foo");
-				REQUIRE(lines[0][1] == "bar");
-				REQUIRE(lines[0][2] == "baz");
+				std::vector<std::vector<std::string>> want = {
+					{"foo", "bar", "baz"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed W2") {
 			auto lines = t.Feed("foo\tbar\tbaz\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 3);
-				REQUIRE(lines[0][0] == "foo");
-				REQUIRE(lines[0][1] == "bar");
-				REQUIRE(lines[0][2] == "baz");
+				std::vector<std::vector<std::string>> want = {
+					{"foo", "bar", "baz"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed W3") {
 			auto lines = t.Feed("foo\rbar\rbaz\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 3);
-				REQUIRE(lines[0][0] == "foo");
-				REQUIRE(lines[0][1] == "bar");
-				REQUIRE(lines[0][2] == "baz");
+				std::vector<std::vector<std::string>> want = {
+					{"foo", "bar", "baz"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed W4") {
 			auto lines = t.Feed("silly windows\r\n");
-			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 2);
-				REQUIRE(lines[0][0] == "silly");
-				REQUIRE(lines[0][1] == "windows");
+			THEN("the Tokeniser returns the specified result") {
+				std::vector<std::vector<std::string>> want = {
+					{"silly", "windows"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed W5") {
 			auto lines = t.Feed("    abc def\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 2);
-				REQUIRE(lines[0][0] == "abc");
-				REQUIRE(lines[0][1] == "def");
+				std::vector<std::vector<std::string>> want = {
+					{"abc", "def"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed W6") {
 			auto lines = t.Feed("ghi jkl    \n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 2);
-				REQUIRE(lines[0][0] == "ghi");
-				REQUIRE(lines[0][1] == "jkl");
+				std::vector<std::vector<std::string>> want = {
+					{"ghi", "jkl"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed W7") {
 			auto lines = t.Feed("    mno pqr    \n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 2);
-				REQUIRE(lines[0][0] == "mno");
-				REQUIRE(lines[0][1] == "pqr");
+				std::vector<std::vector<std::string>> want = {
+					{"mno", "pqr"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q1") {
 			auto lines = t.Feed("abc\\\ndef\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "abc\ndef");
+				std::vector<std::vector<std::string>> want = {
+					{"abc\ndef"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q2") {
 			auto lines = t.Feed("\"abc\ndef\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "abc\ndef");
+				std::vector<std::vector<std::string>> want = {
+					{"abc\ndef"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q3") {
 			auto lines = t.Feed("\"abc\\\ndef\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "abc\ndef");
+				std::vector<std::vector<std::string>> want = {
+					{"abc\ndef"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q4") {
 			auto lines = t.Feed("'abc\ndef'\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "abc\ndef");
+				std::vector<std::vector<std::string>> want = {
+					{"abc\ndef"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q5") {
 			auto lines = t.Feed("'abc\\\ndef'\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "abc\\\ndef");
+				std::vector<std::vector<std::string>> want = {
+					{"abc\\\ndef"}
+				};
+
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q6") {
 			auto lines = t.Feed("Scare\\\" quotes\\\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 2);
-				REQUIRE(lines[0][0] == "Scare\"");
-				REQUIRE(lines[0][1] == "quotes\"");
+				std::vector<std::vector<std::string>> want = {
+					{"Scare\"", "quotes\""}
+				};
+
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q7") {
 			auto lines = t.Feed("I\\'m free\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 2);
-				REQUIRE(lines[0][0] == "I'm");
-				REQUIRE(lines[0][1] == "free");
+				std::vector<std::vector<std::string>> want = {
+					{"I'm", "free"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q8") {
 			auto lines = t.Feed("'hello, I'\\''m an escaped single quote'\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "hello, I'm an escaped single quote");
+				std::vector<std::vector<std::string>> want = {
+					{"hello, I'm an escaped single quote"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed Q9") {
 			auto lines = t.Feed("\"hello, this is an \\\" escaped double quote\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 1);
-				REQUIRE(lines[0][0] == "hello, this is an \" escaped double quote");
+				std::vector<std::vector<std::string>> want = {
+					{"hello, this is an \" escaped double quote"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed M1") {
 			auto lines = t.Feed("first line\nsecond line\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 2);
-				REQUIRE(lines[0].size() == 2);
-				REQUIRE(lines[0][0] == "first");
-				REQUIRE(lines[0][1] == "line");
-				REQUIRE(lines[1].size() == 2);
-				REQUIRE(lines[1][0] == "second");
-				REQUIRE(lines[1][1] == "line");
+				std::vector<std::vector<std::string>> want = {
+					{"first", "line"},
+					{"second", "line"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed U1") {
 			auto lines = t.Feed("北野 武\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 2);
-				REQUIRE(lines[0][0] == "北野");
-				REQUIRE(lines[0][1] == "武");
+				std::vector<std::vector<std::string>> want = {
+					{"北野", "武"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 		WHEN("the Tokeniser is fed X1") {
 			auto lines = t.Feed("enqueue file \"C:\\\\Users\\\\Test\\\\Artist - Title.mp3\" 1\n");
 			THEN ("the Tokeniser returns the specified result") {
-				REQUIRE(lines.size() == 1);
-				REQUIRE(lines[0].size() == 4);
-				REQUIRE(lines[0][0] == "enqueue");
-				REQUIRE(lines[0][1] == "file");
-				REQUIRE(lines[0][2] == "C:\\Users\\Test\\Artist - Title.mp3");
-				REQUIRE(lines[0][3] == "1");
+				std::vector<std::vector<std::string>> want = {
+					{"enqueue", "file", "C:\\Users\\Test\\Artist - Title.mp3", "1"}
+				};
+				REQUIRE(lines == want);
 			}
 		}
 	}
