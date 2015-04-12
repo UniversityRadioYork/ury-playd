@@ -210,7 +210,7 @@ SCENARIO("Tokenisers can backslash-escape bytes", "[tokeniser]") {
 	}
 }
 
-// See http://universityradioyork.github.io/baps3-spec/comms/internal/protocol.html
+// See http://universityradioyork.github.io/baps3-spec/tests/internal.html
 SCENARIO("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 	GIVEN("A fresh Tokeniser") {
 		Tokeniser t;
