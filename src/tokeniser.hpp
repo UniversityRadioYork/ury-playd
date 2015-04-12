@@ -58,10 +58,10 @@ private:
 
 	/// Whether the next character is to be interpreted as an escape code.
 	/// This usually gets set to true when a backslash is detected.
-	bool escape_next = false;
+	bool escape_next;
 
 	/// Whether the tokeniser is currently in a word.
-	bool in_word = false;
+	bool in_word;
 
 	/// The type of quotation currently being used in this Tokeniser.
 	QuoteType quote_type;
