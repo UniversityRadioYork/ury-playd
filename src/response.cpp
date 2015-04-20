@@ -16,15 +16,13 @@
 #include "response.hpp"
 
 const std::string Response::STRINGS[] = {
-        "OK",       // Code::OK
-        "WHAT",     // Code::WHAT
-        "FAIL",     // Code::FAIL
         "OHAI",     // Code::OHAI
         "STATE",    // Code::STATE
         "TIME",     // Code::TIME
         "FILE",     // Code::FILE
         "FEATURES", // Code::FEATURES
-        "END"       // Code::END
+        "END",      // Code::END
+	"ACK"       // Code::ACK
 };
 
 Response::Response(Response::Code code)
