@@ -13,42 +13,43 @@
 #include "response.hpp"
 #include "cmd_result.hpp"
 
+const std::string CommandResult::STRINGS[] = {
+        "OK",   // Code::OK
+        "WHAT", // Code::WHAT
+        "FAIL"  // Code::FAIL
+};
+
 CommandResult CommandResult::Success()
 {
-	return CommandResult(Response::Code::OK, "success");
+	return CommandResult(CommandResult::Code::OK, "success");
 }
 
 CommandResult CommandResult::Invalid(const std::string &msg)
 {
-	return CommandResult(Response::Code::WHAT, msg);
+	return CommandResult(CommandResult::Code::WHAT, msg);
 }
 
 CommandResult CommandResult::Failure(const std::string &msg)
 {
-	return CommandResult(Response::Code::FAIL, msg);
+	return CommandResult(CommandResult::Code::FAIL, msg);
 }
 
-CommandResult::CommandResult(Response::Code type, const std::string &msg)
+CommandResult::CommandResult(CommandResult::Code type, const std::string &msg)
     : msg(msg), type(type)
 {
 }
 
 bool CommandResult::IsSuccess() const
 {
-	return this->type == Response::Code::OK;
+	return this->type == CommandResult::Code::OK;
 }
 
 void CommandResult::Emit(const ResponseSink &sink,
                          const std::vector<std::string> &cmd, size_t id) const
 {
-	Response r(this->type);
-
-	// Only display a message if the result wasn't a successful one.
-	// The message goes at the front, as then clients always know it's the
-	// first argument.
-	if (!this->IsSuccess()) r.AddArg(this->msg);
-
-	// Then, add in the original command words.
+	Response r(Response::Code::ACK);
+	r.AddArg(CommandResult::STRINGS[static_cast<int>(this->type)]);
+	r.AddArg(this->msg);
 	for (auto &cwd : cmd) r.AddArg(cwd);
 
 	sink.Respond(r, id);

@@ -29,15 +29,13 @@ public:
 	 * @see ResponseSink::STRINGS
 	 */
 	enum class Code : std::uint8_t {
-		OK,       ///< Request was valid and produced an answer.
-		WHAT,     ///< Request was invalid/user error.
-		FAIL,     ///< Error, pointing blame at environment.
 		OHAI,     ///< Server starting up.
 		STATE,    ///< Server changing state.
 		TIME,     ///< Server sending current song time,
 		FILE,     ///< The loaded file just changed.
 		FEATURES, ///< Server sending feature list.
-		END       ///< The loaded file just ended on its own.
+		END,      ///< The loaded file just ended on its own.
+		ACK       ///< Command result.
 	};
 
 	/**
