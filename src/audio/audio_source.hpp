@@ -23,9 +23,8 @@
  * AudioSource is an abstract base class, implemented separately for each
  * supported audio file format.
  *
- * @see FlacAudioSource
  * @see Mp3AudioSource
- * @see OggAudioSource
+ * @see SndfileAudioSource
  *
  * @note When we refer to 'samples' in this class, this usually refers to
  *   the smallest unit of data for *all* channels.  Some audio decoders

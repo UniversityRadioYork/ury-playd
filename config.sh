@@ -29,19 +29,16 @@
 #     PKGCONF..........................................pkg-config or equivalent
 #
 #   Package name overrides:
-#     FLACXX_PKG......................................FLAC++ pkg-config package
 #     LIBMPG123_PKG................................libmpg123 pkg-config package
 #     LIBSNDFILE_PKG..............................libsndfile pkg-config package
 #     SDL2_PKG..........................................SDL2 pkg-config package
 #     LIBUV_PKG........................................libuv pkg-config package
 #
 #   File format flags (set to non-empty string to activate):
-#     NO_FLAC................................................don't support FLAC
 #     NO_MP3..................................................don't support MP3
 #     NO_SNDFILE...............................don't support libsndfile formats
 #
 # Notes:
-#   - lack of FLAC++ implies NO_FLAC;
 #   - lack of libmpg123 implies NO_MP3;
 #   - lack of libsndfile implies NO_SNDFILE;
 #   - lack of pkgconf/pkg-config or SDL2 is fatal.
@@ -209,25 +206,10 @@ find_gnumake() {
 # Tries to find all dependencies.
 find_deps() {
 	echo "DEPENDENCIES:"
-	find_flac
 	find_mp3
 	find_sndfile
 	find_sdl2
 	find_libuv
-}
-
-# Finds FLAC++ to provide FLAC support, if requested.
-find_flac() {
-	echo -n "  FLAC++:        "
-
-	if [ -n "$NO_FLAC" ]; then
-		echo "FLAC disabled; skipping"
-		return
-	fi
-
-	try_use_pkg       FLACXX "FLAC++"
-	try_use_pkg       FLACXX "flac++"
-	disable_if_no_pkg FLACXX FLAC
 }
 
 # Finds libmpg123 to provide MP3 support, if requested.
@@ -299,7 +281,6 @@ list_features() {
 	FORMATS=""
 	FCFLAGS=""
 
-	add_format_to_lists flac NO_FLAC    WITH_FLAC
 	add_format_to_lists mp3  NO_MP3     WITH_MP3
 	add_format_to_lists flac NO_SNDFILE WITH_SNDFILE
 	add_format_to_lists ogg  NO_SNDFILE WITH_SNDFILE
@@ -324,7 +305,7 @@ list_features() {
 # Collates the pkg-config packages into $PACKAGES.
 # Also lists on stdout.
 list_packages() {
-	PACKAGES=`echo "$FLACXX_PKG $LIBMPG123_PKG $LIBSNDFILE_PKG $SDL2_PKG $LIBUV_PKG" | sed 's/  */ /g'`
+	PACKAGES=`echo "$LIBMPG123_PKG $LIBSNDFILE_PKG $SDL2_PKG $LIBUV_PKG" | sed 's/  */ /g'`
 	echo "PACKAGES USED:"
 	echo "  $PACKAGES"
 }
@@ -348,7 +329,6 @@ find_sources() {
 	cxx_expr="\( -name "*.cpp" -o -name "*.cxx" \)"
 
 	# Disable feature files if those features are disabled.
-	disable_feature_files "${NO_FLAC}"    flac
 	disable_feature_files "${NO_MP3}"     mp3
 	disable_feature_files "${NO_SNDFILE}" sndfile
 

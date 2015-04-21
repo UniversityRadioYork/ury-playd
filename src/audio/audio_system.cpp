@@ -23,7 +23,6 @@
 #include "audio_system.hpp"
 #include "sample_formats.hpp"
 
-#include "sources/flac.hpp"
 #include "sources/mp3.hpp"
 #include "sources/sndfile.hpp"
 

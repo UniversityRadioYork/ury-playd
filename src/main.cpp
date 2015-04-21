@@ -18,9 +18,6 @@
 #include "player.hpp"
 #include "messages.h"
 
-#ifdef WITH_FLAC
-#include "audio/sources/flac.hpp"
-#endif // WITH_FLAC
 #ifdef WITH_MP3
 #include "audio/sources/mp3.hpp"
 #endif // WITH_MP3
@@ -81,10 +78,6 @@ void SetupAudioSystem(AudioSystem &audio)
 	audio.SetSink(&SdlAudioSink::Build);
 
 // Now set up the available sources.
-#ifdef WITH_FLAC
-	audio.AddSource("flac", &FlacAudioSource::Build);
-#endif // WITH_FLAC
-
 #ifdef WITH_MP3
 	mpg123_init();
 	atexit(mpg123_exit);
