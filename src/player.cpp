@@ -44,7 +44,7 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->file->Emit(Response::Code::TIME, this->sink);
+		this->file->Emit("/player/time/elapsed", this->sink);
 	}
 
 	return this->is_running;
@@ -52,9 +52,9 @@ bool Player::Update()
 
 CommandResult Player::EmitAllAudioState(size_t id) const
 {
-	this->file->Emit(Response::Code::FILE, sink, id);
-	this->file->Emit(Response::Code::TIME, sink, id);
-	this->file->Emit(Response::Code::STATE, sink, id);
+	this->file->Emit("/player/file", sink, id);
+	this->file->Emit("/player/time/elapsed", sink, id);
+	this->file->Emit("/control/state", sink, id);
 
 	return CommandResult::Success();
 }
@@ -127,7 +127,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	this->file->Emit(Response::Code::STATE, this->sink);
+	this->file->Emit("/control/state", this->sink);
 
 	return CommandResult::Success();
 }
@@ -179,7 +179,7 @@ CommandResult Player::SetPlaying(bool playing)
 		return CommandResult::Invalid(e.Message());
 	}
 
-	this->file->Emit(Response::Code::STATE, this->sink);
+	this->file->Emit("/control/state", this->sink);
 
 	return CommandResult::Success();
 }
@@ -249,5 +249,5 @@ void Player::SeekRaw(std::uint64_t pos)
 	assert(this->file != nullptr);
 
 	this->file->Seek(pos);
-	this->file->Emit(Response::Code::TIME, this->sink);
+	this->file->Emit("/player/time/elapsed", this->sink);
 }

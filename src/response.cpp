@@ -22,8 +22,21 @@ const std::string Response::STRINGS[] = {
         "FILE",     // Code::FILE
         "FEATURES", // Code::FEATURES
         "END",      // Code::END
-	"ACK"       // Code::ACK
+        "ACK",      // Code::ACK
+        "RES"       // Code::RES
 };
+
+// Pre-made responses.
+std::unique_ptr<Response> Response::Res(const std::string &type,
+                                        const std::string &path,
+                                        const std::string &value)
+{
+	auto res = std::unique_ptr<Response>(
+		new Response(Response::Code::RES)
+	);
+	res->AddArg(type).AddArg(path).AddArg(value);
+	return res;
+}
 
 Response::Response(Response::Code code)
 {

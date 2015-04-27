@@ -85,13 +85,16 @@ public:
 	/**
 	 * Emits the requested response.
 	 *
-	 * @param code The code of the response to emit, if possible.
+	 * This method does NOT support emitting composite responses.  For
+	 * example, `Emit("/player", x)` shall be ignored.
+	 *
+	 * @param path The path of the response to emit, if possible.
 	 * @param sink The ResponseSink to which the response shall be sent.
 	 *   May be nullptr, in which case Emit should be a no-operation.
 	 * @param id The ID of the connection to which the ResponseSink should
 	 *   route the response.  May be 0 (the default), for all (broadcast).
 	 */
-	virtual void Emit(Response::Code code, const ResponseSink *sink,
+	virtual void Emit(const std::string &path, const ResponseSink *sink,
 	                  size_t id = 0);
 
 	/**
@@ -119,7 +122,7 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	void Emit(Response::Code code, const ResponseSink *sink,
+	void Emit(const std::string &path, const ResponseSink *sink,
 	          size_t id) override;
 
 	// The following all raise an exception:
@@ -156,7 +159,7 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(Response::Code code, const ResponseSink *sink,
+	void Emit(const std::string &path, const ResponseSink *sink,
 	          size_t id) override;
 	std::uint64_t Position() const override;
 

@@ -25,7 +25,7 @@
 // Audio
 //
 
-void Audio::Emit(Response::Code, const ResponseSink *, size_t)
+void Audio::Emit(const std::string &, const ResponseSink *, size_t)
 {
 	// By default, emit nothing.  This is an acceptable behaviour.
 }
@@ -39,13 +39,13 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-void NoAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
+void NoAudio::Emit(const std::string &path, const ResponseSink *rs, size_t id)
 {
-	if (sink == nullptr) return;
+	if (rs == nullptr) return;
 
-	if (code == Response::Code::STATE) {
-		auto r = Response(Response::Code::STATE).AddArg("Ejected");
-		sink->Respond(r, id);
+	if (path == "/control/state") {
+		auto r = Response::Res("Entry", "/control/state", "Ejected");
+		rs->Respond(*r, id);
 	}
 }
 
@@ -75,38 +75,33 @@ PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(Response::Code code, const ResponseSink *rs, size_t id)
+void PipeAudio::Emit(const std::string &path, const ResponseSink *rs, size_t id)
 {
 	if (rs == nullptr) return;
 
 	assert(this->src != nullptr);
 	assert(this->sink != nullptr);
 
-	Response r(code);
+	std::string value;
 
-	switch (code) {
-		case Response::Code::STATE: {
-			auto state = this->sink->State();
-			auto playing = state == Audio::State::PLAYING;
-			r.AddArg(playing ? "Playing" : "Stopped");
-		} break;
-		case Response::Code::FILE: {
-			r.AddArg(this->src->Path());
-		} break;
-		case Response::Code::TIME: {
-			std::uint64_t micros = this->Position();
+	if (path == "/control/state") {
+		auto state = this->sink->State();
+		auto playing = state == Audio::State::PLAYING;
+		value = playing ? "Playing" : "Stopped";
+	} else if (path == "/player/file") {
+		value = this->src->Path();
+	} else if (path == "/player/time/elapsed") {
+		std::uint64_t micros = this->Position();
 
 			// Always announce a broadcast.
 			// Only announce unicasts if CanAnnounceTime(...).
-			bool can = 0 < id || this->CanAnnounceTime(micros, rs);
-			if (!can) return;
-			r.AddArg(std::to_string(micros));
-		} break;
-		default:
-			return;
-	}
+		bool can = 0 < id || this->CanAnnounceTime(micros, rs);
+		if (!can) return;
+		value = std::to_string(micros);
+	} else return;
 
-	rs->Respond(r, id);
+	auto r = Response::Res("Entry", path, value);
+	rs->Respond(*r, id);
 }
 
 void PipeAudio::SetPlaying(bool playing)
