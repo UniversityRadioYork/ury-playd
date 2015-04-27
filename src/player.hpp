@@ -84,6 +84,9 @@ private:
 	/// The set of features playd implements.
 	const static std::vector<std::string> FEATURES;
 
+	/// The resource tree playd exposes.
+	const static std::multimap<std::string, std::string> RESOURCES;
+
 	//
 	// Commands
 	//
@@ -182,6 +185,18 @@ private:
 	 * @return Whether the quit succeeded.
 	 */
 	CommandResult Quit();
+
+	/**
+	 * Emits the requested response.
+	 *
+	 * @param path The path of the response to emit, if possible.
+	 * @param sink The ResponseSink to which the response shall be sent.
+	 *   May be nullptr, in which case Emit should be a no-operation.
+	 * @param id The ID of the connection to which the ResponseSink should
+	 *   route the response.  May be 0 (the default), for all (broadcast).
+	 */
+	virtual void Emit(const std::string &path, const ResponseSink *sink,
+	                  size_t id = 0) const;
 
 	/**
 	 * Asks the current file to dump all of its state to the connection

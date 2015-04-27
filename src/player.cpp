@@ -44,7 +44,7 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->file->Emit("/player/time/elapsed", this->sink);
+		this->Emit("/player/time/elapsed", this->sink);
 	}
 
 	return this->is_running;
@@ -52,10 +52,7 @@ bool Player::Update()
 
 CommandResult Player::EmitAllAudioState(size_t id) const
 {
-	this->file->Emit("/player/file", sink, id);
-	this->file->Emit("/player/time/elapsed", sink, id);
-	this->file->Emit("/control/state", sink, id);
-
+	this->Emit("/", this->sink, id);
 	return CommandResult::Success();
 }
 
@@ -67,7 +64,7 @@ void Player::WelcomeClient(size_t id) const
 	for (auto &f : FEATURES) features.AddArg(f);
 	this->sink->Respond(features, id);
 
-	this->EmitAllAudioState(id);
+	this->Emit("/", this->sink, id);
 }
 
 void Player::End()
@@ -127,7 +124,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	this->file->Emit("/control/state", this->sink);
+	this->Emit("/control/state", this->sink);
 
 	return CommandResult::Success();
 }
@@ -179,7 +176,7 @@ CommandResult Player::SetPlaying(bool playing)
 		return CommandResult::Invalid(e.Message());
 	}
 
-	this->file->Emit("/control/state", this->sink);
+	this->Emit("/control/state", this->sink);
 
 	return CommandResult::Success();
 }
@@ -249,5 +246,44 @@ void Player::SeekRaw(std::uint64_t pos)
 	assert(this->file != nullptr);
 
 	this->file->Seek(pos);
-	this->file->Emit("/player/time/elapsed", this->sink);
+	this->Emit("/player/time/elapsed", this->sink);
+}
+
+const std::multimap<std::string, std::string> Player::RESOURCES = {
+	{"/", "/control"},
+	{"/", "/player"},
+	{"/control", "/control/state"},
+	{"/player", "/player/file"},
+	{"/player", "/player/time"},
+	{"/player/time", "/player/time/elapsed"}
+};
+
+void Player::Emit(const std::string &path, const ResponseSink *sink,
+	              size_t id) const
+{
+	if (this->sink == nullptr) return;
+
+	assert(this->file != nullptr);
+
+	// First, see if Audio responds directly to this -- it implements
+	// emission for several bottom-level entries.
+	auto response = this->file->Emit(path, id == 0);
+	if (response) {
+		sink->Respond(*response, id);
+		return;
+	}
+
+	// Maybe the requested item is a directory?
+	auto count = Player::RESOURCES.count(path);
+	if (0 < count) {
+		auto range = Player::RESOURCES.equal_range(path);
+		// First, emit the directory resource.
+		auto res = Response::Res("Directory", path, std::to_string(count));
+		sink->Respond(*res, id);
+
+		// Next, the contents.
+		for (auto i = range.first; i != range.second; i++) {
+			this->Emit(i->second, sink, id);
+		}
+	}
 }
