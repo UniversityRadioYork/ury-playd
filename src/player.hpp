@@ -163,7 +163,7 @@ private:
 	CommandResult Quit();
 
 	/**
-	 * Emits the requested resource.
+	 * Reads and emits the requested resource.
 	 *
 	 * @param path The path of the response to emit, if possible.
 	 * @param sink The ResponseSink to which the response shall be sent.
@@ -173,7 +173,7 @@ private:
 	 * @return The result of emission, which may be a failure if the
 	 *   resource does not exist.
 	 */
-	virtual CommandResult Emit(const std::string &path,
+	virtual CommandResult Read(const std::string &path,
 	                           const ResponseSink *sink,
 	                           size_t id = 0) const;
 };
