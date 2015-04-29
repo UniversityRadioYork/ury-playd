@@ -99,9 +99,14 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 	if (nargs == 0 && "stop" == word) return this->SetPlaying(false);
 	if (nargs == 0 && "eject" == word) return this->Eject();
 	if (nargs == 0 && "quit" == word) return this->Quit();
-	if (nargs == 1 && "read" == word) return this->Emit(cmd[1], this->sink, id);
 	if (nargs == 1 && "load" == word) return this->Load(cmd[1]);
 	if (nargs == 1 && "seek" == word) return this->Seek(cmd[1]);
+
+	// These commands accept one more argument than they use.
+	// This is because the first argument is a 'tag', emitted with the
+	// command result to allow it to be identified, but otherwise
+	// unused.
+	if (nargs == 2 && "read" == word) return this->Emit(cmd[2], this->sink, id);
 
 	return CommandResult::Invalid(MSG_CMD_INVALID);
 }
