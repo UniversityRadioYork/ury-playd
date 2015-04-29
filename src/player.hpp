@@ -187,16 +187,19 @@ private:
 	CommandResult Quit();
 
 	/**
-	 * Emits the requested response.
+	 * Emits the requested resource.
 	 *
 	 * @param path The path of the response to emit, if possible.
 	 * @param sink The ResponseSink to which the response shall be sent.
 	 *   May be nullptr, in which case Emit should be a no-operation.
 	 * @param id The ID of the connection to which the ResponseSink should
 	 *   route the response.  May be 0 (the default), for all (broadcast).
+	 * @return The result of emission, which may be a failure if the
+	 *   resource does not exist.
 	 */
-	virtual void Emit(const std::string &path, const ResponseSink *sink,
-	                  size_t id = 0) const;
+	virtual CommandResult Emit(const std::string &path,
+	                           const ResponseSink *sink,
+	                           size_t id = 0) const;
 };
 
 #endif // PLAYD_PLAYER_HPP

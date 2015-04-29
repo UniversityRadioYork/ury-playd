@@ -91,6 +91,13 @@ const std::string MSG_SEEK_FAIL = "Seek failed";
 const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer";
 
 //
+// General command failures
+//
+
+/// Message shown when `read` is called with a missing resource.
+const std::string MSG_READ_NOT_FOUND = "not found";
+
+//
 // IO failures
 //
 

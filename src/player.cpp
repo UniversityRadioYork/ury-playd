@@ -107,10 +107,7 @@ CommandResult Player::RunNullaryCommand(const std::string &word, size_t)
 CommandResult Player::RunUnaryCommand(const std::string &word,
                                       const std::string &arg, size_t id)
 {
-	if ("read" == word) {
-		this->Emit(arg, this->sink, id);
-		return CommandResult::Success();
-	}
+	if ("read" == word) return this->Emit(arg, this->sink, id);
 	if ("load" == word) return this->Load(arg);
 	if ("seek" == word) return this->Seek(arg);
 
@@ -255,19 +252,18 @@ const std::multimap<std::string, std::string> Player::RESOURCES = {
 	{"/player/time", "/player/time/elapsed"}
 };
 
-void Player::Emit(const std::string &path, const ResponseSink *sink,
-	              size_t id) const
+CommandResult Player::Emit(const std::string &path,
+                           const ResponseSink *sink,
+	                       size_t id) const
 {
-	if (this->sink == nullptr) return;
-
 	assert(this->file != nullptr);
 
 	// First, see if Audio responds directly to this -- it implements
 	// emission for several bottom-level entries.
 	auto response = this->file->Emit(path, id == 0);
 	if (response) {
-		sink->Respond(*response, id);
-		return;
+		if (this->sink != nullptr) sink->Respond(*response, id);
+		return CommandResult::Success();
 	}
 
 	// Maybe the requested item is a directory?
@@ -276,11 +272,16 @@ void Player::Emit(const std::string &path, const ResponseSink *sink,
 		auto range = Player::RESOURCES.equal_range(path);
 		// First, emit the directory resource.
 		auto res = Response::Res("Directory", path, std::to_string(count));
-		sink->Respond(*res, id);
+		if (this->sink != nullptr) sink->Respond(*res, id);
 
 		// Next, the contents.
 		for (auto i = range.first; i != range.second; i++) {
 			this->Emit(i->second, sink, id);
 		}
+
+		return CommandResult::Success();
 	}
+
+	// Otherwise, it doesn't exist.	
+	return CommandResult::Failure(MSG_READ_NOT_FOUND);
 }
