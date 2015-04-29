@@ -50,12 +50,6 @@ bool Player::Update()
 	return this->is_running;
 }
 
-CommandResult Player::EmitAllAudioState(size_t id) const
-{
-	this->Emit("/", this->sink, id);
-	return CommandResult::Success();
-}
-
 void Player::WelcomeClient(size_t id) const
 {
 	this->sink->Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI), id);
@@ -100,11 +94,10 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 	return CommandResult::Invalid(MSG_CMD_INVALID);
 }
 
-CommandResult Player::RunNullaryCommand(const std::string &word, size_t id)
+CommandResult Player::RunNullaryCommand(const std::string &word, size_t)
 {
 	if ("play" == word) return this->SetPlaying(true);
 	if ("stop" == word) return this->SetPlaying(false);
-	if ("dump" == word) return this->EmitAllAudioState(id);
 	if ("eject" == word) return this->Eject();
 	if ("quit" == word) return this->Quit();
 
@@ -112,8 +105,12 @@ CommandResult Player::RunNullaryCommand(const std::string &word, size_t id)
 }
 
 CommandResult Player::RunUnaryCommand(const std::string &word,
-                                      const std::string &arg, size_t)
+                                      const std::string &arg, size_t id)
 {
+	if ("read" == word) {
+		this->Emit(arg, this->sink, id);
+		return CommandResult::Success();
+	}
 	if ("load" == word) return this->Load(arg);
 	if ("seek" == word) return this->Seek(arg);
 
@@ -144,7 +141,7 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		this->EmitAllAudioState(0);
+		this->Emit("/", this->sink, 0);
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.

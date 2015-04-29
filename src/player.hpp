@@ -197,15 +197,6 @@ private:
 	 */
 	virtual void Emit(const std::string &path, const ResponseSink *sink,
 	                  size_t id = 0) const;
-
-	/**
-	 * Asks the current file to dump all of its state to the connection
-	 * with the given ID.
-	 * @param id The ID of the connection to receive the dump.
-	 * @return A successful CommandResult, to allow this function
-	 * to be used in the dump command.
-	 */
-	CommandResult EmitAllAudioState(size_t id) const;
 };
 
 #endif // PLAYD_PLAYER_HPP
