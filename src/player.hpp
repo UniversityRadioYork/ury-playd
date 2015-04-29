@@ -88,30 +88,6 @@ private:
 	const static std::multimap<std::string, std::string> RESOURCES;
 
 	//
-	// Commands
-	//
-
-	/**
-	 * Runs a nullary (0-argument) command.
-	 * @param word The command word.
-	 * @param id The ID of the client requesting the command.
-	 * @return True if the command was successfully found and executed;
-	 *   false otherwise.
-	 */
-	CommandResult RunNullaryCommand(const std::string &word, size_t id);
-
-	/**
-	 * Runs a unary (1-argument) command.
-	 * @param word The command word.
-	 * @param arg The argument to the command.
-	 * @param id The ID of the client requesting the command.
-	 * @return True if the command was successfully found and executed;
-	 *   false otherwise.
-	 */
-	CommandResult RunUnaryCommand(const std::string &word,
-	                              const std::string &arg, size_t id);
-
-	//
 	// Playback control
 	//
 

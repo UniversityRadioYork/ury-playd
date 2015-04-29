@@ -89,27 +89,19 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 		return CommandResult::Failure(MSG_CMD_PLAYER_CLOSING);
 	}
 
-	if (cmd.size() == 1) return this->RunNullaryCommand(cmd[0], id);
-	if (cmd.size() == 2) return this->RunUnaryCommand(cmd[0], cmd[1], id);
-	return CommandResult::Invalid(MSG_CMD_INVALID);
-}
+	// TODO: more specific message
+	if (cmd.size() == 0) return CommandResult::Invalid(MSG_CMD_INVALID);
 
-CommandResult Player::RunNullaryCommand(const std::string &word, size_t)
-{
-	if ("play" == word) return this->SetPlaying(true);
-	if ("stop" == word) return this->SetPlaying(false);
-	if ("eject" == word) return this->Eject();
-	if ("quit" == word) return this->Quit();
+	auto word = cmd[0];
+	auto nargs = cmd.size() - 1;
 
-	return CommandResult::Invalid(MSG_CMD_INVALID);
-}
-
-CommandResult Player::RunUnaryCommand(const std::string &word,
-                                      const std::string &arg, size_t id)
-{
-	if ("read" == word) return this->Emit(arg, this->sink, id);
-	if ("load" == word) return this->Load(arg);
-	if ("seek" == word) return this->Seek(arg);
+	if (nargs == 0 && "play" == word) return this->SetPlaying(true);
+	if (nargs == 0 && "stop" == word) return this->SetPlaying(false);
+	if (nargs == 0 && "eject" == word) return this->Eject();
+	if (nargs == 0 && "quit" == word) return this->Quit();
+	if (nargs == 1 && "read" == word) return this->Emit(cmd[1], this->sink, id);
+	if (nargs == 1 && "load" == word) return this->Load(cmd[1]);
+	if (nargs == 1 && "seek" == word) return this->Seek(cmd[1]);
 
 	return CommandResult::Invalid(MSG_CMD_INVALID);
 }
