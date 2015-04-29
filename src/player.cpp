@@ -44,7 +44,7 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->Read("/player/time/elapsed", this->sink);
+		this->Read("/player/time/elapsed", 0);
 	}
 
 	return this->is_running;
@@ -58,7 +58,7 @@ void Player::WelcomeClient(size_t id) const
 	for (auto &f : FEATURES) features.AddArg(f);
 	this->sink->Respond(features, id);
 
-	this->Read("/", this->sink, id);
+	this->Read("/", id);
 }
 
 void Player::End()
@@ -106,7 +106,7 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 	// This is because the first argument is a 'tag', emitted with the
 	// command result to allow it to be identified, but otherwise
 	// unused.
-	if (nargs == 2 && "read" == word) return this->Read(cmd[2], this->sink, id);
+	if (nargs == 2 && "read" == word) return this->Read(cmd[2], id);
 
 	return CommandResult::Invalid(MSG_CMD_INVALID);
 }
@@ -115,7 +115,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	this->Read("/control/state", this->sink);
+	this->Read("/control/state", 0);
 
 	return CommandResult::Success();
 }
@@ -135,7 +135,7 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		this->Read("/", this->sink, 0);
+		this->Read("/", 0);
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
@@ -167,7 +167,7 @@ CommandResult Player::SetPlaying(bool playing)
 		return CommandResult::Invalid(e.Message());
 	}
 
-	this->Read("/control/state", this->sink);
+	this->Read("/control/state", 0);
 
 	return CommandResult::Success();
 }
@@ -237,7 +237,7 @@ void Player::SeekRaw(std::uint64_t pos)
 	assert(this->file != nullptr);
 
 	this->file->Seek(pos);
-	this->Read("/player/time/elapsed", this->sink);
+	this->Read("/player/time/elapsed", 0);
 }
 
 const std::multimap<std::string, std::string> Player::RESOURCES = {
@@ -249,9 +249,7 @@ const std::multimap<std::string, std::string> Player::RESOURCES = {
 	{"/player/time", "/player/time/elapsed"}
 };
 
-CommandResult Player::Read(const std::string &path,
-                           const ResponseSink *sink,
-	                       size_t id) const
+CommandResult Player::Read(const std::string &path, size_t id) const
 {
 	assert(this->file != nullptr);
 
@@ -259,7 +257,7 @@ CommandResult Player::Read(const std::string &path,
 	// emission for several bottom-level entries.
 	auto response = this->file->Emit(path, id == 0);
 	if (response) {
-		if (this->sink != nullptr) sink->Respond(*response, id);
+		if (this->sink != nullptr) this->sink->Respond(*response, id);
 		return CommandResult::Success();
 	}
 
@@ -269,11 +267,11 @@ CommandResult Player::Read(const std::string &path,
 		auto range = Player::RESOURCES.equal_range(path);
 		// First, emit the directory resource.
 		auto res = Response::Res("Directory", path, std::to_string(count));
-		if (this->sink != nullptr) sink->Respond(*res, id);
+		if (this->sink != nullptr) this->sink->Respond(*res, id);
 
 		// Next, the contents.
 		for (auto i = range.first; i != range.second; i++) {
-			this->Read(i->second, sink, id);
+			this->Read(i->second, id);
 		}
 
 		return CommandResult::Success();
