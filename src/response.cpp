@@ -34,7 +34,7 @@ std::unique_ptr<Response> Response::Res(const std::string &type,
 	auto res = std::unique_ptr<Response>(
 		new Response(Response::Code::RES)
 	);
-	res->AddArg(type).AddArg(path).AddArg(value);
+	res->AddArg(path).AddArg(type).AddArg(value);
 	return res;
 }
 
