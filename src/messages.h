@@ -94,8 +94,12 @@ const std::string MSG_SEEK_INVALID_VALUE = "Invalid time: try integer";
 // General command failures
 //
 
-/// Message shown when `read` is called with a missing resource.
-const std::string MSG_READ_NOT_FOUND = "not found";
+/// Message shown when a command is called with a missing resource.
+const std::string MSG_NOT_FOUND = "not found";
+
+/// Message shown when an invalid payload is supplied for writing.
+const std::string MSG_INVALID_PAYLOAD = "cannot write this value";
+
 
 //
 // IO failures

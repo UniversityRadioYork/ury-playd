@@ -95,18 +95,13 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 	auto word = cmd[0];
 	auto nargs = cmd.size() - 1;
 
-	if (nargs == 0 && "play" == word) return this->SetPlaying(true);
-	if (nargs == 0 && "stop" == word) return this->SetPlaying(false);
-	if (nargs == 0 && "eject" == word) return this->Eject();
-	if (nargs == 0 && "quit" == word) return this->Quit();
-	if (nargs == 1 && "load" == word) return this->Load(cmd[1]);
-	if (nargs == 1 && "seek" == word) return this->Seek(cmd[1]);
-
 	// These commands accept one more argument than they use.
 	// This is because the first argument is a 'tag', emitted with the
 	// command result to allow it to be identified, but otherwise
 	// unused.
 	if (nargs == 2 && "read" == word) return this->Read(cmd[2], id);
+	if (nargs == 2 && "delete" == word) return this->Delete(cmd[2]);
+	if (nargs == 3 && "write" == word) return this->Write(cmd[2], cmd[3]);
 
 	return CommandResult::Invalid(MSG_CMD_INVALID);
 }
@@ -277,6 +272,35 @@ CommandResult Player::Read(const std::string &path, size_t id) const
 		return CommandResult::Success();
 	}
 
-	// Otherwise, it doesn't exist.	
-	return CommandResult::Failure(MSG_READ_NOT_FOUND);
+	// Otherwise, it doesn't exist.
+	return CommandResult::Failure(MSG_NOT_FOUND);
+}
+
+CommandResult Player::Write(const std::string &path, const std::string &payload)
+{
+	if ("/control/state" == path) {
+		if ("Playing" == payload) return this->SetPlaying(true);
+		if ("Stopped" == payload) return this->SetPlaying(false);
+		if ("Ejected" == payload) return this->Eject();
+		if ("Quitting" == payload) return this->Quit();
+		return CommandResult::Invalid(MSG_INVALID_PAYLOAD);
+	}
+
+	if ("/player/file" == path) return this->Load(payload);
+	if ("/player/time/elapsed" == path) return this->Seek(payload);
+
+	// TODO: operation not permitted
+
+	return CommandResult::Failure(MSG_NOT_FOUND);
+}
+
+CommandResult Player::Delete(const std::string &path)
+{
+	if ("/control/state" == path) return this->Quit();
+	if ("/player/file" == path) return this->Eject();
+	if ("/player/time/elapsed" == path) return this->Seek("0");
+
+	// TODO: operation not permitted
+
+	return CommandResult::Failure(MSG_NOT_FOUND);
 }

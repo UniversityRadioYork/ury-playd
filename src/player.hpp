@@ -163,15 +163,35 @@ private:
 	CommandResult Quit();
 
 	/**
-	 * Reads and emits the requested resource.
+	 * Reads from and emits the requested resource.
 	 *
 	 * @param path The path of the response to emit, if possible.
-	 * @param id The ID of the connection to which the ResponseSink should
+	 * @param id The ID of the connection to which the Player should
 	 *   route the response.  May be 0, for all (broadcast).
-	 * @return The result of emission, which may be a failure if the
+	 * @return The result of reading, which may be a failure if the
 	 *   resource does not exist.
 	 */
 	virtual CommandResult Read(const std::string &path, size_t id) const;
+
+	/**
+	 * Writes to the requested resource.
+	 *
+	 * @param path The path of the response to update, if possible.
+	 * @param payload The intended new value of the reource.
+	 * @return The result of writing, which may be a failure if the
+	 *   resource does not exist, cannot be written to, or the payload
+	 *   is invalid.
+	 */
+	virtual CommandResult Write(const std::string &path, const std::string &payload);
+
+	/**
+	 * Deletes the requested resource.
+	 *
+	 * @param path The path of the response to update, if possible.
+	 * @return The result of deleting, which may be a failure if the
+	 *   resource does not exist, or the resource can't be deleted.
+	 */
+	virtual CommandResult Delete(const std::string &path);
 };
 
 #endif // PLAYD_PLAYER_HPP
