@@ -176,7 +176,7 @@ private:
 	/**
 	 * Writes to the requested resource.
 	 *
-	 * @param path The path of the response to update, if possible.
+	 * @param path The path of the resource to update, if possible.
 	 * @param payload The intended new value of the reource.
 	 * @return The result of writing, which may be a failure if the
 	 *   resource does not exist, cannot be written to, or the payload
@@ -187,11 +187,21 @@ private:
 	/**
 	 * Deletes the requested resource.
 	 *
-	 * @param path The path of the response to update, if possible.
+	 * @param path The path of the resource to update, if possible.
 	 * @return The result of deleting, which may be a failure if the
 	 *   resource does not exist, or the resource can't be deleted.
 	 */
 	virtual CommandResult Delete(const std::string &path);
+
+	/**
+	 * Resolves a failure to write or delete a resource.
+	 * This checks to see if the resource is supposed to exist.  If it
+	 * does, we return an 'invalid method'; if not, a 'not found'.
+	 *
+	 * @param path The path of the resource.
+	 * @return The appropriate CommandResult for the failure.
+	 */
+	virtual CommandResult ResourceFailure(const std::string &path);
 };
 
 #endif // PLAYD_PLAYER_HPP

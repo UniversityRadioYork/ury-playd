@@ -235,31 +235,42 @@ void Player::SeekRaw(std::uint64_t pos)
 	this->Read("/player/time/elapsed", 0);
 }
 
+// Any resource with the single child "" (empty string) is an entry.
+// These need to be looked up via Audio, not handled by Player.
 const std::multimap<std::string, std::string> Player::RESOURCES = {
 	{"/", "/control"},
 	{"/", "/player"},
 	{"/control", "/control/state"},
+	{"/control/state", ""},
 	{"/player", "/player/file"},
 	{"/player", "/player/time"},
-	{"/player/time", "/player/time/elapsed"}
+	{"/player/file", ""},
+	{"/player/time", "/player/time/elapsed"},
+	{"/player/time/elapsed", ""}
 };
 
 CommandResult Player::Read(const std::string &path, size_t id) const
 {
 	assert(this->file != nullptr);
 
-	// First, see if Audio responds directly to this -- it implements
-	// emission for several bottom-level entries.
-	auto response = this->file->Emit(path, id == 0);
-	if (response) {
-		if (this->sink != nullptr) this->sink->Respond(*response, id);
-		return CommandResult::Success();
-	}
-
 	// Maybe the requested item is a directory?
 	auto count = Player::RESOURCES.count(path);
 	if (0 < count) {
 		auto range = Player::RESOURCES.equal_range(path);
+
+		// Is this an entry?  If so, delegate it to Audio to work on.
+		if (1 == count && "" == range.first->second) {
+			// The entry might be currently empty, in which case
+			// Emit will return nullptr.  This is fine, but we'll just
+			// act as if it doesn't exist at all.
+			auto response = this->file->Emit(path, id == 0);
+			if (!response) return CommandResult::Failure(MSG_NOT_FOUND);
+
+			if (this->sink != nullptr) this->sink->Respond(*response, id);
+			return CommandResult::Success();
+		}
+
+		// Otherwise, it's a directory.
 		// First, emit the directory resource.
 		auto res = Response::Res("Directory", path, std::to_string(count));
 		if (this->sink != nullptr) this->sink->Respond(*res, id);
@@ -272,7 +283,7 @@ CommandResult Player::Read(const std::string &path, size_t id) const
 		return CommandResult::Success();
 	}
 
-	// Otherwise, it doesn't exist.
+	// If we get here, the resource doesn't exist and never will do.
 	return CommandResult::Failure(MSG_NOT_FOUND);
 }
 
@@ -289,9 +300,7 @@ CommandResult Player::Write(const std::string &path, const std::string &payload)
 	if ("/player/file" == path) return this->Load(payload);
 	if ("/player/time/elapsed" == path) return this->Seek(payload);
 
-	// TODO: operation not permitted
-
-	return CommandResult::Failure(MSG_NOT_FOUND);
+	return this->ResourceFailure(path);
 }
 
 CommandResult Player::Delete(const std::string &path)
@@ -300,7 +309,18 @@ CommandResult Player::Delete(const std::string &path)
 	if ("/player/file" == path) return this->Eject();
 	if ("/player/time/elapsed" == path) return this->Seek("0");
 
-	// TODO: operation not permitted
+	return this->ResourceFailure(path);
+}
 
+CommandResult Player::ResourceFailure(const std::string &path) {
+	// In this case, we've either got a resource that exists but can't
+	// be written, or a resource that doesn't.  Let's find out which:
+	if (0 < this->RESOURCES.count(path)) {
+		// The resource is valid, but can't be written to.
+		return CommandResult::Failure(MSG_INVALID_ACTION);
+	}
+
+	// Else, the resource doesn't exist.
 	return CommandResult::Failure(MSG_NOT_FOUND);
 }
+
