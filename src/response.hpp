@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -29,15 +30,14 @@ public:
 	 * @see ResponseSink::STRINGS
 	 */
 	enum class Code : std::uint8_t {
-		OK,       ///< Request was valid and produced an answer.
-		WHAT,     ///< Request was invalid/user error.
-		FAIL,     ///< Error, pointing blame at environment.
 		OHAI,     ///< Server starting up.
 		STATE,    ///< Server changing state.
 		TIME,     ///< Server sending current song time,
 		FILE,     ///< The loaded file just changed.
 		FEATURES, ///< Server sending feature list.
-		END       ///< The loaded file just ended on its own.
+		END,      ///< The loaded file just ended on its own.
+		ACK,      ///< Command result.
+		RES       ///< Resource.
 	};
 
 	/**
@@ -45,6 +45,16 @@ public:
 	 * @param code The Response::Code representing the response command.
 	 */
 	Response(Response::Code code);
+
+	/**
+	 * Constructs a RES response.
+	 * @param type The type of resource being emitted.
+	 * @param path The path to the resource.
+	 * @param value The string representing the resource's value.
+	 */
+	static std::unique_ptr<Response> Res(const std::string &type,
+	                                     const std::string &path,
+	                                     const std::string &value);
 
 	/**
 	 * Adds an argument to this Response.

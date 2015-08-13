@@ -16,16 +16,27 @@
 #include "response.hpp"
 
 const std::string Response::STRINGS[] = {
-        "OK",       // Code::OK
-        "WHAT",     // Code::WHAT
-        "FAIL",     // Code::FAIL
         "OHAI",     // Code::OHAI
         "STATE",    // Code::STATE
         "TIME",     // Code::TIME
         "FILE",     // Code::FILE
         "FEATURES", // Code::FEATURES
-        "END"       // Code::END
+        "END",      // Code::END
+        "ACK",      // Code::ACK
+        "RES"       // Code::RES
 };
+
+// Pre-made responses.
+std::unique_ptr<Response> Response::Res(const std::string &type,
+                                        const std::string &path,
+                                        const std::string &value)
+{
+	auto res = std::unique_ptr<Response>(
+		new Response(Response::Code::RES)
+	);
+	res->AddArg(path).AddArg(type).AddArg(value);
+	return res;
+}
 
 Response::Response(Response::Code code)
 {

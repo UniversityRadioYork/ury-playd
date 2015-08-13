@@ -25,9 +25,10 @@
 // Audio
 //
 
-void Audio::Emit(Response::Code, const ResponseSink *, size_t)
+std::unique_ptr<Response> Audio::Emit(const std::string &, bool)
 {
 	// By default, emit nothing.  This is an acceptable behaviour.
+	return std::unique_ptr<Response>();
 }
 
 //
@@ -39,14 +40,17 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-void NoAudio::Emit(Response::Code code, const ResponseSink *sink, size_t id)
+std::unique_ptr<Response> NoAudio::Emit(const std::string &path, bool)
 {
-	if (sink == nullptr) return;
+	std::unique_ptr<Response> ret;
 
-	if (code == Response::Code::STATE) {
-		auto r = Response(Response::Code::STATE).AddArg("Ejected");
-		sink->Respond(r, id);
+	if (path == "/control/state") {
+		ret = std::move(
+			Response::Res("Entry", "/control/state", "Ejected")
+		);
 	}
+
+	return ret;
 }
 
 void NoAudio::SetPlaying(bool)
@@ -70,43 +74,39 @@ std::uint64_t NoAudio::Position() const
 
 PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
                      std::unique_ptr<AudioSink> &&sink)
-    : src(std::move(src)), sink(std::move(sink))
+    : src(std::move(src)), sink(std::move(sink)), announced_time(false)
 {
 	this->ClearFrame();
 }
 
-void PipeAudio::Emit(Response::Code code, const ResponseSink *rs, size_t id)
+std::unique_ptr<Response> PipeAudio::Emit(const std::string &path,
+	bool broadcast)
 {
-	if (rs == nullptr) return;
-
 	assert(this->src != nullptr);
 	assert(this->sink != nullptr);
 
-	Response r(code);
+	std::unique_ptr<Response> ret;
 
-	switch (code) {
-		case Response::Code::STATE: {
-			auto state = this->sink->State();
-			auto playing = state == Audio::State::PLAYING;
-			r.AddArg(playing ? "Playing" : "Stopped");
-		} break;
-		case Response::Code::FILE: {
-			r.AddArg(this->src->Path());
-		} break;
-		case Response::Code::TIME: {
-			std::uint64_t micros = this->Position();
+	std::string value;
 
-			// Always announce a broadcast.
-			// Only announce unicasts if CanAnnounceTime(...).
-			bool can = 0 < id || this->CanAnnounceTime(micros, rs);
-			if (!can) return;
-			r.AddArg(std::to_string(micros));
-		} break;
-		default:
-			return;
-	}
+	if (path == "/control/state") {
+		auto state = this->sink->State();
+		auto playing = state == Audio::State::PLAYING;
+		value = playing ? "Playing" : "Stopped";
+	} else if (path == "/player/file") {
+		value = this->src->Path();
+	} else if (path == "/player/time/elapsed") {
+		std::uint64_t micros = this->Position();
 
-	rs->Respond(r, id);
+		// Always announce a unicast.
+		// Only announce broadcasts if CanAnnounceTime(...).
+		bool can = (!broadcast) || this->CanAnnounceTime(micros);
+		if (!can) return ret;
+		value = std::to_string(micros);
+	} else return ret;
+
+	ret = std::move(Response::Res("Entry", path, value));
+	return ret;
 }
 
 void PipeAudio::SetPlaying(bool playing)
@@ -138,7 +138,7 @@ void PipeAudio::Seek(std::uint64_t position)
 	this->sink->SetPosition(out_samples);
 
 	// Make sure we always announce the new position to all response sinks.
-	this->last_times.clear();
+	this->announced_time = false;
 
 	// We might still have decoded samples from the old position in
 	// our frame, so clear them out.
@@ -210,24 +210,18 @@ bool PipeAudio::FrameFinished() const
 	return this->frame.end() <= this->frame_iterator;
 }
 
-bool PipeAudio::CanAnnounceTime(std::uint64_t micros, const ResponseSink *sink)
+bool PipeAudio::CanAnnounceTime(std::uint64_t micros)
 {
 	std::uint64_t secs = micros / 1000 / 1000;
 
-	auto last_entry = this->last_times.find(sink);
-
 	// We can announce if we don't have a record for this sink, or if the
 	// last record was in a previous second.
-	bool announce = true;
-	if (last_entry != this->last_times.end()) {
-		announce = last_entry->second < secs;
+	bool announce = (!(this->announced_time)) || (this->last_time < secs);
 
-		// This is so as to allow the emplace below to work--it fails
-		// if there's already a value under the same key.
-		if (announce) this->last_times.erase(last_entry);
+	if (announce) {
+		this->announced_time = true;
+		this->last_time = secs;
 	}
-
-	if (announce) this->last_times.emplace(sink, secs);
 
 	return announce;
 }

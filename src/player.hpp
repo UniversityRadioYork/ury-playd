@@ -84,29 +84,8 @@ private:
 	/// The set of features playd implements.
 	const static std::vector<std::string> FEATURES;
 
-	//
-	// Commands
-	//
-
-	/**
-	 * Runs a nullary (0-argument) command.
-	 * @param word The command word.
-	 * @param id The ID of the client requesting the command.
-	 * @return True if the command was successfully found and executed;
-	 *   false otherwise.
-	 */
-	CommandResult RunNullaryCommand(const std::string &word, size_t id);
-
-	/**
-	 * Runs a unary (1-argument) command.
-	 * @param word The command word.
-	 * @param arg The argument to the command.
-	 * @param id The ID of the client requesting the command.
-	 * @return True if the command was successfully found and executed;
-	 *   false otherwise.
-	 */
-	CommandResult RunUnaryCommand(const std::string &word,
-	                              const std::string &arg, size_t id);
+	/// The resource tree playd exposes.
+	const static std::multimap<std::string, std::string> RESOURCES;
 
 	//
 	// Playback control
@@ -184,13 +163,45 @@ private:
 	CommandResult Quit();
 
 	/**
-	 * Asks the current file to dump all of its state to the connection
-	 * with the given ID.
-	 * @param id The ID of the connection to receive the dump.
-	 * @return A successful CommandResult, to allow this function
-	 * to be used in the dump command.
+	 * Reads from and emits the requested resource.
+	 *
+	 * @param path The path of the response to emit, if possible.
+	 * @param id The ID of the connection to which the Player should
+	 *   route the response.  May be 0, for all (broadcast).
+	 * @return The result of reading, which may be a failure if the
+	 *   resource does not exist.
 	 */
-	CommandResult EmitAllAudioState(size_t id) const;
+	virtual CommandResult Read(const std::string &path, size_t id) const;
+
+	/**
+	 * Writes to the requested resource.
+	 *
+	 * @param path The path of the resource to update, if possible.
+	 * @param payload The intended new value of the reource.
+	 * @return The result of writing, which may be a failure if the
+	 *   resource does not exist, cannot be written to, or the payload
+	 *   is invalid.
+	 */
+	virtual CommandResult Write(const std::string &path, const std::string &payload);
+
+	/**
+	 * Deletes the requested resource.
+	 *
+	 * @param path The path of the resource to update, if possible.
+	 * @return The result of deleting, which may be a failure if the
+	 *   resource does not exist, or the resource can't be deleted.
+	 */
+	virtual CommandResult Delete(const std::string &path);
+
+	/**
+	 * Resolves a failure to write or delete a resource.
+	 * This checks to see if the resource is supposed to exist.  If it
+	 * does, we return an 'invalid method'; if not, a 'not found'.
+	 *
+	 * @param path The path of the resource.
+	 * @return The appropriate CommandResult for the failure.
+	 */
+	virtual CommandResult ResourceFailure(const std::string &path);
 };
 
 #endif // PLAYD_PLAYER_HPP

@@ -33,8 +33,8 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			WHEN("Emit(cmd) is called") {
 				c.Emit(d, cmd);
 
-				THEN("the response is OK followed by the command words") {
-					REQUIRE(os.str() == "OK OHAI 'testy test'\n");
+				THEN("the response is ACK OK success, followed by the command words") {
+					REQUIRE(os.str() == "ACK OK success OHAI 'testy test'\n");
 				}
 			}
 		}
@@ -59,8 +59,8 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			WHEN("Emit(cmd) is called") {
 				c.Emit(d, cmd);
 
-				THEN("the response is WHAT followed by the failure message and command") {
-					REQUIRE(os.str() == "WHAT 'PEBCAK error' OHAI 'testy test'\n");
+				THEN("the response is ACK WHAT followed by the failure message and command") {
+					REQUIRE(os.str() == "ACK WHAT 'PEBCAK error' OHAI 'testy test'\n");
 				}
 			}
 		}
@@ -86,8 +86,8 @@ SCENARIO("CommandResult's convenience constructors create correct CommandResults
 			WHEN("Emit(cmd) is called") {
 				c.Emit(d, cmd);
 
-				THEN("the response is FAIL followed by the failure message") {
-					REQUIRE(os.str() == "FAIL 'lp0 on fire' OHAI 'testy test'\n");
+				THEN("the response is ACK FAIL followed by the failure message") {
+					REQUIRE(os.str() == "ACK FAIL 'lp0 on fire' OHAI 'testy test'\n");
 				}
 			}
 		}

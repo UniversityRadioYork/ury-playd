@@ -34,23 +34,22 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 		PipeAudio pa(std::unique_ptr<AudioSource>(new DummyAudioSource("test")),
 		             std::unique_ptr<AudioSink>(new DummyAudioSink()));
 
-		std::ostringstream os;
-		DummyResponseSink rs(os);
-
 		WHEN("the STATE is requested") {
 			AND_WHEN("the state is Playing") {
 				pa.SetPlaying(true);
-				THEN("the result is STATE Playing") {
-					pa.Emit(Response::Code::STATE, &rs, 0);
-					REQUIRE(os.str() == "STATE Playing\n");
+				THEN("the /control/state resource is set to Playing") {
+					auto rs = pa.Emit("/control/state", 0);
+					REQUIRE(rs);
+					REQUIRE(rs->Pack() == "RES /control/state Entry Playing");
 				}
 			}
 
 			AND_WHEN("the state is Stopped") {
 				pa.SetPlaying(false);
-				THEN("the result is STATE Stopped") {
-					pa.Emit(Response::Code::STATE, &rs, 0);
-					REQUIRE(os.str() == "STATE Stopped\n");
+				THEN("the /control/state resource is set to Stopped") {
+					auto rs = pa.Emit("/control/state", 0);
+					REQUIRE(rs);
+					REQUIRE(rs->Pack() == "RES /control/state Entry Stopped");
 				}
 			}
 		}
@@ -58,23 +57,25 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 		WHEN("the TIME is requested") {
 			AND_WHEN("the position is zero") {
 				pa.Seek(0);
-				THEN("the result is TIME 0") {
-					pa.Emit(Response::Code::TIME, &rs, 0);
-					REQUIRE(os.str() == "TIME 0\n");
+				THEN("the /player/time/elapsed resource is set to 0") {
+					auto rs = pa.Emit("/player/time/elapsed", 0);
+					REQUIRE(rs);
+					REQUIRE(rs->Pack() == "RES /player/time/elapsed Entry 0");
 				}
 			}
 
 			AND_WHEN("the position is not zero") {
 				pa.Seek(8675309);
-				THEN("the result is TIME (rounded-off position)") {
+				THEN("the /player/time/elapsed resource is set to (rounded-off position)") {
 					// The DummyAudioSource has 44100Hz
 					// sample rate.  The following
 					// calculation is what a round-trip to
 					// and from samples should cause.
 					// This *won't* be 8675309!
 					auto expected = (((8675309L * 44100) / 1000000) * 1000000) / 44100;
-					pa.Emit(Response::Code::TIME, &rs, 0);
-					REQUIRE(os.str() == "TIME " + std::to_string(expected) + "\n");
+					auto rs = pa.Emit("/player/time/elapsed", 0);
+					REQUIRE(rs);
+					REQUIRE(rs->Pack() == "RES /player/time/elapsed Entry " + std::to_string(expected));
 				}
 			}
 		}

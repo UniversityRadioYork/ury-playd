@@ -44,19 +44,10 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->file->Emit(Response::Code::TIME, this->sink);
+		this->Read("/player/time/elapsed", 0);
 	}
 
 	return this->is_running;
-}
-
-CommandResult Player::EmitAllAudioState(size_t id) const
-{
-	this->file->Emit(Response::Code::FILE, sink, id);
-	this->file->Emit(Response::Code::TIME, sink, id);
-	this->file->Emit(Response::Code::STATE, sink, id);
-
-	return CommandResult::Success();
 }
 
 void Player::WelcomeClient(size_t id) const
@@ -67,7 +58,7 @@ void Player::WelcomeClient(size_t id) const
 	for (auto &f : FEATURES) features.AddArg(f);
 	this->sink->Respond(features, id);
 
-	this->EmitAllAudioState(id);
+	this->Read("/", id);
 }
 
 void Player::End()
@@ -98,27 +89,19 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 		return CommandResult::Failure(MSG_CMD_PLAYER_CLOSING);
 	}
 
-	if (cmd.size() == 1) return this->RunNullaryCommand(cmd[0], id);
-	if (cmd.size() == 2) return this->RunUnaryCommand(cmd[0], cmd[1], id);
-	return CommandResult::Invalid(MSG_CMD_INVALID);
-}
+	// TODO: more specific message
+	if (cmd.size() == 0) return CommandResult::Invalid(MSG_CMD_INVALID);
 
-CommandResult Player::RunNullaryCommand(const std::string &word, size_t id)
-{
-	if ("play" == word) return this->SetPlaying(true);
-	if ("stop" == word) return this->SetPlaying(false);
-	if ("dump" == word) return this->EmitAllAudioState(id);
-	if ("eject" == word) return this->Eject();
-	if ("quit" == word) return this->Quit();
+	auto word = cmd[0];
+	auto nargs = cmd.size() - 1;
 
-	return CommandResult::Invalid(MSG_CMD_INVALID);
-}
-
-CommandResult Player::RunUnaryCommand(const std::string &word,
-                                      const std::string &arg, size_t)
-{
-	if ("load" == word) return this->Load(arg);
-	if ("seek" == word) return this->Seek(arg);
+	// These commands accept one more argument than they use.
+	// This is because the first argument is a 'tag', emitted with the
+	// command result to allow it to be identified, but otherwise
+	// unused.
+	if (nargs == 2 && "read" == word) return this->Read(cmd[2], id);
+	if (nargs == 2 && "delete" == word) return this->Delete(cmd[2]);
+	if (nargs == 3 && "write" == word) return this->Write(cmd[2], cmd[3]);
 
 	return CommandResult::Invalid(MSG_CMD_INVALID);
 }
@@ -127,7 +110,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	this->file->Emit(Response::Code::STATE, this->sink);
+	this->Read("/control/state", 0);
 
 	return CommandResult::Success();
 }
@@ -147,7 +130,7 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		this->EmitAllAudioState(0);
+		this->Read("/", 0);
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
@@ -179,7 +162,7 @@ CommandResult Player::SetPlaying(bool playing)
 		return CommandResult::Invalid(e.Message());
 	}
 
-	this->file->Emit(Response::Code::STATE, this->sink);
+	this->Read("/control/state", 0);
 
 	return CommandResult::Success();
 }
@@ -249,5 +232,95 @@ void Player::SeekRaw(std::uint64_t pos)
 	assert(this->file != nullptr);
 
 	this->file->Seek(pos);
-	this->file->Emit(Response::Code::TIME, this->sink);
+	this->Read("/player/time/elapsed", 0);
 }
+
+// Any resource with the single child "" (empty string) is an entry.
+// These need to be looked up via Audio, not handled by Player.
+const std::multimap<std::string, std::string> Player::RESOURCES = {
+	{"/", "/control"},
+	{"/", "/player"},
+	{"/control", "/control/state"},
+	{"/control/state", ""},
+	{"/player", "/player/file"},
+	{"/player", "/player/time"},
+	{"/player/file", ""},
+	{"/player/time", "/player/time/elapsed"},
+	{"/player/time/elapsed", ""}
+};
+
+CommandResult Player::Read(const std::string &path, size_t id) const
+{
+	assert(this->file != nullptr);
+
+	// Maybe the requested item is a directory?
+	auto count = Player::RESOURCES.count(path);
+	if (0 < count) {
+		auto range = Player::RESOURCES.equal_range(path);
+
+		// Is this an entry?  If so, delegate it to Audio to work on.
+		if (1 == count && "" == range.first->second) {
+			// The entry might be currently empty, in which case
+			// Emit will return nullptr.  This is fine, but we'll just
+			// act as if it doesn't exist at all.
+			auto response = this->file->Emit(path, id == 0);
+			if (!response) return CommandResult::Failure(MSG_NOT_FOUND);
+
+			if (this->sink != nullptr) this->sink->Respond(*response, id);
+			return CommandResult::Success();
+		}
+
+		// Otherwise, it's a directory.
+		// First, emit the directory resource.
+		auto res = Response::Res("Directory", path, std::to_string(count));
+		if (this->sink != nullptr) this->sink->Respond(*res, id);
+
+		// Next, the contents.
+		for (auto i = range.first; i != range.second; i++) {
+			this->Read(i->second, id);
+		}
+
+		return CommandResult::Success();
+	}
+
+	// If we get here, the resource doesn't exist and never will do.
+	return CommandResult::Failure(MSG_NOT_FOUND);
+}
+
+CommandResult Player::Write(const std::string &path, const std::string &payload)
+{
+	if ("/control/state" == path) {
+		if ("Playing" == payload) return this->SetPlaying(true);
+		if ("Stopped" == payload) return this->SetPlaying(false);
+		if ("Ejected" == payload) return this->Eject();
+		if ("Quitting" == payload) return this->Quit();
+		return CommandResult::Invalid(MSG_INVALID_PAYLOAD);
+	}
+
+	if ("/player/file" == path) return this->Load(payload);
+	if ("/player/time/elapsed" == path) return this->Seek(payload);
+
+	return this->ResourceFailure(path);
+}
+
+CommandResult Player::Delete(const std::string &path)
+{
+	if ("/control/state" == path) return this->Quit();
+	if ("/player/file" == path) return this->Eject();
+	if ("/player/time/elapsed" == path) return this->Seek("0");
+
+	return this->ResourceFailure(path);
+}
+
+CommandResult Player::ResourceFailure(const std::string &path) {
+	// In this case, we've either got a resource that exists but can't
+	// be written, or a resource that doesn't.  Let's find out which:
+	if (0 < this->RESOURCES.count(path)) {
+		// The resource is valid, but can't be written to.
+		return CommandResult::Failure(MSG_INVALID_ACTION);
+	}
+
+	// Else, the resource doesn't exist.
+	return CommandResult::Failure(MSG_NOT_FOUND);
+}
+

@@ -85,14 +85,15 @@ public:
 	/**
 	 * Emits the requested response.
 	 *
-	 * @param code The code of the response to emit, if possible.
-	 * @param sink The ResponseSink to which the response shall be sent.
-	 *   May be nullptr, in which case Emit should be a no-operation.
-	 * @param id The ID of the connection to which the ResponseSink should
-	 *   route the response.  May be 0 (the default), for all (broadcast).
+	 * This method does NOT support emitting composite responses.  For
+	 * example, `Emit("/player", x)` shall be ignored.  This functionality
+	 * is provided in Player.
+	 *
+	 * @param path The path of the response to emit, if possible.
+	 * @param broadcast If true, the emission is an update broadcast.
+	 * @return A pointer to the response, if it exists.
 	 */
-	virtual void Emit(Response::Code code, const ResponseSink *sink,
-	                  size_t id = 0);
+	virtual std::unique_ptr<Response> Emit(const std::string &path, bool broadcast);
 
 	/**
 	 * This Audio's current position.
@@ -119,8 +120,7 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	void Emit(Response::Code code, const ResponseSink *sink,
-	          size_t id) override;
+	std::unique_ptr<Response> Emit(const std::string &path, bool broadcast) override;
 
 	// The following all raise an exception:
 
@@ -156,8 +156,7 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	void Emit(Response::Code code, const ResponseSink *sink,
-	          size_t id) override;
+	std::unique_ptr<Response> Emit(const std::string &path, bool broadcast) override;
 	std::uint64_t Position() const override;
 
 private:
@@ -173,18 +172,11 @@ private:
 	/// The current position in the current decoded frame.
 	AudioSource::DecodeVector::iterator frame_iterator;
 
-	/**
-	 * A map of response sink pointers to their last emitted position, in
-	 * seconds.
-	 *
-	 * The pointers are not actually used in any way other than as a
-	 * convenient identifier for each individual ResponseSink.  As such,
-	 * the ResponseSinks are not owned by this object.
-	 *
-	 * @todo (CaptainHayashi) This could cause memory leaks if not emptied
-	 *   regularly--need to check.
-	 */
-	std::map<const ResponseSink *, std::uint64_t> last_times;
+	/// Whether last_time contains a valid last time.
+	bool announced_time;
+
+	/// The last time into this Audio when the time was broadcast.
+	std::uint64_t last_time;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
@@ -218,11 +210,9 @@ private:
 	 * before a CanAnnounceTime(x) will _always_ be false.
 	 *
 	 * @param micros The value of the TIME response, in microseconds.
-	 * @param sink The ResponseSink to which a TIME will be broadcast if
-	 *   this returns true.
-	 * @return Whether it is polite to send TIME to the given sink.
+	 * @return Whether it is polite to broadcast TIME.
 	 */
-	bool CanAnnounceTime(std::uint64_t micros, const ResponseSink *sink);
+	bool CanAnnounceTime(std::uint64_t micros);
 };
 
 #endif // PLAYD_AUDIO_HPP

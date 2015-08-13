@@ -15,7 +15,7 @@
 #include "response.hpp"
 
 /**
- * A result from a command.
+ * A result from a command (an 'ACK' response).
  *
  * Commands may either succeed (with no failure message), or fail (with a
  * failure message).  The success (or not) of a command may be checked with
@@ -24,6 +24,18 @@
 class CommandResult
 {
 public:
+	/**
+	 * Enumeration of possible command result types.
+	 * To be elaborated on pending specification.
+	 * @note If you're adding new ack-codes here, update STRINGS.
+	 * @see CommandResult::STRINGS
+	 */
+	enum class Code : std::uint8_t {
+		OK,   ///< Request was valid and produced an answer.
+		WHAT, ///< Request was invalid/user error.
+		FAIL  ///< Error, pointing blame at environment.
+	};
+
 	/**
 	 * Shortcut for constructing a successful CommandResult.
 	 * @return A CommandResult denoting success.
@@ -46,13 +58,11 @@ public:
 
 	/**
 	 * Constructs a CommandResult.
-	 * @param type The type of command result, encoded as one of
-	 *   the FAIL, WHAT, or OK response codes.
+	 * @param type The type of command result.
 	 * @param msg A message providing more information about the result.
-	 *   This will typically only be used for failures.
 	 *   The message will be copied into the CommandResult.
 	 */
-	CommandResult(Response::Code type, const std::string &msg);
+	CommandResult(CommandResult::Code type, const std::string &msg);
 
 	/**
 	 * Determines whether this CommandResult was successful.
@@ -77,8 +87,14 @@ public:
 	          size_t id = 0) const;
 
 private:
-	std::string msg;     ///< The command result's message.
-	Response::Code type; ///< The command result's response code.
+	/**
+	 * A map from CommandResult::Code codes to their string equivalents.
+	 * @see CommandResult::Code
+	 */
+	static const std::string STRINGS[];
+
+	std::string msg;          ///< The command result's message.
+	CommandResult::Code type; ///< The command result's ack code.
 };
 
 #endif // PLAYD_CMD_RESULT
