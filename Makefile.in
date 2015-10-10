@@ -17,7 +17,7 @@ builddir ?= %%BUILDDIR%%
 srcdir ?= %%SRCDIR%%
 
 # The warning flags to use when building playd.
-WARNS ?= -Wall -Wextra -Werror
+WARNS ?= -Wall -Wextra -pedantic -Werror
 
 # Programs used during building.
 CC         =  %%CC%%
