@@ -45,9 +45,7 @@ std::unique_ptr<Response> NoAudio::Emit(const std::string &path, bool)
 	std::unique_ptr<Response> ret;
 
 	if (path == "/control/state") {
-		ret = std::move(
-			Response::Res("Entry", "/control/state", "Ejected")
-		);
+		ret = Response::Res("Entry", "/control/state", "Ejected");
 	}
 
 	return ret;
@@ -105,8 +103,7 @@ std::unique_ptr<Response> PipeAudio::Emit(const std::string &path,
 		value = std::to_string(micros);
 	} else return ret;
 
-	ret = std::move(Response::Res("Entry", path, value));
-	return ret;
+	return Response::Res("Entry", path, value);
 }
 
 void PipeAudio::SetPlaying(bool playing)
