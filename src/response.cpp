@@ -20,6 +20,7 @@ const std::string Response::STRINGS[] = {
 	"ACK",    // Code::ACK
 	"RES"     // Code::RES
 	"UPDATE", // Code::UPDATE
+	"END",
 };
 
 // Pre-made responses.

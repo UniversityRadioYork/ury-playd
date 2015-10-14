@@ -237,19 +237,7 @@ void IoCore::Shutdown()
 	uv_close(reinterpret_cast<uv_handle_t *>(&this->server), nullptr);
 
 	// Finally, kill off all of the connections with 'fatal' responses.
-	for (const auto conn : this->pool) IoCore::TryShutdown(conn);
-}
-
-/* static */ void IoCore::TryShutdown(const std::shared_ptr<Connection> conn)
-{
-	if (!conn) return;
-
-	auto response = Response(Response::Code::STATE).AddArg("Quitting");
-
-	// The true at the end is for the 'fatal' argument to
-	// Connection::Respond, telling it to close itself after processing
-	// 'response'.
-	conn->Respond(response, true);
+	for (const auto conn : this->pool) conn->Depool();
 }
 
 /* static */ void IoCore::TryRespond(const std::shared_ptr<Connection> conn,
