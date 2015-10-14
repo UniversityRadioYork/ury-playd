@@ -66,7 +66,11 @@ std::string Response::Pack() const
 		// to escape by itself is single quotes, which are replaced by
 		// the sequence '\'' (break out of single quotes, escape a
 		// single quote, then re-enter single quotes).
-		escaped += (c == '\'') ? R"('\'')" : std::string(1, c);
+		if (c == '\'') {
+			escaped += R"('\'')";
+		} else {
+			escaped += c;
+		}
 	}
 
 	// Only single-quote escape if necessary.
