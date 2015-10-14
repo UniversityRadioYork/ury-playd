@@ -30,14 +30,10 @@ public:
 	 * @see ResponseSink::STRINGS
 	 */
 	enum class Code : std::uint8_t {
-		OHAI,     ///< Server starting up.
-		STATE,    ///< Server changing state.
-		TIME,     ///< Server sending current song time,
-		FILE,     ///< The loaded file just changed.
-		FEATURES, ///< Server sending feature list.
-		END,      ///< The loaded file just ended on its own.
-		ACK,      ///< Command result.
-		RES       ///< Resource.
+		OHAI,   ///< Server starting up.
+		ACK,    ///< Command result.
+		RES,    ///< Resource result.
+		UPDATE, ///< Resource changed.
 	};
 
 	/**

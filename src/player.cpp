@@ -22,9 +22,6 @@
 #include "messages.h"
 #include "player.hpp"
 
-const std::vector<std::string> Player::FEATURES{"End", "FileLoad", "PlayStop",
-                                                "Seek", "TimeReport"};
-
 Player::Player(AudioSystem &audio)
     : audio(audio), file(audio.Null()), is_running(true), sink(nullptr)
 {
@@ -52,13 +49,7 @@ bool Player::Update()
 
 void Player::WelcomeClient(size_t id) const
 {
-	this->sink->Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI), id);
-
-	auto features = Response(Response::Code::FEATURES);
-	for (auto &f : FEATURES) features.AddArg(f);
-	this->sink->Respond(features, id);
-
-	this->Read("/", id);
+	this->sink->Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI).AddArg(MSG_PROTO_VER), id);
 }
 
 void Player::End()
@@ -323,4 +314,3 @@ CommandResult Player::ResourceFailure(const std::string &path) {
 	// Else, the resource doesn't exist.
 	return CommandResult::Failure(MSG_NOT_FOUND);
 }
-

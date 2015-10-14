@@ -81,9 +81,6 @@ private:
 	bool is_running;             ///< Whether the Player is running.
 	const ResponseSink *sink;    ///< The sink for audio responses.
 
-	/// The set of features playd implements.
-	const static std::vector<std::string> FEATURES;
-
 	/// The resource tree playd exposes.
 	const static std::multimap<std::string, std::string> RESOURCES;
 
