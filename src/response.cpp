@@ -24,8 +24,8 @@ const std::string Response::STRINGS[] = {
 };
 
 // Pre-made responses.
-std::unique_ptr<Response> Response::Res(const std::string &type,
-                                        const std::string &path,
+std::unique_ptr<Response> Response::Res(const std::string &path,
+                                        const std::string &type,
                                         const std::string &value)
 {
 	auto res = std::unique_ptr<Response>(

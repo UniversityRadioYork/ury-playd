@@ -263,7 +263,7 @@ CommandResult Player::Read(const std::string &path, size_t id) const
 
 		// Otherwise, it's a directory.
 		// First, emit the directory resource.
-		auto res = Response::Res("Directory", path, std::to_string(count));
+		auto res = Response::Res(path, "Directory", std::to_string(count));
 		if (this->sink != nullptr) this->sink->Respond(*res, id);
 
 		// Next, the contents.

@@ -45,12 +45,12 @@ public:
 
 	/**
 	 * Constructs a RES response.
-	 * @param type The type of resource being emitted.
 	 * @param path The path to the resource.
+	 * @param type The type of resource being emitted.
 	 * @param value The string representing the resource's value.
 	 */
-	static std::unique_ptr<Response> Res(const std::string &type,
-	                                     const std::string &path,
+	static std::unique_ptr<Response> Res(const std::string &path,
+	                                     const std::string &type,
 	                                     const std::string &value);
 
 	/**
