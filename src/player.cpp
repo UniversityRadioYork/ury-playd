@@ -20,10 +20,11 @@
 #include "errors.hpp"
 #include "response.hpp"
 #include "messages.h"
+#include "io.hpp"
 #include "player.hpp"
 
 Player::Player(AudioSystem &audio)
-    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr)
+    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr), time_elapsed(0)
 {
 }
 
@@ -38,13 +39,24 @@ bool Player::Update()
 	auto as = this->file->Update();
 
 	if (as == Audio::State::AT_END) this->End();
-	if (as == Audio::State::PLAYING) {
+	if (as == Audio::State::PLAYING && this->ShouldAnnounceTime()) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
+
 		this->Read("", "/player/time/elapsed", 0);
 	}
 
 	return this->is_running;
+}
+
+bool Player::ShouldAnnounceTime()
+{
+	this->time_elapsed += IoCore::PLAYER_UPDATE_PERIOD;
+	if (this->time_elapsed >= 1000) { // 1s
+		this->time_elapsed = 0;
+		return true;
+	}
+	return false;
 }
 
 void Player::WelcomeClient(size_t id) const

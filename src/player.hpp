@@ -80,6 +80,7 @@ private:
 	std::unique_ptr<Audio> file; ///< The currently loaded audio file.
 	bool is_running;             ///< Whether the Player is running.
 	const ResponseSink *sink;    ///< The sink for audio responses.
+	int time_elapsed;            ///< Time since last elasped message.
 
 	/// The resource tree playd exposes.
 	const static std::multimap<std::string, std::string> RESOURCES;
@@ -152,6 +153,13 @@ private:
 	//
 	// Other
 	//
+
+	/**
+	 * If the new time elapsed should be announced. Used to prevent
+	 * spamming the connections with /player/time/elapsed messages.
+	 * @return Whether time elapsed should be announced.
+	 */
+	bool ShouldAnnounceTime();
 
 	/**
 	 * Quits playd.

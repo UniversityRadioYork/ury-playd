@@ -172,12 +172,6 @@ private:
 	/// The current position in the current decoded frame.
 	AudioSource::DecodeVector::iterator frame_iterator;
 
-	/// Whether last_time contains a valid last time.
-	bool announced_time;
-
-	/// The last time into this Audio when the time was broadcast.
-	std::uint64_t last_time;
-
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
 
@@ -198,21 +192,6 @@ private:
 
 	/// Transfers as much of the current frame as possible to the sink.
 	void TransferFrame();
-
-	/**
-	 * Determines whether we can broadcast a TIME response.
-	 *
-	 * To prevent spewing massive amounts of TIME responses, we only send a
-	 * broadcast if the number of seconds has changed since the last
-	 * time CanAnnounceTime() was called for the given sink.
-	 *
-	 * This is *not* idempotent.  A CanAnnounceTime(x) less than one second
-	 * before a CanAnnounceTime(x) will _always_ be false.
-	 *
-	 * @param micros The value of the TIME response, in microseconds.
-	 * @return Whether it is polite to broadcast TIME.
-	 */
-	bool CanAnnounceTime(std::uint64_t micros);
 };
 
 #endif // PLAYD_AUDIO_HPP

@@ -58,7 +58,7 @@ std::uint64_t NoAudio::Position() const
 
 PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
                      std::unique_ptr<AudioSink> &&sink)
-    : src(std::move(src)), sink(std::move(sink)), announced_time(false)
+    : src(std::move(src)), sink(std::move(sink))
 {
 	this->ClearFrame();
 }
@@ -113,9 +113,6 @@ void PipeAudio::Seek(std::uint64_t position)
 	auto in_samples = this->src->SamplesFromMicros(position);
 	auto out_samples = this->src->Seek(in_samples);
 	this->sink->SetPosition(out_samples);
-
-	// Make sure we always announce the new position to all response sinks.
-	this->announced_time = false;
 
 	// We might still have decoded samples from the old position in
 	// our frame, so clear them out.
@@ -185,20 +182,4 @@ bool PipeAudio::DecodeIfFrameEmpty()
 bool PipeAudio::FrameFinished() const
 {
 	return this->frame.end() <= this->frame_iterator;
-}
-
-bool PipeAudio::CanAnnounceTime(std::uint64_t micros)
-{
-	std::uint64_t secs = micros / 1000 / 1000;
-
-	// We can announce if we don't have a record for this sink, or if the
-	// last record was in a previous second.
-	bool announce = (!(this->announced_time)) || (this->last_time < secs);
-
-	if (announce) {
-		this->announced_time = true;
-		this->last_time = secs;
-	}
-
-	return announce;
 }

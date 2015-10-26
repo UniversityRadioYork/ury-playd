@@ -90,10 +90,10 @@ public:
 
 	void Respond(const Response &response, size_t id = 0) const override;
 
-private:
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
 
+private:
 	uv_tcp_t server;    ///< The libuv handle for the TCP server.
 	uv_timer_t updater; ///< The libuv handle for the update timer.
 	Player &player;     ///< The player.
