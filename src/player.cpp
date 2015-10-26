@@ -24,7 +24,7 @@
 #include "player.hpp"
 
 Player::Player(AudioSystem &audio)
-    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr), time_elapsed(0)
+    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr), last_announced(0)
 {
 }
 
@@ -51,9 +51,9 @@ bool Player::Update()
 
 bool Player::ShouldAnnounceTime()
 {
-	this->time_elapsed += IoCore::PLAYER_UPDATE_PERIOD;
-	if (this->time_elapsed >= 1000) { // 1s
-		this->time_elapsed = 0;
+	auto pos = this->file->Position();
+	if (pos - this->last_announced > 1000000) { // 1s
+		this->last_announced = pos;
 		return true;
 	}
 	return false;
@@ -237,6 +237,7 @@ void Player::SeekRaw(std::uint64_t pos)
 	assert(this->file != nullptr);
 
 	this->file->Seek(pos);
+	this->last_announced = pos;
 	this->Read("", "/player/time/elapsed", 0);
 }
 

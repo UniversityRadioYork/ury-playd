@@ -76,11 +76,11 @@ public:
 	void WelcomeClient(size_t id) const;
 
 private:
-	AudioSystem &audio;          ///< The system used for loading audio.
-	std::unique_ptr<Audio> file; ///< The currently loaded audio file.
-	bool is_running;             ///< Whether the Player is running.
-	const ResponseSink *sink;    ///< The sink for audio responses.
-	int time_elapsed;            ///< Time since last elasped message.
+	AudioSystem &audio;           ///< The system used for loading audio.
+	std::unique_ptr<Audio> file;  ///< The currently loaded audio file.
+	bool is_running;              ///< Whether the Player is running.
+	const ResponseSink *sink;     ///< The sink for audio responses.
+	std::uint64_t last_announced; ///< Time since last elasped message.
 
 	/// The resource tree playd exposes.
 	const static std::multimap<std::string, std::string> RESOURCES;
