@@ -168,7 +168,7 @@ private:
 	 * @return The result of reading, which may be a failure if the
 	 *   resource does not exist.
 	 */
-	virtual CommandResult Read(const std::string &path, size_t id) const;
+	virtual CommandResult Read(const std::string &tag, const std::string &path, size_t id) const;
 
 	/**
 	 * Writes to the requested resource.

@@ -22,16 +22,6 @@
 #include "sample_formats.hpp"
 
 //
-// Audio
-//
-
-std::unique_ptr<Response> Audio::Emit(const std::string &, bool)
-{
-	// By default, emit nothing.  This is an acceptable behaviour.
-	return std::unique_ptr<Response>();
-}
-
-//
 // NoAudio
 //
 
@@ -40,15 +30,11 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-std::unique_ptr<Response> NoAudio::Emit(const std::string &path, bool)
+std::pair<std::string, std::string> NoAudio::Emit(const std::string &path)
 {
-	std::unique_ptr<Response> ret;
+	if (path == "/control/state") return std::make_pair("Entry", "Ejected");
 
-	if (path == "/control/state") {
-		ret = Response::Res("/control/state", "Entry", "Ejected");
-	}
-
-	return ret;
+	throw FileError(MSG_NOT_FOUND);
 }
 
 void NoAudio::SetPlaying(bool)
@@ -77,8 +63,7 @@ PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
 	this->ClearFrame();
 }
 
-std::unique_ptr<Response> PipeAudio::Emit(const std::string &path,
-	bool broadcast)
+std::pair<std::string, std::string> PipeAudio::Emit(const std::string &path)
 {
 	assert(this->src != nullptr);
 	assert(this->sink != nullptr);
@@ -95,15 +80,10 @@ std::unique_ptr<Response> PipeAudio::Emit(const std::string &path,
 		value = this->src->Path();
 	} else if (path == "/player/time/elapsed") {
 		std::uint64_t micros = this->Position();
-
-		// Always announce a unicast.
-		// Only announce broadcasts if CanAnnounceTime(...).
-		bool can = (!broadcast) || this->CanAnnounceTime(micros);
-		if (!can) return ret;
 		value = std::to_string(micros);
-	} else return ret;
+	}
 
-	return Response::Res(path, "Entry", value);
+	return std::make_pair("Entry", value);
 }
 
 void PipeAudio::SetPlaying(bool playing)

@@ -41,7 +41,7 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->Read("/player/time/elapsed", 0);
+		this->Read("", "/player/time/elapsed", 0);
 	}
 
 	return this->is_running;
@@ -90,7 +90,7 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 	// This is because the first argument is a 'tag', emitted with the
 	// command result to allow it to be identified, but otherwise
 	// unused.
-	if (nargs == 2 && "read" == word) return this->Read(cmd[2], id);
+	if (nargs == 2 && "read" == word) return this->Read(cmd[1], cmd[2], id);
 	if (nargs == 2 && "delete" == word) return this->Delete(cmd[2]);
 	if (nargs == 3 && "write" == word) return this->Write(cmd[2], cmd[3]);
 
@@ -101,7 +101,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	this->Read("/control/state", 0);
+	this->Read("", "/control/state", 0);
 
 	return CommandResult::Success();
 }
@@ -121,7 +121,9 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
-		this->Read("/", 0);
+		this->Read("", "/player/file", 0);
+		this->Read("", "/player/time/elapsed", 0);
+		this->Read("", "/control/state", 0);
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
@@ -153,7 +155,7 @@ CommandResult Player::SetPlaying(bool playing)
 		return CommandResult::Invalid(e.Message());
 	}
 
-	this->Read("/control/state", 0);
+	this->Read("", "/control/state", 0);
 
 	return CommandResult::Success();
 }
@@ -223,7 +225,7 @@ void Player::SeekRaw(std::uint64_t pos)
 	assert(this->file != nullptr);
 
 	this->file->Seek(pos);
-	this->Read("/player/time/elapsed", 0);
+	this->Read("", "/player/time/elapsed", 0);
 }
 
 // Any resource with the single child "" (empty string) is an entry.
@@ -240,7 +242,7 @@ const std::multimap<std::string, std::string> Player::RESOURCES = {
 	{"/player/time/elapsed", ""}
 };
 
-CommandResult Player::Read(const std::string &path, size_t id) const
+CommandResult Player::Read(const std::string &tag, const std::string &path, size_t id) const
 {
 	assert(this->file != nullptr);
 
@@ -254,21 +256,40 @@ CommandResult Player::Read(const std::string &path, size_t id) const
 			// The entry might be currently empty, in which case
 			// Emit will return nullptr.  This is fine, but we'll just
 			// act as if it doesn't exist at all.
-			auto response = this->file->Emit(path, id == 0);
-			if (!response) return CommandResult::Failure(MSG_NOT_FOUND);
+			std::string type;
+			std::string value;
+			try {
+				std::tie(type, value) = this->file->Emit(path);
+			} catch (FileError &) {
+				return CommandResult::Failure(MSG_NOT_FOUND);
+			}
+
+			// TODO: Correct?
+			if (type == "" || value == "") {
+				return CommandResult::Failure(MSG_NOT_FOUND);
+			}
+
+			std::unique_ptr<Response> response;
+			if (tag == "" || id == 0) {
+				response = Response::Update(path, type, value);
+			} else {
+				response = Response::Res(tag, path, type, value);
+			}
 
 			if (this->sink != nullptr) this->sink->Respond(*response, id);
 			return CommandResult::Success();
 		}
 
 		// Otherwise, it's a directory.
+		assert(id != 0 && tag != ""); // Don't want to RES broadcasts
+
 		// First, emit the directory resource.
-		auto res = Response::Res(path, "Directory", std::to_string(count));
+		auto res = Response::Res(tag, path, "Directory", std::to_string(count));
 		if (this->sink != nullptr) this->sink->Respond(*res, id);
 
 		// Next, the contents.
 		for (auto i = range.first; i != range.second; i++) {
-			this->Read(i->second, id);
+			this->Read(tag, i->second, id);
 		}
 
 		return CommandResult::Success();

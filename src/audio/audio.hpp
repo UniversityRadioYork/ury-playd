@@ -88,12 +88,12 @@ public:
 	 * This method does NOT support emitting composite responses.  For
 	 * example, `Emit("/player", x)` shall be ignored.  This functionality
 	 * is provided in Player.
+	 * @note Resource must exist, or will throw a FileError.
 	 *
 	 * @param path The path of the response to emit, if possible.
-	 * @param broadcast If true, the emission is an update broadcast.
-	 * @return A pointer to the response, if it exists.
+	 * @return Pair of requested resource's type and value.
 	 */
-	virtual std::unique_ptr<Response> Emit(const std::string &path, bool broadcast);
+	virtual std::pair<std::string, std::string> Emit(const std::string &path) = 0;
 
 	/**
 	 * This Audio's current position.
@@ -120,7 +120,7 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	std::unique_ptr<Response> Emit(const std::string &path, bool broadcast) override;
+	std::pair<std::string, std::string> Emit(const std::string &path) override;
 
 	// The following all raise an exception:
 
@@ -156,7 +156,7 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	std::unique_ptr<Response> Emit(const std::string &path, bool broadcast) override;
+	std::pair<std::string, std::string> Emit(const std::string &path) override;
 	std::uint64_t Position() const override;
 
 private:

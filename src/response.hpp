@@ -49,10 +49,20 @@ public:
 	 * @param type The type of resource being emitted.
 	 * @param value The string representing the resource's value.
 	 */
-	static std::unique_ptr<Response> Res(const std::string &path,
+	static std::unique_ptr<Response> Res(const std::string &tag,
+	                                     const std::string &path,
 	                                     const std::string &type,
 	                                     const std::string &value);
 
+
+	/**
+	 * Constructs an UPDATE response.
+	 * @param path Path to the resource.
+	 * @param type Type of response being emitted.
+	 * @param value String representing the resource's value.
+	 */
+	static std::unique_ptr<Response> Update(const std::string &path,
+			const std::string &type, const std::string &value);
 	/**
 	 * Adds an argument to this Response.
 	 * @param arg The argument to add.  The argument must not be escaped.

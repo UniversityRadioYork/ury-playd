@@ -18,18 +18,28 @@
 const std::string Response::STRINGS[] = {
 	"OHAI",   // Code::OHAI
 	"ACK",    // Code::ACK
-	"RES"     // Code::RES
+	"RES",    // Code::RES
 	"UPDATE", // Code::UPDATE
 	"END",
 };
 
 // Pre-made responses.
-std::unique_ptr<Response> Response::Res(const std::string &path,
+std::unique_ptr<Response> Response::Res(const std::string &tag,
+                                        const std::string &path,
                                         const std::string &type,
                                         const std::string &value)
 {
 	auto res = std::unique_ptr<Response>(
 		new Response(Response::Code::RES)
+	);
+	res->AddArg(tag).AddArg(path).AddArg(type).AddArg(value);
+	return res;
+}
+
+std::unique_ptr<Response> Response::Update(const std::string &path, const std::string &type, const std::string &value)
+{
+	auto res = std::unique_ptr<Response>(
+		new Response(Response::Code::UPDATE)
 	);
 	res->AddArg(path).AddArg(type).AddArg(value);
 	return res;
