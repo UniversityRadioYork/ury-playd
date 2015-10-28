@@ -34,7 +34,6 @@ public:
 		ACK,    ///< Command result.
 		RES,    ///< Resource result.
 		UPDATE, ///< Resource changed.
-		END,
 	};
 
 	/**

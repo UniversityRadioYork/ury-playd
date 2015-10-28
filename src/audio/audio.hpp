@@ -105,6 +105,13 @@ public:
 	 * @see Seek
 	 */
 	virtual std::uint64_t Position() const = 0;
+
+protected:
+	/**
+	 * A map from Audio::State codes to their string equivalents.
+	 * @see Audio::State
+	 */
+	static const std::string STATE_STRINGS[];
 };
 
 /**

@@ -75,8 +75,9 @@ void Player::End()
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
+	this->Read("", "/player/state/current", 0);
+
 	if (this->sink == nullptr) return;
-	this->sink->Respond(Response(Response::Code::END));
 }
 
 //
@@ -113,7 +114,7 @@ CommandResult Player::Eject()
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
-	this->Read("", "/control/state", 0);
+	this->Read("", "/player/state/current", 0);
 
 	return CommandResult::Success();
 }
@@ -135,7 +136,8 @@ CommandResult Player::Load(const std::string &path)
 		this->file = this->audio.Load(path);
 		this->Read("", "/player/file", 0);
 		this->Read("", "/player/time/elapsed", 0);
-		this->Read("", "/control/state", 0);
+		this->Read("", "/player/state/current", 0);
+		this->Read("", "/player/state/available", 0);
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
@@ -167,7 +169,7 @@ CommandResult Player::SetPlaying(bool playing)
 		return CommandResult::Invalid(e.Message());
 	}
 
-	this->Read("", "/control/state", 0);
+	this->Read("", "/player/state/current", 0);
 
 	return CommandResult::Success();
 }
@@ -247,9 +249,17 @@ const std::multimap<std::string, std::string> Player::RESOURCES = {
 	{"/", "/control"},
 	{"/", "/player"},
 	{"/control", "/control/state"},
-	{"/control/state", ""},
+	{"/control/state", "/control/state/current"},
+	{"/control/state", "/control/state/available"},
+	{"/control/state/current", ""},
+	{"/control/state/available", ""},
 	{"/player", "/player/file"},
 	{"/player", "/player/time"},
+	{"/player", "/player/state"},
+	{"/player/state", "/player/state/current"},
+	{"/player/state", "/player/state/available"},
+	{"/player/state/current", ""},
+	{"/player/state/available", ""},
 	{"/player/file", ""},
 	{"/player/time", "/player/time/elapsed"},
 	{"/player/time/elapsed", ""}
@@ -271,8 +281,17 @@ CommandResult Player::Read(const std::string &tag, const std::string &path, size
 			// act as if it doesn't exist at all.
 			std::string type;
 			std::string value;
+
 			try {
-				std::tie(type, value) = this->file->Emit(path);
+				if (path == "/control/state/current") {
+					type = "Entry";
+					value = this->is_running ? "running" : "quitting";
+				} else if (path == "/control/state/available") {
+					type = "Entry";
+					value = "running,quitting";
+				} else {
+					std::tie(type, value) = this->file->Emit(path);
+				}
 			} catch (FileError &) {
 				return CommandResult::Failure(MSG_NOT_FOUND);
 			}
@@ -314,11 +333,15 @@ CommandResult Player::Read(const std::string &tag, const std::string &path, size
 
 CommandResult Player::Write(const std::string &path, const std::string &payload)
 {
-	if ("/control/state" == path) {
-		if ("Playing" == payload) return this->SetPlaying(true);
-		if ("Stopped" == payload) return this->SetPlaying(false);
-		if ("Ejected" == payload) return this->Eject();
-		if ("Quitting" == payload) return this->Quit();
+	if ("/control/state/current" == path) {
+		if ("quitting" == payload) return this->Quit();
+		return CommandResult::Invalid(MSG_INVALID_PAYLOAD);
+	}
+
+	if ("/player/state/current" == path) {
+		if ("playing" == payload) return this->SetPlaying(true);
+		if ("stopped" == payload) return this->SetPlaying(false);
+		if ("ejected" == payload) return this->Eject();
 		return CommandResult::Invalid(MSG_INVALID_PAYLOAD);
 	}
 
@@ -330,7 +353,7 @@ CommandResult Player::Write(const std::string &path, const std::string &payload)
 
 CommandResult Player::Delete(const std::string &path)
 {
-	if ("/control/state" == path) return this->Quit();
+	if ("/control/state/current" == path) return this->Quit();
 	if ("/player/file" == path) return this->Eject();
 	if ("/player/time/elapsed" == path) return this->Seek("0");
 

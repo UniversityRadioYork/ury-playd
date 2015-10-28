@@ -21,6 +21,13 @@
 #include "audio_source.hpp"
 #include "sample_formats.hpp"
 
+const std::string Audio::STATE_STRINGS[] {
+	"ejected",
+	"stopped",
+	"playing",
+	"finished",
+};
+
 //
 // NoAudio
 //
@@ -32,7 +39,10 @@ Audio::State NoAudio::Update()
 
 std::pair<std::string, std::string> NoAudio::Emit(const std::string &path)
 {
-	if (path == "/control/state") return std::make_pair("Entry", "Ejected");
+	if (path == "/player/state/current" || path == "/player/state/available") {
+		// Only possible value is the set value
+		return std::make_pair("Entry", "ejected");
+	}
 
 	throw FileError(MSG_NOT_FOUND);
 }
@@ -72,10 +82,12 @@ std::pair<std::string, std::string> PipeAudio::Emit(const std::string &path)
 
 	std::string value;
 
-	if (path == "/control/state") {
+	if (path == "/player/state/current") {
 		auto state = this->sink->State();
-		auto playing = state == Audio::State::PLAYING;
-		value = playing ? "Playing" : "Stopped";
+		value = Audio::STATE_STRINGS[static_cast<int>(state)];
+	} else if (path == "/player/state/available") {
+		// TODO: Use STATE_STRINGS?
+		value = "playing,stopped,ejected,finished";
 	} else if (path == "/player/file") {
 		value = this->src->Path();
 	} else if (path == "/player/time/elapsed") {
