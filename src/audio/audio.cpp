@@ -22,10 +22,10 @@
 #include "sample_formats.hpp"
 
 const std::string Audio::STATE_STRINGS[] {
-	"ejected",
-	"stopped",
-	"playing",
-	"finished",
+	"ejected",  // Audio::State::NONE
+	"stopped",  // Audio::State::STOPPED
+	"playing",  // Audio::State::PLAYING
+	"finished", // Audio::State::AT_END
 };
 
 //

@@ -42,7 +42,6 @@ bool Player::Update()
 	if (as == Audio::State::PLAYING && this->ShouldAnnounceTime()) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-
 		this->Read("", "/player/time/elapsed", 0);
 	}
 
@@ -66,18 +65,15 @@ void Player::WelcomeClient(size_t id) const
 
 void Player::End()
 {
-	this->SetPlaying(false);
+	// Let upstream know that the file ended by itself.
+	// This is needed for auto-advancing playlists, etc.
+	this->Read("", "/player/state/current", 0);
 
 	// Rewind the file back to the start.  We can't use Player::Seek() here
 	// in case End() is called from Seek(); a seek failure could start an
 	// infinite loop.
 	this->SeekRaw(0);
-
-	// Let upstream know that the file ended by itself.
-	// This is needed for auto-advancing playlists, etc.
-	this->Read("", "/player/state/current", 0);
-
-	if (this->sink == nullptr) return;
+	this->SetPlaying(false);
 }
 
 //
