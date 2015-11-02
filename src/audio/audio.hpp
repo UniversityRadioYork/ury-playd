@@ -40,10 +40,10 @@ public:
 	 * @see Update
 	 */
 	enum class State : uint8_t {
-		NONE,    ///< There is no Audio.
-		STOPPED, ///< The Audio has been stopped, or not yet played.
-		PLAYING, ///< The Audio is currently playing.
-		AT_END,  ///< The Audio has ended and can't play without a seek.
+		NONE,     ///< There is no Audio.
+		STOPPED,  ///< The Audio has been stopped, or not yet played.
+		PLAYING,  ///< The Audio is currently playing.
+		FINISHED, ///< The Audio has ended and can't play without a seek.
 	};
 
 	/// Virtual, empty destructor for Audio.

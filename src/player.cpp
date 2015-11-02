@@ -38,7 +38,7 @@ bool Player::Update()
 	assert(this->file != nullptr);
 	auto as = this->file->Update();
 
-	if (as == Audio::State::AT_END) this->End();
+	if (as == Audio::State::FINISHED) this->End();
 	if (as == Audio::State::PLAYING && this->ShouldAnnounceTime()) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.

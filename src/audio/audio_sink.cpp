@@ -132,7 +132,7 @@ Audio::State SdlAudioSink::State()
 void SdlAudioSink::SourceOut()
 {
 	// The sink should only be out if the source is.
-	assert(this->source_out || this->state != Audio::State::AT_END);
+	assert(this->source_out || this->state != Audio::State::FINISHED);
 
 	this->source_out = true;
 }
@@ -149,7 +149,7 @@ void SdlAudioSink::SetPosition(std::uint64_t samples)
 	// We might have been at the end of the file previously.
 	// If so, we might not be now, so clear the out flags.
 	this->source_out = false;
-	if (this->state == Audio::State::AT_END) {
+	if (this->state == Audio::State::FINISHED) {
 		this->state = Audio::State::STOPPED;
 		this->Stop();
 	}
@@ -219,7 +219,7 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	if (avail_samples == 0) {
 		// Is this a temporary condition, or have we genuinely played
 		// out all we can?  If the latter, we're now out too.
-		if (this->source_out) this->state = Audio::State::AT_END;
+		if (this->source_out) this->state = Audio::State::FINISHED;
 
 		// Don't even bother reading from the ring buffer.
 		return;

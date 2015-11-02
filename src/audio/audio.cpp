@@ -25,7 +25,7 @@ const std::string Audio::STATE_STRINGS[] {
 	"ejected",  // Audio::State::NONE
 	"stopped",  // Audio::State::STOPPED
 	"playing",  // Audio::State::PLAYING
-	"finished", // Audio::State::AT_END
+	"finished", // Audio::State::FINISHED
 };
 
 //

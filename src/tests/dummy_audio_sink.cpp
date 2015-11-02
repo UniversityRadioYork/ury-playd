@@ -47,7 +47,7 @@ void DummyAudioSink::SetPosition(std::uint64_t samples)
 
 void DummyAudioSink::SourceOut()
 {
-	this->state = Audio::State::AT_END;
+	this->state = Audio::State::FINISHED;
 }
 
 void DummyAudioSink::Transfer(AudioSink::TransferIterator &begin, const AudioSink::TransferIterator &end)
