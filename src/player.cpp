@@ -160,6 +160,9 @@ CommandResult Player::SetPlaying(bool playing)
 		this->file->SetPlaying(playing);
 	} catch (NoAudioError &e) {
 		return CommandResult::Invalid(e.Message());
+	} catch (SeekError &e) {
+		// MSG_CMD_NEEDS_NOT_FINISHED
+		return CommandResult::Invalid(e.Message());
 	}
 
 	this->Read("", "/player/state/current", 0);

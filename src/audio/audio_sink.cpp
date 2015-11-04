@@ -110,6 +110,9 @@ SdlAudioSink::~SdlAudioSink()
 
 void SdlAudioSink::Start()
 {
+	if (this->state == Audio::State::FINISHED) {
+		throw SeekError(MSG_CMD_NEEDS_NOT_FINISHED);
+	}
 	if (this->state != Audio::State::STOPPED) return;
 
 	SDL_PauseAudioDevice(this->device, 0);
