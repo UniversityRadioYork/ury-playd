@@ -81,6 +81,7 @@ private:
 	bool is_running;              ///< Whether the Player is running.
 	const ResponseSink *sink;     ///< The sink for audio responses.
 	std::uint64_t last_announced; ///< Time since last elasped message.
+	bool announced_finish;        ///< Has announced finish of current audio file?
 
 	/// The resource tree playd exposes.
 	const static std::multimap<std::string, std::string> RESOURCES;

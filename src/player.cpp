@@ -38,7 +38,7 @@ bool Player::Update()
 	assert(this->file != nullptr);
 	auto as = this->file->Update();
 
-	if (as == Audio::State::FINISHED) this->End();
+	if (as == Audio::State::FINISHED && !this->announced_finish) this->End();
 	if (as == Audio::State::PLAYING && this->ShouldAnnounceTime()) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
@@ -68,12 +68,7 @@ void Player::End()
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
 	this->Read("", "/player/state/current", 0);
-
-	// Rewind the file back to the start.  We can't use Player::Seek() here
-	// in case End() is called from Seek(); a seek failure could start an
-	// infinite loop.
-	this->SeekRaw(0);
-	this->SetPlaying(false);
+	this->announced_finish = true;
 }
 
 //
@@ -130,11 +125,13 @@ CommandResult Player::Load(const std::string &path)
 	try {
 		assert(this->file != nullptr);
 		this->file = this->audio.Load(path);
+		assert(this->file != nullptr);
 		this->Read("", "/player/file", 0);
 		this->Read("", "/player/time/elapsed", 0);
 		this->Read("", "/player/state/current", 0);
 		this->Read("", "/player/state/available", 0);
-		assert(this->file != nullptr);
+		this->last_announced = 0;
+		this->announced_finish = false;
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
 		this->Eject();
@@ -236,6 +233,7 @@ void Player::SeekRaw(std::uint64_t pos)
 
 	this->file->Seek(pos);
 	this->last_announced = pos;
+	this->announced_finish = false;
 	this->Read("", "/player/time/elapsed", 0);
 }
 
