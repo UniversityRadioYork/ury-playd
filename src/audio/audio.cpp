@@ -57,6 +57,11 @@ void NoAudio::Seek(std::uint64_t)
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
+std::uint64_t NoAudio::TotalLength() const
+{
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
+}
+
 std::uint64_t NoAudio::Position() const
 {
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
@@ -92,6 +97,9 @@ std::pair<std::string, std::string> PipeAudio::Emit(const std::string &path)
 		value = this->src->Path();
 	} else if (path == "/player/time/elapsed") {
 		std::uint64_t micros = this->Position();
+		value = std::to_string(micros);
+	} else if (path == "/player/time/total") {
+		std::uint64_t micros = this->TotalLength();
 		value = std::to_string(micros);
 	}
 
@@ -129,6 +137,11 @@ void PipeAudio::Seek(std::uint64_t position)
 	// We might still have decoded samples from the old position in
 	// our frame, so clear them out.
 	this->ClearFrame();
+}
+
+std::uint64_t PipeAudio::TotalLength() const
+{
+	return this->src->MicrosFromSamples(this->src->Length());
 }
 
 void PipeAudio::ClearFrame()

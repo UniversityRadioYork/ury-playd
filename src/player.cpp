@@ -127,6 +127,7 @@ CommandResult Player::Load(const std::string &path)
 		this->file = this->audio.Load(path);
 		assert(this->file != nullptr);
 		this->Read("", "/player/file", 0);
+		this->Read("", "/player/time/total", 0);
 		this->Read("", "/player/time/elapsed", 0);
 		this->Read("", "/player/state/current", 0);
 		this->Read("", "/player/state/available", 0);
@@ -259,7 +260,9 @@ const std::multimap<std::string, std::string> Player::RESOURCES = {
 	{"/player/state/available", ""},
 	{"/player/file", ""},
 	{"/player/time", "/player/time/elapsed"},
-	{"/player/time/elapsed", ""}
+	{"/player/time/elapsed", ""},
+	{"/player/time", "/player/time/total"},
+	{"/player/time/total", ""},
 };
 
 CommandResult Player::Read(const std::string &tag, const std::string &path, size_t id) const

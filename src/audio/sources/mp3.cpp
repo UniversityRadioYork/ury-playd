@@ -75,7 +75,7 @@ void Mp3AudioSource::AddFormat(long rate)
 		// available.
 		// If no sample rates work, loading a file will fail anyway.
 		Debug() << "can't support" << rate << std::endl;
-	};
+	}
 }
 
 std::uint8_t Mp3AudioSource::ChannelCount() const
@@ -84,6 +84,7 @@ std::uint8_t Mp3AudioSource::ChannelCount() const
 
 	int chans = 0;
 	mpg123_getformat(this->context, nullptr, &chans, nullptr);
+	Debug() << "ChannelCount():" << chans << "\n";
 	assert(chans != 0);
 	return static_cast<std::uint8_t>(chans);
 }
@@ -108,7 +109,7 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 	assert(this->context != nullptr);
 
 	// Have we tried to seek past the end of the file?
-	auto clen = static_cast<unsigned long>(mpg123_length(this->context));
+	auto clen = this->Length();
 	if (clen < in_samples) {
 		Debug() << "mp3: seek at" << in_samples << "past EOF at"
 		        << clen << std::endl;
@@ -125,6 +126,12 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 	// position.
 	// mpg123_tell gives us the exact mono-samples position.
 	return mpg123_tell(this->context);
+}
+
+std::uint64_t Mp3AudioSource::Length()
+{
+	auto len = mpg123_length(this->context);
+	return static_cast<std::uint64_t>(len);
 }
 
 Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()

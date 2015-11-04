@@ -106,6 +106,12 @@ public:
 	 */
 	virtual std::uint64_t Position() const = 0;
 
+	/**
+	 * This Audio's length.
+	 * @return Audio's length, in microseconds.
+	 */
+	virtual std::uint64_t TotalLength() const = 0;
+
 protected:
 	/**
 	 * A map from Audio::State codes to their string equivalents.
@@ -134,6 +140,7 @@ public:
 	void SetPlaying(bool playing) override;
 	void Seek(std::uint64_t position) override;
 	std::uint64_t Position() const override;
+	std::uint64_t TotalLength() const override;
 };
 
 /**
@@ -165,6 +172,7 @@ public:
 
 	std::pair<std::string, std::string> Emit(const std::string &path) override;
 	std::uint64_t Position() const override;
+	std::uint64_t TotalLength() const override;
 
 private:
 	/// The source of audio data.
