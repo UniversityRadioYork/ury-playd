@@ -196,13 +196,7 @@ CommandResult Player::Seek(const std::string &time_str)
 	} catch (SeekError) {
 		// Seek failures here are a result of the decoder not liking the
 		// seek position (usually because it's outside the audio file!).
-		// Thus, unlike above, we try to recover.
-
-		Debug() << "Seek failure" << std::endl;
-
-		// Make it look to the client as if the seek ran off the end of
-		// the file.
-		this->End();
+		return CommandResult::Invalid(MSG_SEEK_FAIL);
 	}
 
 	// If we've made it all the way down here, we deserve to succeed.
