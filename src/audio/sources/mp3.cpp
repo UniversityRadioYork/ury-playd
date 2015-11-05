@@ -26,10 +26,6 @@
 #include "../sample_formats.hpp"
 #include "mp3.hpp"
 
-// This value is somewhat arbitrary, but corresponds to the minimum buffer size
-// used by ffmpeg, so it's probably sensible.
-const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
-
 /* static */ std::unique_ptr<AudioSource> Mp3AudioSource::Build(
         const std::string &path)
 {
@@ -37,7 +33,7 @@ const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 }
 
 Mp3AudioSource::Mp3AudioSource(const std::string &path)
-    : AudioSource(path), buffer(BUFFER_SIZE), context(nullptr)
+    : AudioSource(path), context(nullptr)
 {
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
@@ -45,11 +41,7 @@ Mp3AudioSource::Mp3AudioSource(const std::string &path)
 	const long *rates = nullptr;
 	size_t nrates = 0;
 	mpg123_rates(&rates, &nrates);
-	for (size_t r = 0; r < nrates; r++) {
-		Debug() << "trying to enable formats at " << rates[r]
-		        << std::endl;
-		AddFormat(rates[r]);
-	}
+	for (size_t r = 0; r < nrates; r++) this->AddFormat(rates[r]);
 
 	if (mpg123_open(this->context, path.c_str()) == MPG123_ERR) {
 		throw FileError("mp3: can't open " + path + ": " +
@@ -84,7 +76,6 @@ std::uint8_t Mp3AudioSource::ChannelCount() const
 
 	int chans = 0;
 	mpg123_getformat(this->context, nullptr, &chans, nullptr);
-	Debug() << "ChannelCount():" << chans << "\n";
 	assert(chans != 0);
 	return static_cast<std::uint8_t>(chans);
 }
@@ -138,7 +129,7 @@ Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()
 {
 	assert(this->context != nullptr);
 
-	auto buf = reinterpret_cast<unsigned char *>(&this->buffer.front());
+	auto buf = this->buffer.data();
 	size_t rbytes = 0;
 	int err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
 

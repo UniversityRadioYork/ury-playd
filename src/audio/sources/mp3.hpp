@@ -11,9 +11,9 @@
 #define PLAYD_AUDIO_SOURCE_MP3_HPP
 #ifdef WITH_MP3
 
+#include <array>
 #include <cstdint>
 #include <string>
-#include <vector>
 
 extern "C" {
 // MPG123 seems to assume the whole world has ssize_t defined.
@@ -58,10 +58,13 @@ public:
 	SampleFormat OutputSampleFormat() const override;
 
 private:
-	/// The size of the internal decoding buffer, in bytes.
-	static const size_t BUFFER_SIZE;
+	/** The size of the internal decoding buffer, in bytes.
+	 * This value is somewhat arbitrary, but corresponds to the minimum buffer size
+	 * used by ffmpeg, so it's probably sensible.
+	 */
+	static const size_t BUFFER_SIZE = 16384;
 
-	std::vector<std::uint8_t> buffer; ///< The decoding buffer.
+	std::array<std::uint8_t, BUFFER_SIZE> buffer; ///< The decoding buffer.
 
 	/// Pointer to the mpg123 context associated with this source.
 	mpg123_handle *context;
