@@ -152,9 +152,8 @@ void SdlAudioSink::SetPosition(std::uint64_t samples)
 	// We might have been at the end of the file previously.
 	// If so, we might not be now, so clear the out flags.
 	this->source_out = false;
-	if (this->state == Audio::State::FINISHED) {
+	if (this->state != Audio::State::PLAYING) {
 		this->state = Audio::State::STOPPED;
-		this->Stop();
 	}
 
 	// The ringbuf will have been full of samples from the old
