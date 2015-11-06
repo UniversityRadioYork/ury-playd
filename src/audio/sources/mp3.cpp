@@ -119,7 +119,7 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 	return mpg123_tell(this->context);
 }
 
-std::uint64_t Mp3AudioSource::Length()
+std::uint64_t Mp3AudioSource::Length() const
 {
 	auto len = mpg123_length(this->context);
 	return static_cast<std::uint64_t>(len);

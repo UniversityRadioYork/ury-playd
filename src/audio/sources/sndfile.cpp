@@ -89,7 +89,7 @@ std::uint64_t SndfileAudioSource::Seek(std::uint64_t in_samples)
 	return out_samples;
 }
 
-std::uint64_t SndfileAudioSource::Length()
+std::uint64_t SndfileAudioSource::Length() const
 {
 	return static_cast<std::uint64_t>(this->info.frames);
 }

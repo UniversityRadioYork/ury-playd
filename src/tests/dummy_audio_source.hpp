@@ -35,6 +35,7 @@ public:
 	std::uint32_t SampleRate() const override;
 	SampleFormat OutputSampleFormat() const override;
 	std::uint64_t Seek(std::uint64_t position) override;
+	std::uint64_t Length() const override;
 
 	/// @return The path of the DummyAudioSource.
 	const std::string &Path() const;

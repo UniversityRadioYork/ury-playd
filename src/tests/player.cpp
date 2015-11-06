@@ -30,7 +30,7 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 			}
 		}
 		WHEN("the player has been asked to quit") {
-			auto res = p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Quitting"});
+			auto res = p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state/current", "quitting"});
 			THEN("The quit was a success") {
 				REQUIRE(res.IsSuccess());
 			}
@@ -38,7 +38,7 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 				REQUIRE_FALSE(p.Update());
 			}
 			THEN("Any future quits fail") {
-				REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Quitting"}).IsSuccess());
+				REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state/current", "quitting"}).IsSuccess());
 			}
 		}
 	}
@@ -65,7 +65,7 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 			THEN("setting state to 'Ejected' returns success") {
 				// Telling an ejected player to eject is a
 				// no-op.
-				REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Ejected"}).IsSuccess());
+				REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/state/current", "ejected"}).IsSuccess());
 			}
 			THEN("loading for a known file type returns success") {
 				REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.mp3"}).IsSuccess());
@@ -80,18 +80,18 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 
 			AND_WHEN("the audio is stopped") {
 				THEN("setting state to Playing returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Playing"}).IsSuccess());
+					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/state/current", "playing"}).IsSuccess());
 				}
 				THEN("setting state to Stopped returns success") {
 					// Telling a stopped file to stop is a
 					// no-op.
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Stopped"}).IsSuccess());
+					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/state/current", "stopped"}).IsSuccess());
 				}
 				THEN("seeking to 0 returns success") {
 					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/time/elapsed", "0"}).IsSuccess());
 				}
 				THEN("setting state to Ejected returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Ejected"}).IsSuccess());
+					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/state/current", "ejected"}).IsSuccess());
 				}
 				THEN("loading for a known file type returns success") {
 					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.mp3"}).IsSuccess());
@@ -102,21 +102,21 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 			}
 
 			AND_WHEN("the audio is playing") {
-				p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Playing"});
+				p.RunCommand(std::vector<std::string>{"write", "tag", "/player/state/current", "playing"});
 
 				THEN("setting state to Playing returns failure") {
 					// Telling a playing file to play is a
 					// no-op.
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Playing"}).IsSuccess());
+					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/state/current", "playing"}).IsSuccess());
 				}
 				THEN("setting state to Stopped returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Stopped"}).IsSuccess());
+					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/state/current", "stopped"}).IsSuccess());
 				}
 				THEN("seeking to 0 returns success") {
 					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/time/elapsed", "0"}).IsSuccess());
 				}
 				THEN("setting state to Ejected returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Ejected"}).IsSuccess());
+					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/state/current", "ejected"}).IsSuccess());
 				}
 				THEN("loading for a known file type returns success") {
 					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.mp3"}).IsSuccess());

@@ -105,7 +105,7 @@ public:
 	 * Gets the length of the audio file, in samples.
 	 * @return The total number of samples in the file.
 	 */
-	virtual std::uint64_t Length() = 0;
+	virtual std::uint64_t Length() const = 0;
 
 	//
 	// Methods provided 'for free'

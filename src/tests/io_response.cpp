@@ -55,34 +55,34 @@ SCENARIO("Responses correctly escape arguments with single quotes", "[response]"
 	}
 
 	WHEN("the Response is fed a single argument with double quotes") {
-		auto r = Response(Response::Code::FILE).AddArg(R"("scare"-quotes)");
+		auto r = Response(Response::Code::RES).AddArg(R"("scare"-quotes)");
 
 		THEN("the emitted response's argument is single-quoted") {
-			REQUIRE(r.Pack() == R"(FILE '"scare"-quotes')");
+			REQUIRE(r.Pack() == R"(RES '"scare"-quotes')");
 		}
 	}
 
 	WHEN("the Response is fed a single argument with whitespace") {
-		auto r = Response(Response::Code::END).AddArg("pargon pargon pargon");
+		auto r = Response(Response::Code::RES).AddArg("pargon pargon pargon");
 
 		THEN("the emitted response's argument is single-quoted") {
-			REQUIRE(r.Pack() == R"(END 'pargon pargon pargon')");
+			REQUIRE(r.Pack() == R"(RES 'pargon pargon pargon')");
 		}
 	}
 
 	WHEN("the Response is fed several arguments with differing whitespace") {
-		auto r = Response(Response::Code::END).AddArg("a space").AddArg("new\nline").AddArg("tab\tstop");
+		auto r = Response(Response::Code::UPDATE).AddArg("a space").AddArg("new\nline").AddArg("tab\tstop");
 
 		THEN("the emitted response's argument is single-quoted") {
-			REQUIRE(r.Pack() == "END 'a space' 'new\nline' 'tab\tstop'");
+			REQUIRE(r.Pack() == "UPDATE 'a space' 'new\nline' 'tab\tstop'");
 		}
 	}
 
 	WHEN("the Response is fed a representative example with backslashes and spaces") {
-		auto r = Response(Response::Code::FILE).AddArg(R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
+		auto r = Response(Response::Code::UPDATE).AddArg(R"(C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3)");
 
 		THEN("the emitted response's argument is single-quoted") {
-			REQUIRE(r.Pack() == R"(FILE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
+			REQUIRE(r.Pack() == R"(UPDATE 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
 		}
 	}
 }

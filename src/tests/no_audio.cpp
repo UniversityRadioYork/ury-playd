@@ -34,32 +34,16 @@ SCENARIO("NoAudio emits state, but no file or position", "[no-audio]") {
 		NoAudio n;
 
 		WHEN("the NoAudio is asked to emit a state") {
-			auto rs = n.Emit("/control/state", 0);
+			std::string type, value;
+			std::tie(type, value) = n.Emit("/player/state/current");
 
 			THEN("'Ejected' is emitted") {
-				REQUIRE(rs);
-				REQUIRE(rs->Pack() == "RES /control/state Entry Ejected");
-			}
-		}
-
-		WHEN("the NoAudio is asked to emit a file") {
-			auto rs = n.Emit("/player/file", 0);
-
-			THEN("nothing is emitted") {
-				REQUIRE_FALSE(rs);
-			}
-		}
-
-		WHEN("the NoAudio is asked to emit a time") {
-			auto rs = n.Emit("/player/time/elapsed", 0);
-
-			THEN("nothing is emitted") {
-				REQUIRE_FALSE(rs);
+				REQUIRE(type == "Entry");
+				REQUIRE(value == "ejected");
 			}
 		}
 	}
 }
-
 
 SCENARIO("NoAudio throws exceptions when asked to do audio-type things", "[no-audio]") {
 	GIVEN("A NoAudio object") {
@@ -89,5 +73,16 @@ SCENARIO("NoAudio throws exceptions when asked to do audio-type things", "[no-au
 			}
 		}
 
+		WHEN("asked to emit a file") {
+			THEN("nothing is emitted") {
+				REQUIRE_THROWS_AS(n.Emit("/player/file"), FileError);
+			}
+		}
+
+		WHEN("asked to emit a time") {
+			THEN("nothing is emitted") {
+				REQUIRE_THROWS_AS(n.Emit("/player/time/elapsed"), FileError);
+			}
+		}
 	}
 }
