@@ -41,7 +41,8 @@ std::pair<std::string, std::string> NoAudio::Emit(const std::string &path)
 {
 	if (path == "/player/state/current" || path == "/player/state/available") {
 		// Only possible value is the set value
-		return std::make_pair("Entry", "ejected");
+		std::string value = Audio::STATE_STRINGS[static_cast<int>(Audio::State::NONE)];
+		return std::make_pair("Entry", value);
 	}
 
 	throw FileError(MSG_NOT_FOUND);
