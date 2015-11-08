@@ -38,7 +38,7 @@ SCENARIO("NoAudio emits state, but no file or position", "[no-audio]") {
 			std::tie(type, value) = n.Emit("/player/state/current");
 
 			THEN("'Ejected' is emitted") {
-				REQUIRE(type == "Entry");
+				REQUIRE(type == "string");
 				REQUIRE(value == "ejected");
 			}
 		}

@@ -278,11 +278,11 @@ CommandResult Player::Read(const std::string &tag, const std::string &path, size
 
 			try {
 				if (path == "/control/state/current") {
-					type = "Entry";
+					type = "string";
 					value = this->is_running ? "running" : "quitting";
 				} else if (path == "/control/state/available") {
-					type = "Entry";
-					value = "running,quitting";
+					type = "list";
+					value = "running|quitting";
 				} else {
 					std::tie(type, value) = this->file->Emit(path);
 				}
@@ -310,7 +310,7 @@ CommandResult Player::Read(const std::string &tag, const std::string &path, size
 		assert(id != 0 && tag != ""); // Don't want to RES broadcasts
 
 		// First, emit the directory resource.
-		auto res = Response::Res(tag, path, "Directory", std::to_string(count));
+		auto res = Response::Res(tag, path, "directory", std::to_string(count));
 		if (this->sink != nullptr) this->sink->Respond(*res, id);
 
 		// Next, the contents.

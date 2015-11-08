@@ -4,7 +4,6 @@
 /**
  * @file
  * Implementation of the PipeAudio class.
- * @see audio/pipe_audio.hpp
  */
 
 #include <algorithm>
@@ -39,10 +38,12 @@ Audio::State NoAudio::Update()
 
 std::pair<std::string, std::string> NoAudio::Emit(const std::string &path)
 {
-	if (path == "/player/state/current" || path == "/player/state/available") {
-		// Only possible value is the set value
-		std::string value = Audio::STATE_STRINGS[static_cast<int>(Audio::State::NONE)];
-		return std::make_pair("Entry", value);
+	// Only possible value is the set value
+	std::string value = Audio::STATE_STRINGS[static_cast<int>(Audio::State::NONE)];
+	if (path == "/player/state/current") {
+		return std::make_pair("string", value);
+	} else if (path == "/player/state/available") {
+		return std::make_pair("list", value);
 	}
 
 	throw FileError(MSG_NOT_FOUND);
@@ -86,25 +87,28 @@ std::pair<std::string, std::string> PipeAudio::Emit(const std::string &path)
 
 	std::unique_ptr<Response> ret;
 
+	std::string type;
 	std::string value;
 
 	if (path == "/player/state/current") {
+		type = "string";
 		auto state = this->sink->State();
 		value = Audio::STATE_STRINGS[static_cast<int>(state)];
 	} else if (path == "/player/state/available") {
 		// TODO: Use STATE_STRINGS?
-		value = "playing,stopped,ejected,finished";
+		type = "list";
+		value = "playing|stopped|ejected|finished";
 	} else if (path == "/player/file") {
 		value = this->src->Path();
 	} else if (path == "/player/time/elapsed") {
-		std::uint64_t micros = this->Position();
-		value = std::to_string(micros);
+		type = "integer";
+		value = std::to_string(this->Position());
 	} else if (path == "/player/time/total") {
-		std::uint64_t micros = this->TotalLength();
-		value = std::to_string(micros);
+		type = "integer";
+		value = std::to_string(this->TotalLength());
 	}
 
-	return std::make_pair("Entry", value);
+	return std::make_pair(type, value);
 }
 
 void PipeAudio::SetPlaying(bool playing)

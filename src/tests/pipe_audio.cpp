@@ -40,7 +40,7 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 				THEN("the /control/state resource is set to Playing") {
 					std::string type, value;
 					std::tie(type, value) = pa.Emit("/player/state/current");
-					REQUIRE(type == "Entry");
+					REQUIRE(type == "string");
 					REQUIRE(value == "playing");
 				}
 			}
@@ -50,7 +50,7 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 				THEN("the /control/state resource is set to Stopped") {
 					std::string type, value;
 					std::tie(type, value) = pa.Emit("/player/state/current");
-					REQUIRE(type == "Entry");
+					REQUIRE(type == "string");
 					REQUIRE(value == "stopped");
 				}
 			}
@@ -62,7 +62,7 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 				THEN("the /player/time/elapsed resource is set to 0") {
 					std::string type, value;
 					std::tie(type, value) = pa.Emit("/player/time/elapsed");
-					REQUIRE(type == "Entry");
+					REQUIRE(type == "integer");
 					REQUIRE(value == "0");
 				}
 			}
@@ -78,7 +78,7 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 					auto expected = (((8675309L * 44100) / 1000000) * 1000000) / 44100;
 					std::string type, value;
 					std::tie(type, value) = pa.Emit("/player/time/elapsed");
-					REQUIRE(type == "Entry");
+					REQUIRE(type == "integer");
 					REQUIRE(value == std::to_string(expected));
 				}
 			}
