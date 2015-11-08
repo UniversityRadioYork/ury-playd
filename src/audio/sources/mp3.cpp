@@ -107,18 +107,15 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 {
 	assert(this->context != nullptr);
 
-	// See BytesPerSample() for an explanation of this ChannelCount().
-	auto mono_samples = in_samples * this->ChannelCount();
-
 	// Have we tried to seek past the end of the file?
 	auto clen = static_cast<unsigned long>(mpg123_length(this->context));
-	if (clen < mono_samples) {
-		Debug() << "mp3: seek at" << mono_samples << "past EOF at"
+	if (clen < in_samples) {
+		Debug() << "mp3: seek at" << in_samples << "past EOF at"
 		        << clen << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
-	if (mpg123_seek(this->context, mono_samples, SEEK_SET) == MPG123_ERR) {
+	if (mpg123_seek(this->context, in_samples, SEEK_SET) == MPG123_ERR) {
 		Debug() << "mp3: seek failed:" << mpg123_strerror(this->context)
 		        << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
@@ -127,7 +124,7 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 	// The actual seek position may not be the same as the requested
 	// position.
 	// mpg123_tell gives us the exact mono-samples position.
-	return mpg123_tell(this->context) / this->ChannelCount();
+	return mpg123_tell(this->context);
 }
 
 Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()
