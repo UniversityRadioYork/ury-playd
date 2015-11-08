@@ -26,10 +26,6 @@
 #include "../sample_formats.hpp"
 #include "mp3.hpp"
 
-// This value is somewhat arbitrary, but corresponds to the minimum buffer size
-// used by ffmpeg, so it's probably sensible.
-const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
-
 /* static */ std::unique_ptr<AudioSource> Mp3AudioSource::Build(
         const std::string &path)
 {
@@ -37,7 +33,7 @@ const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 }
 
 Mp3AudioSource::Mp3AudioSource(const std::string &path)
-    : AudioSource(path), buffer(BUFFER_SIZE), context(nullptr)
+    : AudioSource(path), context(nullptr)
 {
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
@@ -45,11 +41,7 @@ Mp3AudioSource::Mp3AudioSource(const std::string &path)
 	const long *rates = nullptr;
 	size_t nrates = 0;
 	mpg123_rates(&rates, &nrates);
-	for (size_t r = 0; r < nrates; r++) {
-		Debug() << "trying to enable formats at " << rates[r]
-		        << std::endl;
-		AddFormat(rates[r]);
-	}
+	for (size_t r = 0; r < nrates; r++) this->AddFormat(rates[r]);
 
 	if (mpg123_open(this->context, path.c_str()) == MPG123_ERR) {
 		throw FileError("mp3: can't open " + path + ": " +
@@ -75,7 +67,7 @@ void Mp3AudioSource::AddFormat(long rate)
 		// available.
 		// If no sample rates work, loading a file will fail anyway.
 		Debug() << "can't support" << rate << std::endl;
-	};
+	}
 }
 
 std::uint8_t Mp3AudioSource::ChannelCount() const
@@ -108,7 +100,7 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 	assert(this->context != nullptr);
 
 	// Have we tried to seek past the end of the file?
-	auto clen = static_cast<unsigned long>(mpg123_length(this->context));
+	auto clen = this->Length();
 	if (clen < in_samples) {
 		Debug() << "mp3: seek at" << in_samples << "past EOF at"
 		        << clen << std::endl;
@@ -127,11 +119,17 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 	return mpg123_tell(this->context);
 }
 
+std::uint64_t Mp3AudioSource::Length() const
+{
+	auto len = mpg123_length(this->context);
+	return static_cast<std::uint64_t>(len);
+}
+
 Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()
 {
 	assert(this->context != nullptr);
 
-	auto buf = reinterpret_cast<unsigned char *>(&this->buffer.front());
+	auto buf = this->buffer.data();
 	size_t rbytes = 0;
 	int err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
 

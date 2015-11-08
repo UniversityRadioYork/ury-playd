@@ -73,7 +73,7 @@ std::uint32_t SndfileAudioSource::SampleRate() const
 std::uint64_t SndfileAudioSource::Seek(std::uint64_t in_samples)
 {
 	// Have we tried to seek past the end of the file?
-	auto clen = static_cast<unsigned long>(this->info.frames);
+	auto clen = this->Length();
 	if (clen < in_samples) {
 		Debug() << "sndfile: seek at" << in_samples << "past EOF at"
 		        << clen << std::endl;
@@ -87,6 +87,11 @@ std::uint64_t SndfileAudioSource::Seek(std::uint64_t in_samples)
 	}
 
 	return out_samples;
+}
+
+std::uint64_t SndfileAudioSource::Length() const
+{
+	return static_cast<std::uint64_t>(this->info.frames);
 }
 
 SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()

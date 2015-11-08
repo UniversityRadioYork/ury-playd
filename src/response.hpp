@@ -30,14 +30,10 @@ public:
 	 * @see ResponseSink::STRINGS
 	 */
 	enum class Code : std::uint8_t {
-		OHAI,     ///< Server starting up.
-		STATE,    ///< Server changing state.
-		TIME,     ///< Server sending current song time,
-		FILE,     ///< The loaded file just changed.
-		FEATURES, ///< Server sending feature list.
-		END,      ///< The loaded file just ended on its own.
-		ACK,      ///< Command result.
-		RES       ///< Resource.
+		OHAI,   ///< Server starting up.
+		ACK,    ///< Command result.
+		RES,    ///< Resource result.
+		UPDATE, ///< Resource changed.
 	};
 
 	/**
@@ -48,14 +44,28 @@ public:
 
 	/**
 	 * Constructs a RES response.
-	 * @param type The type of resource being emitted.
+	 * @param tag Identifying string of the original command that we're
+	 * responding to.
 	 * @param path The path to the resource.
+	 * @param type The type of resource being emitted.
 	 * @param value The string representing the resource's value.
+	 * @return Response object to be sent (to individual client).
 	 */
-	static std::unique_ptr<Response> Res(const std::string &type,
+	static std::unique_ptr<Response> Res(const std::string &tag,
 	                                     const std::string &path,
+	                                     const std::string &type,
 	                                     const std::string &value);
 
+	/**
+	 * Constructs an UPDATE response.
+	 * @param path Path to the resource.
+	 * @param type Type of response being emitted.
+	 * @param value String representing the resource's value.
+	 * @return Response object to be sent (to all).
+	 */
+	static std::unique_ptr<Response> Update(const std::string &path,
+	                                        const std::string &type,
+	                                        const std::string &value);
 	/**
 	 * Adds an argument to this Response.
 	 * @param arg The argument to add.  The argument must not be escaped.

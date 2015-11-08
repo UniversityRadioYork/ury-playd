@@ -40,10 +40,10 @@ public:
 	 * @see Update
 	 */
 	enum class State : uint8_t {
-		NONE,    ///< There is no Audio.
-		STOPPED, ///< The Audio has been stopped, or not yet played.
-		PLAYING, ///< The Audio is currently playing.
-		AT_END,  ///< The Audio has ended and can't play without a seek.
+		NONE,     ///< There is no Audio.
+		STOPPED,  ///< Audio has been stopped, or not yet played.
+		PLAYING,  ///< Audio is currently playing.
+		FINISHED, ///< Audio has ended and can't play without a seek.
 	};
 
 	/// Virtual, empty destructor for Audio.
@@ -88,12 +88,12 @@ public:
 	 * This method does NOT support emitting composite responses.  For
 	 * example, `Emit("/player", x)` shall be ignored.  This functionality
 	 * is provided in Player.
+	 * @note Resource must exist, or will throw a FileError.
 	 *
 	 * @param path The path of the response to emit, if possible.
-	 * @param broadcast If true, the emission is an update broadcast.
-	 * @return A pointer to the response, if it exists.
+	 * @return Pair of requested resource's type and value.
 	 */
-	virtual std::unique_ptr<Response> Emit(const std::string &path, bool broadcast);
+	virtual std::pair<std::string, std::string> Emit(const std::string &path) = 0;
 
 	/**
 	 * This Audio's current position.
@@ -105,6 +105,19 @@ public:
 	 * @see Seek
 	 */
 	virtual std::uint64_t Position() const = 0;
+
+	/**
+	 * This Audio's length.
+	 * @return Audio's length, in microseconds.
+	 */
+	virtual std::uint64_t TotalLength() const = 0;
+
+protected:
+	/**
+	 * A map from Audio::State codes to their string equivalents.
+	 * @see Audio::State
+	 */
+	static const std::string STATE_STRINGS[];
 };
 
 /**
@@ -120,13 +133,14 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	std::unique_ptr<Response> Emit(const std::string &path, bool broadcast) override;
+	std::pair<std::string, std::string> Emit(const std::string &path) override;
 
 	// The following all raise an exception:
 
 	void SetPlaying(bool playing) override;
 	void Seek(std::uint64_t position) override;
 	std::uint64_t Position() const override;
+	std::uint64_t TotalLength() const override;
 };
 
 /**
@@ -156,8 +170,9 @@ public:
 	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
 
-	std::unique_ptr<Response> Emit(const std::string &path, bool broadcast) override;
+	std::pair<std::string, std::string> Emit(const std::string &path) override;
 	std::uint64_t Position() const override;
+	std::uint64_t TotalLength() const override;
 
 private:
 	/// The source of audio data.
@@ -171,12 +186,6 @@ private:
 
 	/// The current position in the current decoded frame.
 	AudioSource::DecodeVector::iterator frame_iterator;
-
-	/// Whether last_time contains a valid last time.
-	bool announced_time;
-
-	/// The last time into this Audio when the time was broadcast.
-	std::uint64_t last_time;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
@@ -198,21 +207,6 @@ private:
 
 	/// Transfers as much of the current frame as possible to the sink.
 	void TransferFrame();
-
-	/**
-	 * Determines whether we can broadcast a TIME response.
-	 *
-	 * To prevent spewing massive amounts of TIME responses, we only send a
-	 * broadcast if the number of seconds has changed since the last
-	 * time CanAnnounceTime() was called for the given sink.
-	 *
-	 * This is *not* idempotent.  A CanAnnounceTime(x) less than one second
-	 * before a CanAnnounceTime(x) will _always_ be false.
-	 *
-	 * @param micros The value of the TIME response, in microseconds.
-	 * @return Whether it is polite to broadcast TIME.
-	 */
-	bool CanAnnounceTime(std::uint64_t micros);
 };
 
 #endif // PLAYD_AUDIO_HPP

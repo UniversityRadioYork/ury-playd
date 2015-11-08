@@ -38,18 +38,20 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 			AND_WHEN("the state is Playing") {
 				pa.SetPlaying(true);
 				THEN("the /control/state resource is set to Playing") {
-					auto rs = pa.Emit("/control/state", 0);
-					REQUIRE(rs);
-					REQUIRE(rs->Pack() == "RES /control/state Entry Playing");
+					std::string type, value;
+					std::tie(type, value) = pa.Emit("/player/state/current");
+					REQUIRE(type == "string");
+					REQUIRE(value == "playing");
 				}
 			}
 
 			AND_WHEN("the state is Stopped") {
 				pa.SetPlaying(false);
 				THEN("the /control/state resource is set to Stopped") {
-					auto rs = pa.Emit("/control/state", 0);
-					REQUIRE(rs);
-					REQUIRE(rs->Pack() == "RES /control/state Entry Stopped");
+					std::string type, value;
+					std::tie(type, value) = pa.Emit("/player/state/current");
+					REQUIRE(type == "string");
+					REQUIRE(value == "stopped");
 				}
 			}
 		}
@@ -58,9 +60,10 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 			AND_WHEN("the position is zero") {
 				pa.Seek(0);
 				THEN("the /player/time/elapsed resource is set to 0") {
-					auto rs = pa.Emit("/player/time/elapsed", 0);
-					REQUIRE(rs);
-					REQUIRE(rs->Pack() == "RES /player/time/elapsed Entry 0");
+					std::string type, value;
+					std::tie(type, value) = pa.Emit("/player/time/elapsed");
+					REQUIRE(type == "integer");
+					REQUIRE(value == "0");
 				}
 			}
 
@@ -73,9 +76,10 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 					// and from samples should cause.
 					// This *won't* be 8675309!
 					auto expected = (((8675309L * 44100) / 1000000) * 1000000) / 44100;
-					auto rs = pa.Emit("/player/time/elapsed", 0);
-					REQUIRE(rs);
-					REQUIRE(rs->Pack() == "RES /player/time/elapsed Entry " + std::to_string(expected));
+					std::string type, value;
+					std::tie(type, value) = pa.Emit("/player/time/elapsed");
+					REQUIRE(type == "integer");
+					REQUIRE(value == std::to_string(expected));
 				}
 			}
 		}

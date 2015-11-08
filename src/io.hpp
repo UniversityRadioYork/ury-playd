@@ -151,21 +151,11 @@ private:
 	 * checks the shared pointer for emptiness.
 	 * @param conn The connection to receive the response.  May be empty,
 	 *   in which case no response is sent.
+	 * @param response Actual response object to send.
 	 * @see TryShutdown
 	 */
 	static void TryRespond(const std::shared_ptr<Connection> conn,
 	                       const Response &response);
-
-	/**
-	 * Sends a 'this server is shutting down' response to the given
-	 * connection.
-	 * The difference between this and conn->Respond is that TryShutdown
-	 * checks the shared pointer for emptiness.
-	 * @param conn The connection to receive the response.  May be empty,
-	 *   in which case no response is sent.
-	 * @see TryRespond
-	 */
-	static void TryShutdown(const std::shared_ptr<Connection> conn);
 
 	/**
 	 * Sends the given response to all connections.

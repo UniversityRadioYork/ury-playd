@@ -15,11 +15,16 @@
 // Client communications
 //
 
-/// Message shown when a client connects to playd.
+/// Playd's version string. Used in OHAI
 #ifndef PD_VERSION
 #define PD_VERSION "0.0.0"
 #endif
+
+/// Playd version string. Used in OHAI.
 const std::string MSG_OHAI = "playd " PD_VERSION;
+
+/// Protocol version supported by Playd. Used in OHAI.
+const std::string MSG_PROTO_VER = "bifrost α";
 
 //
 // Command failure messages
@@ -45,6 +50,13 @@ const std::string MSG_CMD_NEEDS_PLAYING = "Command requires a playing file";
  * when there isn't anything stopped.
  */
 const std::string MSG_CMD_NEEDS_STOPPED = "Command requires a stopped file";
+
+/**
+ * Message shown when a command that works only when a file is not finished is
+ * fired when the file is finished.
+ */
+const std::string MSG_CMD_NEEDS_NOT_FINISHED =
+        "Command requires an unfinished file";
 
 /// Message shown when a command is sent to a closing Player.
 const std::string MSG_CMD_PLAYER_CLOSING = "Server is closing";

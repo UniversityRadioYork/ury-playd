@@ -16,24 +16,29 @@
 #include "response.hpp"
 
 const std::string Response::STRINGS[] = {
-        "OHAI",     // Code::OHAI
-        "STATE",    // Code::STATE
-        "TIME",     // Code::TIME
-        "FILE",     // Code::FILE
-        "FEATURES", // Code::FEATURES
-        "END",      // Code::END
-        "ACK",      // Code::ACK
-        "RES"       // Code::RES
+        "OHAI",   // Code::OHAI
+        "ACK",    // Code::ACK
+        "RES",    // Code::RES
+        "UPDATE", // Code::UPDATE
 };
 
 // Pre-made responses.
-std::unique_ptr<Response> Response::Res(const std::string &type,
+std::unique_ptr<Response> Response::Res(const std::string &tag,
                                         const std::string &path,
+                                        const std::string &type,
                                         const std::string &value)
 {
-	auto res = std::unique_ptr<Response>(
-		new Response(Response::Code::RES)
-	);
+	auto res = std::unique_ptr<Response>(new Response(Response::Code::RES));
+	res->AddArg(tag).AddArg(path).AddArg(type).AddArg(value);
+	return res;
+}
+
+std::unique_ptr<Response> Response::Update(const std::string &path,
+                                           const std::string &type,
+                                           const std::string &value)
+{
+	auto res =
+	        std::unique_ptr<Response>(new Response(Response::Code::UPDATE));
 	res->AddArg(path).AddArg(type).AddArg(value);
 	return res;
 }
@@ -70,7 +75,11 @@ std::string Response::Pack() const
 		// to escape by itself is single quotes, which are replaced by
 		// the sequence '\'' (break out of single quotes, escape a
 		// single quote, then re-enter single quotes).
-		escaped += (c == '\'') ? R"('\'')" : std::string(1, c);
+		if (c == '\'') {
+			escaped += R"('\'')";
+		} else {
+			escaped += c;
+		}
 	}
 
 	// Only single-quote escape if necessary.

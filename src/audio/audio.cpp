@@ -4,7 +4,6 @@
 /**
  * @file
  * Implementation of the PipeAudio class.
- * @see audio/pipe_audio.hpp
  */
 
 #include <algorithm>
@@ -21,15 +20,12 @@
 #include "audio_source.hpp"
 #include "sample_formats.hpp"
 
-//
-// Audio
-//
-
-std::unique_ptr<Response> Audio::Emit(const std::string &, bool)
-{
-	// By default, emit nothing.  This is an acceptable behaviour.
-	return std::unique_ptr<Response>();
-}
+const std::string Audio::STATE_STRINGS[]{
+	"ejected",  // Audio::State::NONE
+	"stopped",  // Audio::State::STOPPED
+	"playing",  // Audio::State::PLAYING
+	"finished", // Audio::State::FINISHED
+};
 
 //
 // NoAudio
@@ -40,15 +36,17 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-std::unique_ptr<Response> NoAudio::Emit(const std::string &path, bool)
+std::pair<std::string, std::string> NoAudio::Emit(const std::string &path)
 {
-	std::unique_ptr<Response> ret;
-
-	if (path == "/control/state") {
-		ret = Response::Res("Entry", "/control/state", "Ejected");
+	// Only possible value is the set value
+	std::string value = Audio::STATE_STRINGS[static_cast<int>(Audio::State::NONE)];
+	if (path == "/player/state/current") {
+		return std::make_pair("string", value);
+	} else if (path == "/player/state/available") {
+		return std::make_pair("list", value);
 	}
 
-	return ret;
+	throw FileError(MSG_NOT_FOUND);
 }
 
 void NoAudio::SetPlaying(bool)
@@ -57,6 +55,11 @@ void NoAudio::SetPlaying(bool)
 }
 
 void NoAudio::Seek(std::uint64_t)
+{
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
+}
+
+std::uint64_t NoAudio::TotalLength() const
 {
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
@@ -72,38 +75,40 @@ std::uint64_t NoAudio::Position() const
 
 PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
                      std::unique_ptr<AudioSink> &&sink)
-    : src(std::move(src)), sink(std::move(sink)), announced_time(false)
+    : src(std::move(src)), sink(std::move(sink))
 {
 	this->ClearFrame();
 }
 
-std::unique_ptr<Response> PipeAudio::Emit(const std::string &path,
-	bool broadcast)
+std::pair<std::string, std::string> PipeAudio::Emit(const std::string &path)
 {
 	assert(this->src != nullptr);
 	assert(this->sink != nullptr);
 
 	std::unique_ptr<Response> ret;
 
+	std::string type;
 	std::string value;
 
-	if (path == "/control/state") {
+	if (path == "/player/state/current") {
+		type = "string";
 		auto state = this->sink->State();
-		auto playing = state == Audio::State::PLAYING;
-		value = playing ? "Playing" : "Stopped";
+		value = Audio::STATE_STRINGS[static_cast<int>(state)];
+	} else if (path == "/player/state/available") {
+		// TODO: Use STATE_STRINGS?
+		type = "list";
+		value = "playing|stopped|ejected|finished";
 	} else if (path == "/player/file") {
 		value = this->src->Path();
 	} else if (path == "/player/time/elapsed") {
-		std::uint64_t micros = this->Position();
+		type = "integer";
+		value = std::to_string(this->Position());
+	} else if (path == "/player/time/total") {
+		type = "integer";
+		value = std::to_string(this->TotalLength());
+	}
 
-		// Always announce a unicast.
-		// Only announce broadcasts if CanAnnounceTime(...).
-		bool can = (!broadcast) || this->CanAnnounceTime(micros);
-		if (!can) return ret;
-		value = std::to_string(micros);
-	} else return ret;
-
-	return Response::Res("Entry", path, value);
+	return std::make_pair(type, value);
 }
 
 void PipeAudio::SetPlaying(bool playing)
@@ -134,12 +139,14 @@ void PipeAudio::Seek(std::uint64_t position)
 	auto out_samples = this->src->Seek(in_samples);
 	this->sink->SetPosition(out_samples);
 
-	// Make sure we always announce the new position to all response sinks.
-	this->announced_time = false;
-
 	// We might still have decoded samples from the old position in
 	// our frame, so clear them out.
 	this->ClearFrame();
+}
+
+std::uint64_t PipeAudio::TotalLength() const
+{
+	return this->src->MicrosFromSamples(this->src->Length());
 }
 
 void PipeAudio::ClearFrame()
@@ -205,20 +212,4 @@ bool PipeAudio::DecodeIfFrameEmpty()
 bool PipeAudio::FrameFinished() const
 {
 	return this->frame.end() <= this->frame_iterator;
-}
-
-bool PipeAudio::CanAnnounceTime(std::uint64_t micros)
-{
-	std::uint64_t secs = micros / 1000 / 1000;
-
-	// We can announce if we don't have a record for this sink, or if the
-	// last record was in a previous second.
-	bool announce = (!(this->announced_time)) || (this->last_time < secs);
-
-	if (announce) {
-		this->announced_time = true;
-		this->last_time = secs;
-	}
-
-	return announce;
 }

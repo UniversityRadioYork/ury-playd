@@ -76,13 +76,12 @@ public:
 	void WelcomeClient(size_t id) const;
 
 private:
-	AudioSystem &audio;          ///< The system used for loading audio.
-	std::unique_ptr<Audio> file; ///< The currently loaded audio file.
-	bool is_running;             ///< Whether the Player is running.
-	const ResponseSink *sink;    ///< The sink for audio responses.
-
-	/// The set of features playd implements.
-	const static std::vector<std::string> FEATURES;
+	AudioSystem &audio;           ///< The system used for loading audio.
+	std::unique_ptr<Audio> file;  ///< The currently loaded audio file.
+	bool is_running;              ///< Whether the Player is running.
+	const ResponseSink *sink;     ///< The sink for audio responses.
+	std::uint64_t last_announced; ///< Time since last elasped message.
+	bool announced_finish; ///< Has announced finish of current audio file?
 
 	/// The resource tree playd exposes.
 	const static std::multimap<std::string, std::string> RESOURCES;
@@ -94,6 +93,7 @@ private:
 	/**
 	 * Tells the audio file to start or stop playing.
 	 * @param playing True if playing; false otherwise.
+	 * @return CommandResult indicating if the start/stop was successful.
 	 * @see Play
 	 * @see Stop
 	 */
@@ -157,6 +157,13 @@ private:
 	//
 
 	/**
+	 * If the new time elapsed should be announced. Used to prevent
+	 * spamming the connections with /player/time/elapsed messages.
+	 * @return Whether time elapsed should be announced.
+	 */
+	bool ShouldAnnounceTime();
+
+	/**
 	 * Quits playd.
 	 * @return Whether the quit succeeded.
 	 */
@@ -165,13 +172,16 @@ private:
 	/**
 	 * Reads from and emits the requested resource.
 	 *
+	 * @param tag Identifying tag used by the client connection.
+	 *   Blank in the case of broadcasts.
 	 * @param path The path of the response to emit, if possible.
 	 * @param id The ID of the connection to which the Player should
 	 *   route the response.  May be 0, for all (broadcast).
 	 * @return The result of reading, which may be a failure if the
 	 *   resource does not exist.
 	 */
-	virtual CommandResult Read(const std::string &path, size_t id) const;
+	virtual CommandResult Read(const std::string &tag,
+	                           const std::string &path, size_t id) const;
 
 	/**
 	 * Writes to the requested resource.
@@ -182,7 +192,8 @@ private:
 	 *   resource does not exist, cannot be written to, or the payload
 	 *   is invalid.
 	 */
-	virtual CommandResult Write(const std::string &path, const std::string &payload);
+	virtual CommandResult Write(const std::string &path,
+	                            const std::string &payload);
 
 	/**
 	 * Deletes the requested resource.
