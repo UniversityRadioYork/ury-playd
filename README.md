@@ -10,24 +10,33 @@ ongoing BAPS3 project to build a new radio playout system).
 
 `playd DEVICE-ID [ADDRESS] [PORT]`
 
-* Invoking `playd` with no arguments lists the various device IDs
+* Running `playd` with no arguments lists the various device IDs
   available to it.
 * Full protocol information is available on the GitHub wiki.
 * On POSIX systems, see the enclosed man page.
 
-`playd` understands the following commands via its TCP/IP interface:
+`playd` talks over TCP/IP using a filesystem-like interface.
+Examples of commands it understands:
 
-* `load "/full/path/to/file"` — Loads /full/path/to/file for playback;
-* `eject` — Unloads the current file;
-* `play` — Starts playback;
-* `stop` — Stops (pauses) playback;
-* `seek 1000` — Seeks to 1,000 microseconds after the start of the current file.
-* `quit` — Closes `playd`.
+* `read TAG '/'` — Dumps all of `playd`'s state;
+* `read TAG '/player/time/elapsed'` — Sends the current position in the file, in microseconds;
+* `write TAG '/player/time/elapsed' 1000` — Seeks to 1,000 microseconds after the start of the current file.
+* `write TAG '/player/file' '/full/path/to/file'` — Loads /full/path/to/file for playback;
+* `read TAG '/control/state'` — Sends the current state (`Stopped`, `Ejected`, `Playing` or `Quitting`);
+* `write TAG '/control/state' 'Ejected'` — Unloads the current file;
+* `write TAG '/control/state' 'Playing'` — Starts playback;
+* `write TAG '/control/state' 'Stopped'` — Stops (pauses) playback;
+* `write TAG '/control/state' 'Quitting'` — Closes `playd`.
+
+Where you see `TAG`, you can put anything, like a number or series of letters.
+`playd` will send any responses to your command with that `TAG` attached, so you
+can see which command caused which responses.
+
+A complete command reference is available in `README.commands.md`.
 
 ### Sending commands manually
 
-To connect directly to `playd` and issue commands to it, you can use
-[netcat]:
+To connect to `playd` and issue commands, you can use [netcat]:
 
     # If you specified [ADDRESS] or [PORT], replace localhost and 1350 respectively.
     $ nc localhost 1350
