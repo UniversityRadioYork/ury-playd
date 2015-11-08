@@ -20,7 +20,7 @@
 #include "audio_source.hpp"
 #include "sample_formats.hpp"
 
-const std::string Audio::STATE_STRINGS[] {
+const std::string Audio::STATE_STRINGS[]{
 	"ejected",  // Audio::State::NONE
 	"stopped",  // Audio::State::STOPPED
 	"playing",  // Audio::State::PLAYING

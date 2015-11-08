@@ -53,8 +53,7 @@ const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
  *
  * [b]: https://nikhilm.github.io/uvbook/filesystem.html#buffers-and-streams
  */
-struct WriteReq
-{
+struct WriteReq {
 	uv_write_t req;   ///< The main libuv write handle.
 	uv_buf_t buf;     ///< The associated write buffer.
 	Connection *conn; ///< The recipient Connection.
@@ -112,7 +111,7 @@ void UvRespondCallback(uv_write_t *req, int status)
 	// should close.  These have the 'fatal' flag set.
 	if (wr->fatal && wr->conn != nullptr) wr->conn->Depool();
 
-	delete[] wr -> buf.base;
+	delete[] wr->buf.base;
 	delete wr;
 }
 

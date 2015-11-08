@@ -24,7 +24,11 @@
 #include "player.hpp"
 
 Player::Player(AudioSystem &audio)
-    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr), last_announced(0)
+    : audio(audio),
+      file(audio.Null()),
+      is_running(true),
+      sink(nullptr),
+      last_announced(0)
 {
 }
 
@@ -38,7 +42,8 @@ bool Player::Update()
 	assert(this->file != nullptr);
 	auto as = this->file->Update();
 
-	if (as == Audio::State::FINISHED && !this->announced_finish) this->End();
+	if (as == Audio::State::FINISHED && !this->announced_finish)
+		this->End();
 	if (as == Audio::State::PLAYING && this->ShouldAnnounceTime()) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
@@ -60,7 +65,10 @@ bool Player::ShouldAnnounceTime()
 
 void Player::WelcomeClient(size_t id) const
 {
-	this->sink->Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI).AddArg(MSG_PROTO_VER), id);
+	this->sink->Respond(Response(Response::Code::OHAI)
+	                            .AddArg(MSG_OHAI)
+	                            .AddArg(MSG_PROTO_VER),
+	                    id);
 }
 
 void Player::End()
@@ -238,28 +246,29 @@ void Player::SeekRaw(std::uint64_t pos)
 // Any resource with the single child "" (empty string) is an entry.
 // These need to be looked up via Audio, not handled by Player.
 const std::multimap<std::string, std::string> Player::RESOURCES = {
-	{"/", "/control"},
-	{"/", "/player"},
-	{"/control", "/control/state"},
-	{"/control/state", "/control/state/current"},
-	{"/control/state", "/control/state/available"},
-	{"/control/state/current", ""},
-	{"/control/state/available", ""},
-	{"/player", "/player/file"},
-	{"/player", "/player/time"},
-	{"/player", "/player/state"},
-	{"/player/state", "/player/state/current"},
-	{"/player/state", "/player/state/available"},
-	{"/player/state/current", ""},
-	{"/player/state/available", ""},
-	{"/player/file", ""},
-	{"/player/time", "/player/time/elapsed"},
-	{"/player/time/elapsed", ""},
-	{"/player/time", "/player/time/total"},
-	{"/player/time/total", ""},
+        {"/", "/control"},
+        {"/", "/player"},
+        {"/control", "/control/state"},
+        {"/control/state", "/control/state/current"},
+        {"/control/state", "/control/state/available"},
+        {"/control/state/current", ""},
+        {"/control/state/available", ""},
+        {"/player", "/player/file"},
+        {"/player", "/player/time"},
+        {"/player", "/player/state"},
+        {"/player/state", "/player/state/current"},
+        {"/player/state", "/player/state/available"},
+        {"/player/state/current", ""},
+        {"/player/state/available", ""},
+        {"/player/file", ""},
+        {"/player/time", "/player/time/elapsed"},
+        {"/player/time/elapsed", ""},
+        {"/player/time", "/player/time/total"},
+        {"/player/time/total", ""},
 };
 
-CommandResult Player::Read(const std::string &tag, const std::string &path, size_t id) const
+CommandResult Player::Read(const std::string &tag, const std::string &path,
+                           size_t id) const
 {
 	assert(this->file != nullptr);
 
@@ -271,20 +280,22 @@ CommandResult Player::Read(const std::string &tag, const std::string &path, size
 		// Is this an entry?  If so, delegate it to Audio to work on.
 		if (1 == count && "" == range.first->second) {
 			// The entry might be currently empty, in which case
-			// Emit will return nullptr.  This is fine, but we'll just
-			// act as if it doesn't exist at all.
+			// Emit will return nullptr.  This is fine, but we'll
+			// just act as if it doesn't exist at all.
 			std::string type;
 			std::string value;
 
 			try {
 				if (path == "/control/state/current") {
 					type = "string";
-					value = this->is_running ? "running" : "quitting";
+					value = this->is_running ? "running"
+					                         : "quitting";
 				} else if (path == "/control/state/available") {
 					type = "list";
 					value = "running|quitting";
 				} else {
-					std::tie(type, value) = this->file->Emit(path);
+					std::tie(type, value) =
+					        this->file->Emit(path);
 				}
 			} catch (FileError &) {
 				return CommandResult::Failure(MSG_NOT_FOUND);
@@ -302,7 +313,8 @@ CommandResult Player::Read(const std::string &tag, const std::string &path, size
 				response = Response::Res(tag, path, type, value);
 			}
 
-			if (this->sink != nullptr) this->sink->Respond(*response, id);
+			if (this->sink != nullptr)
+				this->sink->Respond(*response, id);
 			return CommandResult::Success();
 		}
 
@@ -310,7 +322,8 @@ CommandResult Player::Read(const std::string &tag, const std::string &path, size
 		assert(id != 0 && tag != ""); // Don't want to RES broadcasts
 
 		// First, emit the directory resource.
-		auto res = Response::Res(tag, path, "directory", std::to_string(count));
+		auto res = Response::Res(tag, path, "directory",
+		                         std::to_string(count));
 		if (this->sink != nullptr) this->sink->Respond(*res, id);
 
 		// Next, the contents.
@@ -354,7 +367,8 @@ CommandResult Player::Delete(const std::string &path)
 	return this->ResourceFailure(path);
 }
 
-CommandResult Player::ResourceFailure(const std::string &path) {
+CommandResult Player::ResourceFailure(const std::string &path)
+{
 	// In this case, we've either got a resource that exists but can't
 	// be written, or a resource that doesn't.  Let's find out which:
 	if (0 < this->RESOURCES.count(path)) {

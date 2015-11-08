@@ -59,8 +59,8 @@ public:
 
 private:
 	/** The size of the internal decoding buffer, in bytes.
-	 * This value is somewhat arbitrary, but corresponds to the minimum buffer size
-	 * used by ffmpeg, so it's probably sensible.
+	 * This value is somewhat arbitrary, but corresponds to the minimum
+	 * buffer size used by ffmpeg, so it's probably sensible.
 	 */
 	static const size_t BUFFER_SIZE = 16384;
 

@@ -81,7 +81,7 @@ private:
 	bool is_running;              ///< Whether the Player is running.
 	const ResponseSink *sink;     ///< The sink for audio responses.
 	std::uint64_t last_announced; ///< Time since last elasped message.
-	bool announced_finish;        ///< Has announced finish of current audio file?
+	bool announced_finish; ///< Has announced finish of current audio file?
 
 	/// The resource tree playd exposes.
 	const static std::multimap<std::string, std::string> RESOURCES;
@@ -180,7 +180,8 @@ private:
 	 * @return The result of reading, which may be a failure if the
 	 *   resource does not exist.
 	 */
-	virtual CommandResult Read(const std::string &tag, const std::string &path, size_t id) const;
+	virtual CommandResult Read(const std::string &tag,
+	                           const std::string &path, size_t id) const;
 
 	/**
 	 * Writes to the requested resource.
@@ -191,7 +192,8 @@ private:
 	 *   resource does not exist, cannot be written to, or the payload
 	 *   is invalid.
 	 */
-	virtual CommandResult Write(const std::string &path, const std::string &payload);
+	virtual CommandResult Write(const std::string &path,
+	                            const std::string &payload);
 
 	/**
 	 * Deletes the requested resource.
