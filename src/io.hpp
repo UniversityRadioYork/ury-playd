@@ -151,6 +151,7 @@ private:
 	 * checks the shared pointer for emptiness.
 	 * @param conn The connection to receive the response.  May be empty,
 	 *   in which case no response is sent.
+	 * @param response Actual response object to send.
 	 * @see TryShutdown
 	 */
 	static void TryRespond(const std::shared_ptr<Connection> conn,

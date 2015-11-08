@@ -93,6 +93,7 @@ private:
 	/**
 	 * Tells the audio file to start or stop playing.
 	 * @param playing True if playing; false otherwise.
+	 * @return CommandResult indicating if the start/stop was successful.
 	 * @see Play
 	 * @see Stop
 	 */
@@ -171,6 +172,8 @@ private:
 	/**
 	 * Reads from and emits the requested resource.
 	 *
+	 * @param tag Identifying tag used by the client connection.
+	 *   Blank in the case of broadcasts.
 	 * @param path The path of the response to emit, if possible.
 	 * @param id The ID of the connection to which the Player should
 	 *   route the response.  May be 0, for all (broadcast).

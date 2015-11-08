@@ -44,9 +44,11 @@ public:
 
 	/**
 	 * Constructs a RES response.
+	 * @param tag Identifying string of the original command that we're responding to.
 	 * @param path The path to the resource.
 	 * @param type The type of resource being emitted.
 	 * @param value The string representing the resource's value.
+	 * @return Response object to be sent (to individual client).
 	 */
 	static std::unique_ptr<Response> Res(const std::string &tag,
 	                                     const std::string &path,
@@ -59,6 +61,7 @@ public:
 	 * @param path Path to the resource.
 	 * @param type Type of response being emitted.
 	 * @param value String representing the resource's value.
+	 * @return Response object to be sent (to all).
 	 */
 	static std::unique_ptr<Response> Update(const std::string &path,
 			const std::string &type, const std::string &value);

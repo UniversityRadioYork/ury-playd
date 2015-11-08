@@ -19,9 +19,11 @@
 #ifndef PD_VERSION
 #define PD_VERSION "0.0.0"
 #endif
+
+/// Playd version string. Used in OHAI.
 const std::string MSG_OHAI = "playd " PD_VERSION;
 
-// Protocol version supported by Playd. Used in OHAI.
+/// Protocol version supported by Playd. Used in OHAI.
 const std::string MSG_PROTO_VER = "bifrost α";
 
 //
