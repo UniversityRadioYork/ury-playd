@@ -15,14 +15,7 @@ ongoing BAPS3 project to build a new radio playout system).
 * Full protocol information is available on the GitHub wiki.
 * On POSIX systems, see the enclosed man page.
 
-`playd` understands the following commands via its TCP/IP interface:
-
-* `load "/full/path/to/file"` — Loads /full/path/to/file for playback;
-* `eject` — Unloads the current file;
-* `play` — Starts playback;
-* `stop` — Stops (pauses) playback;
-* `seek 1000` — Seeks to 1,000 microseconds after the start of the current file.
-* `quit` — Closes `playd`.
+For command usage, see `README.commands.md`.
 
 ### Sending commands manually
 

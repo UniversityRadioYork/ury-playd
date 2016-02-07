@@ -15,32 +15,25 @@
 
 #include "response.hpp"
 
+const std::string Response::NOREQUEST = "!";
+
 const std::string Response::STRINGS[] = {
-        "OHAI",     // Code::OHAI
-        "STATE",    // Code::STATE
-        "TIME",     // Code::TIME
-        "FILE",     // Code::FILE
-        "FEATURES", // Code::FEATURES
-        "END",      // Code::END
-        "ACK",      // Code::ACK
-        "RES"       // Code::RES
+	"OHAI",     // Code::OHAI
+	"IAMA",     // Code::IAMA
+	"FLOAD",    // Code::FLOAD
+	"EJECT",    // Code::EJECT
+	"POS",      // Code::POS
+	"END",      // Code::END
+	"PLAY",     // Code::PLAY
+	"STOP",     // Code::STOP
+	"ACK",      // Code::ACK
+	"DUMP",     // Code::DUMP
+	"QUIT"      // Code::QUIT
 };
 
-// Pre-made responses.
-std::unique_ptr<Response> Response::Res(const std::string &type,
-                                        const std::string &path,
-                                        const std::string &value)
+Response::Response(const std::string &tag, Response::Code code)
 {
-	auto res = std::unique_ptr<Response>(
-		new Response(Response::Code::RES)
-	);
-	res->AddArg(path).AddArg(type).AddArg(value);
-	return res;
-}
-
-Response::Response(Response::Code code)
-{
-	this->string = Response::STRINGS[static_cast<int>(code)];
+	this->string = Response::EscapeArg(tag) + " " + Response::STRINGS[static_cast<int>(code)];
 }
 
 Response &Response::AddArg(const std::string &arg)
@@ -83,7 +76,7 @@ std::string Response::Pack() const
 // ResponseSink
 //
 
-void ResponseSink::Respond(const Response &, size_t) const
+void ResponseSink::Respond(size_t, Response &) const
 {
 	// By default, do nothing.
 }

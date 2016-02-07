@@ -88,7 +88,7 @@ public:
 	 */
 	void UpdatePlayer();
 
-	void Respond(const Response &response, size_t id = 0) const override;
+	void Respond(size_t id, Response &response) const override;
 
 private:
 	/// The period between player updates.
@@ -175,10 +175,10 @@ private:
 
 	/**
 	 * Sends the given response to the identified connection.
-	 * @param response The response to broadcast.
 	 * @param id The ID of the recipient connection.
+	 * @param response The response to broadcast.
 	 */
-	void Unicast(const Response &response, size_t id) const;
+	void Unicast(size_t id, const Response &response) const;
 };
 
 /**

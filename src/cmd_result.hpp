@@ -38,31 +38,35 @@ public:
 
 	/**
 	 * Shortcut for constructing a successful CommandResult.
+	 * @param tag The tag of the original command.
 	 * @return A CommandResult denoting success.
 	 */
-	static CommandResult Success();
+	static CommandResult Success(const std::string &tag);
 
 	/**
 	 * Shortcut for constructing an invalid-response CommandResult.
+	 * @param tag The tag of the original command.
 	 * @param msg The failure message.  See CommandResult().
 	 * @return A CommandResult denoting an invalid response.
 	 */
-	static CommandResult Invalid(const std::string &msg);
+	static CommandResult Invalid(const std::string &tag, const std::string &msg);
 
 	/**
 	 * Shortcut for constructing a failed CommandResult.
+	 * @param tag The tag of the original command.
 	 * @param msg The failure message.  See CommandResult().
 	 * @return A CommandResult denoting failure.
 	 */
-	static CommandResult Failure(const std::string &msg);
+	static CommandResult Failure(const std::string &tag, const std::string &msg);
 
 	/**
 	 * Constructs a CommandResult.
+	 * @param tag The tag of the original command.
 	 * @param type The type of command result.
 	 * @param msg A message providing more information about the result.
 	 *   The message will be copied into the CommandResult.
 	 */
-	CommandResult(CommandResult::Code type, const std::string &msg);
+	CommandResult(const std::string &tag, CommandResult::Code type, const std::string &msg);
 
 	/**
 	 * Determines whether this CommandResult was successful.
@@ -78,13 +82,15 @@ public:
 	 * is 'X msg', where 'msg' is the result message and 'X' is whichever
 	 * response code is most appropriate for the failure.
 	 *
-	 * @param sink The ResponseSink to which the response will be sent.
-	 * @param cmd The original command that created this CommandResult.
 	 * @param id The connection ID in the sink to which the response will
 	 *   be sent.  Defaults to 0 (broadcast).
+	 * @param tag The tag of the original command.
+	 * @param sink The ResponseSink to which the response will be sent.
+	 * @param cmd The original command that created this CommandResult, excluding tag.
 	 */
-	void Emit(const ResponseSink &sink, const std::vector<std::string> &cmd,
-	          size_t id = 0) const;
+	void Emit(size_t id,
+	          const ResponseSink &sink,
+	          const std::vector<std::string> &cmd) const;
 
 private:
 	/**
@@ -93,6 +99,7 @@ private:
 	 */
 	static const std::string STRINGS[];
 
+	std::string tag;          ///< The original command's tag.
 	std::string msg;          ///< The command result's message.
 	CommandResult::Code type; ///< The command result's ack code.
 };

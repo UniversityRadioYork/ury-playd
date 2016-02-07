@@ -22,16 +22,6 @@
 #include "sample_formats.hpp"
 
 //
-// Audio
-//
-
-std::unique_ptr<Response> Audio::Emit(const std::string &, bool)
-{
-	// By default, emit nothing.  This is an acceptable behaviour.
-	return std::unique_ptr<Response>();
-}
-
-//
 // NoAudio
 //
 
@@ -40,15 +30,9 @@ Audio::State NoAudio::Update()
 	return Audio::State::NONE;
 }
 
-std::unique_ptr<Response> NoAudio::Emit(const std::string &path, bool)
+Audio::State NoAudio::CurrentState() const
 {
-	std::unique_ptr<Response> ret;
-
-	if (path == "/control/state") {
-		ret = Response::Res("Entry", "/control/state", "Ejected");
-	}
-
-	return ret;
+	return Audio::State::NONE;
 }
 
 void NoAudio::SetPlaying(bool)
@@ -56,12 +40,17 @@ void NoAudio::SetPlaying(bool)
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
-void NoAudio::Seek(std::uint64_t)
+void NoAudio::SetPosition(std::uint64_t)
 {
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
 std::uint64_t NoAudio::Position() const
+{
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
+}
+
+const std::string& NoAudio::File() const
 {
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
@@ -77,33 +66,9 @@ PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
 	this->ClearFrame();
 }
 
-std::unique_ptr<Response> PipeAudio::Emit(const std::string &path,
-	bool broadcast)
+const std::string& PipeAudio::File() const
 {
-	assert(this->src != nullptr);
-	assert(this->sink != nullptr);
-
-	std::unique_ptr<Response> ret;
-
-	std::string value;
-
-	if (path == "/control/state") {
-		auto state = this->sink->State();
-		auto playing = state == Audio::State::PLAYING;
-		value = playing ? "Playing" : "Stopped";
-	} else if (path == "/player/file") {
-		value = this->src->Path();
-	} else if (path == "/player/time/elapsed") {
-		std::uint64_t micros = this->Position();
-
-		// Always announce a unicast.
-		// Only announce broadcasts if CanAnnounceTime(...).
-		bool can = (!broadcast) || this->CanAnnounceTime(micros);
-		if (!can) return ret;
-		value = std::to_string(micros);
-	} else return ret;
-
-	return Response::Res("Entry", path, value);
+	return this->src->Path();
 }
 
 void PipeAudio::SetPlaying(bool playing)
@@ -117,6 +82,11 @@ void PipeAudio::SetPlaying(bool playing)
 	}
 }
 
+Audio::State PipeAudio::CurrentState() const
+{
+	return this->sink->State();
+}
+
 std::uint64_t PipeAudio::Position() const
 {
 	assert(this->sink != nullptr);
@@ -125,7 +95,7 @@ std::uint64_t PipeAudio::Position() const
 	return this->src->MicrosFromSamples(this->sink->Position());
 }
 
-void PipeAudio::Seek(std::uint64_t position)
+void PipeAudio::SetPosition(std::uint64_t position)
 {
 	assert(this->sink != nullptr);
 	assert(this->src != nullptr);
@@ -133,9 +103,6 @@ void PipeAudio::Seek(std::uint64_t position)
 	auto in_samples = this->src->SamplesFromMicros(position);
 	auto out_samples = this->src->Seek(in_samples);
 	this->sink->SetPosition(out_samples);
-
-	// Make sure we always announce the new position to all response sinks.
-	this->announced_time = false;
 
 	// We might still have decoded samples from the old position in
 	// our frame, so clear them out.
@@ -205,20 +172,4 @@ bool PipeAudio::DecodeIfFrameEmpty()
 bool PipeAudio::FrameFinished() const
 {
 	return this->frame.end() <= this->frame_iterator;
-}
-
-bool PipeAudio::CanAnnounceTime(std::uint64_t micros)
-{
-	std::uint64_t secs = micros / 1000 / 1000;
-
-	// We can announce if we don't have a record for this sink, or if the
-	// last record was in a previous second.
-	bool announce = (!(this->announced_time)) || (this->last_time < secs);
-
-	if (announce) {
-		this->announced_time = true;
-		this->last_time = secs;
-	}
-
-	return announce;
 }

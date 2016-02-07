@@ -23,6 +23,9 @@
 class Response
 {
 public:
+	/// The tag for unsolicited messages (not from responses).
+	static const std::string NOREQUEST;
+
 	/**
 	 * Enumeration of all possible response codes.
 	 * @note If you're adding new responses here, update
@@ -31,30 +34,24 @@ public:
 	 */
 	enum class Code : std::uint8_t {
 		OHAI,     ///< Server starting up.
-		STATE,    ///< Server changing state.
-		TIME,     ///< Server sending current song time,
-		FILE,     ///< The loaded file just changed.
-		FEATURES, ///< Server sending feature list.
-		END,      ///< The loaded file just ended on its own.
+		IAMA,     ///< Server sending its role.
+		FLOAD,    ///< The loaded file just changed.
+		EJECT,    ///< The loaded file just ejected.
+		POS,      ///< Server sending current song time.
+		END,      ///< The loaded file just ended.
+		PLAY,     ///< The loaded file is playing.
+		STOP,     ///< The loaded file has stopped.
 		ACK,      ///< Command result.
-		RES       ///< Resource.
+		DUMP,     ///< Client has finished dumping.
+		QUIT,     ///< Client is quitting.
 	};
 
 	/**
 	 * Constructs a Response with no arguments.
+	 * @param tag The tag of the response.
 	 * @param code The Response::Code representing the response command.
 	 */
-	Response(Response::Code code);
-
-	/**
-	 * Constructs a RES response.
-	 * @param type The type of resource being emitted.
-	 * @param path The path to the resource.
-	 * @param value The string representing the resource's value.
-	 */
-	static std::unique_ptr<Response> Res(const std::string &type,
-	                                     const std::string &path,
-	                                     const std::string &value);
+	Response(const std::string &tag, Response::Code code);
 
 	/**
 	 * Adds an argument to this Response.
@@ -100,12 +97,11 @@ public:
 
 	/**
 	 * Outputs a response.
+	 * @param id The ID of the client of the ResponseSink receiving this response.
+	 *   Use 0 for broadcasts.
 	 * @param response The Response to output.
-	 * @param id The ID, if pertinent, of the sub-component of the
-	 *   ResponseSink to receive a Response, or 0, which signifies that the
-	 *   entire sub-component should receive the Response.  Defaults to 0.
 	 */
-	virtual void Respond(const Response &response, size_t id = 0) const;
+	virtual void Respond(size_t id, Response &response) const;
 };
 
 #endif // PLAYD_IO_RESPONSE_HPP

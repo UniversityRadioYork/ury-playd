@@ -244,7 +244,7 @@ void IoCore::Shutdown()
 {
 	if (!conn) return;
 
-	auto response = Response(Response::Code::STATE).AddArg("Quitting");
+	auto response = Response(Response::NOREQUEST, Response::Code::QUIT);
 
 	// The true at the end is for the 'fatal' argument to
 	// Connection::Respond, telling it to close itself after processing
@@ -258,14 +258,14 @@ void IoCore::Shutdown()
 	if (conn) conn->Respond(response);
 }
 
-void IoCore::Respond(const Response &response, size_t id) const
+void IoCore::Respond(size_t id, Response &response) const
 {
 	if (this->pool.empty()) return;
 
 	if (id == 0) {
 		this->Broadcast(response);
 	} else {
-		this->Unicast(response, id);
+		this->Unicast(id, response);
 	}
 }
 
@@ -278,7 +278,7 @@ void IoCore::Broadcast(const Response &response) const
 	for (const auto c : this->pool) IoCore::TryRespond(c, response);
 }
 
-void IoCore::Unicast(const Response &response, size_t id) const
+void IoCore::Unicast(size_t id, const Response &response) const
 {
 	assert(0 < id && id <= this->pool.size());
 
@@ -429,7 +429,10 @@ void Connection::RunCommand(const std::vector<std::string> &cmd)
 	std::cerr << std::endl;
 
 	CommandResult res = this->player.RunCommand(cmd, this->id);
-	res.Emit(this->parent, cmd, this->id);
+
+	// Get rid of the tag before emitting the command result.
+	auto mcmd = std::vector<std::string>(++cmd.cbegin(), cmd.cend());
+	res.Emit(this->id, this->parent, mcmd);
 }
 
 void Connection::Depool()

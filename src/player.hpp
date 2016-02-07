@@ -80,12 +80,7 @@ private:
 	std::unique_ptr<Audio> file; ///< The currently loaded audio file.
 	bool is_running;             ///< Whether the Player is running.
 	const ResponseSink *sink;    ///< The sink for audio responses.
-
-	/// The set of features playd implements.
-	const static std::vector<std::string> FEATURES;
-
-	/// The resource tree playd exposes.
-	const static std::multimap<std::string, std::string> RESOURCES;
+	std::uint64_t last_pos;      ///< The last position broadcast.
 
 	//
 	// Playback control
@@ -93,45 +88,65 @@ private:
 
 	/**
 	 * Tells the audio file to start or stop playing.
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param playing True if playing; false otherwise.
 	 * @see Play
 	 * @see Stop
 	 */
-	CommandResult SetPlaying(bool playing);
+	CommandResult SetPlaying(size_t id, const std::string &tag, bool playing);
 
 	/**
 	 * Ejects the current loaded song, if any.
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return Whether the ejection succeeded.
 	 */
-	CommandResult Eject();
+	CommandResult Eject(size_t id, const std::string &tag);
 
 	/**
 	 * Loads a track.
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param path The absolute path to a track to load.
 	 * @return Whether the load succeeded.
 	 */
-	CommandResult Load(const std::string &path);
+	CommandResult Load(size_t id, const std::string &tag, const std::string &path);
 
-	/// Handles ending a file (stopping and rewinding).
-	void End();
+	/**
+	 * Ends a file, stopping and rewinding.
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 * @return Whether the end succeeded.
+	 */
+	CommandResult End(size_t id, const std::string &tag);
 
 	//
 	// Seeking
 	//
 
 	/**
-	 * Seeks to a given position in the current track.
-	 * @param time_str A string containing a timestamp, followed by the
-	 *   shorthand for the units of time in which the timestamp is measured
-	 *   relative to the start of the track.  If the latter is omitted,
-	 *   microseconds are assumed.
+	 * Seeks to a given position in the current file.
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.  For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 * @param pos_str A string containing a timestamp, in microseconds
 	 * @return Whether the seek succeeded.
 	 */
-	CommandResult Seek(const std::string &time_str);
+	CommandResult Pos(size_t id, const std::string &tag, const std::string &pos_str);
 
 	/**
-	 * Parses time_str as a seek timestamp.
-	 * @param time_str The time string to be parsed.
+	 * Parses pos_str as a seek timestamp.
+	 * @param pos_str The time string to be parsed.
 	 * @return The parsed time.
 	 * @exception std::out_of_range
 	 *   See http://www.cplusplus.com/reference/string/stoull/#exceptions
@@ -140,17 +155,21 @@ private:
 	 * @exception SeekError
 	 *   Raised if checks beyond those done by stoull fail.
 	 */
-	static std::uint64_t SeekParse(const std::string &time_str);
+	static std::uint64_t PosParse(const std::string &pos_str);
 
 	/**
 	 * Performs an actual seek.
 	 * This does not do any EOF handling.
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.  For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param pos The new position, in microseconds.
 	 * @exception SeekError
 	 *   Raised if the seek is out of range (usually EOF).
 	 * @see Player::Seek
 	 */
-	void SeekRaw(std::uint64_t pos);
+	void PosRaw(size_t id, const std::string &tag, std::uint64_t pos);
 
 	//
 	// Other
@@ -158,50 +177,66 @@ private:
 
 	/**
 	 * Quits playd.
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.  For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return Whether the quit succeeded.
 	 */
-	CommandResult Quit();
+	CommandResult Quit(size_t id, const std::string &tag);
 
 	/**
-	 * Reads from and emits the requested resource.
+	 * Dumps the current player state to the given ID.
 	 *
-	 * @param path The path of the response to emit, if possible.
 	 * @param id The ID of the connection to which the Player should
-	 *   route the response.  May be 0, for all (broadcast).
-	 * @return The result of reading, which may be a failure if the
-	 *   resource does not exist.
+	 *   route any responses.  For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 * @return The result of dumping, which is always success.
 	 */
-	virtual CommandResult Read(const std::string &path, size_t id) const;
+	CommandResult Dump(size_t id, const std::string &tag) const;
 
 	/**
-	 * Writes to the requested resource.
+	 * Emits everything that would be sent via a Dump to the given ID.
 	 *
-	 * @param path The path of the resource to update, if possible.
-	 * @param payload The intended new value of the reource.
-	 * @return The result of writing, which may be a failure if the
-	 *   resource does not exist, cannot be written to, or the payload
-	 *   is invalid.
+	 * This neither finishes with DUMP, nor checks for sink==nullptr,
+	 * nor returns a CommandResult.
+	 *
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.  For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *
+	 * @see Dump
 	 */
-	virtual CommandResult Write(const std::string &path, const std::string &payload);
+	void DumpRaw(size_t id, const std::string &tag) const;
 
 	/**
-	 * Deletes the requested resource.
+	 * Emits a response for the current audio state to the sink.
 	 *
-	 * @param path The path of the resource to update, if possible.
-	 * @return The result of deleting, which may be a failure if the
-	 *   resource does not exist, or the resource can't be deleted.
+	 * @param id The ID of the connection to which the Player should
+	 *   route any responses.  For broadcasts, use 0.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *
+	 * @see DumpRaw
 	 */
-	virtual CommandResult Delete(const std::string &path);
+	 void DumpState(size_t id, const std::string &tag) const;
 
 	/**
-	 * Resolves a failure to write or delete a resource.
-	 * This checks to see if the resource is supposed to exist.  If it
-	 * does, we return an 'invalid method'; if not, a 'not found'.
+	 * Determines whether we can broadcast a POS response.
 	 *
-	 * @param path The path of the resource.
-	 * @return The appropriate CommandResult for the failure.
+	 * To prevent spewing massive amounts of POS responses, we only send a
+	 * broadcast if the number of seconds has changed since the last
+	 * time CanAnnounceTime() was called.
+	 *
+	 * This is *not* idempotent.  A CanAnnounceTime(x) less than one second
+	 * before a CanAnnounceTime(x) will _always_ be false.
+	 *
+	 * @param micros The value of the POS response, in microseconds.
+	 * @return Whether it is polite to broadcast POS.
 	 */
-	virtual CommandResult ResourceFailure(const std::string &path);
+	bool CanAnnounceTime(std::uint64_t micros);
 };
 
 #endif // PLAYD_PLAYER_HPP

@@ -15,15 +15,21 @@
 // Client communications
 //
 
-/// Message shown when a client connects to playd.
 #ifndef PD_VERSION
 #define PD_VERSION "0.0.0"
 #endif
-const std::string MSG_OHAI = "playd " PD_VERSION;
+/// The playd name and version.
+const std::string MSG_OHAI_PLAYD = "playd-" PD_VERSION;
+
+/// The protocol name and version.
+const std::string MSG_OHAI_BIFROST = "bifrost-0.3.0";
 
 //
 // Command failure messages
 //
+
+/// Message shown when the CommandHandler receives an under-length command.
+const std::string MSG_CMD_SHORT = "Command must contain at least a tag and one command word";
 
 /// Message shown when the CommandHandler receives an invalid command.
 const std::string MSG_CMD_INVALID = "Bad command or file name";

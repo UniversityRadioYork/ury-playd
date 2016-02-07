@@ -19,23 +19,23 @@ const std::string CommandResult::STRINGS[] = {
         "FAIL"  // Code::FAIL
 };
 
-CommandResult CommandResult::Success()
+CommandResult CommandResult::Success(const std::string &tag)
 {
-	return CommandResult(CommandResult::Code::OK, "success");
+	return CommandResult(tag, CommandResult::Code::OK, "success");
 }
 
-CommandResult CommandResult::Invalid(const std::string &msg)
+CommandResult CommandResult::Invalid(const std::string &tag, const std::string &msg)
 {
-	return CommandResult(CommandResult::Code::WHAT, msg);
+	return CommandResult(tag, CommandResult::Code::WHAT, msg);
 }
 
-CommandResult CommandResult::Failure(const std::string &msg)
+CommandResult CommandResult::Failure(const std::string &tag, const std::string &msg)
 {
-	return CommandResult(CommandResult::Code::FAIL, msg);
+	return CommandResult(tag, CommandResult::Code::FAIL, msg);
 }
 
-CommandResult::CommandResult(CommandResult::Code type, const std::string &msg)
-    : msg(msg), type(type)
+CommandResult::CommandResult(const std::string &tag, CommandResult::Code type, const std::string &msg)
+    : tag(tag), msg(msg), type(type)
 {
 }
 
@@ -44,13 +44,14 @@ bool CommandResult::IsSuccess() const
 	return this->type == CommandResult::Code::OK;
 }
 
-void CommandResult::Emit(const ResponseSink &sink,
-                         const std::vector<std::string> &cmd, size_t id) const
+void CommandResult::Emit(size_t id,
+	                     const ResponseSink &sink,
+                         const std::vector<std::string> &cmd) const
 {
-	Response r(Response::Code::ACK);
+	Response r(this->tag, Response::Code::ACK);
 	r.AddArg(CommandResult::STRINGS[static_cast<int>(this->type)]);
 	r.AddArg(this->msg);
 	for (auto &cwd : cmd) r.AddArg(cwd);
 
-	sink.Respond(r, id);
+	sink.Respond(id, r);
 }
