@@ -91,7 +91,7 @@ std::string Response::Pack() const
 // ResponseSink
 //
 
-void ResponseSink::Respond(size_t, Response &) const
+void ResponseSink::Respond(size_t, const Response &) const
 {
 	// By default, do nothing.
 }

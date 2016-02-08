@@ -87,46 +87,38 @@ private:
 
 	/**
 	 * Tells the audio file to start or stop playing.
-	 * @param id The ID of the connection to which the Player should
-	 *   route any responses.For broadcasts, use 0.
 	 * @param tag The tag of the request calling this command.
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param playing True if playing; false otherwise.
 	 * @see Play
 	 * @see Stop
 	 */
-	Response SetPlaying(size_t id, const std::string &tag, bool playing);
+	Response SetPlaying(const std::string &tag, bool playing);
 
 	/**
 	 * Ejects the current loaded song, if any.
-	 * @param id The ID of the connection to which the Player should
-	 *   route any responses.For broadcasts, use 0.
 	 * @param tag The tag of the request calling this command.
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return Whether the ejection succeeded.
 	 */
-	Response Eject(size_t id, const std::string &tag);
+	Response Eject(const std::string &tag);
 
 	/**
 	 * Loads a track.
-	 * @param id The ID of the connection to which the Player should
-	 *   route any responses.For broadcasts, use 0.
 	 * @param tag The tag of the request calling this command.
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param path The absolute path to a track to load.
 	 * @return Whether the load succeeded.
 	 */
-	Response Load(size_t id, const std::string &tag, const std::string &path);
+	Response Load(const std::string &tag, const std::string &path);
 
 	/**
 	 * Ends a file, stopping and rewinding.
-	 * @param id The ID of the connection to which the Player should
-	 *   route any responses.For broadcasts, use 0.
 	 * @param tag The tag of the request calling this command.
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return Whether the end succeeded.
 	 */
-	Response End(size_t id, const std::string &tag);
+	Response End(const std::string &tag);
 
 	//
 	// Seeking
@@ -134,14 +126,12 @@ private:
 
 	/**
 	 * Seeks to a given position in the current file.
-	 * @param id The ID of the connection to which the Player should
-	 *   route any responses.  For broadcasts, use 0.
 	 * @param tag The tag of the request calling this command.
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param pos_str A string containing a timestamp, in microseconds
 	 * @return Whether the seek succeeded.
 	 */
-	Response Pos(size_t id, const std::string &tag, const std::string &pos_str);
+	Response Pos(const std::string &tag, const std::string &pos_str);
 
 	/**
 	 * Parses pos_str as a seek timestamp.
@@ -159,8 +149,6 @@ private:
 	/**
 	 * Performs an actual seek.
 	 * This does not do any EOF handling.
-	 * @param id The ID of the connection to which the Player should
-	 *   route any responses.  For broadcasts, use 0.
 	 * @param tag The tag of the request calling this command.
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param pos The new position, in microseconds.
@@ -168,7 +156,7 @@ private:
 	 *   Raised if the seek is out of range (usually EOF).
 	 * @see Player::Seek
 	 */
-	void PosRaw(size_t id, const std::string &tag, std::uint64_t pos);
+	void PosRaw(const std::string &tag, std::uint64_t pos);
 
 	//
 	// Other
@@ -176,13 +164,11 @@ private:
 
 	/**
 	 * Quits playd.
-	 * @param id The ID of the connection to which the Player should
-	 *   route any responses.  For broadcasts, use 0.
 	 * @param tag The tag of the request calling this command.
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return Whether the quit succeeded.
 	 */
-	Response Quit(size_t id, const std::string &tag);
+	Response Quit(const std::string &tag);
 
 	/**
 	 * Dumps the current player state to the given ID.

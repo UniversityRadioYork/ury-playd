@@ -124,7 +124,7 @@ public:
 	 *   Use 0 for broadcasts.
 	 * @param response The Response to output.
 	 */
-	virtual void Respond(size_t id, Response &response) const;
+	virtual void Respond(size_t id, const Response &response) const;
 };
 
 #endif // PLAYD_IO_RESPONSE_HPP

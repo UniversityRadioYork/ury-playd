@@ -178,12 +178,6 @@ private:
 	/// The current position in the current decoded frame.
 	AudioSource::DecodeVector::iterator frame_iterator;
 
-	/// Whether last_time contains a valid last time.
-	bool announced_time;
-
-	/// The last time into this Audio when the time was broadcast.
-	std::uint64_t last_time;
-
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
 

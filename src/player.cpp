@@ -37,7 +37,7 @@ bool Player::Update()
 	assert(this->file != nullptr);
 	auto as = this->file->Update();
 
-	if (as == Audio::State::AT_END) this->End(0, Response::NOREQUEST);
+	if (as == Audio::State::AT_END) this->End(Response::NOREQUEST);
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
@@ -57,16 +57,16 @@ void Player::WelcomeClient(size_t id) const
 	this->Dump(id, Response::NOREQUEST);
 }
 
-Response Player::End(size_t id, const std::string &tag)
+Response Player::End(const std::string &tag)
 {
 	this->sink->Respond(0, Response(tag, Response::Code::END));
 
-	this->SetPlaying(id, tag, false);
+	this->SetPlaying(tag, false);
 
 	// Rewind the file back to the start.  We can't use Player::Pos() here
 	// in case End() is called from Pos(); a seek failure could start an
 	// infinite loop.
-	this->PosRaw(id, tag, 0);
+	this->PosRaw(tag, 0);
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
@@ -99,19 +99,19 @@ Response Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 	auto word = cmd[1];
 	auto nargs = cmd.size() - 2;
 
-	if (nargs == 0 && "play" == word) return this->SetPlaying(id, tag, true);
-	if (nargs == 0 && "stop" == word) return this->SetPlaying(id, tag, false);
-	if (nargs == 0 && "end" == word) return this->End(id, tag);
-	if (nargs == 0 && "eject" == word) return this->Eject(id, tag);
-	if (nargs == 0 && "quit" == word) return this->Quit(id, tag);
+	if (nargs == 0 && "play" == word) return this->SetPlaying(tag, true);
+	if (nargs == 0 && "stop" == word) return this->SetPlaying(tag, false);
+	if (nargs == 0 && "end" == word) return this->End(tag);
+	if (nargs == 0 && "eject" == word) return this->Eject(tag);
+	if (nargs == 0 && "quit" == word) return this->Quit(tag);
 	if (nargs == 0 && "dump" == word) return this->Dump(id, tag);
-	if (nargs == 1 && "fload" == word) return this->Load(id, tag, cmd[2]);
-	if (nargs == 1 && "pos" == word) return this->Pos(id, tag, cmd[2]);
+	if (nargs == 1 && "fload" == word) return this->Load(tag, cmd[2]);
+	if (nargs == 1 && "pos" == word) return this->Pos(tag, cmd[2]);
 
 	return Response::Invalid(tag, MSG_CMD_INVALID);
 }
 
-Response Player::Eject(size_t id, const std::string &tag)
+Response Player::Eject(const std::string &tag)
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
@@ -121,7 +121,7 @@ Response Player::Eject(size_t id, const std::string &tag)
 	return Response::Success(tag);
 }
 
-Response Player::Load(size_t id, const std::string &tag, const std::string &path)
+Response Player::Load(const std::string &tag, const std::string &path)
 {
 	if (path.empty()) return Response::Invalid(tag, MSG_LOAD_EMPTY_PATH);
 
@@ -141,19 +141,19 @@ Response Player::Load(size_t id, const std::string &tag, const std::string &path
 		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
-		this->Eject(0, tag);
+		this->Eject(tag);
 		return Response::Failure(tag, e.Message());
 	} catch (Error &) {
 		// Ensure a load failure doesn't leave a corrupted track
 		// loaded.
-		this->Eject(0, tag);
+		this->Eject(tag);
 		throw;
 	}
 
 	return Response::Success(tag);
 }
 
-Response Player::SetPlaying(size_t id, const std::string &tag, bool playing)
+Response Player::SetPlaying(const std::string &tag, bool playing)
 {
 	// Why is SetPlaying not split between Start() and Stop()?, I hear the
 	// best practices purists amongst you say.  Quite simply, there is a
@@ -174,14 +174,14 @@ Response Player::SetPlaying(size_t id, const std::string &tag, bool playing)
 	return Response::Success(tag);
 }
 
-Response Player::Quit(size_t id, const std::string &tag)
+Response Player::Quit(const std::string &tag)
 {
-	this->Eject(id, tag);
+	this->Eject(tag);
 	this->is_running = false;
 	return Response::Success(tag);
 }
 
-Response Player::Pos(size_t id, const std::string &tag, const std::string &pos_str)
+Response Player::Pos(const std::string &tag, const std::string &pos_str)
 {
 	std::uint64_t pos = 0;
 	try {
@@ -193,7 +193,7 @@ Response Player::Pos(size_t id, const std::string &tag, const std::string &pos_s
 	}
 
 	try {
-		this->PosRaw(id, tag, pos);
+		this->PosRaw(tag, pos);
 	} catch (NoAudioError) {
 		return Response::Invalid(tag, MSG_CMD_NEEDS_LOADED);
 	} catch (SeekError) {
@@ -205,7 +205,7 @@ Response Player::Pos(size_t id, const std::string &tag, const std::string &pos_s
 
 		// Make it look to the client as if the seek ran off the end of
 		// the file.
-		this->End(id, tag);
+		this->End(tag);
 	}
 
 	// If we've made it all the way down here, we deserve to succeed.
@@ -234,7 +234,7 @@ Response Player::Pos(size_t id, const std::string &tag, const std::string &pos_s
 	return pos;
 }
 
-void Player::PosRaw(size_t id, const std::string &tag, std::uint64_t pos)
+void Player::PosRaw(const std::string &tag, std::uint64_t pos)
 {
 	assert(this->file != nullptr);
 

@@ -258,7 +258,7 @@ void IoCore::Shutdown()
 	if (conn) conn->Respond(response);
 }
 
-void IoCore::Respond(size_t id, Response &response) const
+void IoCore::Respond(size_t id, const Response &response) const
 {
 	if (this->pool.empty()) return;
 

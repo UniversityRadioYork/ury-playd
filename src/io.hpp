@@ -88,7 +88,7 @@ public:
 	 */
 	void UpdatePlayer();
 
-	void Respond(size_t id, Response &response) const override;
+	void Respond(size_t id, const Response &response) const override;
 
 private:
 	/// The period between player updates.
