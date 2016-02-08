@@ -84,13 +84,9 @@ public:
 	 *
 	 * @param id The connection ID in the sink to which the response will
 	 *   be sent.  Defaults to 0 (broadcast).
-	 * @param tag The tag of the original command.
 	 * @param sink The ResponseSink to which the response will be sent.
-	 * @param cmd The original command that created this CommandResult, excluding tag.
 	 */
-	void Emit(size_t id,
-	          const ResponseSink &sink,
-	          const std::vector<std::string> &cmd) const;
+	void Emit(size_t id, const ResponseSink &sink) const;
 
 private:
 	/**

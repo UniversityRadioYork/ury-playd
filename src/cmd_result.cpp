@@ -44,14 +44,11 @@ bool CommandResult::IsSuccess() const
 	return this->type == CommandResult::Code::OK;
 }
 
-void CommandResult::Emit(size_t id,
-	                     const ResponseSink &sink,
-                         const std::vector<std::string> &cmd) const
+void CommandResult::Emit(size_t id, const ResponseSink &sink) const
 {
 	Response r(this->tag, Response::Code::ACK);
 	r.AddArg(CommandResult::STRINGS[static_cast<int>(this->type)]);
 	r.AddArg(this->msg);
-	for (auto &cwd : cmd) r.AddArg(cwd);
 
 	sink.Respond(id, r);
 }

@@ -430,9 +430,7 @@ void Connection::RunCommand(const std::vector<std::string> &cmd)
 
 	CommandResult res = this->player.RunCommand(cmd, this->id);
 
-	// Get rid of the tag before emitting the command result.
-	auto mcmd = std::vector<std::string>(++cmd.cbegin(), cmd.cend());
-	res.Emit(this->id, this->parent, mcmd);
+	res.Emit(this->id, this->parent);
 }
 
 void Connection::Depool()
