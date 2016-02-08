@@ -19,7 +19,6 @@
     <ClCompile Include="src\audio\sample_formats.cpp" />
     <ClCompile Include="src\audio\sources\mp3.cpp" />
     <ClCompile Include="src\audio\sources\sndfile.cpp" />
-    <ClCompile Include="src\cmd_result.cpp" />
     <ClCompile Include="src\contrib\pa_ringbuffer\pa_ringbuffer.c" />
     <ClCompile Include="src\errors.cpp" />
     <ClCompile Include="src\io.cpp" />
@@ -37,7 +36,6 @@
     <ClInclude Include="src\audio\sample_formats.hpp" />
     <ClInclude Include="src\audio\sources\mp3.hpp" />
     <ClInclude Include="src\audio\sources\sndfile.hpp" />
-    <ClInclude Include="src\cmd_result.hpp" />
     <ClInclude Include="src\contrib\pa_ringbuffer\pa_memorybarrier.h" />
     <ClInclude Include="src\contrib\pa_ringbuffer\pa_ringbuffer.h" />
     <ClInclude Include="src\errors.hpp" />

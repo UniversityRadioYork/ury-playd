@@ -20,7 +20,6 @@
 #include "audio/audio_system.hpp"
 #include "audio/audio.hpp"
 #include "response.hpp"
-#include "cmd_result.hpp"
 
 /**
  * A Player contains a loaded audio file and a command API for manipulating it.
@@ -50,7 +49,7 @@ public:
 	 *   this command generates.
 	 * @return Whether the command succeeded.
 	 */
-	CommandResult RunCommand(const std::vector<std::string> &words,
+	Response RunCommand(const std::vector<std::string> &words,
 	                         size_t id = 0);
 
 	/**
@@ -96,7 +95,7 @@ private:
 	 * @see Play
 	 * @see Stop
 	 */
-	CommandResult SetPlaying(size_t id, const std::string &tag, bool playing);
+	Response SetPlaying(size_t id, const std::string &tag, bool playing);
 
 	/**
 	 * Ejects the current loaded song, if any.
@@ -106,7 +105,7 @@ private:
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return Whether the ejection succeeded.
 	 */
-	CommandResult Eject(size_t id, const std::string &tag);
+	Response Eject(size_t id, const std::string &tag);
 
 	/**
 	 * Loads a track.
@@ -117,7 +116,7 @@ private:
 	 * @param path The absolute path to a track to load.
 	 * @return Whether the load succeeded.
 	 */
-	CommandResult Load(size_t id, const std::string &tag, const std::string &path);
+	Response Load(size_t id, const std::string &tag, const std::string &path);
 
 	/**
 	 * Ends a file, stopping and rewinding.
@@ -127,7 +126,7 @@ private:
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return Whether the end succeeded.
 	 */
-	CommandResult End(size_t id, const std::string &tag);
+	Response End(size_t id, const std::string &tag);
 
 	//
 	// Seeking
@@ -142,7 +141,7 @@ private:
 	 * @param pos_str A string containing a timestamp, in microseconds
 	 * @return Whether the seek succeeded.
 	 */
-	CommandResult Pos(size_t id, const std::string &tag, const std::string &pos_str);
+	Response Pos(size_t id, const std::string &tag, const std::string &pos_str);
 
 	/**
 	 * Parses pos_str as a seek timestamp.
@@ -183,7 +182,7 @@ private:
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return Whether the quit succeeded.
 	 */
-	CommandResult Quit(size_t id, const std::string &tag);
+	Response Quit(size_t id, const std::string &tag);
 
 	/**
 	 * Dumps the current player state to the given ID.
@@ -194,13 +193,13 @@ private:
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return The result of dumping, which is always success.
 	 */
-	CommandResult Dump(size_t id, const std::string &tag) const;
+	Response Dump(size_t id, const std::string &tag) const;
 
 	/**
 	 * Emits everything that would be sent via a Dump to the given ID.
 	 *
 	 * This neither finishes with DUMP, nor checks for sink==nullptr,
-	 * nor returns a CommandResult.
+	 * nor returns a Response.
 	 *
 	 * @param id The ID of the connection to which the Player should
 	 *   route any responses.  For broadcasts, use 0.

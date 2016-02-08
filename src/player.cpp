@@ -16,7 +16,6 @@
 
 #include "audio/audio_system.hpp"
 #include "audio/audio.hpp"
-#include "cmd_result.hpp"
 #include "errors.hpp"
 #include "response.hpp"
 #include "messages.h"
@@ -58,7 +57,7 @@ void Player::WelcomeClient(size_t id) const
 	this->Dump(id, Response::NOREQUEST);
 }
 
-CommandResult Player::End(size_t id, const std::string &tag)
+Response Player::End(size_t id, const std::string &tag)
 {
 	this->sink->Respond(0, Response(tag, Response::Code::END));
 
@@ -71,28 +70,28 @@ CommandResult Player::End(size_t id, const std::string &tag)
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
-	if (this->sink == nullptr) return CommandResult::Success(tag);
+	if (this->sink == nullptr) return Response::Success(tag);
 
-	return CommandResult::Success(tag);
+	return Response::Success(tag);
 }
 
 //
 // Commands
 //
 
-CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
+Response Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 {
 	// First of all, figure out what the tag of this command is.
 	// We make it by adding the id to the zeroth command word.
-	if (cmd.size() == 0) return CommandResult::Invalid(Response::NOREQUEST, MSG_CMD_SHORT);
+	if (cmd.size() == 0) return Response::Invalid(Response::NOREQUEST, MSG_CMD_SHORT);
 	auto tag = cmd[0];
-	if (cmd.size() <= 1) return CommandResult::Invalid(tag, MSG_CMD_SHORT);
+	if (cmd.size() <= 1) return Response::Invalid(tag, MSG_CMD_SHORT);
 
 	if (!this->is_running) {
 		// Refuse any and all commands when not running.
 		// This is mainly to prevent the internal state from
 		// going weird, but seems logical anyway.
-		return CommandResult::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 	}
 
 	// The first word is always the tag; the second is the actual command word.
@@ -109,22 +108,22 @@ CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 	if (nargs == 1 && "fload" == word) return this->Load(id, tag, cmd[2]);
 	if (nargs == 1 && "pos" == word) return this->Pos(id, tag, cmd[2]);
 
-	return CommandResult::Invalid(tag, MSG_CMD_INVALID);
+	return Response::Invalid(tag, MSG_CMD_INVALID);
 }
 
-CommandResult Player::Eject(size_t id, const std::string &tag)
+Response Player::Eject(size_t id, const std::string &tag)
 {
 	assert(this->file != nullptr);
 	this->file = this->audio.Null();
 
 	this->DumpState(0, tag);
 
-	return CommandResult::Success(tag);
+	return Response::Success(tag);
 }
 
-CommandResult Player::Load(size_t id, const std::string &tag, const std::string &path)
+Response Player::Load(size_t id, const std::string &tag, const std::string &path)
 {
-	if (path.empty()) return CommandResult::Invalid(tag, MSG_LOAD_EMPTY_PATH);
+	if (path.empty()) return Response::Invalid(tag, MSG_LOAD_EMPTY_PATH);
 
 	assert(this->file != nullptr);
 
@@ -143,7 +142,7 @@ CommandResult Player::Load(size_t id, const std::string &tag, const std::string 
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
 		this->Eject(0, tag);
-		return CommandResult::Failure(tag, e.Message());
+		return Response::Failure(tag, e.Message());
 	} catch (Error &) {
 		// Ensure a load failure doesn't leave a corrupted track
 		// loaded.
@@ -151,10 +150,10 @@ CommandResult Player::Load(size_t id, const std::string &tag, const std::string 
 		throw;
 	}
 
-	return CommandResult::Success(tag);
+	return Response::Success(tag);
 }
 
-CommandResult Player::SetPlaying(size_t id, const std::string &tag, bool playing)
+Response Player::SetPlaying(size_t id, const std::string &tag, bool playing)
 {
 	// Why is SetPlaying not split between Start() and Stop()?, I hear the
 	// best practices purists amongst you say.  Quite simply, there is a
@@ -167,22 +166,22 @@ CommandResult Player::SetPlaying(size_t id, const std::string &tag, bool playing
 	try {
 		this->file->SetPlaying(playing);
 	} catch (NoAudioError &e) {
-		return CommandResult::Invalid(tag, e.Message());
+		return Response::Invalid(tag, e.Message());
 	}
 
 	this->DumpState(0, tag);
 
-	return CommandResult::Success(tag);
+	return Response::Success(tag);
 }
 
-CommandResult Player::Quit(size_t id, const std::string &tag)
+Response Player::Quit(size_t id, const std::string &tag)
 {
 	this->Eject(id, tag);
 	this->is_running = false;
-	return CommandResult::Success(tag);
+	return Response::Success(tag);
 }
 
-CommandResult Player::Pos(size_t id, const std::string &tag, const std::string &pos_str)
+Response Player::Pos(size_t id, const std::string &tag, const std::string &pos_str)
 {
 	std::uint64_t pos = 0;
 	try {
@@ -190,13 +189,13 @@ CommandResult Player::Pos(size_t id, const std::string &tag, const std::string &
 	} catch (SeekError &e) {
 		// Seek errors here are a result of clients sending weird times.
 		// Thus, we tell them off.
-		return CommandResult::Invalid(tag, e.Message());
+		return Response::Invalid(tag, e.Message());
 	}
 
 	try {
 		this->PosRaw(id, tag, pos);
 	} catch (NoAudioError) {
-		return CommandResult::Invalid(tag, MSG_CMD_NEEDS_LOADED);
+		return Response::Invalid(tag, MSG_CMD_NEEDS_LOADED);
 	} catch (SeekError) {
 		// Seek failures here are a result of the decoder not liking the
 		// seek position (usually because it's outside the audio file!).
@@ -210,7 +209,7 @@ CommandResult Player::Pos(size_t id, const std::string &tag, const std::string &
 	}
 
 	// If we've made it all the way down here, we deserve to succeed.
-	return CommandResult::Success(tag);
+	return Response::Success(tag);
 }
 
 /* static */ std::uint64_t Player::PosParse(const std::string &pos_str)
@@ -288,11 +287,11 @@ void Player::DumpState(size_t id, const std::string &tag) const
 	this->sink->Respond(id, Response(tag, code));
 }
 
-CommandResult Player::Dump(size_t id, const std::string &tag) const
+Response Player::Dump(size_t id, const std::string &tag) const
 {
 	this->DumpRaw(id, tag);
 	this->sink->Respond(id, Response(tag, Response::Code::DUMP));
-	return CommandResult::Success(tag);
+	return Response::Success(tag);
 }
 
 bool Player::CanAnnounceTime(std::uint64_t micros)

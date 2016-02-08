@@ -47,6 +47,21 @@ std::string Response::Pack() const
 	return this->string;
 }
 
+/* static */ Response Response::Success(const std::string &tag)
+{
+	return Response(tag, Response::Code::ACK).AddArg("OK").AddArg("success");
+}
+
+/* static */ Response Response::Invalid(const std::string &tag, const std::string &msg)
+{
+	return Response(tag, Response::Code::ACK).AddArg("WHAT").AddArg(msg);
+}
+
+/* static */ Response Response::Failure(const std::string &tag, const std::string &msg)
+{
+	return Response(tag, Response::Code::ACK).AddArg("FAIL").AddArg(msg);
+}
+
 /* static */ std::string Response::EscapeArg(const std::string &arg)
 {
 	bool escaping = false;

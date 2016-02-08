@@ -67,6 +67,29 @@ public:
 	 */
 	std::string Pack() const;
 
+	/**
+	 * Shortcut for constructing a final response to a successful request.
+	 * @param tag The tag of the original request.
+	 * @return A Response acknowledging a successful request.
+	 */
+	static Response Success(const std::string &tag);
+
+	/**
+	* Shortcut for constructing a final response to a invalid request.
+	* @param tag The tag of the original request.
+	* @param msg The failure message.
+	* @return A Response acknowledging an invalid request.
+	*/
+	static Response Invalid(const std::string &tag, const std::string &msg);
+
+	/**
+	* Shortcut for constructing a final response to a failed request.
+	* @param tag The tag of the original request.
+	* @param msg The failure message.
+	* @return A Response acknowledging a failed request.
+	*/
+	static Response Failure(const std::string &tag, const std::string &msg);
+
 private:
 	/**
 	 * A map from Response::Code codes to their string equivalents.
