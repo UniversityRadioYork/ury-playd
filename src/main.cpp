@@ -12,7 +12,6 @@
 #include <iostream>
 #include <tuple>
 
-#include "audio/audio_system.hpp"
 #include "io.hpp"
 #include "response.hpp"
 #include "player.hpp"
@@ -31,8 +30,8 @@ static const std::string DEFAULT_HOST = "0.0.0.0";
 /// The default TCP port on which playd will bind.
 static const std::string DEFAULT_PORT = "1350";
 
-/// Map from file extensions to builders for AudioSources for them.
-static const std::map<std::string, AudioSystem::SourceFn> SOURCES = {
+/// Map from file extensions to AudioSource builder functions.
+static const std::map<std::string, Player::SourceFn> SOURCES = {
 #ifdef WITH_MP3
 	{"mp3", &std::make_unique<Mp3AudioSource, const std::string &>},
 #endif // WITH_MP3
@@ -150,19 +149,21 @@ void ExitWithError(const std::string &msg)
  */
 int main(int argc, char *argv[])
 {
-// If we don't ignore SIGPIPE, certain classes of connection droppage
-// will crash our program with it.
-// TODO(CaptainHayashi): a more rigorous ifndef here.
+	// If we don't ignore SIGPIPE, certain classes of connection droppage
+	// will crash our program with it.
+	// TODO(CaptainHayashi): a more rigorous ifndef here.
 #ifndef _MSC_VER
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+	// SDL requires some cleanup and teardown.
 	// This call needs to happen before GetDeviceID, otherwise no device
 	// IDs will be recognised.  (This is why it's here, and not in
 	// SetupAudioSystem.)
 	SdlAudioSink::InitLibrary();
 	atexit(SdlAudioSink::CleanupLibrary);
 
+	// mpg123 insists on us running its init and exit functions, too.
 #ifdef WITH_MP3
 	mpg123_init();
 	atexit(mpg123_exit);
@@ -173,15 +174,14 @@ int main(int argc, char *argv[])
 	auto device_id = GetDeviceID(args);
 	if (device_id < 0) ExitWithUsage(args.at(0));
 
-	// Set up all of the components of playd in one fell swoop.
-	AudioSystem audio(device_id,
+	Player player(device_id,
 		&std::make_unique<SdlAudioSink, const AudioSource &, int>,
 		SOURCES);
-	Player player(audio);
-	IoCore io(player);
 
+	// Set up the IO now (to avoid a circular dependency).
 	// Make sure the player broadcasts its responses back to the IoCore.
-	player.SetSink(io);
+	IoCore io(player);
+	player.SetIo(io);
 
 	// Now, actually run the IO loop.
 	std::string host;

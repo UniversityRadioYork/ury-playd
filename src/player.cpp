@@ -14,22 +14,24 @@
 #include <string>
 #include <vector>
 
-#include "audio/audio_system.hpp"
+#include "audio/audio_sink.hpp"
+#include "audio/audio_source.hpp"
 #include "audio/audio.hpp"
 #include "errors.hpp"
 #include "response.hpp"
 #include "messages.h"
 #include "player.hpp"
 
-
-Player::Player(AudioSystem &audio)
-    : audio(audio), file(std::make_unique<NoAudio>()), is_running(true), sink(nullptr)
+Player::Player(int device_id,
+	SinkFn sink,
+	std::map<std::string, SourceFn> sources)
+    : device_id(device_id), sink(sink), sources(sources), file(std::make_unique<NoAudio>()), is_running(true), io(nullptr), last_pos(0)
 {
 }
 
-void Player::SetSink(ResponseSink &sink)
+void Player::SetIo(ResponseSink &io)
 {
-	this->sink = &sink;
+	this->io = &io;
 }
 
 bool Player::Update()
@@ -43,7 +45,7 @@ bool Player::Update()
 		// advanced since last update.  So we need to update it.
 		auto pos = this->file->Position();
 		if (this->CanAnnounceTime(pos)) {
-			this->sink->Respond(0, Response(Response::NOREQUEST, Response::Code::POS).AddArg(std::to_string(pos)));
+			this->io->Respond(0, Response(Response::NOREQUEST, Response::Code::POS).AddArg(std::to_string(pos)));
 		}
 	}
 
@@ -52,14 +54,14 @@ bool Player::Update()
 
 void Player::WelcomeClient(size_t id) const
 {
-	this->sink->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI).AddArg(std::to_string(id)).AddArg(MSG_OHAI_BIFROST).AddArg(MSG_OHAI_PLAYD));
-	this->sink->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA).AddArg("player/file"));
+	this->io->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI).AddArg(std::to_string(id)).AddArg(MSG_OHAI_BIFROST).AddArg(MSG_OHAI_PLAYD));
+	this->io->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA).AddArg("player/file"));
 	this->Dump(id, Response::NOREQUEST);
 }
 
 Response Player::End(const std::string &tag)
 {
-	this->sink->Respond(0, Response(tag, Response::Code::END));
+	this->io->Respond(0, Response(tag, Response::Code::END));
 
 	this->SetPlaying(tag, false);
 
@@ -70,7 +72,7 @@ Response Player::End(const std::string &tag)
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
-	if (this->sink == nullptr) return Response::Success(tag);
+	if (this->io == nullptr) return Response::Success(tag);
 
 	return Response::Success(tag);
 }
@@ -135,7 +137,7 @@ Response Player::Load(const std::string &tag, const std::string &path)
 
 	try {
 		assert(this->file != nullptr);
-		this->file = this->audio.Load(path);
+		this->file = this->LoadRaw(path);
 		this->last_pos = 0;
 		this->DumpRaw(0, tag);
 		assert(this->file != nullptr);
@@ -243,7 +245,7 @@ void Player::PosRaw(const std::string &tag, std::uint64_t pos)
 	// This is required to make CanAnnounceTime() continue working.
 	this->last_pos = pos / 1000 / 1000;
 
-	this->sink->Respond(0, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
+	this->io->Respond(0, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
 }
 
 void Player::DumpRaw(size_t id, const std::string &tag) const
@@ -255,10 +257,10 @@ void Player::DumpRaw(size_t id, const std::string &tag) const
 	// This information won't exist if there is no file.
 	if (this->file->CurrentState() != Audio::State::NONE) {
 		auto file = this->file->File();
-		this->sink->Respond(id, Response(tag, Response::Code::FLOAD).AddArg(file));
+		this->io->Respond(id, Response(tag, Response::Code::FLOAD).AddArg(file));
 
 		auto pos = this->file->Position();
-		this->sink->Respond(id, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
+		this->io->Respond(id, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
 	}
 }
 
@@ -284,13 +286,13 @@ void Player::DumpState(size_t id, const std::string &tag) const
 		return;
 	}
 
-	this->sink->Respond(id, Response(tag, code));
+	this->io->Respond(id, Response(tag, code));
 }
 
 Response Player::Dump(size_t id, const std::string &tag) const
 {
 	this->DumpRaw(id, tag);
-	this->sink->Respond(id, Response(tag, Response::Code::DUMP));
+	this->io->Respond(id, Response(tag, Response::Code::DUMP));
 	return Response::Success(tag);
 }
 
@@ -303,4 +305,27 @@ bool Player::CanAnnounceTime(std::uint64_t micros)
 	if (announce) this->last_pos = secs;
 
 	return announce;
+}
+
+std::unique_ptr<Audio> Player::LoadRaw(const std::string &path) const
+{
+	std::unique_ptr<AudioSource> source = this->LoadSource(path);
+	assert(source != nullptr);
+
+	auto sink = this->sink(*source, this->device_id);
+	return std::make_unique<PipeAudio>(
+	        std::move(source), std::move(sink));
+}
+
+std::unique_ptr<AudioSource> Player::LoadSource(const std::string &path) const
+{
+	size_t extpoint = path.find_last_of('.');
+	std::string ext = path.substr(extpoint + 1);
+
+	auto ibuilder = this->sources.find(ext);
+	if (ibuilder == this->sources.end()) {
+		throw FileError("Unknown file format: " + ext);
+	}
+
+	return (ibuilder->second)(path);
 }
