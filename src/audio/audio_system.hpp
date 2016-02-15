@@ -49,12 +49,6 @@ public:
 	AudioSystem(int device_id);
 
 	/**
-	 * Creates an Audio for a lack of audio.
-	 * @return A unique pointer to a dummy Audio.
-	 */
-	std::unique_ptr<Audio> Null() const;
-
-	/**
 	 * Loads a file, creating an Audio for it.
 	 * @param path The path to a file.
 	 * @return A unique pointer to the Audio for that file.

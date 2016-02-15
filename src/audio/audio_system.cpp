@@ -34,11 +34,6 @@ AudioSystem::AudioSystem(int device_id)
 {
 }
 
-std::unique_ptr<Audio> AudioSystem::Null() const
-{
-	return std::make_unique<NoAudio>();
-}
-
 std::unique_ptr<Audio> AudioSystem::Load(const std::string &path) const
 {
 	std::unique_ptr<AudioSource> source = this->LoadSource(path);

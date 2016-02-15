@@ -23,7 +23,7 @@
 
 
 Player::Player(AudioSystem &audio)
-    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr)
+    : audio(audio), file(std::make_unique<NoAudio>()), is_running(true), sink(nullptr)
 {
 }
 
@@ -114,7 +114,7 @@ Response Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
 Response Player::Eject(const std::string &tag)
 {
 	assert(this->file != nullptr);
-	this->file = this->audio.Null();
+	this->file = std::make_unique<NoAudio>();
 
 	this->DumpState(0, tag);
 
@@ -131,7 +131,7 @@ Response Player::Load(const std::string &tag, const std::string &path)
 	// This ensures that we don't have any situations where two files are
 	// contending over resources, or the current file spends a second or
 	// two flushing its remaining audio.
-	this->file = this->audio.Null();
+	this->file = std::make_unique<NoAudio>();
 
 	try {
 		assert(this->file != nullptr);
