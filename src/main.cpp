@@ -75,8 +75,6 @@ int GetDeviceID(const std::vector<std::string> &args)
  */
 void SetupAudioSystem(AudioSystem &audio)
 {
-	audio.SetSink(&SdlAudioSink::Build);
-
 // Now set up the available sources.
 #ifdef WITH_MP3
 	mpg123_init();
@@ -178,7 +176,8 @@ int main(int argc, char *argv[])
 	if (device_id < 0) ExitWithUsage(args.at(0));
 
 	// Set up all of the components of playd in one fell swoop.
-	AudioSystem audio(device_id);
+	AudioSystem audio(device_id, &std::make_unique<SdlAudioSink, const AudioSource &, int>);
+
 	SetupAudioSystem(audio);
 	Player player(audio);
 	IoCore io(player);

@@ -45,8 +45,9 @@ public:
 	/**
 	 * Constructs a AudioSystem.
 	 * @param device_id The device ID to which sinks shall output.
+	 * @param sb The function to be used for building Sinks.
 	 */
-	AudioSystem(int device_id);
+	AudioSystem(int device_id, SinkBuilder sb);
 
 	/**
 	 * Loads a file, creating an Audio for it.

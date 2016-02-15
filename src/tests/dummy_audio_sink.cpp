@@ -14,12 +14,6 @@
 #include "../audio/audio_sink.hpp"
 #include "dummy_audio_sink.hpp"
 
-/* static */ std::unique_ptr<AudioSink> DummyAudioSink::Build(
-        const AudioSource &, int)
-{
-	return std::make_unique<DummyAudioSink>();
-}
-
 void DummyAudioSink::Start()
 {
 	this->state = Audio::State::PLAYING;

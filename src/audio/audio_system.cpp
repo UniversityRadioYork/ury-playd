@@ -26,11 +26,8 @@
 #include "sources/mp3.hpp"
 #include "sources/sndfile.hpp"
 
-AudioSystem::AudioSystem(int device_id)
-    : sink([](const AudioSource &, int) -> std::unique_ptr<AudioSink> {
-	      throw InternalError("No audio sink!");
-      }),
-      device_id(device_id)
+AudioSystem::AudioSystem(int device_id, SinkBuilder sink)
+    : sink(sink), device_id(device_id)
 {
 }
 
@@ -55,11 +52,6 @@ std::unique_ptr<AudioSource> AudioSystem::LoadSource(const std::string &path) co
 	}
 
 	return (ibuilder->second)(path);
-}
-
-void AudioSystem::SetSink(AudioSystem::SinkBuilder sink)
-{
-	this->sink = sink;
 }
 
 void AudioSystem::AddSource(const std::string &ext,

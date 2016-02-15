@@ -49,12 +49,6 @@ static void SDLCallback(void *vsink, std::uint8_t *data, int len)
 	sink->Callback(data, len);
 }
 
-/* static */ std::unique_ptr<AudioSink> SdlAudioSink::Build(
-        const AudioSource &source, int device_id)
-{
-	return std::make_unique<SdlAudioSink>(source, device_id);
-}
-
 SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
     : bytes_per_sample(source.BytesPerSample()),
       ring_buf(RINGBUF_POWER, source.BytesPerSample()),
