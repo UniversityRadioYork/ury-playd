@@ -260,8 +260,9 @@ private:
 	/**
 	 * Handles a tokenised command line.
 	 * @param msg A vector of command words representing a command line.
+	 * @return A final response returning whether the command succeeded.
 	 */
-	void RunCommand(const std::vector<std::string> &msg);
+	Response RunCommand(const std::vector<std::string> &msg);
 };
 
 #endif // PLAYD_IO_CORE_HPP

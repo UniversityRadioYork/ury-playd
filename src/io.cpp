@@ -159,9 +159,11 @@ void IoCore::Accept(uv_stream_t *server)
 	client->data = static_cast<void *>(conn.get());
 	this->pool[id - 1] = std::move(conn);
 
-	// The player will already have been told to send responses to the
-	// IoCore, so all it needs to know is the slot.
-	this->player.WelcomeClient(id);
+	// Begin initial responses
+	this->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI).AddArg(std::to_string(id)).AddArg(MSG_OHAI_BIFROST).AddArg(MSG_OHAI_PLAYD));
+	this->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA).AddArg("player/file"));
+	this->player.Dump(id, Response::NOREQUEST);
+	// End initial responses
 
 	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 }
@@ -416,20 +418,36 @@ void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 
 	// Everything looks okay for reading.
 	auto cmds = this->tokeniser.Feed(std::string(chars, nread));
-	for (auto cmd : cmds) RunCommand(cmd);
+	for (auto cmd : cmds) {
+		if (cmd.empty()) continue;
+
+		Response res = RunCommand(cmd);
+		this->Respond(res);
+	}
 	delete[] chars;
 }
 
-void Connection::RunCommand(const std::vector<std::string> &cmd)
+Response Connection::RunCommand(const std::vector<std::string> &cmd)
 {
-	if (cmd.empty()) return;
+	// First of all, figure out what the tag of this command is.
+	// The first word is always the tag.
+	auto tag = cmd[0];
+	if (cmd.size() <= 1) return Response::Invalid(tag, MSG_CMD_SHORT);
 
-	Debug() << "Received command:";
-	for (const auto &word : cmd) std::cerr << ' ' << '"' << word << '"';
-	std::cerr << std::endl;
+	// The next words are the actual command, and any other arguments.
+	auto word = cmd[1];
+	auto nargs = cmd.size() - 2;
 
-	Response res = this->player.RunCommand(cmd, this->id);
-	this->Respond(res);
+	if (nargs == 0 && "play" == word) return this->player.SetPlaying(tag, true);
+	if (nargs == 0 && "stop" == word) return this->player.SetPlaying(tag, false);
+	if (nargs == 0 && "end" == word) return this->player.End(tag);
+	if (nargs == 0 && "eject" == word) return this->player.Eject(tag);
+	if (nargs == 0 && "quit" == word) return this->player.Quit(tag);
+	if (nargs == 0 && "dump" == word) return this->player.Dump(id, tag);
+	if (nargs == 1 && "fload" == word) return this->player.Load(tag, cmd[2]);
+	if (nargs == 1 && "pos" == word) return this->player.Pos(tag, cmd[2]);
+
+	return Response::Invalid(tag, MSG_CMD_INVALID);
 }
 
 void Connection::Depool()

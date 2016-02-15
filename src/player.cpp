@@ -52,15 +52,35 @@ bool Player::Update()
 	return this->is_running;
 }
 
-void Player::WelcomeClient(size_t id) const
+//
+// Commands
+//
+
+Response Player::Dump(size_t id, const std::string &tag) const
 {
-	this->io->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI).AddArg(std::to_string(id)).AddArg(MSG_OHAI_BIFROST).AddArg(MSG_OHAI_PLAYD));
-	this->io->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA).AddArg("player/file"));
-	this->Dump(id, Response::NOREQUEST);
+	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	this->DumpRaw(id, tag);
+	this->io->Respond(id, Response(tag, Response::Code::DUMP));
+	return Response::Success(tag);
+}
+
+Response Player::Eject(const std::string &tag)
+{
+	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	assert(this->file != nullptr);
+	this->file = std::make_unique<NoAudio>();
+
+	this->DumpState(0, tag);
+
+	return Response::Success(tag);
 }
 
 Response Player::End(const std::string &tag)
 {
+	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
 	this->io->Respond(0, Response(tag, Response::Code::END));
 
 	this->SetPlaying(tag, false);
@@ -77,54 +97,9 @@ Response Player::End(const std::string &tag)
 	return Response::Success(tag);
 }
 
-//
-// Commands
-//
-
-Response Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
-{
-	// First of all, figure out what the tag of this command is.
-	// We make it by adding the id to the zeroth command word.
-	if (cmd.size() == 0) return Response::Invalid(Response::NOREQUEST, MSG_CMD_SHORT);
-	auto tag = cmd[0];
-	if (cmd.size() <= 1) return Response::Invalid(tag, MSG_CMD_SHORT);
-
-	if (!this->is_running) {
-		// Refuse any and all commands when not running.
-		// This is mainly to prevent the internal state from
-		// going weird, but seems logical anyway.
-		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
-	}
-
-	// The first word is always the tag; the second is the actual command word.
-
-	auto word = cmd[1];
-	auto nargs = cmd.size() - 2;
-
-	if (nargs == 0 && "play" == word) return this->SetPlaying(tag, true);
-	if (nargs == 0 && "stop" == word) return this->SetPlaying(tag, false);
-	if (nargs == 0 && "end" == word) return this->End(tag);
-	if (nargs == 0 && "eject" == word) return this->Eject(tag);
-	if (nargs == 0 && "quit" == word) return this->Quit(tag);
-	if (nargs == 0 && "dump" == word) return this->Dump(id, tag);
-	if (nargs == 1 && "fload" == word) return this->Load(tag, cmd[2]);
-	if (nargs == 1 && "pos" == word) return this->Pos(tag, cmd[2]);
-
-	return Response::Invalid(tag, MSG_CMD_INVALID);
-}
-
-Response Player::Eject(const std::string &tag)
-{
-	assert(this->file != nullptr);
-	this->file = std::make_unique<NoAudio>();
-
-	this->DumpState(0, tag);
-
-	return Response::Success(tag);
-}
-
 Response Player::Load(const std::string &tag, const std::string &path)
 {
+	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 	if (path.empty()) return Response::Invalid(tag, MSG_LOAD_EMPTY_PATH);
 
 	assert(this->file != nullptr);
@@ -155,36 +130,10 @@ Response Player::Load(const std::string &tag, const std::string &path)
 	return Response::Success(tag);
 }
 
-Response Player::SetPlaying(const std::string &tag, bool playing)
-{
-	// Why is SetPlaying not split between Start() and Stop()?, I hear the
-	// best practices purists amongst you say.  Quite simply, there is a
-	// large amount of fiddly exception boilerplate here that would
-	// otherwise be duplicated between the two methods.  The 'public'
-	// interface Player gives is Start()/Stop(), anyway.
-
-	assert(this->file != nullptr);
-
-	try {
-		this->file->SetPlaying(playing);
-	} catch (NoAudioError &e) {
-		return Response::Invalid(tag, e.Message());
-	}
-
-	this->DumpState(0, tag);
-
-	return Response::Success(tag);
-}
-
-Response Player::Quit(const std::string &tag)
-{
-	this->Eject(tag);
-	this->is_running = false;
-	return Response::Success(tag);
-}
-
 Response Player::Pos(const std::string &tag, const std::string &pos_str)
 {
+	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
 	std::uint64_t pos = 0;
 	try {
 		pos = PosParse(pos_str);
@@ -213,6 +162,42 @@ Response Player::Pos(const std::string &tag, const std::string &pos_str)
 	// If we've made it all the way down here, we deserve to succeed.
 	return Response::Success(tag);
 }
+
+Response Player::SetPlaying(const std::string &tag, bool playing)
+{
+	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	// Why is SetPlaying not split between Start() and Stop()?, I hear the
+	// best practices purists amongst you say.  Quite simply, there is a
+	// large amount of fiddly exception boilerplate here that would
+	// otherwise be duplicated between the two methods.  The 'public'
+	// interface Player gives is Start()/Stop(), anyway.
+
+	assert(this->file != nullptr);
+
+	try {
+		this->file->SetPlaying(playing);
+	} catch (NoAudioError &e) {
+		return Response::Invalid(tag, e.Message());
+	}
+
+	this->DumpState(0, tag);
+
+	return Response::Success(tag);
+}
+
+Response Player::Quit(const std::string &tag)
+{
+	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	this->Eject(tag);
+	this->is_running = false;
+	return Response::Success(tag);
+}
+
+//
+// Command implementations
+//
 
 /* static */ std::uint64_t Player::PosParse(const std::string &pos_str)
 {
@@ -287,13 +272,6 @@ void Player::DumpState(size_t id, const std::string &tag) const
 	}
 
 	this->io->Respond(id, Response(tag, code));
-}
-
-Response Player::Dump(size_t id, const std::string &tag) const
-{
-	this->DumpRaw(id, tag);
-	this->io->Respond(id, Response(tag, Response::Code::DUMP));
-	return Response::Success(tag);
 }
 
 bool Player::CanAnnounceTime(std::uint64_t micros)
