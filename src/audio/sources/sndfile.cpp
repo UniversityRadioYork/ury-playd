@@ -24,12 +24,6 @@
 #include "../audio_source.hpp"
 #include "sndfile.hpp"
 
-/* static */ std::unique_ptr<AudioSource> SndfileAudioSource::Build(
-        const std::string &path)
-{
-	return std::make_unique<SndfileAudioSource>(path);
-}
-
 SndfileAudioSource::SndfileAudioSource(const std::string &path)
     : AudioSource(path), file(nullptr), buffer()
 {

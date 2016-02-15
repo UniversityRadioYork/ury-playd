@@ -81,13 +81,13 @@ void SetupAudioSystem(AudioSystem &audio)
 #ifdef WITH_MP3
 	mpg123_init();
 	atexit(mpg123_exit);
-	audio.AddSource("mp3", &Mp3AudioSource::Build);
+	audio.AddSource("mp3", &std::make_unique<Mp3AudioSource, const std::string &>);
 #endif // WITH_MP3
 
 #ifdef WITH_SNDFILE
-	audio.AddSource("flac", &SndfileAudioSource::Build);
-	audio.AddSource("ogg", &SndfileAudioSource::Build);
-	audio.AddSource("wav", &SndfileAudioSource::Build);
+	audio.AddSource("flac", &std::make_unique<SndfileAudioSource, const std::string &>);
+	audio.AddSource("ogg", &std::make_unique<SndfileAudioSource, const std::string &>);
+	audio.AddSource("wav", &std::make_unique<SndfileAudioSource, const std::string &>);
 #endif // WITH_SNDFILE
 }
 

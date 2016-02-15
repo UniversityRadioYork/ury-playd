@@ -14,11 +14,6 @@
 #include "../audio/audio_source.hpp"
 #include "dummy_audio_source.hpp"
 
-/* static */ std::unique_ptr<AudioSource> DummyAudioSource::Build(const std::string &path)
-{
-	return std::make_unique<DummyAudioSource>(path);
-}
-
 AudioSource::DecodeResult DummyAudioSource::Decode()
 {
 	return std::make_pair(AudioSource::DecodeState::DECODING, AudioSource::DecodeVector());
