@@ -33,7 +33,7 @@ const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 /* static */ std::unique_ptr<AudioSource> Mp3AudioSource::Build(
         const std::string &path)
 {
-	return std::unique_ptr<AudioSource>(new Mp3AudioSource(path));
+	return std::make_unique<Mp3AudioSource>(path);
 }
 
 Mp3AudioSource::Mp3AudioSource(const std::string &path)

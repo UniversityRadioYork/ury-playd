@@ -17,7 +17,7 @@
 /* static */ std::unique_ptr<AudioSink> DummyAudioSink::Build(
         const AudioSource &, int)
 {
-	return std::unique_ptr<AudioSink>(new DummyAudioSink());
+	return std::make_unique<DummyAudioSink>();
 }
 
 void DummyAudioSink::Start()

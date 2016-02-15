@@ -36,7 +36,7 @@ AudioSystem::AudioSystem(int device_id)
 
 std::unique_ptr<Audio> AudioSystem::Null() const
 {
-	return std::unique_ptr<Audio>(new NoAudio());
+	return std::make_unique<NoAudio>();
 }
 
 std::unique_ptr<Audio> AudioSystem::Load(const std::string &path) const
@@ -45,8 +45,8 @@ std::unique_ptr<Audio> AudioSystem::Load(const std::string &path) const
 	assert(source != nullptr);
 
 	auto sink = this->sink(*source, this->device_id);
-	return std::unique_ptr<Audio>(
-	        new PipeAudio(std::move(source), std::move(sink)));
+	return std::make_unique<PipeAudio>(
+	        std::move(source), std::move(sink));
 }
 
 std::unique_ptr<AudioSource> AudioSystem::LoadSource(const std::string &path) const

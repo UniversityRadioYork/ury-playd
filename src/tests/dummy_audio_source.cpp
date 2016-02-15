@@ -16,7 +16,7 @@
 
 /* static */ std::unique_ptr<AudioSource> DummyAudioSource::Build(const std::string &path)
 {
-	return std::unique_ptr<AudioSource>(new DummyAudioSource(path));
+	return std::make_unique<DummyAudioSource>(path);
 }
 
 AudioSource::DecodeResult DummyAudioSource::Decode()

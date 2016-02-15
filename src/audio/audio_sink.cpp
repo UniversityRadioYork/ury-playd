@@ -52,7 +52,7 @@ static void SDLCallback(void *vsink, std::uint8_t *data, int len)
 /* static */ std::unique_ptr<AudioSink> SdlAudioSink::Build(
         const AudioSource &source, int device_id)
 {
-	return std::unique_ptr<AudioSink>(new SdlAudioSink(source, device_id));
+	return std::make_unique<SdlAudioSink>(source, device_id);
 }
 
 SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
