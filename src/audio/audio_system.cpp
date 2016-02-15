@@ -26,8 +26,8 @@
 #include "sources/mp3.hpp"
 #include "sources/sndfile.hpp"
 
-AudioSystem::AudioSystem(int device_id, SinkBuilder sink)
-    : sink(sink), device_id(device_id)
+AudioSystem::AudioSystem(int device_id, SinkFn sink, std::map<std::string, SourceFn> sources)
+    : sink(sink), device_id(device_id), sources(sources)
 {
 }
 
@@ -52,10 +52,4 @@ std::unique_ptr<AudioSource> AudioSystem::LoadSource(const std::string &path) co
 	}
 
 	return (ibuilder->second)(path);
-}
-
-void AudioSystem::AddSource(const std::string &ext,
-                            AudioSystem::SourceBuilder source)
-{
-	this->sources.emplace(ext, source);
 }

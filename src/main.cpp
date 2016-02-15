@@ -31,6 +31,19 @@ static const std::string DEFAULT_HOST = "0.0.0.0";
 /// The default TCP port on which playd will bind.
 static const std::string DEFAULT_PORT = "1350";
 
+/// Map from file extensions to builders for AudioSources for them.
+static const std::map<std::string, AudioSystem::SourceFn> SOURCES = {
+#ifdef WITH_MP3
+	{"mp3", &std::make_unique<Mp3AudioSource, const std::string &>},
+#endif // WITH_MP3
+
+#ifdef WITH_SNDFILE
+	{"flac", &std::make_unique<SndfileAudioSource, const std::string &>},
+	{"ogg", &std::make_unique<SndfileAudioSource, const std::string &>},
+	{"wav", &std::make_unique<SndfileAudioSource, const std::string &>},
+#endif // WITH_SNDFILE
+};
+
 /**
  * Creates a vector of strings from a C-style argument vector.
  * @param argc Program argument count.
@@ -67,26 +80,6 @@ int GetDeviceID(const std::vector<std::string> &args)
 	if (!SdlAudioSink::IsOutputDevice(id)) return -1;
 
 	return id;
-}
-
-/**
- * Sets up the audio system with the desired sources and sinks.
- * @param audio The audio system to configure.
- */
-void SetupAudioSystem(AudioSystem &audio)
-{
-// Now set up the available sources.
-#ifdef WITH_MP3
-	mpg123_init();
-	atexit(mpg123_exit);
-	audio.AddSource("mp3", &std::make_unique<Mp3AudioSource, const std::string &>);
-#endif // WITH_MP3
-
-#ifdef WITH_SNDFILE
-	audio.AddSource("flac", &std::make_unique<SndfileAudioSource, const std::string &>);
-	audio.AddSource("ogg", &std::make_unique<SndfileAudioSource, const std::string &>);
-	audio.AddSource("wav", &std::make_unique<SndfileAudioSource, const std::string &>);
-#endif // WITH_SNDFILE
 }
 
 /**
@@ -170,15 +163,20 @@ int main(int argc, char *argv[])
 	SdlAudioSink::InitLibrary();
 	atexit(SdlAudioSink::CleanupLibrary);
 
+#ifdef WITH_MP3
+	mpg123_init();
+	atexit(mpg123_exit);
+#endif // WITH_MP3
+
 	auto args = MakeArgVector(argc, argv);
 
 	auto device_id = GetDeviceID(args);
 	if (device_id < 0) ExitWithUsage(args.at(0));
 
 	// Set up all of the components of playd in one fell swoop.
-	AudioSystem audio(device_id, &std::make_unique<SdlAudioSink, const AudioSource &, int>);
-
-	SetupAudioSystem(audio);
+	AudioSystem audio(device_id,
+		&std::make_unique<SdlAudioSink, const AudioSource &, int>,
+		SOURCES);
 	Player player(audio);
 	IoCore io(player);
 
