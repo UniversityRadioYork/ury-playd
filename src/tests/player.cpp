@@ -9,20 +9,21 @@
 #include <sstream>
 
 #include "catch.hpp"
-#include "../audio/audio_system.hpp"
 #include "../errors.hpp"
 #include "../player.hpp"
 #include "dummy_audio_sink.hpp"
 #include "dummy_audio_source.hpp"
 #include "dummy_response_sink.hpp"
 
+const std::map<std::string, Player::SourceFn> DUMMY_SRCS {
+	{"mp3", &std::make_unique<DummyAudioSource, const std::string &>}
+};
+
 SCENARIO("Player accurately represents whether it is running", "[player]") {
 	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
-		AudioSystem ds(0);
-		Player p(ds);
-
-		ds.SetSink(&DummyAudioSink::Build);
-		ds.AddSource("mp3", &DummyAudioSource::Build);
+		Player p(0,
+			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 DUMMY_SRCS);
 
 		WHEN("the player has not been asked to quit") {
 			THEN("Update returns true (the player is running)") {
@@ -30,15 +31,15 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 			}
 		}
 		WHEN("the player has been asked to quit") {
-			auto res = p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Quitting"});
+			auto res = p.Quit("tag");
 			THEN("The quit was a success") {
-				REQUIRE(res.IsSuccess());
+				REQUIRE(res.Pack() == "tag ACK OK Success");
 			}
 			THEN("Update returns false (the player is no longer running)") {
 				REQUIRE_FALSE(p.Update());
 			}
 			THEN("Any future quits fail") {
-				REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Quitting"}).IsSuccess());
+				REQUIRE_FALSE(p.Quit("tag2").Pack() == "tag2 ACK OK Success");
 			}
 		}
 	}
@@ -46,83 +47,81 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 
 SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-system]") {
 	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
-		AudioSystem ds(0);
-		Player p(ds);
-
-		ds.SetSink(&DummyAudioSink::Build);
-		ds.AddSource("mp3", &DummyAudioSource::Build);
+		Player p(0,
+			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 DUMMY_SRCS);
 
 		WHEN("there is no audio loaded") {
-			THEN("setting state to 'Playing' returns failure") {
-				REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Playing"}).IsSuccess());
+			THEN("playing returns failure") {
+				REQUIRE_FALSE(p.SetPlaying("tag", true).Pack() == "tag ACK OK Success");
 			}
-			THEN("setting state to 'Stopped' returns failure") {
-				REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Stopped"}).IsSuccess());
+			THEN("stopping returns failure") {
+				REQUIRE_FALSE(p.SetPlaying("tag", false).Pack() == "tag ACK OK Success");
 			}
 			THEN("setting time to 0 returns failure") {
-				REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/time/elapsed", "0"}).IsSuccess());
+				REQUIRE_FALSE(p.Pos("tag", 0).Pack() == "tag ACK OK Success");
 			}
 			THEN("setting state to 'Ejected' returns success") {
 				// Telling an ejected player to eject is a
 				// no-op.
-				REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Ejected"}).IsSuccess());
+				REQUIRE(p.Eject("tag").Pack() == "ACK OK Success");
 			}
 			THEN("loading for a known file type returns success") {
-				REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.mp3"}).IsSuccess());
+				REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK Success");
 			}
 			THEN("loading for an unknown file type returns failure") {
-				REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.wav"}).IsSuccess());
+				REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK Success");
 			}
 		}
 
 		WHEN("there is audio loaded") {
-			p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.mp3"});
+			p.Load("tag", "blah.mp3");
 
 			AND_WHEN("the audio is stopped") {
 				THEN("setting state to Playing returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Playing"}).IsSuccess());
+					REQUIRE(p.SetPlaying("tag", true).Pack() == "tag ACK OK Success");
 				}
 				THEN("setting state to Stopped returns success") {
 					// Telling a stopped file to stop is a
 					// no-op.
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Stopped"}).IsSuccess());
+					REQUIRE(p.SetPlaying("tag", false).Pack() == "tag ACK OK Success");
 				}
 				THEN("seeking to 0 returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/time/elapsed", "0"}).IsSuccess());
+					REQUIRE(p.Pos("tag", 0).Pack() == "tag ACK OK Success");
 				}
 				THEN("setting state to Ejected returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Ejected"}).IsSuccess());
+					REQUIRE(p.Eject("tag").Pack() == "tag ACK OK Success");
 				}
 				THEN("loading for a known file type returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.mp3"}).IsSuccess());
+					REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK Success");
 				}
 				THEN("loading for an unknown file type returns failure") {
-					REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.wav"}).IsSuccess());
+					REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK Success");
 				}
 			}
 
 			AND_WHEN("the audio is playing") {
-				p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Playing"});
+				p.SetPlaying("tag", true).Pack();
 
 				THEN("setting state to Playing returns failure") {
 					// Telling a playing file to play is a
 					// no-op.
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Playing"}).IsSuccess());
+					REQUIRE(p.SetPlaying("tag", true).Pack() == "tag ACK OK Success");
 				}
 				THEN("setting state to Stopped returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Stopped"}).IsSuccess());
+					REQUIRE(p.SetPlaying("tag", false).Pack() == "tag ACK OK Success");
 				}
 				THEN("seeking to 0 returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/time/elapsed", "0"}).IsSuccess());
+					REQUIRE(p.Pos("tag", 0).Pack() == "tag ACK OK Success");
 				}
 				THEN("setting state to Ejected returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/control/state", "Ejected"}).IsSuccess());
+					REQUIRE(p.Eject("tag").Pack() == "tag ACK OK Success");
 				}
 				THEN("loading for a known file type returns success") {
-					REQUIRE(p.RunCommand(std::vector<std::string>{"write", "tag", "/player/file", "blah.mp3"}).IsSuccess());
+					REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK Success");
 				}
 				THEN("loading for an unknown file type returns failure") {
-					REQUIRE_FALSE(p.RunCommand(std::vector<std::string>{"/player/file", "blah.wav"}).IsSuccess());
+					REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK Success");
 				}
 			}
 		}
