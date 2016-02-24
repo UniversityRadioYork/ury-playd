@@ -33,13 +33,13 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 		WHEN("the player has been asked to quit") {
 			auto res = p.Quit("tag");
 			THEN("The quit was a success") {
-				REQUIRE(res.Pack() == "tag ACK OK Success");
+				REQUIRE(res.Pack() == "tag ACK OK success");
 			}
 			THEN("Update returns false (the player is no longer running)") {
 				REQUIRE_FALSE(p.Update());
 			}
 			THEN("Any future quits fail") {
-				REQUIRE_FALSE(p.Quit("tag2").Pack() == "tag2 ACK OK Success");
+				REQUIRE_FALSE(p.Quit("tag2").Pack() == "tag2 ACK OK success");
 			}
 		}
 	}
@@ -53,24 +53,24 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 
 		WHEN("there is no audio loaded") {
 			THEN("playing returns failure") {
-				REQUIRE_FALSE(p.SetPlaying("tag", true).Pack() == "tag ACK OK Success");
+				REQUIRE_FALSE(p.SetPlaying("tag", true).Pack() == "tag ACK OK success");
 			}
 			THEN("stopping returns failure") {
-				REQUIRE_FALSE(p.SetPlaying("tag", false).Pack() == "tag ACK OK Success");
+				REQUIRE_FALSE(p.SetPlaying("tag", false).Pack() == "tag ACK OK success");
 			}
 			THEN("setting time to 0 returns failure") {
-				REQUIRE_FALSE(p.Pos("tag", 0).Pack() == "tag ACK OK Success");
+				REQUIRE_FALSE(p.Pos("tag", "0").Pack() == "tag ACK OK success");
 			}
 			THEN("setting state to 'Ejected' returns success") {
 				// Telling an ejected player to eject is a
 				// no-op.
-				REQUIRE(p.Eject("tag").Pack() == "ACK OK Success");
+				REQUIRE(p.Eject("tag").Pack() == "tag ACK OK success");
 			}
 			THEN("loading for a known file type returns success") {
-				REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK Success");
+				REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK success");
 			}
 			THEN("loading for an unknown file type returns failure") {
-				REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK Success");
+				REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK success");
 			}
 		}
 
@@ -79,24 +79,24 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 
 			AND_WHEN("the audio is stopped") {
 				THEN("setting state to Playing returns success") {
-					REQUIRE(p.SetPlaying("tag", true).Pack() == "tag ACK OK Success");
+					REQUIRE(p.SetPlaying("tag", true).Pack() == "tag ACK OK success");
 				}
 				THEN("setting state to Stopped returns success") {
 					// Telling a stopped file to stop is a
 					// no-op.
-					REQUIRE(p.SetPlaying("tag", false).Pack() == "tag ACK OK Success");
+					REQUIRE(p.SetPlaying("tag", false).Pack() == "tag ACK OK success");
 				}
 				THEN("seeking to 0 returns success") {
-					REQUIRE(p.Pos("tag", 0).Pack() == "tag ACK OK Success");
+					REQUIRE(p.Pos("tag", "0").Pack() == "tag ACK OK success");
 				}
 				THEN("setting state to Ejected returns success") {
-					REQUIRE(p.Eject("tag").Pack() == "tag ACK OK Success");
+					REQUIRE(p.Eject("tag").Pack() == "tag ACK OK success");
 				}
 				THEN("loading for a known file type returns success") {
-					REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK Success");
+					REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK success");
 				}
 				THEN("loading for an unknown file type returns failure") {
-					REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK Success");
+					REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK success");
 				}
 			}
 
@@ -106,22 +106,22 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 				THEN("setting state to Playing returns failure") {
 					// Telling a playing file to play is a
 					// no-op.
-					REQUIRE(p.SetPlaying("tag", true).Pack() == "tag ACK OK Success");
+					REQUIRE(p.SetPlaying("tag", true).Pack() == "tag ACK OK success");
 				}
 				THEN("setting state to Stopped returns success") {
-					REQUIRE(p.SetPlaying("tag", false).Pack() == "tag ACK OK Success");
+					REQUIRE(p.SetPlaying("tag", false).Pack() == "tag ACK OK success");
 				}
 				THEN("seeking to 0 returns success") {
-					REQUIRE(p.Pos("tag", 0).Pack() == "tag ACK OK Success");
+					REQUIRE(p.Pos("tag", "0").Pack() == "tag ACK OK success");
 				}
 				THEN("setting state to Ejected returns success") {
-					REQUIRE(p.Eject("tag").Pack() == "tag ACK OK Success");
+					REQUIRE(p.Eject("tag").Pack() == "tag ACK OK success");
 				}
 				THEN("loading for a known file type returns success") {
-					REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK Success");
+					REQUIRE(p.Load("tag", "blah.mp3").Pack() == "tag ACK OK success");
 				}
 				THEN("loading for an unknown file type returns failure") {
-					REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK Success");
+					REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK success");
 				}
 			}
 		}
