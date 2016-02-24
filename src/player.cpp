@@ -45,7 +45,7 @@ bool Player::Update()
 		// advanced since last update.  So we need to update it.
 		auto pos = this->file->Position();
 		if (this->CanAnnounceTime(pos)) {
-			this->io->Respond(0, Response(Response::NOREQUEST, Response::Code::POS).AddArg(std::to_string(pos)));
+			this->Respond(0, Response(Response::NOREQUEST, Response::Code::POS).AddArg(std::to_string(pos)));
 		}
 	}
 
@@ -61,7 +61,7 @@ Response Player::Dump(size_t id, const std::string &tag) const
 	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	this->DumpRaw(id, tag);
-	this->io->Respond(id, Response(tag, Response::Code::DUMP));
+	this->Respond(id, Response(tag, Response::Code::DUMP));
 	return Response::Success(tag);
 }
 
@@ -81,7 +81,9 @@ Response Player::End(const std::string &tag)
 {
 	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
-	this->io->Respond(0, Response(tag, Response::Code::END));
+	// Let upstream know that the file ended by itself.
+	// This is needed for auto-advancing playlists, etc.
+	this->Respond(0, Response(tag, Response::Code::END));
 
 	this->SetPlaying(tag, false);
 
@@ -89,10 +91,6 @@ Response Player::End(const std::string &tag)
 	// in case End() is called from Pos(); a seek failure could start an
 	// infinite loop.
 	this->PosRaw(tag, 0);
-
-	// Let upstream know that the file ended by itself.
-	// This is needed for auto-advancing playlists, etc.
-	if (this->io == nullptr) return Response::Success(tag);
 
 	return Response::Success(tag);
 }
@@ -230,7 +228,7 @@ void Player::PosRaw(const std::string &tag, std::uint64_t pos)
 	// This is required to make CanAnnounceTime() continue working.
 	this->last_pos = pos / 1000 / 1000;
 
-	this->io->Respond(0, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
+	this->Respond(0, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
 }
 
 void Player::DumpRaw(size_t id, const std::string &tag) const
@@ -242,10 +240,10 @@ void Player::DumpRaw(size_t id, const std::string &tag) const
 	// This information won't exist if there is no file.
 	if (this->file->CurrentState() != Audio::State::NONE) {
 		auto file = this->file->File();
-		this->io->Respond(id, Response(tag, Response::Code::FLOAD).AddArg(file));
+		this->Respond(id, Response(tag, Response::Code::FLOAD).AddArg(file));
 
 		auto pos = this->file->Position();
-		this->io->Respond(id, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
+		this->Respond(id, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
 	}
 }
 
@@ -271,7 +269,12 @@ void Player::DumpState(size_t id, const std::string &tag) const
 		return;
 	}
 
-	this->io->Respond(id, Response(tag, code));
+	this->Respond(id, Response(tag, code));
+}
+
+void Player::Respond(int id, Response rs) const
+{
+	if (this->io != nullptr) this->io->Respond(id, rs);
 }
 
 bool Player::CanAnnounceTime(std::uint64_t micros)

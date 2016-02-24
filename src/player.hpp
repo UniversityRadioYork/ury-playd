@@ -194,7 +194,17 @@ private:
 	 *
 	 * @see DumpRaw
 	 */
-	 void DumpState(size_t id, const std::string &tag) const;
+	void DumpState(size_t id, const std::string &tag) const;
+
+	/**
+	 * Outputs a response, if there is a ResponseSink attached.
+	 *
+	 * Otherwise, this method does nothing.
+	 * @param id The ID of the client receiving this response.
+	 *   Use 0 for broadcasts.
+	 * @param response The Response to output.
+	 */
+	void Respond(int id, Response rs) const;
 
 	/**
 	 * Determines whether we can broadcast a POS response.
