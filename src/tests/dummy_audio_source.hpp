@@ -18,14 +18,6 @@ class DummyAudioSource : public AudioSource
 {
 public:
 	/**
-	 * Helper function for creating uniquely pointed-to Mp3AudioSources.
-	 * @param path The path to the file to load and decode using this
-	 *   decoder.
-	 * @return A unique pointer to a Mp3AudioSource for the given path.
-	 */
-	static std::unique_ptr<AudioSource> Build(const std::string &path);
-
-	/**
 	 * Constructs a DummyAudioSource.
 	 * @param path The path of the file this DummyAudioSource 'represents'.
 	 */
@@ -37,7 +29,7 @@ public:
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	/// @return The path of the DummyAudioSource.
-	const std::string &Path() const;
+	const std::string &Path() const override;
 
 	/// The position of the AudioSource, in samples.
 	std::uint64_t position;

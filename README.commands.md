@@ -19,18 +19,24 @@ On Windows, use [PuTTY][] in _raw mode_ with an _Implicit CR for every LF_.
 When connecting to `playd`, it will send a few initial responses to inform
 the client of its current state.  This will look something like:
 
-    OHAI playd
-    FEATURES End FileLoad PlayStop Seek TimeReport
-    TIME 0
-    STATE Ejected
+    ! OHAI 1 bifrost-0.3.0 playd-0.3.0
+    ! IAMA player/file
+    ! PLAY
+    ! FLOAD 'C:\Users\mattbw\Music\07 - Games Without Frontiers.mp3'
+    ! POS 72399818
+    ! DUMP
 
 This tells the client:
 
-* The name of the server program (`playd`);
-* The BAPS3 features implemented by `playd`;
-* The current position, in microseconds, into the current song (in this example,
-  it is `0` because there is no song)
-* The current state (`Ejected`, which means no song is loaded).
+* Its client ID is 1 (mostly used for debug purposes);
+* This server speaks the Bifrost protocol, version 0.3.0;
+* This server runs `playd` version 0.3.0;
+* This server is a file player;
+* There is a file loaded and it is playing;
+* The file loaded is 'C:\Users\mattbw\Music\07 - Games Without Frontiers.mp3'
+  (a brilliant song from Peter Gabriel)
+* We are 72,399,818 microseconds, or 72.4 seconds, into the song;
+* This is all the information we need to begin sending commands.
 
 ## Command Format
 
@@ -41,7 +47,13 @@ This tells the client:
 * Words can be _quoted_ to avoid needing to backslash-escape large amounts of
   whitespace: either using _double quotes_, which allows backslash escaping, or
   _single quotes_, which doesn't;
-* The first word represents the _command_, and each subsequent word is an
+* The first word is a _tag_, which _should_ uniquely identify the command among
+  any other commands `playd` receives.  If you're confident you're the only
+  user of a `playd`, feel free to use anything here, as long as it contains
+  neither `!` nor `:`.  If you're sharing a `playd` with something else, you
+  will need to make sure your tags don't clash with theirs (eg, using GUIDs, or
+  hashes including your hostname/MAC address/etc).
+* The second word represents the _command_, and each subsequent word is an
   _argument_ to that command.
 
 ## Requests
@@ -51,9 +63,9 @@ always in _lowercase_.
 
 ### quit
 
-Terminates `playd`.
+Terminates `playd`.  (May be removed in future versions.)
 
-### load _file_
+### fload _file_
 
 Loads _file_, which is an _absolute_ path to an audio file.
 
@@ -70,58 +82,74 @@ Starts playing the currently loaded file.
 Stops playing the currently loaded file.  This does not alter the position;
 use `seek 0` after `stop` to rewind the file.
 
-### seek _position_
+### pos _position_
 
 Seeks to _position_ microseconds since the beginning of the file.
+
+### end
+
+Causes the song to jump right to the end; this is useful for skipping to the
+next file if you're using a playlist manager like `listd` with `playd`.
+
+### dump
+
+Dumps all of the current state, as if you had just connected (except we don't
+show you the `OHAI` or `IAMA` again).
 
 ## Responses
 
 These are the responses sent to clients by `playd`.  Response commands are
 always in _uppercase_.
 
-### OHAI _name_
+### OHAI _id_ _protocol-ver_ _server-ver_
 
-Identifies the server program.
+Identifies the server program and version, the protocol server and version, and
+the client ID.
 
-### FEATURES _feat1_ _feat2..._
+### IAMA _role_
 
-Lists the BAPS3 feature flags supported by `playd`.
+States the Bifrost role of `playd`, ie `player/file`.
 
 ### END
 
 Marks the end of a file.  This is sent if a file finishes playing of its own
-accord.
+accord, or if `end` is sent.
 
-### TIME _position_
+### POS _position_
 
 Announces the current position in the file, in microseconds.
 
-### STATE _state_
+### PLAY
 
-Announces a state change.  The _state_ will be one of:
+Announces that the file is now being played.
 
-* `Playing` - the current file is now being played;
-* `Stopped` - the current file is now stopped;
-* `Ejected` - the current file has just been ejected;
-* `Quitting` - `playd` is now quitting.
+### STOP
 
-### FILE _file_
+Announces that the file is now stopped.
+
+### EJECT
+
+Announces that no file is loaded.
+
+### QUIT
+
+Announces that the server is quitting (may be removed in future versions).
+
+### FLOAD _file_
 
 Announces that _file_ has just been loaded.
 
-### OK _command..._
+### ACK _status_ _message_ _command..._
 
-Announces that a valid _command_ has just been received and processed.
+_The format of this response may change in future versions._
 
-### WHAT _message_ _command..._
+Announces that a _command_ has just been received and processed.
 
-Announces that an invalid _command_ was just received.
-An error _message_ is provided.
+The result of the command is given by _status_:
 
-### FAIL _message_ _command..._
-
-Announces that a valid _command_ failed.
-An error _message_ is provided.
+* `WHAT`: command is syntactically invalid.
+* `FAIL`: command unsuccessfully completed.
+* `OK`:  command successfully completed.
 
 [BAPS3 specification]: https://UniversityRadioYork.github.io/baps3-spec
 [PuTTY]:               http://www.chiark.greenend.org.uk/~sgtatham/putty/

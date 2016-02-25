@@ -54,19 +54,6 @@ public:
 	//
 
 	/**
-	 * Sets whether this Audio should be playing or not.
-	 * @param playing True for playing; false for stopped.
-	 */
-	virtual void SetPlaying(bool playing) = 0;
-
-	/**
-	 * Attempts to seek to the given position.
-	 * @param position The position to seek to, in microseconds.
-	 * @see Position
-	 */
-	virtual void Seek(std::uint64_t position) = 0;
-
-	/**
 	 * Performs an update cycle on this Audio.
 	 *
 	 * Depending on the Audio implementation, this may do actions such as
@@ -78,22 +65,37 @@ public:
 	 */
 	virtual State Update() = 0;
 
+	/**
+	 * Sets whether this Audio should be playing or not.
+	 * @param playing True for playing; false for stopped.
+	 * @exception NoAudioError if the current state is NONE.
+	 */
+	virtual void SetPlaying(bool playing) = 0;
+
+	/**
+	 * Attempts to seek to the given position.
+	 * @param position The position to seek to, in microseconds.
+	 * @exception NoAudioError if the current state is NONE.
+	 * @see Position
+	 */
+	virtual void SetPosition(std::uint64_t position) = 0;
+
 	//
 	// Property access
 	//
 
 	/**
-	 * Emits the requested response.
-	 *
-	 * This method does NOT support emitting composite responses.  For
-	 * example, `Emit("/player", x)` shall be ignored.  This functionality
-	 * is provided in Player.
-	 *
-	 * @param path The path of the response to emit, if possible.
-	 * @param broadcast If true, the emission is an update broadcast.
-	 * @return A pointer to the response, if it exists.
+	 * This Audio's current file.
+	 * @return The filename of this current file.
+	 * @exception NoAudioError if the current state is NONE.
 	 */
-	virtual std::unique_ptr<Response> Emit(const std::string &path, bool broadcast);
+	virtual const std::string &File() const = 0;
+
+	/**
+	 * The state of this Audio.
+	 * @return this Audio's current state.
+	 */
+	virtual	Audio::State CurrentState() const = 0;
 
 	/**
 	 * This Audio's current position.
@@ -102,6 +104,7 @@ public:
 	 * do not expect it to be highly accurate.
 	 *
 	 * @return The current position, in microseconds.
+	 * @exception NoAudioError if the current state is NONE.
 	 * @see Seek
 	 */
 	virtual std::uint64_t Position() const = 0;
@@ -120,13 +123,14 @@ class NoAudio : public Audio
 {
 public:
 	Audio::State Update() override;
-	std::unique_ptr<Response> Emit(const std::string &path, bool broadcast) override;
+	Audio::State CurrentState() const override;
 
 	// The following all raise an exception:
 
 	void SetPlaying(bool playing) override;
-	void Seek(std::uint64_t position) override;
+	void SetPosition(std::uint64_t position) override;
 	std::uint64_t Position() const override;
+	const std::string &File() const override;
 };
 
 /**
@@ -152,11 +156,13 @@ public:
 	PipeAudio(std::unique_ptr<AudioSource> &&src,
 	          std::unique_ptr<AudioSink> &&sink);
 
-	void SetPlaying(bool playing) override;
-	void Seek(std::uint64_t position) override;
 	Audio::State Update() override;
+	const std::string &File() const override;
 
-	std::unique_ptr<Response> Emit(const std::string &path, bool broadcast) override;
+	void SetPlaying(bool playing) override;
+	Audio::State CurrentState() const override;
+
+	void SetPosition(std::uint64_t position) override;
 	std::uint64_t Position() const override;
 
 private:
@@ -171,12 +177,6 @@ private:
 
 	/// The current position in the current decoded frame.
 	AudioSource::DecodeVector::iterator frame_iterator;
-
-	/// Whether last_time contains a valid last time.
-	bool announced_time;
-
-	/// The last time into this Audio when the time was broadcast.
-	std::uint64_t last_time;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
@@ -198,21 +198,6 @@ private:
 
 	/// Transfers as much of the current frame as possible to the sink.
 	void TransferFrame();
-
-	/**
-	 * Determines whether we can broadcast a TIME response.
-	 *
-	 * To prevent spewing massive amounts of TIME responses, we only send a
-	 * broadcast if the number of seconds has changed since the last
-	 * time CanAnnounceTime() was called for the given sink.
-	 *
-	 * This is *not* idempotent.  A CanAnnounceTime(x) less than one second
-	 * before a CanAnnounceTime(x) will _always_ be false.
-	 *
-	 * @param micros The value of the TIME response, in microseconds.
-	 * @return Whether it is polite to broadcast TIME.
-	 */
-	bool CanAnnounceTime(std::uint64_t micros);
 };
 
 #endif // PLAYD_AUDIO_HPP

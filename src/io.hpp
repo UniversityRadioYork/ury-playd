@@ -88,7 +88,7 @@ public:
 	 */
 	void UpdatePlayer();
 
-	void Respond(const Response &response, size_t id = 0) const override;
+	void Respond(size_t id, const Response &response) const override;
 
 private:
 	/// The period between player updates.
@@ -175,10 +175,10 @@ private:
 
 	/**
 	 * Sends the given response to the identified connection.
-	 * @param response The response to broadcast.
 	 * @param id The ID of the recipient connection.
+	 * @param response The response to broadcast.
 	 */
-	void Unicast(const Response &response, size_t id) const;
+	void Unicast(size_t id, const Response &response) const;
 };
 
 /**
@@ -260,8 +260,9 @@ private:
 	/**
 	 * Handles a tokenised command line.
 	 * @param msg A vector of command words representing a command line.
+	 * @return A final response returning whether the command succeeded.
 	 */
-	void RunCommand(const std::vector<std::string> &msg);
+	Response RunCommand(const std::vector<std::string> &msg);
 };
 
 #endif // PLAYD_IO_CORE_HPP
