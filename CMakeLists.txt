@@ -52,14 +52,19 @@ endif()
 
 ##
 
-include_directories(${SDL2_INCLUDE_DIR} ${LIBUV_INCLUDE_DIR} ${MPG123_INCLUDE_DIR} ${LIBSNDFILE_INCLUDE_DIR})
-
 add_subdirectory("src")
 
 get_property(SRCS GLOBAL PROPERTY SRCS_LIST)
 add_executable(playd ${SRCS})
-target_link_libraries(playd ${SDL2_LIBRARY} ${LIBUV_LIBRARY} ${MPG123_LIBRARY} ${LIBSNDFILE_LIBRARY})
-
+foreach(mylib SDL2 LIBUV MPG123 LIBSNDFILE)
+  if(${mylib}_LIBRARY AND ${mylib}_INCLUDE_DIR)
+    target_link_libraries(playd ${${mylib}_LIBRARY})
+	include_directories(playd ${${mylib}_INCLUDE_DIR})
+  endif()
+endforeach()
+if(WIN32)
+  target_link_libraries(playd wsock32 ws2_32 iphlpapi psapi userenv)
+endif()
 # Print all variables
 get_cmake_property(_variableNames VARIABLES)
 foreach (_variableName ${_variableNames})
