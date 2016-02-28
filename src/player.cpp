@@ -136,7 +136,10 @@ Response Player::Load(const std::string &tag, const std::string &path)
 	
 	// A load will change all of the player's state in one go,
 	// so just send a Dump() instead of writing out all of the responses here.
-	return this->Dump(0, Response::NOREQUEST);
+    // Don't take the response from here, though, because it has the wrong tag.
+	this->Dump(0, Response::NOREQUEST);
+    
+    return Response::Success(tag);
 }
 
 Response Player::Pos(const std::string &tag, const std::string &pos_str)
