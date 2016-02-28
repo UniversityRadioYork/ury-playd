@@ -179,7 +179,7 @@ Response Player::SetPlaying(const std::string &tag, bool playing)
 		return Response::Invalid(tag, e.Message());
 	}
 
-	this->DumpState(0, tag);
+	this->DumpState(0, Response::NOREQUEST);
 
 	return Response::Success(tag);
 }
