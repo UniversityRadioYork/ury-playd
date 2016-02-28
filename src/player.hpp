@@ -142,9 +142,9 @@ private:
 	SinkFn sink;                             ///< The sink create function.
 	std::map<std::string, SourceFn> sources; ///< The file formats map.
 	std::unique_ptr<Audio> file;             ///< The loaded audio file.
-	bool is_running;                         ///< Whether the Player runs.
-	const ResponseSink *io;                  ///< The sink for responses.
-	std::uint64_t last_pos;                  ///< The last-sent position.
+	bool dead;              ///< Whether the Player is closing.
+	const ResponseSink *io; ///< The sink for responses.
+	std::uint64_t last_pos; ///< The last-sent position.
 
 	/**
 	 * Parses pos_str as a seek timestamp.

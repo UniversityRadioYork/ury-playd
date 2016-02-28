@@ -27,7 +27,7 @@ Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sourc
       sink(sink),
       sources(sources),
       file(std::make_unique<NoAudio>()),
-      is_running(true),
+      dead(false),
       io(nullptr),
       last_pos(0)
 {
@@ -55,7 +55,7 @@ bool Player::Update()
 		}
 	}
 
-	return this->is_running;
+	return !this->dead;
 }
 
 //
@@ -64,8 +64,7 @@ bool Player::Update()
 
 Response Player::Dump(size_t id, const std::string &tag) const
 {
-	if (!this->is_running)
-		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	this->DumpState(id, tag);
 
@@ -85,8 +84,7 @@ Response Player::Dump(size_t id, const std::string &tag) const
 
 Response Player::Eject(const std::string &tag)
 {
-	if (!this->is_running)
-		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	assert(this->file != nullptr);
 	this->file = std::make_unique<NoAudio>();
@@ -98,8 +96,7 @@ Response Player::Eject(const std::string &tag)
 
 Response Player::End(const std::string &tag)
 {
-	if (!this->is_running)
-		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
@@ -117,8 +114,7 @@ Response Player::End(const std::string &tag)
 
 Response Player::Load(const std::string &tag, const std::string &path)
 {
-	if (!this->is_running)
-		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 	if (path.empty()) return Response::Invalid(tag, MSG_LOAD_EMPTY_PATH);
 
 	assert(this->file != nullptr);
@@ -158,8 +154,7 @@ Response Player::Load(const std::string &tag, const std::string &path)
 
 Response Player::Pos(const std::string &tag, const std::string &pos_str)
 {
-	if (!this->is_running)
-		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	std::uint64_t pos = 0;
 	try {
@@ -192,8 +187,7 @@ Response Player::Pos(const std::string &tag, const std::string &pos_str)
 
 Response Player::SetPlaying(const std::string &tag, bool playing)
 {
-	if (!this->is_running)
-		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	// Why is SetPlaying not split between Start() and Stop()?, I hear the
 	// best practices purists amongst you say.  Quite simply, there is a
@@ -215,11 +209,10 @@ Response Player::SetPlaying(const std::string &tag, bool playing)
 
 Response Player::Quit(const std::string &tag)
 {
-	if (!this->is_running)
-		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	this->Eject(tag);
-	this->is_running = false;
+	this->dead = true;
 	return Response::Success(tag);
 }
 
