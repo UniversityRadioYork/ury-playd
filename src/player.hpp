@@ -75,7 +75,7 @@ public:
 	/**
 	 * Tells the audio file to start or stop playing.
 	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *   For unsolicited state changes, use Response::NOREQUEST.
 	 * @param playing True if playing; false otherwise.
 	 * @see Play
 	 * @see Stop
@@ -96,7 +96,7 @@ public:
 	/**
 	 * Ejects the current loaded song, if any.
 	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *   For unsolicited ejects, use Response::NOREQUEST.
 	 * @return Whether the ejection succeeded.
 	 */
 	Response Eject(const std::string &tag);
@@ -104,15 +104,15 @@ public:
 	/**
 	 * Ends a file, stopping and rewinding.
 	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *   For unsolicited ends, use Response::NOREQUEST.
 	 * @return Whether the end succeeded.
 	 */
 	Response End(const std::string &tag);
 
 	/**
-	 * Loads a track.
+	 * Loads a file.
 	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *   For unsolicited loads, use Response::NOREQUEST.
 	 * @param path The absolute path to a track to load.
 	 * @return Whether the load succeeded.
 	 */
@@ -121,7 +121,7 @@ public:
 	/**
 	 * Seeks to a given position in the current file.
 	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *   For unsolicited seeks, use Response::NOREQUEST.
 	 * @param pos_str A string containing a timestamp, in microseconds
 	 * @return Whether the seek succeeded.
 	 */
@@ -130,7 +130,7 @@ public:
 	/**
 	 * Quits playd.
 	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *   For unsolicited quits, use Response::NOREQUEST.
 	 * @return Whether the quit succeeded.
 	 */
 	Response Quit(const std::string &tag);
@@ -161,7 +161,7 @@ private:
 	 * Performs an actual seek.
 	 * This does not do any EOF handling.
 	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited dumps, use Response::NOREQUEST.
+	 *   For unsolicited seeks, use Response::NOREQUEST.
 	 * @param pos The new position, in microseconds.
 	 * @exception SeekError
 	 *   Raised if the seek is out of range (usually EOF).
