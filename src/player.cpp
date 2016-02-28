@@ -168,8 +168,7 @@ Response Player::SetPlaying(const std::string &tag, bool playing)
 	// Why is SetPlaying not split between Start() and Stop()?, I hear the
 	// best practices purists amongst you say.  Quite simply, there is a
 	// large amount of fiddly exception boilerplate here that would
-	// otherwise be duplicated between the two methods.  The 'public'
-	// interface Player gives is Start()/Stop(), anyway.
+	// otherwise be duplicated between the two methods.
 
 	assert(this->file != nullptr);
 
