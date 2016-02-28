@@ -124,7 +124,7 @@ Response Player::Load(const std::string &tag, const std::string &path)
 
 	assert(this->file != nullptr);
 	this->last_pos = 0;
-	this->DumpRaw(0, tag);
+	this->DumpRaw(0, Response::NOREQUEST);
 
 	return Response::Success(tag);
 }
