@@ -90,13 +90,19 @@ public:
 
 	void Respond(size_t id, const Response &response) const override;
 
+	/// Shuts down the IoCore by terminating all IO loop tasks.
+	void Shutdown();
+
 private:
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
 
-	uv_tcp_t server;    ///< The libuv handle for the TCP server.
-	uv_timer_t updater; ///< The libuv handle for the update timer.
-	Player &player;     ///< The player.
+	uv_loop_t *loop;     ///< The loop this IoCore is using.
+	uv_signal_t sigint;  ///< The libuv handle for the Ctrl-C signal.
+	uv_tcp_t server;     ///< The libuv handle for the TCP server.
+	uv_timer_t updater;  ///< The libuv handle for the update timer.
+
+	Player &player;      ///< The player.
 
 	/// The set of connections inside this IoCore.
 	std::vector<std::shared_ptr<Connection>> pool;
@@ -115,10 +121,15 @@ private:
 	void InitAcceptor(const std::string &address, const std::string &port);
 
 	/// Sets up a periodic timer to run the playd update loop.
-	void DoUpdateTimer();
+	void InitUpdateTimer();
 
-	/// Shuts down the IoCore by terminating all IO loop tasks.
-	void Shutdown();
+	/**
+	 * Initialises playd's signal handling.
+	 *
+	 * We trap SIGINT, and the equivalent emulated signal on Windows, to
+	 * make playd close gracefully when Ctrl-C is sent.
+	 */
+	void InitSignals();
 
 	//
 	// Connection pool handling
@@ -144,28 +155,6 @@ private:
 	//
 	// Response dispatch
 	//
-
-	/**
-	 * Sends a normal response to the given connection.
-	 * The difference between this and conn->Respond is that TryRespond
-	 * checks the shared pointer for emptiness.
-	 * @param conn The connection to receive the response.  May be empty,
-	 *   in which case no response is sent.
-	 * @see TryShutdown
-	 */
-	static void TryRespond(const std::shared_ptr<Connection> conn,
-	                       const Response &response);
-
-	/**
-	 * Sends a 'this server is shutting down' response to the given
-	 * connection.
-	 * The difference between this and conn->Respond is that TryShutdown
-	 * checks the shared pointer for emptiness.
-	 * @param conn The connection to receive the response.  May be empty,
-	 *   in which case no response is sent.
-	 * @see TryRespond
-	 */
-	static void TryShutdown(const std::shared_ptr<Connection> conn);
 
 	/**
 	 * Sends the given response to all connections.
@@ -215,10 +204,9 @@ public:
 	/**
 	 * Emits a Response via this Connection.
 	 * @param response The response to send.
-	 * @param fatal If true, the Connection will close upon
-	 *   receiving the response.
 	 */
-	void Respond(const Response &response, bool fatal = false);
+	void Respond(const Response &response);
+
 
 	/**
 	 * Processes a data read on this connection.
@@ -226,6 +214,14 @@ public:
 	 * @param buf The buffer containing the read data.
 	 */
 	void Read(ssize_t nread, const uv_buf_t *buf);
+
+	/**
+	 * Gracefully shuts this connection down.
+	 *
+	 * This is similar to (and implemented in terms of) Depool,
+	 * but waits for all writes to finish first.
+	 */
+	void Shutdown();
 
 	/**
 	 * Removes this connection from its connection pool.

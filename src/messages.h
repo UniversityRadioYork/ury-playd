@@ -113,6 +113,9 @@ const std::string MSG_INVALID_ACTION = "cannot perform this action";
 // IO failures
 //
 
+/// Message shown when allocating an IO object fails.
+const std::string MSG_IO_CANNOT_ALLOC = "cannot allocate I/O object";
+
 /// Message shown when too many simultaneous connections are launched.
 const std::string MSG_TOO_MANY_CONNS = "too many simultaneous connections";
 
