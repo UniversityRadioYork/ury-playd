@@ -501,16 +501,16 @@ Response Connection::RunCommand(const std::vector<std::string> &cmd)
 	auto word = cmd[1];
 	auto nargs = cmd.size() - 2;
 
-	if (nargs == 0 && "play" == word)
-		return this->player.SetPlaying(tag, true);
-	if (nargs == 0 && "stop" == word)
-		return this->player.SetPlaying(tag, false);
-	if (nargs == 0 && "end" == word) return this->player.End(tag);
-	if (nargs == 0 && "eject" == word) return this->player.Eject(tag);
-	if (nargs == 0 && "dump" == word) return this->player.Dump(id, tag);
-	if (nargs == 1 && "fload" == word)
-		return this->player.Load(tag, cmd[2]);
-	if (nargs == 1 && "pos" == word) return this->player.Pos(tag, cmd[2]);
+	if (nargs == 0) {
+		if ("play" == word) return this->player.SetPlaying(tag, true);
+		if ("stop" == word) return this->player.SetPlaying(tag, false);
+		if ("end" == word) return this->player.End(tag);
+		if ("eject" == word) return this->player.Eject(tag);
+		if ("dump" == word) return this->player.Dump(id, tag);
+	} else if (nargs == 1) {
+		if ("fload" == word) return this->player.Load(tag, cmd[2]);
+		if ("pos" == word) return this->player.Pos(tag, cmd[2]);
+	}
 
 	return Response::Invalid(tag, MSG_CMD_INVALID);
 }

@@ -149,10 +149,10 @@ void ExitWithError(const std::string &msg)
  */
 int main(int argc, char *argv[])
 {
-// If we don't ignore SIGPIPE, certain classes of connection droppage
-// will crash our program with it.
-// TODO(CaptainHayashi): a more rigorous ifndef here.
 #ifndef _MSC_VER
+	// If we don't ignore SIGPIPE, certain classes of connection droppage
+	// will crash our program with it.
+	// TODO(CaptainHayashi): a more rigorous ifndef here.
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -163,8 +163,8 @@ int main(int argc, char *argv[])
 	SdlAudioSink::InitLibrary();
 	atexit(SdlAudioSink::CleanupLibrary);
 
-// mpg123 insists on us running its init and exit functions, too.
 #ifdef WITH_MP3
+	// mpg123 insists on us running its init and exit functions, too.
 	mpg123_init();
 	atexit(mpg123_exit);
 #endif // WITH_MP3
