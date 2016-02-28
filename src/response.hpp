@@ -43,7 +43,6 @@ public:
 		STOP,     ///< The loaded file has stopped.
 		ACK,      ///< Command result.
 		DUMP,     ///< Client has finished dumping.
-		QUIT,     ///< Client is quitting.
 	};
 
 	/**

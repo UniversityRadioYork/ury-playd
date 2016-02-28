@@ -28,7 +28,6 @@ const std::string Response::STRINGS[] = {
 	"STOP",     // Code::STOP
 	"ACK",      // Code::ACK
 	"DUMP",     // Code::DUMP
-	"QUIT"      // Code::QUIT
 };
 
 Response::Response(const std::string &tag, Response::Code code)
