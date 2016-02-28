@@ -107,13 +107,10 @@ Response Player::Load(const std::string &tag, const std::string &path)
 	// contending over resources, or the current file spends a second or
 	// two flushing its remaining audio.
 	this->file = std::make_unique<NoAudio>();
+	assert(this->file != nullptr);
 
 	try {
-		assert(this->file != nullptr);
 		this->file = this->LoadRaw(path);
-		this->last_pos = 0;
-		this->DumpRaw(0, tag);
-		assert(this->file != nullptr);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
 		this->Eject(tag);
@@ -124,6 +121,10 @@ Response Player::Load(const std::string &tag, const std::string &path)
 		this->Eject(tag);
 		throw;
 	}
+
+	assert(this->file != nullptr);
+	this->last_pos = 0;
+	this->DumpRaw(0, tag);
 
 	return Response::Success(tag);
 }
