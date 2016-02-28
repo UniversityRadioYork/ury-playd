@@ -153,8 +153,8 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	PipeAudio(std::unique_ptr<AudioSource> &&src,
-	          std::unique_ptr<AudioSink> &&sink);
+	PipeAudio(std::unique_ptr<AudioSource> src,
+	          std::unique_ptr<AudioSink> sink);
 
 	Audio::State Update() override;
 	const std::string &File() const override;

@@ -59,8 +59,8 @@ const std::string &NoAudio::File() const
 // PipeAudio
 //
 
-PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
-                     std::unique_ptr<AudioSink> &&sink)
+PipeAudio::PipeAudio(std::unique_ptr<AudioSource> src,
+                     std::unique_ptr<AudioSink> sink)
     : src(std::move(src)), sink(std::move(sink))
 {
 	this->ClearFrame();

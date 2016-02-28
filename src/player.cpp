@@ -24,8 +24,8 @@
 
 Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sources)
     : device_id(device_id),
-      sink(sink),
-      sources(sources),
+      sink(std::move(sink)),
+      sources(std::move(sources)),
       file(std::make_unique<NoAudio>()),
       dead(false),
       io(nullptr),
