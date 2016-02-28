@@ -27,7 +27,6 @@ const std::string Response::STRINGS[] = {
 	"PLAY",     // Code::PLAY
 	"STOP",     // Code::STOP
 	"ACK",      // Code::ACK
-	"DUMP",     // Code::DUMP
 };
 
 Response::Response(const std::string &tag, Response::Code code)

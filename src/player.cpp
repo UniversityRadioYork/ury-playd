@@ -60,8 +60,17 @@ Response Player::Dump(size_t id, const std::string &tag) const
 {
 	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
-	this->DumpRaw(id, tag);
-	this->Respond(id, Response(tag, Response::Code::DUMP));
+	this->DumpState(id, tag);
+
+	// This information won't exist if there is no file.
+	if (this->file->CurrentState() != Audio::State::NONE) {
+		auto file = this->file->File();
+		this->Respond(id, Response(tag, Response::Code::FLOAD).AddArg(file));
+
+		auto pos = this->file->Position();
+		this->Respond(id, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
+	}
+
 	return Response::Success(tag);
 }
 
@@ -124,9 +133,10 @@ Response Player::Load(const std::string &tag, const std::string &path)
 
 	assert(this->file != nullptr);
 	this->last_pos = 0;
-	this->DumpRaw(0, Response::NOREQUEST);
-
-	return Response::Success(tag);
+	
+	// A load will change all of the player's state in one go,
+	// so just send a Dump() instead of writing out all of the responses here.
+	return this->Dump(0, Response::NOREQUEST);
 }
 
 Response Player::Pos(const std::string &tag, const std::string &pos_str)
@@ -229,22 +239,6 @@ void Player::PosRaw(const std::string &tag, std::uint64_t pos)
 	this->last_pos = pos / 1000 / 1000;
 
 	this->Respond(0, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
-}
-
-void Player::DumpRaw(size_t id, const std::string &tag) const
-{
-	auto rs = std::vector<Response>();
-
-	this->DumpState(id, tag);
-
-	// This information won't exist if there is no file.
-	if (this->file->CurrentState() != Audio::State::NONE) {
-		auto file = this->file->File();
-		this->Respond(id, Response(tag, Response::Code::FLOAD).AddArg(file));
-
-		auto pos = this->file->Position();
-		this->Respond(id, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
-	}
 }
 
 void Player::DumpState(size_t id, const std::string &tag) const

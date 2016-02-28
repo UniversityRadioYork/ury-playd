@@ -204,6 +204,7 @@ void IoCore::Accept(uv_stream_t *server)
 	this->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI).AddArg(std::to_string(id)).AddArg(MSG_OHAI_BIFROST).AddArg(MSG_OHAI_PLAYD));
 	this->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA).AddArg("player/file"));
 	this->player.Dump(id, Response::NOREQUEST);
+	this->Respond(id, Response::Success(Response::NOREQUEST));
 	// End initial responses
 
 	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);

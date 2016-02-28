@@ -170,21 +170,6 @@ private:
 	void PosRaw(const std::string &tag, std::uint64_t pos);
 
 	/**
-	 * Emits everything that would be sent via a Dump to the given ID.
-	 *
-	 * This neither finishes with DUMP, nor checks for sink==nullptr,
-	 * nor returns a Response.
-	 *
-	 * @param id The ID of the connection to which the Player should
-	 *   route any responses.  For broadcasts, use 0.
-	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited dumps, use Response::NOREQUEST.
-	 *
-	 * @see Dump
-	 */
-	void DumpRaw(size_t id, const std::string &tag) const;
-
-	/**
 	 * Emits a response for the current audio state to the sink.
 	 *
 	 * @param id The ID of the connection to which the Player should

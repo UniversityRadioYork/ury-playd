@@ -42,7 +42,6 @@ public:
 		PLAY,     ///< The loaded file is playing.
 		STOP,     ///< The loaded file has stopped.
 		ACK,      ///< Command result.
-		DUMP,     ///< Client has finished dumping.
 	};
 
 	/**
