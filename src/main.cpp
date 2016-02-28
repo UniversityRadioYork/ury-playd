@@ -33,13 +33,13 @@ static const std::string DEFAULT_PORT = "1350";
 /// Map from file extensions to AudioSource builder functions.
 static const std::map<std::string, Player::SourceFn> SOURCES = {
 #ifdef WITH_MP3
-	{"mp3", &std::make_unique<Mp3AudioSource, const std::string &>},
+        {"mp3", &std::make_unique<Mp3AudioSource, const std::string &>},
 #endif // WITH_MP3
 
 #ifdef WITH_SNDFILE
-	{"flac", &std::make_unique<SndfileAudioSource, const std::string &>},
-	{"ogg", &std::make_unique<SndfileAudioSource, const std::string &>},
-	{"wav", &std::make_unique<SndfileAudioSource, const std::string &>},
+        {"flac", &std::make_unique<SndfileAudioSource, const std::string &>},
+        {"ogg", &std::make_unique<SndfileAudioSource, const std::string &>},
+        {"wav", &std::make_unique<SndfileAudioSource, const std::string &>},
 #endif // WITH_SNDFILE
 };
 
@@ -149,9 +149,9 @@ void ExitWithError(const std::string &msg)
  */
 int main(int argc, char *argv[])
 {
-	// If we don't ignore SIGPIPE, certain classes of connection droppage
-	// will crash our program with it.
-	// TODO(CaptainHayashi): a more rigorous ifndef here.
+// If we don't ignore SIGPIPE, certain classes of connection droppage
+// will crash our program with it.
+// TODO(CaptainHayashi): a more rigorous ifndef here.
 #ifndef _MSC_VER
 	signal(SIGPIPE, SIG_IGN);
 #endif
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 	SdlAudioSink::InitLibrary();
 	atexit(SdlAudioSink::CleanupLibrary);
 
-	// mpg123 insists on us running its init and exit functions, too.
+// mpg123 insists on us running its init and exit functions, too.
 #ifdef WITH_MP3
 	mpg123_init();
 	atexit(mpg123_exit);
@@ -175,8 +175,8 @@ int main(int argc, char *argv[])
 	if (device_id < 0) ExitWithUsage(args.at(0));
 
 	Player player(device_id,
-		&std::make_unique<SdlAudioSink, const AudioSource &, int>,
-		SOURCES);
+	              &std::make_unique<SdlAudioSink, const AudioSource &, int>,
+	              SOURCES);
 
 	// Set up the IO now (to avoid a circular dependency).
 	// Make sure the player broadcasts its responses back to the IoCore.

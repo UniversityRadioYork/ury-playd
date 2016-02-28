@@ -18,20 +18,21 @@
 const std::string Response::NOREQUEST = "!";
 
 const std::string Response::STRINGS[] = {
-	"OHAI",     // Code::OHAI
-	"IAMA",     // Code::IAMA
-	"FLOAD",    // Code::FLOAD
-	"EJECT",    // Code::EJECT
-	"POS",      // Code::POS
-	"END",      // Code::END
-	"PLAY",     // Code::PLAY
-	"STOP",     // Code::STOP
-	"ACK",      // Code::ACK
+        "OHAI",  // Code::OHAI
+        "IAMA",  // Code::IAMA
+        "FLOAD", // Code::FLOAD
+        "EJECT", // Code::EJECT
+        "POS",   // Code::POS
+        "END",   // Code::END
+        "PLAY",  // Code::PLAY
+        "STOP",  // Code::STOP
+        "ACK",   // Code::ACK
 };
 
 Response::Response(const std::string &tag, Response::Code code)
 {
-	this->string = Response::EscapeArg(tag) + " " + Response::STRINGS[static_cast<int>(code)];
+	this->string = Response::EscapeArg(tag) + " " +
+	               Response::STRINGS[static_cast<int>(code)];
 }
 
 Response &Response::AddArg(const std::string &arg)
@@ -47,15 +48,19 @@ std::string Response::Pack() const
 
 /* static */ Response Response::Success(const std::string &tag)
 {
-	return Response(tag, Response::Code::ACK).AddArg("OK").AddArg("success");
+	return Response(tag, Response::Code::ACK)
+	        .AddArg("OK")
+	        .AddArg("success");
 }
 
-/* static */ Response Response::Invalid(const std::string &tag, const std::string &msg)
+/* static */ Response Response::Invalid(const std::string &tag,
+                                        const std::string &msg)
 {
 	return Response(tag, Response::Code::ACK).AddArg("WHAT").AddArg(msg);
 }
 
-/* static */ Response Response::Failure(const std::string &tag, const std::string &msg)
+/* static */ Response Response::Failure(const std::string &tag,
+                                        const std::string &msg)
 {
 	return Response(tag, Response::Code::ACK).AddArg("FAIL").AddArg(msg);
 }

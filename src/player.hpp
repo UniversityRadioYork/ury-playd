@@ -43,9 +43,11 @@ public:
 	 * Constructs a Player.
 	 * @param device_id The device ID to which sinks shall output.
 	 * @param sink The function to be used for building sinks.
-	 * @param sources The map of file extensions to functions used for building sources.
+	 * @param sources The map of file extensions to functions used for
+	 * building sources.
 	 */
-	Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sources);
+	Player(int device_id, SinkFn sink,
+	       std::map<std::string, SourceFn> sources);
 
 	/// Deleted copy constructor.
 	Player(const Player &) = delete;

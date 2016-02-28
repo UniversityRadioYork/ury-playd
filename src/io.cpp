@@ -128,7 +128,7 @@ void UvSigintCallback(uv_signal_t *handle, int signum)
 	assert(player != nullptr);
 
 	if (signum != SIGINT) return;
-	
+
 	Debug() << "Caught SIGINT, closing..." << std::endl;
 	player->Quit(Response::NOREQUEST);
 
@@ -143,7 +143,7 @@ void UvShutdownCallback(uv_shutdown_t *handle, int status)
 
 	if (status) {
 		Debug() << "UvShutdownCallback: got status:" << status
-			<< std::endl;
+		        << std::endl;
 	}
 
 	auto *conn = static_cast<Connection *>(handle->data);
@@ -173,7 +173,7 @@ void IoCore::Run(const std::string &host, const std::string &port)
 	this->InitAcceptor(host, port);
 	this->InitSignals();
 	this->InitUpdateTimer();
-	
+
 	uv_run(this->loop, UV_RUN_DEFAULT);
 
 	// We presume all of the open handles have been closed in Shutdown().
@@ -201,8 +201,12 @@ void IoCore::Accept(uv_stream_t *server)
 	this->pool[id - 1] = std::move(conn);
 
 	// Begin initial responses
-	this->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI).AddArg(std::to_string(id)).AddArg(MSG_OHAI_BIFROST).AddArg(MSG_OHAI_PLAYD));
-	this->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA).AddArg("player/file"));
+	this->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI)
+	                          .AddArg(std::to_string(id))
+	                          .AddArg(MSG_OHAI_BIFROST)
+	                          .AddArg(MSG_OHAI_PLAYD));
+	this->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA)
+	                          .AddArg("player/file"));
 	this->player.Dump(id, Response::NOREQUEST);
 	this->Respond(id, Response::Success(Response::NOREQUEST));
 	// End initial responses
@@ -363,7 +367,8 @@ void IoCore::InitSignals()
 {
 	int r = uv_signal_init(this->loop, &this->sigint);
 	if (r) {
-		throw InternalError(MSG_IO_CANNOT_ALLOC + ": " + std::string(uv_err_name(r)));
+		throw InternalError(MSG_IO_CANNOT_ALLOC + ": " +
+		                    std::string(uv_err_name(r)));
 	}
 
 	// We pass the player, not the IoCore.
@@ -496,12 +501,15 @@ Response Connection::RunCommand(const std::vector<std::string> &cmd)
 	auto word = cmd[1];
 	auto nargs = cmd.size() - 2;
 
-	if (nargs == 0 && "play" == word) return this->player.SetPlaying(tag, true);
-	if (nargs == 0 && "stop" == word) return this->player.SetPlaying(tag, false);
+	if (nargs == 0 && "play" == word)
+		return this->player.SetPlaying(tag, true);
+	if (nargs == 0 && "stop" == word)
+		return this->player.SetPlaying(tag, false);
 	if (nargs == 0 && "end" == word) return this->player.End(tag);
 	if (nargs == 0 && "eject" == word) return this->player.Eject(tag);
 	if (nargs == 0 && "dump" == word) return this->player.Dump(id, tag);
-	if (nargs == 1 && "fload" == word) return this->player.Load(tag, cmd[2]);
+	if (nargs == 1 && "fload" == word)
+		return this->player.Load(tag, cmd[2]);
 	if (nargs == 1 && "pos" == word) return this->player.Pos(tag, cmd[2]);
 
 	return Response::Invalid(tag, MSG_CMD_INVALID);
@@ -514,7 +522,8 @@ void Connection::Shutdown()
 
 	req->data = this;
 
-	uv_shutdown(req, reinterpret_cast<uv_stream_t *>(this->tcp), UvShutdownCallback);
+	uv_shutdown(req, reinterpret_cast<uv_stream_t *>(this->tcp),
+	            UvShutdownCallback);
 }
 
 void Connection::Depool()

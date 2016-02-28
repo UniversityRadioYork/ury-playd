@@ -29,7 +29,8 @@ const std::string MSG_OHAI_BIFROST = "bifrost-0.3.0";
 //
 
 /// Message shown when the CommandHandler receives an under-length command.
-const std::string MSG_CMD_SHORT = "Command must contain at least a tag and one command word";
+const std::string MSG_CMD_SHORT =
+        "Command must contain at least a tag and one command word";
 
 /// Message shown when the CommandHandler receives an invalid command.
 const std::string MSG_CMD_INVALID = "Bad command or file name";

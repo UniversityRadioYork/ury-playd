@@ -95,7 +95,7 @@ public:
 	 * The state of this Audio.
 	 * @return this Audio's current state.
 	 */
-	virtual	Audio::State CurrentState() const = 0;
+	virtual Audio::State CurrentState() const = 0;
 
 	/**
 	 * This Audio's current position.

@@ -97,12 +97,12 @@ private:
 	/// The period between player updates.
 	static const uint16_t PLAYER_UPDATE_PERIOD;
 
-	uv_loop_t *loop;     ///< The loop this IoCore is using.
-	uv_signal_t sigint;  ///< The libuv handle for the Ctrl-C signal.
-	uv_tcp_t server;     ///< The libuv handle for the TCP server.
-	uv_timer_t updater;  ///< The libuv handle for the update timer.
+	uv_loop_t *loop;    ///< The loop this IoCore is using.
+	uv_signal_t sigint; ///< The libuv handle for the Ctrl-C signal.
+	uv_tcp_t server;    ///< The libuv handle for the TCP server.
+	uv_timer_t updater; ///< The libuv handle for the update timer.
 
-	Player &player;      ///< The player.
+	Player &player; ///< The player.
 
 	/// The set of connections inside this IoCore.
 	std::vector<std::shared_ptr<Connection>> pool;
@@ -206,7 +206,6 @@ public:
 	 * @param response The response to send.
 	 */
 	void Respond(const Response &response);
-
 
 	/**
 	 * Processes a data read on this connection.

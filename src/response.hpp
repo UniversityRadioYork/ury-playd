@@ -33,15 +33,15 @@ public:
 	 * @see ResponseSink::STRINGS
 	 */
 	enum class Code : std::uint8_t {
-		OHAI,     ///< Server starting up.
-		IAMA,     ///< Server sending its role.
-		FLOAD,    ///< The loaded file just changed.
-		EJECT,    ///< The loaded file just ejected.
-		POS,      ///< Server sending current song time.
-		END,      ///< The loaded file just ended.
-		PLAY,     ///< The loaded file is playing.
-		STOP,     ///< The loaded file has stopped.
-		ACK,      ///< Command result.
+		OHAI,  ///< Server starting up.
+		IAMA,  ///< Server sending its role.
+		FLOAD, ///< The loaded file just changed.
+		EJECT, ///< The loaded file just ejected.
+		POS,   ///< Server sending current song time.
+		END,   ///< The loaded file just ended.
+		PLAY,  ///< The loaded file is playing.
+		STOP,  ///< The loaded file has stopped.
+		ACK,   ///< Command result.
 	};
 
 	/**
@@ -118,7 +118,8 @@ public:
 
 	/**
 	 * Outputs a response.
-	 * @param id The ID of the client of the ResponseSink receiving this response.
+	 * @param id The ID of the client of the ResponseSink receiving this
+	 * response.
 	 *   Use 0 for broadcasts.
 	 * @param response The Response to output.
 	 */

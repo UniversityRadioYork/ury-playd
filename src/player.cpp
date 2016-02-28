@@ -22,10 +22,14 @@
 #include "messages.h"
 #include "player.hpp"
 
-Player::Player(int device_id,
-	SinkFn sink,
-	std::map<std::string, SourceFn> sources)
-    : device_id(device_id), sink(sink), sources(sources), file(std::make_unique<NoAudio>()), is_running(true), io(nullptr), last_pos(0)
+Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sources)
+    : device_id(device_id),
+      sink(sink),
+      sources(sources),
+      file(std::make_unique<NoAudio>()),
+      is_running(true),
+      io(nullptr),
+      last_pos(0)
 {
 }
 
@@ -45,7 +49,9 @@ bool Player::Update()
 		// advanced since last update.  So we need to update it.
 		auto pos = this->file->Position();
 		if (this->CanAnnounceTime(pos)) {
-			this->Respond(0, Response(Response::NOREQUEST, Response::Code::POS).AddArg(std::to_string(pos)));
+			this->Respond(0, Response(Response::NOREQUEST,
+			                          Response::Code::POS)
+			                         .AddArg(std::to_string(pos)));
 		}
 	}
 
@@ -58,17 +64,20 @@ bool Player::Update()
 
 Response Player::Dump(size_t id, const std::string &tag) const
 {
-	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (!this->is_running)
+		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	this->DumpState(id, tag);
 
 	// This information won't exist if there is no file.
 	if (this->file->CurrentState() != Audio::State::NONE) {
 		auto file = this->file->File();
-		this->Respond(id, Response(tag, Response::Code::FLOAD).AddArg(file));
+		this->Respond(
+		        id, Response(tag, Response::Code::FLOAD).AddArg(file));
 
 		auto pos = this->file->Position();
-		this->Respond(id, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
+		this->Respond(id, Response(tag, Response::Code::POS)
+		                          .AddArg(std::to_string(pos)));
 	}
 
 	return Response::Success(tag);
@@ -76,7 +85,8 @@ Response Player::Dump(size_t id, const std::string &tag) const
 
 Response Player::Eject(const std::string &tag)
 {
-	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (!this->is_running)
+		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	assert(this->file != nullptr);
 	this->file = std::make_unique<NoAudio>();
@@ -88,7 +98,8 @@ Response Player::Eject(const std::string &tag)
 
 Response Player::End(const std::string &tag)
 {
-	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (!this->is_running)
+		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
@@ -106,7 +117,8 @@ Response Player::End(const std::string &tag)
 
 Response Player::Load(const std::string &tag, const std::string &path)
 {
-	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (!this->is_running)
+		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 	if (path.empty()) return Response::Invalid(tag, MSG_LOAD_EMPTY_PATH);
 
 	assert(this->file != nullptr);
@@ -133,18 +145,21 @@ Response Player::Load(const std::string &tag, const std::string &path)
 
 	assert(this->file != nullptr);
 	this->last_pos = 0;
-	
+
 	// A load will change all of the player's state in one go,
-	// so just send a Dump() instead of writing out all of the responses here.
-    // Don't take the response from here, though, because it has the wrong tag.
+	// so just send a Dump() instead of writing out all of the responses
+	// here.
+	// Don't take the response from here, though, because it has the wrong
+	// tag.
 	this->Dump(0, Response::NOREQUEST);
-    
-    return Response::Success(tag);
+
+	return Response::Success(tag);
 }
 
 Response Player::Pos(const std::string &tag, const std::string &pos_str)
 {
-	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (!this->is_running)
+		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	std::uint64_t pos = 0;
 	try {
@@ -177,7 +192,8 @@ Response Player::Pos(const std::string &tag, const std::string &pos_str)
 
 Response Player::SetPlaying(const std::string &tag, bool playing)
 {
-	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (!this->is_running)
+		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	// Why is SetPlaying not split between Start() and Stop()?, I hear the
 	// best practices purists amongst you say.  Quite simply, there is a
@@ -199,7 +215,8 @@ Response Player::SetPlaying(const std::string &tag, bool playing)
 
 Response Player::Quit(const std::string &tag)
 {
-	if (!this->is_running) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (!this->is_running)
+		return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	this->Eject(tag);
 	this->is_running = false;
@@ -241,7 +258,8 @@ void Player::PosRaw(const std::string &tag, std::uint64_t pos)
 	// This is required to make CanAnnounceTime() continue working.
 	this->last_pos = pos / 1000 / 1000;
 
-	this->Respond(0, Response(tag, Response::Code::POS).AddArg(std::to_string(pos)));
+	this->Respond(0, Response(tag, Response::Code::POS)
+	                         .AddArg(std::to_string(pos)));
 }
 
 void Player::DumpState(size_t id, const std::string &tag) const
@@ -249,21 +267,21 @@ void Player::DumpState(size_t id, const std::string &tag) const
 	Response::Code code = Response::Code::EJECT;
 
 	switch (this->file->CurrentState()) {
-	case Audio::State::AT_END:
-		code = Response::Code::END;
-		break;
-	case Audio::State::NONE:
-		code = Response::Code::EJECT;
-		break;
-	case Audio::State::PLAYING:
-		code = Response::Code::PLAY;
-		break;
-	case Audio::State::STOPPED:
-		code = Response::Code::STOP;
-		break;
-	default:
-		// Just don't dump anything in this case.
-		return;
+		case Audio::State::AT_END:
+			code = Response::Code::END;
+			break;
+		case Audio::State::NONE:
+			code = Response::Code::EJECT;
+			break;
+		case Audio::State::PLAYING:
+			code = Response::Code::PLAY;
+			break;
+		case Audio::State::STOPPED:
+			code = Response::Code::STOP;
+			break;
+		default:
+			// Just don't dump anything in this case.
+			return;
 	}
 
 	this->Respond(id, Response(tag, code));
@@ -291,8 +309,7 @@ std::unique_ptr<Audio> Player::LoadRaw(const std::string &path) const
 	assert(source != nullptr);
 
 	auto sink = this->sink(*source, this->device_id);
-	return std::make_unique<PipeAudio>(
-	        std::move(source), std::move(sink));
+	return std::make_unique<PipeAudio>(std::move(source), std::move(sink));
 }
 
 std::unique_ptr<AudioSource> Player::LoadSource(const std::string &path) const

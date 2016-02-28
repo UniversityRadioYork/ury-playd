@@ -50,7 +50,7 @@ std::uint64_t NoAudio::Position() const
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
-const std::string& NoAudio::File() const
+const std::string &NoAudio::File() const
 {
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
@@ -66,7 +66,7 @@ PipeAudio::PipeAudio(std::unique_ptr<AudioSource> &&src,
 	this->ClearFrame();
 }
 
-const std::string& PipeAudio::File() const
+const std::string &PipeAudio::File() const
 {
 	return this->src->Path();
 }
