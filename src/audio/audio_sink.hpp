@@ -136,13 +136,6 @@ public:
 	void Callback(std::uint8_t *out, int nbytes);
 
 	/**
-	 * Converts a sample format identifier from playd to SDL.
-	 * @param fmt The playd sample format identifier.
-	 * @return The SDL equivalent of the given SampleFormat.
-	 */
-	static SDL_AudioFormat SDLFormat(SampleFormat fmt);
-
-	/**
 	 * Gets the number and name of each output device entry in the
 	 * AudioSystem.
 	 * @return List of output devices, as strings.
