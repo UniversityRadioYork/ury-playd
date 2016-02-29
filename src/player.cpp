@@ -231,8 +231,15 @@ Response Player::Quit(const std::string &tag)
 {
 	size_t cpos = 0;
 
-	// In previous versions, this used to parse a unit at the end.
-	// This was removed for simplicity--use baps3-cli etc. instead.
+	// Try and see if this position string is negative.
+	// Cheap and easy way: see if it has '-'.
+	// This means we don't need to skip whitespace first, with no loss
+	// of suction: no valid position string will contain '-'.
+	if (pos_str.find('-') != std::string::npos) {
+		throw SeekError(MSG_SEEK_INVALID_VALUE);
+	}
+
+
 	std::uint64_t pos;
 	try {
 		pos = std::stoull(pos_str, &cpos);

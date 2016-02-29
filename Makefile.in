@@ -210,3 +210,9 @@ format: $(TO_FORMAT)
 coverage: CXXFLAGS += -fprofile-arcs -ftest-coverage
 coverage: LDFLAGS += -fprofile-arcs -ftest-coverage
 coverage: clean mkdir test
+
+llvm-cov: CXXFLAGS += -fprofile-instr-generate -fcoverage-mapping
+llvm-cov: LDFLAGS += -fprofile-instr-generate -fcoverage-mapping
+llvm-cov: clean mkdir test
+	llvm-profdata merge default.profraw --output default.profdata
+	llvm-cov report -instr-profile default.profdata $(TEST_BIN)
