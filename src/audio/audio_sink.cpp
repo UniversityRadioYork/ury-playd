@@ -39,7 +39,7 @@ Audio::State AudioSink::State()
 
 const size_t SdlAudioSink::RINGBUF_POWER = 16;
 
-/* static */ const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> SdlAudioSink::FORMATS {
+/* static */ const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> SdlAudioSink::FORMATS = {
 	AUDIO_U8,  // PACKED_UNSIGNED_INT_8
 	AUDIO_S8,  // PACKED_SIGNED_INT_8
 	AUDIO_S16, // PACKED_SIGNED_INT_16
