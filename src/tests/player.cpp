@@ -101,6 +101,10 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 			THEN("loading for an unknown file type returns failure") {
 				REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK success");
 			}
+			THEN("loading for an empty filename returns failure") {
+				auto r = "tag ACK WHAT '"s + MSG_LOAD_EMPTY_PATH + "'"s;
+				REQUIRE(p.Load("tag", "").Pack() == r);
+			}
 		}
 
 		WHEN("there is audio loaded") {
@@ -127,6 +131,10 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 				THEN("loading for an unknown file type returns failure") {
 					REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK success");
 				}
+				THEN("loading for an empty filename returns failure") {
+					auto r = "tag ACK WHAT '"s + MSG_LOAD_EMPTY_PATH + "'"s;
+					REQUIRE(p.Load("tag", "").Pack() == r);
+				}
 			}
 
 			AND_WHEN("the audio is playing") {
@@ -152,6 +160,11 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 				THEN("loading for an unknown file type returns failure") {
 					REQUIRE_FALSE(p.Load("tag", "blah.wav").Pack() == "tag ACK OK success");
 				}
+				THEN("loading for an empty filename returns failure") {
+					auto r = "tag ACK WHAT '"s + MSG_LOAD_EMPTY_PATH + "'"s;
+					REQUIRE(p.Load("tag", "").Pack() == r);
+				}
+
 			}
 		}
 
