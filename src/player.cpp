@@ -86,6 +86,13 @@ Response Player::Eject(const std::string &tag)
 {
 	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
+	// Silently ignore ejects on ejected files.
+	// Concurrently speaking, this should be fine, as we are the only
+	// thread that can eject or un-eject files.
+	if (this->file->CurrentState() == Audio::State::NONE) {
+		return Response::Success(tag);
+	}
+
 	assert(this->file != nullptr);
 	this->file = std::make_unique<NoAudio>();
 
