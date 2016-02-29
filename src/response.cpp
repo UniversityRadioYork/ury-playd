@@ -7,17 +7,17 @@
  * @see response.hpp
  */
 
+#include <array>
 #include <cctype>
-#include <initializer_list>
 #include <sstream>
 
 #include "errors.hpp"
 
 #include "response.hpp"
 
-const std::string Response::NOREQUEST = "!";
+/* static */ const std::string Response::NOREQUEST = "!";
 
-const std::string Response::STRINGS[] = {
+/* static */ const std::array<std::string, Response::CODE_COUNT> Response::STRINGS {
         "OHAI",  // Code::OHAI
         "IAMA",  // Code::IAMA
         "FLOAD", // Code::FLOAD
@@ -32,7 +32,7 @@ const std::string Response::STRINGS[] = {
 Response::Response(const std::string &tag, Response::Code code)
 {
 	this->string = Response::EscapeArg(tag) + " " +
-	               Response::STRINGS[static_cast<int>(code)];
+	               STRINGS[static_cast<uint8_t>(code)];
 }
 
 Response &Response::AddArg(const std::string &arg)

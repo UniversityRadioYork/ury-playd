@@ -7,10 +7,11 @@
  * @see audio/sample_formats.cpp
  */
 
-#include <cstdint>
-
 #ifndef PLAYD_SAMPLE_FORMATS_HPP
 #define PLAYD_SAMPLE_FORMATS_HPP
+
+#include <array>
+#include <cstdint>
 
 /**
  * Sample formats available in playd.
@@ -34,7 +35,10 @@ enum class SampleFormat : std::uint8_t {
 	PACKED_FLOAT_32        ///< Packed 32-bit floating point.
 };
 
+/// Number of sample formats available; should agree with SampleFormat.
+constexpr std::size_t SAMPLE_FORMAT_COUNT = 5;
+
 /// Map from SampleFormats to bytes-per-mono-sample.
-extern const std::size_t SAMPLE_FORMAT_BPS[6];
+extern const std::array<std::size_t, SAMPLE_FORMAT_COUNT> SAMPLE_FORMAT_BPS;
 
 #endif // PLAYD_SAMPLE_FORMATS_HPP

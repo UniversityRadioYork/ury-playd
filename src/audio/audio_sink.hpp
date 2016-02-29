@@ -10,6 +10,7 @@
 #ifndef PLAYD_AUDIO_SINK_HPP
 #define PLAYD_AUDIO_SINK_HPP
 
+#include <array>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -162,6 +163,9 @@ private:
 	/// n, where 2^n is the capacity of the Audio ring buffer.
 	/// @see RINGBUF_SIZE
 	static const size_t RINGBUF_POWER;
+
+	/// Mapping from SampleFormats to their equivalent SDL_AudioFormats.
+	static const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> FORMATS;
 
 	/// Number of bytes in one sample.
 	size_t bytes_per_sample;

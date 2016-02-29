@@ -29,8 +29,8 @@ public:
 	/**
 	 * Enumeration of all possible response codes.
 	 * @note If you're adding new responses here, update
-	 * ResponseSink::STRINGS.
-	 * @see ResponseSink::STRINGS
+	 *       Response::STRINGS.
+	 * @see Response::STRINGS
 	 */
 	enum class Code : std::uint8_t {
 		OHAI,  ///< Server starting up.
@@ -41,8 +41,11 @@ public:
 		END,   ///< The loaded file just ended.
 		PLAY,  ///< The loaded file is playing.
 		STOP,  ///< The loaded file has stopped.
-		ACK,   ///< Command result.
+		ACK    ///< Command result.
 	};
+
+	/// The number of codes, which should agree with Response::Code.
+	static constexpr std::uint8_t CODE_COUNT = 9;
 
 	/**
 	 * Constructs a Response with no arguments.
@@ -89,11 +92,12 @@ public:
 	static Response Failure(const std::string &tag, const std::string &msg);
 
 private:
+
 	/**
 	 * A map from Response::Code codes to their string equivalents.
 	 * @see Response::Code
 	 */
-	static const std::string STRINGS[];
+	static const std::array<std::string, CODE_COUNT> STRINGS;
 
 	/**
 	 * Escapes a single response argument.
