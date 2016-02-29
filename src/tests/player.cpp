@@ -10,14 +10,43 @@
 
 #include "catch.hpp"
 #include "../errors.hpp"
+#include "../messages.h"
 #include "../player.hpp"
 #include "dummy_audio_sink.hpp"
 #include "dummy_audio_source.hpp"
 #include "dummy_response_sink.hpp"
 
+using namespace std::string_literals;
+
 const std::map<std::string, Player::SourceFn> DUMMY_SRCS {
 	{"mp3", &std::make_unique<DummyAudioSource, const std::string &>}
 };
+
+SCENARIO("Player announces changes in state correctly", "[player]") {
+	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
+		Player p(0,
+			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 DUMMY_SRCS);
+		
+		WHEN("the player has nothing loaded") {
+			GIVEN("a DummyResponseSink") {
+				std::ostringstream os;
+				DummyResponseSink drs(os);
+				p.SetIo(drs);
+
+				THEN("ejecting should emit nothing") {
+					p.Eject("tag");
+					REQUIRE(os.str() == "");
+				}
+	
+				THEN("loading a file should emit all state") {
+					p.Load("tag", "baz.mp3");
+					REQUIRE(os.str() == "! STOP\n! FLOAD baz.mp3\n! POS 0\n");
+				}
+			}
+		}
+	}
+}
 
 SCENARIO("Player accurately represents whether it is running", "[player]") {
 	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
@@ -58,7 +87,7 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 			THEN("stopping returns failure") {
 				REQUIRE_FALSE(p.SetPlaying("tag", false).Pack() == "tag ACK OK success");
 			}
-			THEN("setting time to 0 returns failure") {
+			THEN("setting time to 1 returns failure") {
 				REQUIRE_FALSE(p.Pos("tag", "0").Pack() == "tag ACK OK success");
 			}
 			THEN("setting state to 'Ejected' returns success") {
@@ -126,5 +155,101 @@ SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-
 			}
 		}
 
+	}
+}
+
+SCENARIO("Player refuses absurd seek positions", "[seek]") {
+	GIVEN("a loaded Player") {
+		Player p(0,
+			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 DUMMY_SRCS);
+		
+		p.Load("tag", "blah.mp3");
+
+		auto response = "tag ACK WHAT '"s + MSG_SEEK_INVALID_VALUE + "'"s;
+
+		WHEN("the player is told to seek to a negative time") {
+			auto res = p.Pos("tag", "-5");
+
+			THEN("it rejects the seek") {
+				REQUIRE(res.Pack() == response);
+			}
+		}
+
+		WHEN("the player is told to seek to a time with units") {
+			auto res = p.Pos("tag", "10ms");
+
+			THEN("it rejects the seek") {
+				REQUIRE(res.Pack() == response);
+			}
+		}
+
+		WHEN("the player is told to seek to a fractional time") {
+			auto res = p.Pos("tag", "100.52");
+
+			THEN("it rejects the seek") {
+				REQUIRE(res.Pack() == response);
+			}
+		}
+
+		WHEN("the player is told to seek to a non-numeric time") {
+			auto res = p.Pos("tag", "PI");
+
+			THEN("it rejects the seek") {
+				REQUIRE(res.Pack() == response);
+			}
+		}
+
+		WHEN("the player is told to seek to an empty time") {
+			auto res = p.Pos("tag", "");
+
+			THEN("it rejects the seek") {
+				REQUIRE(res.Pack() == response);
+			}
+		}
+
+		// Seeking to non-base-10 positions deliberately left untested.
+		// It's harmless if allowed.
+	}
+}
+
+SCENARIO("Player refuses commands when quitting", "[player]") {
+	GIVEN("a loaded Player") {
+		Player p(0,
+			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 DUMMY_SRCS);
+		
+		p.Load("tag", "blah.mp3");
+
+		auto response = "tag ACK FAIL '"s + MSG_CMD_PLAYER_CLOSING + "'"s;
+
+		WHEN("the player is told to quit") {
+			p.Quit("t");
+			
+			THEN("loading returns a player-closing failure") {
+				REQUIRE(p.Load("tag", "barbaz.mp3").Pack() == response);
+			}
+			THEN("ejecting returns a player-closing failure") {
+				REQUIRE(p.Eject("tag").Pack() == response);
+			}
+			THEN("seeking returns a player-closing failure") {
+				REQUIRE(p.Pos("tag", "100").Pack() == response);
+			}
+			THEN("ending returns a player-closing failure") {
+				REQUIRE(p.End("tag").Pack() == response);
+			}
+			THEN("playing returns a player-closing failure") {
+				REQUIRE(p.SetPlaying("tag", true).Pack() == response);
+			}
+			THEN("stopping returns a player-closing failure") {
+				REQUIRE(p.SetPlaying("tag", false).Pack() == response);
+			}
+			THEN("quitting returns a player-closing failure") {
+				REQUIRE(p.Quit("tag").Pack() == response);
+			}
+			THEN("dumping returns a player-closing failure") {
+				REQUIRE(p.Dump(5, "tag").Pack() == response);
+			}
+		}
 	}
 }
