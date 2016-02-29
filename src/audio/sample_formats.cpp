@@ -12,10 +12,10 @@
 
 #include "sample_formats.hpp"
 
-const std::array<std::size_t, SAMPLE_FORMAT_COUNT> SAMPLE_FORMAT_BPS = {
+const std::array<std::size_t, SAMPLE_FORMAT_COUNT> SAMPLE_FORMAT_BPS {{
         1, // PACKED_UNSIGNED_INT_8
         1, // PACKED_SIGNED_INT_8
         2, // PACKED_SIGNED_INT_16
         4, // PACKED_SIGNED_INT_32
         4  // PACKED_FLOAT_32
-};
+}};
