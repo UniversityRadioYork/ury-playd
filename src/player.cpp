@@ -107,14 +107,14 @@ Response Player::End(const std::string &tag)
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
-	this->Respond(0, Response(tag, Response::Code::END));
+	this->Respond(0, Response(Response::NOREQUEST, Response::Code::END));
 
 	this->SetPlaying(tag, false);
 
 	// Rewind the file back to the start.  We can't use Player::Pos() here
 	// in case End() is called from Pos(); a seek failure could start an
 	// infinite loop.
-	this->PosRaw(tag, 0);
+	this->PosRaw(Response::NOREQUEST, 0);
 
 	return Response::Success(tag);
 }
