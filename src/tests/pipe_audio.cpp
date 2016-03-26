@@ -29,7 +29,7 @@ SCENARIO("PipeAudio can be constructed with a DummyAudioSink and DummyAudioSourc
 	}
 }
 
-SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]") {
+SCENARIO("PipeAudio responds to getters with valid responses", "[pipe-audio]") {
 	GIVEN("a valid PipeAudio and DummyResponseSink") {
 		auto src = std::make_unique<DummyAudioSource>("test");
 		auto snk = std::make_unique<DummyAudioSink>(*src, 0);
@@ -73,5 +73,66 @@ SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]"
 			}
 		}
 
+	}
+}
+
+SCENARIO("PipeAudio propagates source emptiness correctly", "[pipe-audio]") {
+	GIVEN("a valid set of dummy components") {
+		auto src = std::make_unique<DummyAudioSource>("test");
+		auto snk = std::make_unique<DummyAudioSink>(*src, 0);
+		snk->state = Audio::State::STOPPED;
+
+		// We build the PipeAudio later, because it moves src and snk
+		// out of easy modification range.
+
+		WHEN("the DummyResponseSource is reporting end of file") {
+			src->run_out = true;
+
+			PipeAudio pa(std::move(src), std::move(snk));
+
+			THEN("Update() returns AT_END") {
+				REQUIRE(pa.Update() == Audio::State::AT_END);
+			}
+		}
+	}
+}
+
+SCENARIO("PipeAudio acquires state from the sink correctly", "[pipe-audio]") {
+	GIVEN("a valid set of dummy components") {
+		auto src = std::make_unique<DummyAudioSource>("test");
+		auto snk = std::make_unique<DummyAudioSink>(*src, 0);
+
+		// We build the PipeAudio later, because it moves src and snk
+		// out of easy modification range.
+
+		WHEN("the DummyResponseSink's state is STOPPED") {
+			snk->state = Audio::State::STOPPED;
+
+			PipeAudio pa(std::move(src), std::move(snk));
+
+			THEN("Update() returns STOPPED") {
+				REQUIRE(pa.Update() == Audio::State::STOPPED);
+			}
+		}
+
+		WHEN("the DummyResponseSink's state is PLAYING") {
+			snk->state = Audio::State::PLAYING;
+
+			PipeAudio pa(std::move(src), std::move(snk));
+
+			THEN("Update() returns PLAYING") {
+				REQUIRE(pa.Update() == Audio::State::PLAYING);
+			}
+		}
+	
+		WHEN("the DummyResponseSink's state is AT_END") {
+			snk->state = Audio::State::AT_END;
+
+			PipeAudio pa(std::move(src), std::move(snk));
+
+			THEN("Update() returns AT_END") {
+				REQUIRE(pa.Update() == Audio::State::AT_END);
+			}
+		}
 	}
 }

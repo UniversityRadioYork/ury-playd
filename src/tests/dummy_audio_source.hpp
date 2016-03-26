@@ -33,4 +33,7 @@ public:
 
 	/// The position of the AudioSource, in samples.
 	std::uint64_t position;
+
+	/// If true, the audio source will claim it has run out.
+	bool run_out = false;
 };

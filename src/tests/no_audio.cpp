@@ -70,5 +70,12 @@ SCENARIO("NoAudio throws exceptions when asked to do audio-type things", "[no-au
 				REQUIRE_THROWS_AS(n.Position(), NoAudioError);
 			}
 		}
+
+		WHEN("File() is called") {
+			THEN("NoAudioError is thrown") {
+				REQUIRE_THROWS_AS(n.File(), NoAudioError);
+			}
+		}
+
 	}
 }

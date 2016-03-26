@@ -16,7 +16,9 @@
 
 AudioSource::DecodeResult DummyAudioSource::Decode()
 {
-	return std::make_pair(AudioSource::DecodeState::DECODING, AudioSource::DecodeVector());
+	auto state = run_out ? AudioSource::DecodeState::END_OF_FILE
+	                     : AudioSource::DecodeState::DECODING;
+	return std::make_pair(state, AudioSource::DecodeVector());
 }
 
 std::uint8_t DummyAudioSource::ChannelCount() const
