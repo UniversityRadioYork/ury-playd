@@ -74,7 +74,7 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 	}
 }
 
-SCENARIO("Player interacts correctly with a AudioSystem", "[player][dummy-audio-system]") {
+SCENARIO("Player interacts correctly with the audio system", "[player]") {
 	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
 		Player p(0,
 			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
@@ -223,6 +223,30 @@ SCENARIO("Player refuses absurd seek positions", "[seek]") {
 
 		// Seeking to non-base-10 positions deliberately left untested.
 		// It's harmless if allowed.
+	}
+}
+
+SCENARIO("Player handles End requests correctly", "[player]") {
+	GIVEN("a loaded Player") {
+		Player p(0,
+			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 DUMMY_SRCS);
+
+		p.Load("tag", "blah.mp3");
+
+		std::ostringstream os;
+		DummyResponseSink drs(os);
+		p.SetIo(drs);
+
+		WHEN("End is sent to the player") {
+			p.End("tag");
+
+			THEN("the response contains END, STOP, and POS") {
+				REQUIRE(os.str() == "! END\n"
+						    "! STOP\n"
+						    "! POS 0\n");
+			}
+		}
 	}
 }
 
