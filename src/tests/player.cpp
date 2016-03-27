@@ -19,8 +19,11 @@
 using namespace std::string_literals;
 
 const std::map<std::string, Player::SourceFn> DUMMY_SRCS {
-	{"mp3", &std::make_unique<DummyAudioSource, const std::string &>}
+	{"mp3", &std::make_unique<DummyAudioSource, const std::string &>},
+	{"ogg", [](const std::string &) -> std::unique_ptr<AudioSource> { throw FileError("test failure 1"); }},
+	{"flac", [](const std::string &) -> std::unique_ptr<AudioSource> { throw InternalError("test failure 2"); }}
 };
+
 
 SCENARIO("Player announces changes in state correctly", "[player]") {
 	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
@@ -286,6 +289,64 @@ SCENARIO("Player refuses commands when quitting", "[player]") {
 			}
 			THEN("dumping returns a player-closing failure") {
 				REQUIRE(p.Dump(5, "tag").Pack() == response);
+			}
+		}
+	}
+}
+
+SCENARIO("Player handles load errors properly", "[seek]") {
+	GIVEN("a Player") {
+		Player p(0,
+			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 DUMMY_SRCS);
+		
+		WHEN("no file is loaded") {
+			std::ostringstream os;
+			DummyResponseSink drs(os);
+			p.SetIo(drs);
+
+			AND_WHEN("a load fails with FileError") {
+				auto rs = p.Load("tag", "blah.ogg");
+
+				THEN("the load response is FAIL with the given message") {
+					REQUIRE(rs.Pack() == "tag ACK FAIL 'test failure 1'");
+				}
+
+				THEN("the player does not eject") {
+					REQUIRE(os.str() == "");
+				}
+			}
+
+			AND_WHEN("a load fails with InternalError") {
+				THEN("the error propagates outwards") {
+					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), InternalError);	
+				}
+			}
+		}
+
+		WHEN("a file is already loaded") {
+			p.Load("tag", "foo.mp3");
+
+			std::ostringstream os;
+			DummyResponseSink drs(os);
+			p.SetIo(drs);
+
+			AND_WHEN("a load fails with FileError") {
+				auto rs = p.Load("tag", "blah.ogg");
+
+				THEN("the load response is FAIL with the given message") {
+					REQUIRE(rs.Pack() == "tag ACK FAIL 'test failure 1'");
+				}
+
+				THEN("the player ejects") {
+					REQUIRE(os.str() == "! EJECT\n");
+				}
+			}
+
+			AND_WHEN("a load fails with InternalError") {
+				THEN("the error propagates outwards") {
+					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), InternalError);	
+				}
 			}
 		}
 	}
