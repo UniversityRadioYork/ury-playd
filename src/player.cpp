@@ -130,20 +130,13 @@ Response Player::Load(const std::string &tag, const std::string &path)
 	// This ensures that we don't have any situations where two files are
 	// contending over resources, or the current file spends a second or
 	// two flushing its remaining audio.
-	this->file = std::make_unique<NoAudio>();
-	assert(this->file != nullptr);
+	this->Eject(Response::NOREQUEST);
 
 	try {
 		this->file = this->LoadRaw(path);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
-		this->Eject(tag);
 		return Response::Failure(tag, e.Message());
-	} catch (Error &) {
-		// Ensure a load failure doesn't leave a corrupted track
-		// loaded.
-		this->Eject(tag);
-		throw;
 	}
 
 	assert(this->file != nullptr);
