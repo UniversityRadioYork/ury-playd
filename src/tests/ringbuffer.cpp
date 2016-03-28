@@ -115,6 +115,17 @@ SCENARIO("RingBuffer reports capacities correctly", "[ringbuffer]") {
 					REQUIRE(rb.WriteCapacity() == 1<<5);
 				}
 			}
+
+			AND_WHEN("the buffer is flushed") {
+				rb.Flush();
+
+				THEN("ReadCapacity() is 0") {
+					REQUIRE(rb.ReadCapacity() == 0);
+				}
+				THEN("WriteCapacity() is 2^power") {
+					REQUIRE(rb.WriteCapacity() == 1<<5);
+				}
+			}
 		}
 		WHEN("the buffer is filled") {
 			rb.Write(msg, 1<<5);
@@ -124,6 +135,17 @@ SCENARIO("RingBuffer reports capacities correctly", "[ringbuffer]") {
 			}
 			THEN("WriteCapacity() is 0") {
 				REQUIRE(rb.WriteCapacity() == 0);
+			}
+
+			AND_WHEN("the buffer is flushed") {
+				rb.Flush();
+
+				THEN("ReadCapacity() is 0") {
+					REQUIRE(rb.ReadCapacity() == 0);
+				}
+				THEN("WriteCapacity() is 2^power") {
+					REQUIRE(rb.WriteCapacity() == 1<<5);
+				}
 			}
 		}
 	}
