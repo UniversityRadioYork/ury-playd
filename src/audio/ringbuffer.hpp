@@ -81,7 +81,7 @@ public:
 	 * @return The number of samples written, which should not exceed count.
 	 * @see WriteCapacity
 	 */
-	unsigned long Write(char *start, unsigned long count);
+	unsigned long Write(const char *start, unsigned long count);
 
 	/**
 	 * Reads samples from the ring buffer into an array.
