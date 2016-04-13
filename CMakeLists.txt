@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.4)
 project(playd)
-
 list(APPEND CMAKE_MODULE_PATH "${playd_SOURCE_DIR}/cmake_scripts")
 
 include(add_sources)
@@ -54,8 +53,13 @@ endif()
 
 add_subdirectory("src")
 
-get_property(SRCS GLOBAL PROPERTY SRCS_LIST)
+get_property(SRCS GLOBAL PROPERTY playd_SRCS)
+message(STATUS "playd sources: ${SRCS}")
 add_executable(playd ${SRCS})
+get_property(SRCS GLOBAL PROPERTY playd_tests_SRCS)
+message(STATUS "tests sources: ${SRCS}")
+add_executable(playd_tests ${SRCS})
+
 foreach(mylib SDL2 LIBUV MPG123 LIBSNDFILE)
   if(${mylib}_LIBRARY AND ${mylib}_INCLUDE_DIR)
     target_link_libraries(playd ${${mylib}_LIBRARY})
@@ -66,7 +70,8 @@ if(WIN32)
   target_link_libraries(playd wsock32 ws2_32 iphlpapi psapi userenv)
 endif()
 # Print all variables
-get_cmake_property(_variableNames VARIABLES)
-foreach (_variableName ${_variableNames})
-    message(STATUS "${_variableName}=${${_variableName}}")
-endforeach()
+#get_cmake_property(_variableNames VARIABLES)
+#foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+#endforeach()
+#message(STATUS "${OUTPUT}")

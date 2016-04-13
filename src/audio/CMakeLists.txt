@@ -1,4 +1,4 @@
-add_sources(
+add_sources(playd
   audio.cpp
   audio_sink.cpp
   audio_source.cpp

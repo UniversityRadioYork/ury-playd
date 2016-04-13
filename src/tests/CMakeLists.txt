@@ -1,0 +1,14 @@
+add_sources(playd_tests
+  cmd_result.cpp
+  dummy_audio_sink.cpp
+  dummy_audio_source.cpp
+  dummy_response_sink.cpp
+  errors.cpp
+  io_response.cpp
+  main.cpp
+  no_audio.cpp
+  pipe_audio.cpp
+  pipe_audio_system.cpp
+  player.cpp
+  tokeniser.cpp
+  )

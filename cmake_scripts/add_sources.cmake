@@ -1,9 +1,9 @@
 # function to collect all the sources from sub-directories
 # into a single list
-function(add_sources)
-  get_property(is_defined GLOBAL PROPERTY SRCS_LIST DEFINED)
+function(add_sources binary)
+  get_property(is_defined GLOBAL PROPERTY ${binary}_SRCS DEFINED)
   if(NOT is_defined)
-    define_property(GLOBAL PROPERTY SRCS_LIST
+    define_property(GLOBAL PROPERTY ${binary}_SRCS
       BRIEF_DOCS "List of source files"
       FULL_DOCS "List of source files to be compiled in one library")
   endif()
@@ -16,5 +16,5 @@ function(add_sources)
     list(APPEND SRCS "${s}")
   endforeach()
   # append to global list
-  set_property(GLOBAL APPEND PROPERTY SRCS_LIST "${SRCS}")
+  set_property(GLOBAL APPEND PROPERTY ${binary}_SRCS "${SRCS}")
 endfunction(add_sources)

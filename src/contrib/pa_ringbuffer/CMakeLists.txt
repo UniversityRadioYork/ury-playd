@@ -1,1 +1,1 @@
-add_sources(pa_ringbuffer.c)
+add_sources(playd pa_ringbuffer.c)
