@@ -29,37 +29,19 @@ SCENARIO("NoAudio reports the state as NONE", "[no-audio]") {
 	}
 }
 
-SCENARIO("NoAudio emits state, but no file or position", "[no-audio]") {
+SCENARIO("NoAudio returns a state of NONE", "[no-audio]") {
 	GIVEN("A NoAudio object") {
 		NoAudio n;
 
-		WHEN("the NoAudio is asked to emit a state") {
-			auto rs = n.Emit("/control/state", 0);
+		WHEN("the NoAudio is asked for its state") {
+			auto state = n.CurrentState();
 
-			THEN("'Ejected' is emitted") {
-				REQUIRE(rs);
-				REQUIRE(rs->Pack() == "RES /control/state Entry Ejected");
-			}
-		}
-
-		WHEN("the NoAudio is asked to emit a file") {
-			auto rs = n.Emit("/player/file", 0);
-
-			THEN("nothing is emitted") {
-				REQUIRE_FALSE(rs);
-			}
-		}
-
-		WHEN("the NoAudio is asked to emit a time") {
-			auto rs = n.Emit("/player/time/elapsed", 0);
-
-			THEN("nothing is emitted") {
-				REQUIRE_FALSE(rs);
+			THEN("the state is NONE") {
+				REQUIRE(state == Audio::State::NONE);
 			}
 		}
 	}
 }
-
 
 SCENARIO("NoAudio throws exceptions when asked to do audio-type things", "[no-audio]") {
 	GIVEN("A NoAudio object") {
@@ -77,15 +59,21 @@ SCENARIO("NoAudio throws exceptions when asked to do audio-type things", "[no-au
 			}
 		}
 
-		WHEN("Seek() is called") {
+		WHEN("SetPosition() is called") {
 			THEN("NoAudioError is thrown") {
-				REQUIRE_THROWS_AS(n.Seek(100), NoAudioError);
+				REQUIRE_THROWS_AS(n.SetPosition(100), NoAudioError);
 			}
 		}
 
 		WHEN("Position() is called") {
 			THEN("NoAudioError is thrown") {
 				REQUIRE_THROWS_AS(n.Position(), NoAudioError);
+			}
+		}
+
+		WHEN("File() is called") {
+			THEN("NoAudioError is thrown") {
+				REQUIRE_THROWS_AS(n.File(), NoAudioError);
 			}
 		}
 

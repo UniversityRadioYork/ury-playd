@@ -12,7 +12,6 @@
 #include <iostream>
 #include <tuple>
 
-#include "audio/audio_system.hpp"
 #include "io.hpp"
 #include "response.hpp"
 #include "player.hpp"
@@ -30,6 +29,19 @@ static const std::string DEFAULT_HOST = "0.0.0.0";
 
 /// The default TCP port on which playd will bind.
 static const std::string DEFAULT_PORT = "1350";
+
+/// Map from file extensions to AudioSource builder functions.
+static const std::map<std::string, Player::SourceFn> SOURCES = {
+#ifdef WITH_MP3
+        {"mp3", &std::make_unique<Mp3AudioSource, const std::string &>},
+#endif // WITH_MP3
+
+#ifdef WITH_SNDFILE
+        {"flac", &std::make_unique<SndfileAudioSource, const std::string &>},
+        {"ogg", &std::make_unique<SndfileAudioSource, const std::string &>},
+        {"wav", &std::make_unique<SndfileAudioSource, const std::string &>},
+#endif // WITH_SNDFILE
+};
 
 /**
  * Creates a vector of strings from a C-style argument vector.
@@ -67,28 +79,6 @@ int GetDeviceID(const std::vector<std::string> &args)
 	if (!SdlAudioSink::IsOutputDevice(id)) return -1;
 
 	return id;
-}
-
-/**
- * Sets up the audio system with the desired sources and sinks.
- * @param audio The audio system to configure.
- */
-void SetupAudioSystem(AudioSystem &audio)
-{
-	audio.SetSink(&SdlAudioSink::Build);
-
-// Now set up the available sources.
-#ifdef WITH_MP3
-	mpg123_init();
-	atexit(mpg123_exit);
-	audio.AddSource("mp3", &Mp3AudioSource::Build);
-#endif // WITH_MP3
-
-#ifdef WITH_SNDFILE
-	audio.AddSource("flac", &SndfileAudioSource::Build);
-	audio.AddSource("ogg", &SndfileAudioSource::Build);
-	audio.AddSource("wav", &SndfileAudioSource::Build);
-#endif // WITH_SNDFILE
 }
 
 /**
@@ -159,32 +149,39 @@ void ExitWithError(const std::string &msg)
  */
 int main(int argc, char *argv[])
 {
-// If we don't ignore SIGPIPE, certain classes of connection droppage
-// will crash our program with it.
-// TODO(CaptainHayashi): a more rigorous ifndef here.
 #ifndef _MSC_VER
+	// If we don't ignore SIGPIPE, certain classes of connection droppage
+	// will crash our program with it.
+	// TODO(CaptainHayashi): a more rigorous ifndef here.
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+	// SDL requires some cleanup and teardown.
 	// This call needs to happen before GetDeviceID, otherwise no device
 	// IDs will be recognised.  (This is why it's here, and not in
 	// SetupAudioSystem.)
 	SdlAudioSink::InitLibrary();
 	atexit(SdlAudioSink::CleanupLibrary);
 
+#ifdef WITH_MP3
+	// mpg123 insists on us running its init and exit functions, too.
+	mpg123_init();
+	atexit(mpg123_exit);
+#endif // WITH_MP3
+
 	auto args = MakeArgVector(argc, argv);
 
 	auto device_id = GetDeviceID(args);
 	if (device_id < 0) ExitWithUsage(args.at(0));
 
-	// Set up all of the components of playd in one fell swoop.
-	AudioSystem audio(device_id);
-	SetupAudioSystem(audio);
-	Player player(audio);
-	IoCore io(player);
+	Player player(device_id,
+	              &std::make_unique<SdlAudioSink, const AudioSource &, int>,
+	              SOURCES);
 
+	// Set up the IO now (to avoid a circular dependency).
 	// Make sure the player broadcasts its responses back to the IoCore.
-	player.SetSink(io);
+	IoCore io(player);
+	player.SetIo(io);
 
 	// Now, actually run the IO loop.
 	std::string host;

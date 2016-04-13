@@ -6,7 +6,7 @@
 .\" playd man page.
 .\" This man page uses the 'mdoc' macro set; see `man mdoc` for details.
 .\"
-.Dd December 5, 2014
+.Dd February 14, 2016
 .Dt PLAYD 1
 .Os
 .\"
@@ -85,13 +85,22 @@ Requests and responses consist of one or more whitespace-delimited
 followed by a line-feed.
 .It
 The first word, the
+.Em tag ,
+uniquely identifies the request being sent
+or answered.
+Examples of good tags include UUIDs,
+or hashes of the command send time and
+originating host.
+Broadcasts from the server have the tag '!'.
+.It
+The next word, the
 .Em command word ,
-denotes the specific request or response.
-A command word in
-.Em lowercase
-denotes a request; in
-.Em CAPITALS ,
-a response:
+denotes the specific request
+(if in
+.Em lowercase ) ,
+or response
+(if in
+.Em CAPITALS ) :
 .Nm
 is case-sensitive.
 .It
@@ -117,6 +126,8 @@ only speaks TCP/IP (by design),
 it can be hard to speak with it from a terminal on the local machine.
 Programs such as
 .Xr nc 1
+or
+.Xr socat 1
 may bridge this gap in functionality.
 .\"
 .\"==========
@@ -132,89 +143,95 @@ session are:
 .Bl -tag -width "load path" -offset indent
 .It eject
 Unloads the current file, stopping any playback.
-.It load Ar path
+.It fload Ar path
 Loads the file at
 .Ar path ,
 which must be absolute.
 .It play
 Starts, or resumes, playback of the current file.
-.It seek Ar pos
+.It pos Ar micros
 Seeks to
-.Ar pos
+.Ar micros
 microseconds past the start of the file.
 Seeking past a file's end is equivalent to seeking to the end directly.
 .It stop
 Stops playback of the current file, keeping the current position.
-.It quit
+.It end
 Makes
 .Nm
-quit.
+behave as if the current file has just ended.
+.\"
+.It dump
+Asks
+.Nm
+to emit all current state to this client as responses.
 .El
 .\"
 .\"-----------
 .Ss Responses
 .\"-----------
-.Bl -tag -width "FILE path " -offset indent
+.Bl -tag -width "FLOAD path " -offset indent
+.It OHAI Ar id Ar protocol Ar server
+Sent upon connection.
+.Ar id
+is the ID assigned to the connected client.
+.Ar protocol
+is the name and version of the Bifrost protocol being used.
+.Ar server
+identifies the playd server and version number.
 .\"
-.It END
-The loaded file has reached its physical end.
-.\"
-.It FAIL Ar reason Ar command...
-.Nm
-failed to execute
-.Ar command .
-A human-readable
-.Ar reason
-is provided.
-.\"
-.It FEATURES Ar feature1 Op Ar feature2...
-The set of BAPS3 feature flags
+.It IAMA Ar role
+Describes the Bifrost role
 .Nm
 implements.  This identifies the features
 .Nm
 provides to external clients.
 .\"
-.It FILE Ar path
-The loaded file has changed to the file at
-.Ar path .
-.\"
-.It OHAI Ar ident
-Sent upon connection;
-.Ar ident
-identifies the playd server and version number.
-.\"
-.It OK Ar command...
+.It ACK OK Ar details
 .Nm
-just finished processing
-.Ar command .
+just finished processing a request,
+identified by the tag of this response.
+Further details are provided in
+.Ar details .
 .\"
-.It STATE Ar state
-The playback state has changed to
-.Ar state .
-This may be one of the following:
-.Bl -tag -width "Quitting" -offset indent
-.It Ejected
-No file is loaded.
-.It Playing
-A file is loaded and playing.
-.It Quitting
+.It ACK FAIL Ar details
 .Nm
-is about to shut down.
-.It Stopped
-A file is loaded, but is not playing.
-.El
+failed to execute a request,
+identified by the tag of this response.
+Further details are provided in
+.Ar details .
 .\"
-.It TIME Ar pos
+.It ACK WHAT Ar details
+.Nm
+did not understand a request,
+identified by the tag of this response.
+Further details are provided in
+.Ar details .
+.\"
+.It DUMP
+.Nm
+has finished responding to a dump command.
+.\"
+.It END
+The loaded file has reached its physical end.
+.\"
+.It EJECT
+There is no currently loaded file.
+.\"
+.It FLOAD Ar path
+The file at
+.Ar path
+is loaded.
+.\"
+.It PLAY
+The currently loaded file is now playing.
+.\"
+.It STOP
+The currently loaded file is now stopped.
+.\"
+.It POS Ar pos
 Periodic announcement of the current file position in microseconds,
 .Ar pos .
-.\"
-.It WHAT Ar message Ar command...
-.Nm
-did not understand
-.Ar command .
-A human-readable
-.Ar message
-is provided.
 .El
 .\"
 .\"==========
@@ -256,25 +273,24 @@ A session with
 .Nm
 may look like the following:
 .Bd -literal -offset indent
--> OHAI 'playd v0.1.1'
--> FEATURES End FileLoad PlayStop Seek TimeReport
--> TIME 0
--> STATE Ejected
-<- load '/usr/home/foo/awesome-mix.mp3'
--> OK load '/usr/home/foo/awesome-mix.mp3'
--> FILE '/usr/home/foo/awesome-mix.mp3'
--> STATE Stopped
-<- play
--> OK play
--> STATE Playing
+-> ! OHAI 1 'bifrost-0.3.0' 'playd-0.3.0'
+-> ! IAMA player/file
+-> ! POS 0
+-> ! EJECT
+<- 1 fload '/usr/home/foo/awesome-mix.mp3'
+-> ! FLOAD '/usr/home/foo/awesome-mix.mp3'
+-> ! STOP
+-> 1 ACK OK success
+<- 2 play
+-> ! PLAY
+-> 2 ACK OK success
 (file plays to end)
--> END
--> STATE Stopped
--> TIME 0
--> eject
-<- OK eject
--> STATE Ejected
-(disconnect)
+-> ! END
+-> ! STOP
+-> ! POS 0
+-> 3 eject
+<- ! EJECT
+<- 3 ACK OK success
 .Ed
 .\"
 .\"=========

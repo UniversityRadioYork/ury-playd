@@ -41,29 +41,10 @@ const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
 // These should generally trampoline back into class methods.
 //
 
-/**
- * A structure used to associate a write buffer with a write handle.
- *
- * The WriteReq can appear to libuv code as a `uv_write_t`, as it includes a
- * `uv_write_t` at the start of its memory footprint.  This is a slightly
- * nasty use of low-level C, but works well.
- *
- * This tactic comes from the [Buffers and Streams][b] section of the uvbook;
- * see the _Write to pipe_ sub-section.
- *
- * [b]: https://nikhilm.github.io/uvbook/filesystem.html#buffers-and-streams
- */
-struct WriteReq
-{
-	uv_write_t req;   ///< The main libuv write handle.
-	uv_buf_t buf;     ///< The associated write buffer.
-	Connection *conn; ///< The recipient Connection.
-	bool fatal;       ///< Whether the Connection should now close.
-};
-
 /// The function used to allocate and initialise buffers for client reading.
 void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf)
 {
+	// Since we used new here, we need to use delete when we finish reading.
 	*buf = uv_buf_init(new char[suggested_size](), suggested_size);
 }
 
@@ -79,41 +60,49 @@ void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	assert(stream != nullptr);
 
-	Connection *tcp = static_cast<Connection *>(stream->data);
+	auto *tcp = static_cast<Connection *>(stream->data);
 	assert(tcp != nullptr);
 
+	// NB: Read delete[]s buf->base, so we don't.
 	tcp->Read(nread, buf);
+
+	// We don't delete the handle.
+	// It will be used for future reads on this client!
 }
 
 /// The callback fired when a new client connection is acquired by the listener.
 void UvListenCallback(uv_stream_t *server, int status)
 {
-	if (status < 0) return;
 	assert(server != nullptr);
+	if (status < 0) return;
 
-	IoCore *pool = static_cast<IoCore *>(server->data);
-	assert(pool != nullptr);
+	auto *io = static_cast<IoCore *>(server->data);
+	assert(io != nullptr);
 
-	pool->Accept(server);
+	io->Accept(server);
 }
 
 /// The callback fired when a response has been sent to a client.
-void UvRespondCallback(uv_write_t *req, int status)
+void UvWriteCallback(uv_write_t *req, int status)
 {
+	assert(req != nullptr);
+
 	if (status) {
 		Debug() << "UvRespondCallback: got status:" << status
 		        << std::endl;
 	}
 
-	auto *wr = reinterpret_cast<WriteReq *>(req);
-	assert(wr != nullptr);
+	// We receive the write buffer as the write_t's data pointer.
+	// This is because something has to delete[] it,
+	// and we drew the short straw.
+	auto *buf = static_cast<char *>(req->data);
+	assert(buf != nullptr);
 
-	// Certain requests are intended to signal to the connection that it
-	// should close.  These have the 'fatal' flag set.
-	if (wr->fatal && wr->conn != nullptr) wr->conn->Depool();
+	delete[] buf;
 
-	delete[] wr -> buf.base;
-	delete wr;
+	// This handle was created specifically for this shutdown.
+	// We thus have to delete it.
+	delete req;
 }
 
 /// The callback fired when the update timer fires.
@@ -121,32 +110,84 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 {
 	assert(handle != nullptr);
 
-	IoCore *io = static_cast<IoCore *>(handle->data);
+	auto *io = static_cast<IoCore *>(handle->data);
 	assert(io != nullptr);
+
 	io->UpdatePlayer();
+
+	// We don't delete the handle.
+	// It is being used for other timer fires.
+}
+
+/// The callback fired when SIGINT occurs.
+void UvSigintCallback(uv_signal_t *handle, int signum)
+{
+	assert(handle != nullptr);
+
+	auto *player = static_cast<Player *>(handle->data);
+	assert(player != nullptr);
+
+	if (signum != SIGINT) return;
+
+	Debug() << "Caught SIGINT, closing..." << std::endl;
+	player->Quit(Response::NOREQUEST);
+
+	// We don't delete the handle.
+	// It is being used for other signals.
+}
+
+/// The callback fired when a client is shut down.
+void UvShutdownCallback(uv_shutdown_t *handle, int status)
+{
+	assert(handle != nullptr);
+
+	if (status) {
+		Debug() << "UvShutdownCallback: got status:" << status
+		        << std::endl;
+	}
+
+	auto *conn = static_cast<Connection *>(handle->data);
+	assert(conn != nullptr);
+
+	// Now actually tell the client to die off.
+	conn->Depool();
+
+	// This handle was created specifically for this shutdown.
+	// We thus have to delete it.
+	delete handle;
 }
 
 //
 // IoCore
 //
 
-IoCore::IoCore(Player &player) : player(player)
+IoCore::IoCore(Player &player) : loop(nullptr), player(player)
 {
 }
 
 void IoCore::Run(const std::string &host, const std::string &port)
 {
+	this->loop = uv_default_loop();
+	if (this->loop == nullptr) throw InternalError(MSG_IO_CANNOT_ALLOC);
+
 	this->InitAcceptor(host, port);
-	this->DoUpdateTimer();
-	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+	this->InitSignals();
+	this->InitUpdateTimer();
+
+	uv_run(this->loop, UV_RUN_DEFAULT);
+
+	// We presume all of the open handles have been closed in Shutdown().
+	// We need only close the loop.
+	uv_loop_close(this->loop);
 }
 
 void IoCore::Accept(uv_stream_t *server)
 {
 	assert(server != nullptr);
+	assert(this->loop != nullptr);
 
 	auto client = new uv_tcp_t();
-	uv_tcp_init(uv_default_loop(), client);
+	uv_tcp_init(this->loop, client);
 
 	// libuv does the 'nonzero is error' thing here
 	if (uv_accept(server, (uv_stream_t *)client)) {
@@ -159,9 +200,16 @@ void IoCore::Accept(uv_stream_t *server)
 	client->data = static_cast<void *>(conn.get());
 	this->pool[id - 1] = std::move(conn);
 
-	// The player will already have been told to send responses to the
-	// IoCore, so all it needs to know is the slot.
-	this->player.WelcomeClient(id);
+	// Begin initial responses
+	this->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI)
+	                          .AddArg(std::to_string(id))
+	                          .AddArg(MSG_OHAI_BIFROST)
+	                          .AddArg(MSG_OHAI_PLAYD));
+	this->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA)
+	                          .AddArg("player/file"));
+	this->player.Dump(id, Response::NOREQUEST);
+	this->Respond(id, Response::Success(Response::NOREQUEST));
+	// End initial responses
 
 	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
 }
@@ -225,6 +273,8 @@ void IoCore::UpdatePlayer()
 
 void IoCore::Shutdown()
 {
+	Debug() << "Shutting down..." << std::endl;
+
 	// If the player is ready to terminate, we need to kill the event loop
 	// in order to disconnect clients and stop the updating.
 	// We do this by stopping everything using the loop.
@@ -236,36 +286,24 @@ void IoCore::Shutdown()
 	// down the connections):
 	uv_close(reinterpret_cast<uv_handle_t *>(&this->server), nullptr);
 
-	// Finally, kill off all of the connections with 'fatal' responses.
-	for (const auto conn : this->pool) IoCore::TryShutdown(conn);
+	// Next, ask each connection to stop.
+	for (const auto conn : this->pool) {
+		if (conn) conn->Shutdown();
+	}
+
+	// Finally, unregister signal processing.
+	uv_signal_stop(&this->sigint);
+	uv_close(reinterpret_cast<uv_handle_t *>(&this->sigint), nullptr);
 }
 
-/* static */ void IoCore::TryShutdown(const std::shared_ptr<Connection> conn)
-{
-	if (!conn) return;
-
-	auto response = Response(Response::Code::STATE).AddArg("Quitting");
-
-	// The true at the end is for the 'fatal' argument to
-	// Connection::Respond, telling it to close itself after processing
-	// 'response'.
-	conn->Respond(response, true);
-}
-
-/* static */ void IoCore::TryRespond(const std::shared_ptr<Connection> conn,
-                                     const Response &response)
-{
-	if (conn) conn->Respond(response);
-}
-
-void IoCore::Respond(const Response &response, size_t id) const
+void IoCore::Respond(size_t id, const Response &response) const
 {
 	if (this->pool.empty()) return;
 
 	if (id == 0) {
 		this->Broadcast(response);
 	} else {
-		this->Unicast(response, id);
+		this->Unicast(id, response);
 	}
 }
 
@@ -275,37 +313,45 @@ void IoCore::Broadcast(const Response &response) const
 
 	// Copy the connection by value, so that there's at least one
 	// active reference to it throughout.
-	for (const auto c : this->pool) IoCore::TryRespond(c, response);
+	for (const auto c : this->pool) {
+		if (c) c->Respond(response);
+	}
 }
 
-void IoCore::Unicast(const Response &response, size_t id) const
+void IoCore::Unicast(size_t id, const Response &response) const
 {
 	assert(0 < id && id <= this->pool.size());
 
 	Debug() << "unicast @" << std::to_string(id) << ":" << response.Pack()
 	        << std::endl;
 
-	IoCore::TryRespond(this->pool.at(id - 1), response);
+	auto c = this->pool.at(id - 1);
+	if (c) c->Respond(response);
 }
 
-void IoCore::DoUpdateTimer()
+void IoCore::InitUpdateTimer()
 {
-	uv_timer_init(uv_default_loop(), &this->updater);
+	assert(this->loop != nullptr);
+
+	uv_timer_init(this->loop, &this->updater);
 	this->updater.data = static_cast<void *>(this);
+
 	uv_timer_start(&this->updater, UvUpdateTimerCallback, 0,
 	               PLAYER_UPDATE_PERIOD);
 }
 
 void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 {
-	int uport = std::stoi(port);
+	assert(this->loop != nullptr);
 
-	uv_tcp_init(uv_default_loop(), &this->server);
+	if (uv_tcp_init(this->loop, &this->server)) {
+		throw InternalError(MSG_IO_CANNOT_ALLOC);
+	}
 	this->server.data = static_cast<void *>(this);
 	assert(this->server.data != nullptr);
 
 	struct sockaddr_in bind_addr;
-	uv_ip4_addr(address.c_str(), uport, &bind_addr);
+	uv_ip4_addr(address.c_str(), std::stoi(port), &bind_addr);
 	uv_tcp_bind(&this->server, (const sockaddr *)&bind_addr, 0);
 
 	int r = uv_listen((uv_stream_t *)&this->server, 128, UvListenCallback);
@@ -315,6 +361,22 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	}
 
 	Debug() << "Listening at" << address << "on" << port << std::endl;
+}
+
+void IoCore::InitSignals()
+{
+	int r = uv_signal_init(this->loop, &this->sigint);
+	if (r) {
+		throw InternalError(MSG_IO_CANNOT_ALLOC + ": " +
+		                    std::string(uv_err_name(r)));
+	}
+
+	// We pass the player, not the IoCore.
+	// This is so the SIGINT handler can tell the player to quit,
+	// which then tells us to shutdown
+	this->sigint.data = static_cast<void *>(&this->player);
+	assert(this->sigint.data != nullptr);
+	uv_signal_start(&this->sigint, UvSigintCallback, SIGINT);
 }
 
 //
@@ -330,28 +392,32 @@ Connection::Connection(IoCore &parent, uv_tcp_t *tcp, Player &player, size_t id)
 Connection::~Connection()
 {
 	Debug() << "Closing connection from" << Name() << std::endl;
-	uv_close((uv_handle_t *)this->tcp, UvCloseCallback);
+	uv_close(reinterpret_cast<uv_handle_t *>(this->tcp), UvCloseCallback);
 }
 
-void Connection::Respond(const Response &response, bool fatal)
+void Connection::Respond(const Response &response)
 {
+	// Pack provides us the response's wire format, except the newline.
+	// We can provide that here.
 	auto string = response.Pack();
+	string.push_back('\n');
 
 	unsigned int l = string.length();
-	const char *s = string.c_str();
-	assert(s != nullptr);
 
-	auto req = new WriteReq;
-	req->conn = this;
-	req->fatal = fatal;
+	// Make a libuv buffer and pour the request into it.
+	// The onus is on UvRespondCallback to free buf.base.
+	auto buf = uv_buf_init(new char[l], l);
+	assert(buf.base != nullptr);
+	string.copy(buf.base, l);
 
-	req->buf = uv_buf_init(new char[l + 1], l + 1);
-	assert(req->buf.base != nullptr);
-	memcpy(req->buf.base, s, l);
-	req->buf.base[l] = '\n';
+	// Make a write request.
+	// Since the callback must free the buffer, pass it through as data.
+	// The callback will also free req.
+	auto req = new uv_write_t;
+	req->data = static_cast<void *>(buf.base);
 
-	uv_write((uv_write_t *)req, (uv_stream_t *)this->tcp, &req->buf, 1,
-	         UvRespondCallback);
+	uv_write((uv_write_t *)req, (uv_stream_t *)this->tcp, &buf, 1,
+	         UvWriteCallback);
 }
 
 std::string Connection::Name()
@@ -409,27 +475,55 @@ void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 		return;
 	}
 
-	auto chars = buf->base;
-
 	// Make sure we actually have some data to read!
-	if (chars == nullptr) return;
+	if (buf->base == nullptr) return;
 
 	// Everything looks okay for reading.
-	auto cmds = this->tokeniser.Feed(std::string(chars, nread));
-	for (auto cmd : cmds) RunCommand(cmd);
-	delete[] chars;
+	auto cmds = this->tokeniser.Feed(std::string(buf->base, nread));
+	for (auto cmd : cmds) {
+		if (cmd.empty()) continue;
+
+		Response res = RunCommand(cmd);
+		this->Respond(res);
+	}
+
+	delete[] buf->base;
 }
 
-void Connection::RunCommand(const std::vector<std::string> &cmd)
+Response Connection::RunCommand(const std::vector<std::string> &cmd)
 {
-	if (cmd.empty()) return;
+	// First of all, figure out what the tag of this command is.
+	// The first word is always the tag.
+	auto tag = cmd[0];
+	if (cmd.size() <= 1) return Response::Invalid(tag, MSG_CMD_SHORT);
 
-	Debug() << "Received command:";
-	for (const auto &word : cmd) std::cerr << ' ' << '"' << word << '"';
-	std::cerr << std::endl;
+	// The next words are the actual command, and any other arguments.
+	auto word = cmd[1];
+	auto nargs = cmd.size() - 2;
 
-	CommandResult res = this->player.RunCommand(cmd, this->id);
-	res.Emit(this->parent, cmd, this->id);
+	if (nargs == 0) {
+		if ("play" == word) return this->player.SetPlaying(tag, true);
+		if ("stop" == word) return this->player.SetPlaying(tag, false);
+		if ("end" == word) return this->player.End(tag);
+		if ("eject" == word) return this->player.Eject(tag);
+		if ("dump" == word) return this->player.Dump(id, tag);
+	} else if (nargs == 1) {
+		if ("fload" == word) return this->player.Load(tag, cmd[2]);
+		if ("pos" == word) return this->player.Pos(tag, cmd[2]);
+	}
+
+	return Response::Invalid(tag, MSG_CMD_INVALID);
+}
+
+void Connection::Shutdown()
+{
+	auto req = new uv_shutdown_t;
+	assert(req != nullptr);
+
+	req->data = this;
+
+	uv_shutdown(req, reinterpret_cast<uv_stream_t *>(this->tcp),
+	            UvShutdownCallback);
 }
 
 void Connection::Depool()

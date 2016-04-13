@@ -7,6 +7,7 @@
  * @see audio/audio_sink.hpp
  */
 
+#include <array>
 #include <algorithm>
 #include <cassert>
 #include <climits>
@@ -38,6 +39,14 @@ Audio::State AudioSink::State()
 
 const size_t SdlAudioSink::RINGBUF_POWER = 16;
 
+/* static */ const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> SdlAudioSink::FORMATS {{
+	AUDIO_U8,  // PACKED_UNSIGNED_INT_8
+	AUDIO_S8,  // PACKED_SIGNED_INT_8
+	AUDIO_S16, // PACKED_SIGNED_INT_16
+	AUDIO_S32, // PACKED_SIGNED_INT_32
+	AUDIO_F32  // PACKED_FLOAT_32
+}};
+
 /**
  * The callback used by SDL_Audio.
  * Trampolines back into vsink, which must point to an SdlAudioSink.
@@ -47,12 +56,6 @@ static void SDLCallback(void *vsink, std::uint8_t *data, int len)
 	assert(vsink != nullptr);
 	auto sink = static_cast<SdlAudioSink *>(vsink);
 	sink->Callback(data, len);
-}
-
-/* static */ std::unique_ptr<AudioSink> SdlAudioSink::Build(
-        const AudioSource &source, int device_id)
-{
-	return std::unique_ptr<AudioSink>(new SdlAudioSink(source, device_id));
 }
 
 SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
@@ -71,7 +74,7 @@ SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
 	SDL_AudioSpec want;
 	SDL_zero(want);
 	want.freq = source.SampleRate();
-	want.format = SDLFormat(source.OutputSampleFormat());
+	want.format = FORMATS[static_cast<int>(source.OutputSampleFormat())];
 	want.channels = source.ChannelCount();
 	want.callback = &SDLCallback;
 	want.userdata = (void *)this;
@@ -235,23 +238,6 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	this->position_sample_count += read_samples;
 }
 
-/// Mappings from SampleFormats to their equivalent SDL_AudioFormats.
-static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
-        {SampleFormat::PACKED_UNSIGNED_INT_8, AUDIO_U8},
-        {SampleFormat::PACKED_SIGNED_INT_8, AUDIO_S8},
-        {SampleFormat::PACKED_SIGNED_INT_16, AUDIO_S16},
-        {SampleFormat::PACKED_SIGNED_INT_32, AUDIO_S32},
-        {SampleFormat::PACKED_FLOAT_32, AUDIO_F32}};
-
-/* static */ SDL_AudioFormat SdlAudioSink::SDLFormat(SampleFormat fmt)
-{
-	try {
-		return sdl_from_sf.at(fmt);
-	} catch (std::out_of_range) {
-		throw FileError(MSG_DECODE_BADRATE);
-	}
-}
-
 /* static */ std::vector<std::pair<int, std::string>> SdlAudioSink::GetDevicesInfo()
 {
 	std::vector<std::pair<int, std::string>> list;
@@ -260,9 +246,7 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 	int is = SDL_GetNumAudioDevices(0);
 	for (int i = 0; i < is; i++) {
 		const char *n = SDL_GetAudioDeviceName(i, 0);
-		if (n == nullptr) continue;
-
-		list.emplace_back(i, std::string(n));
+		if (n != nullptr) list.emplace_back(i, std::string(n));
 	}
 
 	return list;
@@ -272,6 +256,6 @@ static const std::map<SampleFormat, SDL_AudioFormat> sdl_from_sf = {
 {
 	int ids = SDL_GetNumAudioDevices(0);
 
-	// See above comment for why this is sufficient.
+	// See comment in GetDevicesInfo for why this is sufficient.
 	return (0 <= id && id < ids);
 }

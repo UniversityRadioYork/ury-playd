@@ -17,8 +17,8 @@
 
 SCENARIO("PipeAudio can be constructed with a DummyAudioSink and DummyAudioSource", "[pipe-audio]") {
 	GIVEN("unique pointers to a sink and source") {
-		auto src = std::unique_ptr<AudioSource>(new DummyAudioSource("test"));
-		auto sink = std::unique_ptr<AudioSink>(new DummyAudioSink());
+		auto src = std::make_unique<DummyAudioSource>("test");
+		auto sink = std::make_unique<DummyAudioSink>(*src, 0);
 
 		WHEN("a PipeAudio is created") {
 			THEN("no exceptions are thrown and queries return the expected initial values") {
@@ -29,56 +29,110 @@ SCENARIO("PipeAudio can be constructed with a DummyAudioSink and DummyAudioSourc
 	}
 }
 
-SCENARIO("PipeAudio responds to Emit calls with valid responses", "[pipe-audio]") {
+SCENARIO("PipeAudio responds to getters with valid responses", "[pipe-audio]") {
 	GIVEN("a valid PipeAudio and DummyResponseSink") {
-		PipeAudio pa(std::unique_ptr<AudioSource>(new DummyAudioSource("test")),
-		             std::unique_ptr<AudioSink>(new DummyAudioSink()));
+		auto src = std::make_unique<DummyAudioSource>("test");
+		auto snk = std::make_unique<DummyAudioSink>(*src, 0);
+		PipeAudio pa(std::move(src), std::move(snk));
 
-		WHEN("the STATE is requested") {
+		WHEN("the state is requested") {
 			AND_WHEN("the state is Playing") {
 				pa.SetPlaying(true);
-				THEN("the /control/state resource is set to Playing") {
-					auto rs = pa.Emit("/control/state", 0);
-					REQUIRE(rs);
-					REQUIRE(rs->Pack() == "RES /control/state Entry Playing");
+				THEN("the state is reported as Playing") {
+					REQUIRE(pa.CurrentState() == Audio::State::PLAYING);
 				}
 			}
 
 			AND_WHEN("the state is Stopped") {
 				pa.SetPlaying(false);
-				THEN("the /control/state resource is set to Stopped") {
-					auto rs = pa.Emit("/control/state", 0);
-					REQUIRE(rs);
-					REQUIRE(rs->Pack() == "RES /control/state Entry Stopped");
+				THEN("the state is reported as Stopped") {
+					REQUIRE(pa.CurrentState() == Audio::State::STOPPED);
 				}
 			}
 		}
 
-		WHEN("the TIME is requested") {
+		WHEN("the position is requested") {
 			AND_WHEN("the position is zero") {
-				pa.Seek(0);
-				THEN("the /player/time/elapsed resource is set to 0") {
-					auto rs = pa.Emit("/player/time/elapsed", 0);
-					REQUIRE(rs);
-					REQUIRE(rs->Pack() == "RES /player/time/elapsed Entry 0");
+				pa.SetPosition(0);
+				THEN("the position is reported as 0") {
+					REQUIRE(pa.Position() == 0);
 				}
 			}
 
 			AND_WHEN("the position is not zero") {
-				pa.Seek(8675309);
-				THEN("the /player/time/elapsed resource is set to (rounded-off position)") {
+				pa.SetPosition(8675309);
+				THEN("the position is reported as (rounded-off position)") {
 					// The DummyAudioSource has 44100Hz
 					// sample rate.  The following
 					// calculation is what a round-trip to
 					// and from samples should cause.
 					// This *won't* be 8675309!
 					auto expected = (((8675309L * 44100) / 1000000) * 1000000) / 44100;
-					auto rs = pa.Emit("/player/time/elapsed", 0);
-					REQUIRE(rs);
-					REQUIRE(rs->Pack() == "RES /player/time/elapsed Entry " + std::to_string(expected));
+					REQUIRE(pa.Position() == expected);
 				}
 			}
 		}
 
+	}
+}
+
+SCENARIO("PipeAudio propagates source emptiness correctly", "[pipe-audio]") {
+	GIVEN("a valid set of dummy components") {
+		auto src = std::make_unique<DummyAudioSource>("test");
+		auto snk = std::make_unique<DummyAudioSink>(*src, 0);
+		snk->state = Audio::State::STOPPED;
+
+		// We build the PipeAudio later, because it moves src and snk
+		// out of easy modification range.
+
+		WHEN("the DummyResponseSource is reporting end of file") {
+			src->run_out = true;
+
+			PipeAudio pa(std::move(src), std::move(snk));
+
+			THEN("Update() returns AT_END") {
+				REQUIRE(pa.Update() == Audio::State::AT_END);
+			}
+		}
+	}
+}
+
+SCENARIO("PipeAudio acquires state from the sink correctly", "[pipe-audio]") {
+	GIVEN("a valid set of dummy components") {
+		auto src = std::make_unique<DummyAudioSource>("test");
+		auto snk = std::make_unique<DummyAudioSink>(*src, 0);
+
+		// We build the PipeAudio later, because it moves src and snk
+		// out of easy modification range.
+
+		WHEN("the DummyResponseSink's state is STOPPED") {
+			snk->state = Audio::State::STOPPED;
+
+			PipeAudio pa(std::move(src), std::move(snk));
+
+			THEN("Update() returns STOPPED") {
+				REQUIRE(pa.Update() == Audio::State::STOPPED);
+			}
+		}
+
+		WHEN("the DummyResponseSink's state is PLAYING") {
+			snk->state = Audio::State::PLAYING;
+
+			PipeAudio pa(std::move(src), std::move(snk));
+
+			THEN("Update() returns PLAYING") {
+				REQUIRE(pa.Update() == Audio::State::PLAYING);
+			}
+		}
+	
+		WHEN("the DummyResponseSink's state is AT_END") {
+			snk->state = Audio::State::AT_END;
+
+			PipeAudio pa(std::move(src), std::move(snk));
+
+			THEN("Update() returns AT_END") {
+				REQUIRE(pa.Update() == Audio::State::AT_END);
+			}
+		}
 	}
 }
