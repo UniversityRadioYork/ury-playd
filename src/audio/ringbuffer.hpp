@@ -50,14 +50,14 @@ public:
 	 * @return The number of samples this ring buffer has space to store.
 	 * @see Write
 	 */
-	unsigned long WriteCapacity() const;
+	size_t WriteCapacity() const;
 
 	/**
 	 * The current read capacity.
 	 * @return The number of samples available in this ring buffer.
 	 * @see Read
 	 */
-	unsigned long ReadCapacity() const;
+	size_t ReadCapacity() const;
 
 	/**
 	 * Writes samples from an array into the ring buffer.
