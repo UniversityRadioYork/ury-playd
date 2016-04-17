@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.0)
 project(playd)
 list(APPEND CMAKE_MODULE_PATH "${playd_SOURCE_DIR}/cmake_scripts")
 
-include(add_sources)
 include(set_compiler_flags)
 
 find_package(SDL2 REQUIRED)
@@ -30,6 +29,7 @@ message(STATUS "Supported formats: ${SUPPORTED_FMTS}")
 list (FIND SUPPORTED_FMTS "MP3" _index)
 if (${_index} GREATER -1)
   add_definitions(-DWITH_MP3)
+  set(SRCS ${SRCS} src/audio/sources/mp3.cpp)
 else()
   add_definitions(-DNO_MP3)
 endif()
@@ -37,6 +37,7 @@ endif()
 # Def if sndfile found
 if(LIBSNDFILE_FOUND)
   add_definitions(-DWITH_SNDFILE)
+  set(SRCS ${SRCS} src/audio/sources/sndfile.cpp)
 else()
   add_definitions(-DNO_SNDFILE)
 endif()
@@ -51,18 +52,40 @@ endif()
 
 ##
 
-add_subdirectory("src")
-add_subdirectory("src/tests")
-
-get_property(SRCS GLOBAL PROPERTY playd_SRCS)
-message(STATUS "playd sources: ${SRCS}")
+set(SRCS ${SRCS}
+  src/errors.cpp
+  src/io.cpp
+  src/player.cpp
+  src/response.cpp
+  src/tokeniser.cpp
+  src/audio/audio.cpp
+  src/audio/audio_sink.cpp
+  src/audio/audio_source.cpp
+  src/audio/ringbuffer.cpp
+  src/audio/sample_formats.cpp
+  src/contrib/pa_ringbuffer/pa_ringbuffer.c
+  )
+set(tests_SRCS ${tests_SRCS}
+  src/tests/dummy_audio_sink.cpp
+  src/tests/dummy_audio_source.cpp
+  src/tests/dummy_response_sink.cpp
+  src/tests/errors.cpp
+  src/tests/io_response.cpp
+  src/tests/main.cpp
+  src/tests/no_audio.cpp
+  src/tests/pipe_audio.cpp
+  src/tests/player.cpp
+  src/tests/ringbuffer.cpp
+  src/tests/tokeniser.cpp
+)
 add_executable(playd ${SRCS} "src/main.cpp")
-get_property(tests_SRCS GLOBAL PROPERTY playd_tests_SRCS)
-message(STATUS "tests sources: ${tests_SRCS}")
 add_executable(playd_tests ${SRCS} ${tests_SRCS})
-
-add_test(NAME mytest COMMAND playd_tests)
+add_test(NAME playd_tests COMMAND playd_tests)
+# `make check` to both compile and run tests
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
+  DEPENDS playd_tests)
 enable_testing()
+
 foreach(mylib SDL2 LIBUV MPG123 LIBSNDFILE)
   if(${mylib}_LIBRARY AND ${mylib}_INCLUDE_DIR)
     target_link_libraries(playd ${${mylib}_LIBRARY})
@@ -75,9 +98,3 @@ if(WIN32)
   target_link_libraries(playd wsock32 ws2_32 iphlpapi psapi userenv)
   target_link_libraries(playd_tests wsock32 ws2_32 iphlpapi psapi userenv)
 endif()
-# Print all variables
-#get_cmake_property(_variableNames VARIABLES)
-#foreach (_variableName ${_variableNames})
-#    message(STATUS "${_variableName}=${${_variableName}}")
-#endforeach()
-message(STATUS "${OUTPUT}")
