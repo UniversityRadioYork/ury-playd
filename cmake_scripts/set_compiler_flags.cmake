@@ -65,24 +65,24 @@ ELSEIF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 ENDIF()
 
 # The following flags will be tried on all compilers
-# If a C++11 able compiler is detected, then the flag is added
+# If a C++14 able compiler is detected, then the flag is added
 # otherwise an error is thrown
-CHECK_CXX_COMPILER_FLAG(-std=c++11 ALL_C11)
-IF(ALL_C11)
-	MESSAGE(STATUS "Enabling '-std=c++11' compiler flag")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-ENDIF(ALL_C11)
+CHECK_CXX_COMPILER_FLAG(-std=c++14 ALL_C14)
+IF(ALL_C14)
+	MESSAGE(STATUS "Enabling '-std=c++14' compiler flag")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+ENDIF(ALL_C14)
 
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	IF(MSVC_VERSION STREQUAL "1900")
-		MESSAGE(STATUS "Using MSVC 2015. Supports C++11.")
-		SET(ALL_C11 ON)
+		MESSAGE(STATUS "Using MSVC 2015. Supports C++14.")
+		SET(ALL_C14 ON)
 	ENDIF(MSVC_VERSION STREQUAL "1900")
 ENDIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 
-IF(NOT ALL_C11)
-  MESSAGE(FATAL_ERROR "Unable to locate a c++11 compatible compiler")
-ENDIF(NOT ALL_C11)
+IF(NOT ALL_C14)
+  MESSAGE(FATAL_ERROR "Unable to locate a c++14 compatible compiler")
+ENDIF(NOT ALL_C14)
 
 
 # This flag appeared to be important when compiling in Travis VMs
