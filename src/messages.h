@@ -15,15 +15,22 @@
 // Client communications
 //
 
-/// Message shown when a client connects to playd.
 #ifndef PD_VERSION
 #define PD_VERSION "0.0.0"
 #endif
-const std::string MSG_OHAI = "playd " PD_VERSION;
+/// The playd name and version.
+const std::string MSG_OHAI_PLAYD = "playd-" PD_VERSION;
+
+/// The protocol name and version.
+const std::string MSG_OHAI_BIFROST = "bifrost-0.3.0";
 
 //
 // Command failure messages
 //
+
+/// Message shown when the CommandHandler receives an under-length command.
+const std::string MSG_CMD_SHORT =
+        "Command must contain at least a tag and one command word";
 
 /// Message shown when the CommandHandler receives an invalid command.
 const std::string MSG_CMD_INVALID = "Bad command or file name";
@@ -106,6 +113,9 @@ const std::string MSG_INVALID_ACTION = "cannot perform this action";
 //
 // IO failures
 //
+
+/// Message shown when allocating an IO object fails.
+const std::string MSG_IO_CANNOT_ALLOC = "cannot allocate I/O object";
 
 /// Message shown when too many simultaneous connections are launched.
 const std::string MSG_TOO_MANY_CONNS = "too many simultaneous connections";

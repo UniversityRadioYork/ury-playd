@@ -14,25 +14,28 @@
 #include <string>
 #include <vector>
 
-#include "audio/audio_system.hpp"
+#include "audio/audio_sink.hpp"
+#include "audio/audio_source.hpp"
 #include "audio/audio.hpp"
-#include "cmd_result.hpp"
 #include "errors.hpp"
 #include "response.hpp"
 #include "messages.h"
 #include "player.hpp"
 
-const std::vector<std::string> Player::FEATURES{"End", "FileLoad", "PlayStop",
-                                                "Seek", "TimeReport"};
-
-Player::Player(AudioSystem &audio)
-    : audio(audio), file(audio.Null()), is_running(true), sink(nullptr)
+Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sources)
+    : device_id(device_id),
+      sink(std::move(sink)),
+      sources(std::move(sources)),
+      file(std::make_unique<NoAudio>()),
+      dead(false),
+      io(nullptr),
+      last_pos(0)
 {
 }
 
-void Player::SetSink(ResponseSink &sink)
+void Player::SetIo(ResponseSink &io)
 {
-	this->sink = &sink;
+	this->io = &io;
 }
 
 bool Player::Update()
@@ -40,84 +43,86 @@ bool Player::Update()
 	assert(this->file != nullptr);
 	auto as = this->file->Update();
 
-	if (as == Audio::State::AT_END) this->End();
+	if (as == Audio::State::AT_END) this->End(Response::NOREQUEST);
 	if (as == Audio::State::PLAYING) {
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
-		this->Read("/player/time/elapsed", 0);
+		auto pos = this->file->Position();
+		if (this->CanAnnounceTime(pos)) {
+			this->Respond(0, Response(Response::NOREQUEST,
+			                          Response::Code::POS)
+			                         .AddArg(std::to_string(pos)));
+		}
 	}
 
-	return this->is_running;
-}
-
-void Player::WelcomeClient(size_t id) const
-{
-	this->sink->Respond(Response(Response::Code::OHAI).AddArg(MSG_OHAI), id);
-
-	auto features = Response(Response::Code::FEATURES);
-	for (auto &f : FEATURES) features.AddArg(f);
-	this->sink->Respond(features, id);
-
-	this->Read("/", id);
-}
-
-void Player::End()
-{
-	this->SetPlaying(false);
-
-	// Rewind the file back to the start.  We can't use Player::Seek() here
-	// in case End() is called from Seek(); a seek failure could start an
-	// infinite loop.
-	this->SeekRaw(0);
-
-	// Let upstream know that the file ended by itself.
-	// This is needed for auto-advancing playlists, etc.
-	if (this->sink == nullptr) return;
-	this->sink->Respond(Response(Response::Code::END));
+	return !this->dead;
 }
 
 //
 // Commands
 //
 
-CommandResult Player::RunCommand(const std::vector<std::string> &cmd, size_t id)
+Response Player::Dump(size_t id, const std::string &tag) const
 {
-	if (!this->is_running) {
-		// Refuse any and all commands when not running.
-		// This is mainly to prevent the internal state from
-		// going weird, but seems logical anyway.
-		return CommandResult::Failure(MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	this->DumpState(id, tag);
+
+	// This information won't exist if there is no file.
+	if (this->file->CurrentState() != Audio::State::NONE) {
+		auto file = this->file->File();
+		this->Respond(
+		        id, Response(tag, Response::Code::FLOAD).AddArg(file));
+
+		auto pos = this->file->Position();
+		this->Respond(id, Response(tag, Response::Code::POS)
+		                          .AddArg(std::to_string(pos)));
 	}
 
-	// TODO: more specific message
-	if (cmd.size() == 0) return CommandResult::Invalid(MSG_CMD_INVALID);
-
-	auto word = cmd[0];
-	auto nargs = cmd.size() - 1;
-
-	// These commands accept one more argument than they use.
-	// This is because the first argument is a 'tag', emitted with the
-	// command result to allow it to be identified, but otherwise
-	// unused.
-	if (nargs == 2 && "read" == word) return this->Read(cmd[2], id);
-	if (nargs == 2 && "delete" == word) return this->Delete(cmd[2]);
-	if (nargs == 3 && "write" == word) return this->Write(cmd[2], cmd[3]);
-
-	return CommandResult::Invalid(MSG_CMD_INVALID);
+	return Response::Success(tag);
 }
 
-CommandResult Player::Eject()
+Response Player::Eject(const std::string &tag)
 {
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	// Silently ignore ejects on ejected files.
+	// Concurrently speaking, this should be fine, as we are the only
+	// thread that can eject or un-eject files.
+	if (this->file->CurrentState() == Audio::State::NONE) {
+		return Response::Success(tag);
+	}
+
 	assert(this->file != nullptr);
-	this->file = this->audio.Null();
-	this->Read("/control/state", 0);
+	this->file = std::make_unique<NoAudio>();
 
-	return CommandResult::Success();
+	this->DumpState(0, tag);
+
+	return Response::Success(tag);
 }
 
-CommandResult Player::Load(const std::string &path)
+Response Player::End(const std::string &tag)
 {
-	if (path.empty()) return CommandResult::Invalid(MSG_LOAD_EMPTY_PATH);
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	// Let upstream know that the file ended by itself.
+	// This is needed for auto-advancing playlists, etc.
+	this->Respond(0, Response(Response::NOREQUEST, Response::Code::END));
+
+	this->SetPlaying(tag, false);
+
+	// Rewind the file back to the start.  We can't use Player::Pos() here
+	// in case End() is called from Pos(); a seek failure could start an
+	// infinite loop.
+	this->PosRaw(Response::NOREQUEST, 0);
+
+	return Response::Success(tag);
+}
+
+Response Player::Load(const std::string &tag, const std::string &path)
+{
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (path.empty()) return Response::Invalid(tag, MSG_LOAD_EMPTY_PATH);
 
 	assert(this->file != nullptr);
 
@@ -125,70 +130,45 @@ CommandResult Player::Load(const std::string &path)
 	// This ensures that we don't have any situations where two files are
 	// contending over resources, or the current file spends a second or
 	// two flushing its remaining audio.
-	this->file = this->audio.Null();
+	this->Eject(Response::NOREQUEST);
 
 	try {
-		assert(this->file != nullptr);
-		this->file = this->audio.Load(path);
-		this->Read("/", 0);
-		assert(this->file != nullptr);
+		this->file = this->LoadRaw(path);
 	} catch (FileError &e) {
 		// File errors aren't fatal, so catch them here.
-		this->Eject();
-		return CommandResult::Failure(e.Message());
-	} catch (Error &) {
-		// Ensure a load failure doesn't leave a corrupted track
-		// loaded.
-		this->Eject();
-		throw;
+		return Response::Failure(tag, e.Message());
 	}
-
-	return CommandResult::Success();
-}
-
-CommandResult Player::SetPlaying(bool playing)
-{
-	// Why is SetPlaying not split between Start() and Stop()?, I hear the
-	// best practices purists amongst you say.  Quite simply, there is a
-	// large amount of fiddly exception boilerplate here that would
-	// otherwise be duplicated between the two methods.  The 'public'
-	// interface Player gives is Start()/Stop(), anyway.
 
 	assert(this->file != nullptr);
+	this->last_pos = 0;
 
-	try {
-		this->file->SetPlaying(playing);
-	} catch (NoAudioError &e) {
-		return CommandResult::Invalid(e.Message());
-	}
+	// A load will change all of the player's state in one go,
+	// so just send a Dump() instead of writing out all of the responses
+	// here.
+	// Don't take the response from here, though, because it has the wrong
+	// tag.
+	this->Dump(0, Response::NOREQUEST);
 
-	this->Read("/control/state", 0);
-
-	return CommandResult::Success();
+	return Response::Success(tag);
 }
 
-CommandResult Player::Quit()
+Response Player::Pos(const std::string &tag, const std::string &pos_str)
 {
-	this->Eject();
-	this->is_running = false;
-	return CommandResult::Success();
-}
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
-CommandResult Player::Seek(const std::string &time_str)
-{
 	std::uint64_t pos = 0;
 	try {
-		pos = SeekParse(time_str);
+		pos = PosParse(pos_str);
 	} catch (SeekError &e) {
 		// Seek errors here are a result of clients sending weird times.
 		// Thus, we tell them off.
-		return CommandResult::Invalid(e.Message());
+		return Response::Invalid(tag, e.Message());
 	}
 
 	try {
-		this->SeekRaw(pos);
+		this->PosRaw(tag, pos);
 	} catch (NoAudioError) {
-		return CommandResult::Invalid(MSG_CMD_NEEDS_LOADED);
+		return Response::Invalid(tag, MSG_CMD_NEEDS_LOADED);
 	} catch (SeekError) {
 		// Seek failures here are a result of the decoder not liking the
 		// seek position (usually because it's outside the audio file!).
@@ -198,22 +178,64 @@ CommandResult Player::Seek(const std::string &time_str)
 
 		// Make it look to the client as if the seek ran off the end of
 		// the file.
-		this->End();
+		this->End(tag);
 	}
 
 	// If we've made it all the way down here, we deserve to succeed.
-	return CommandResult::Success();
+	return Response::Success(tag);
 }
 
-/* static */ std::uint64_t Player::SeekParse(const std::string &time_str)
+Response Player::SetPlaying(const std::string &tag, bool playing)
+{
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	// Why is SetPlaying not split between Start() and Stop()?, I hear the
+	// best practices purists amongst you say.  Quite simply, there is a
+	// large amount of fiddly exception boilerplate here that would
+	// otherwise be duplicated between the two methods.
+
+	assert(this->file != nullptr);
+
+	try {
+		this->file->SetPlaying(playing);
+	} catch (NoAudioError &e) {
+		return Response::Invalid(tag, e.Message());
+	}
+
+	this->DumpState(0, Response::NOREQUEST);
+
+	return Response::Success(tag);
+}
+
+Response Player::Quit(const std::string &tag)
+{
+	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+
+	this->Eject(tag);
+	this->dead = true;
+	return Response::Success(tag);
+}
+
+//
+// Command implementations
+//
+
+/* static */ std::uint64_t Player::PosParse(const std::string &pos_str)
 {
 	size_t cpos = 0;
 
-	// In previous versions, this used to parse a unit at the end.
-	// This was removed for simplicity--use baps3-cli etc. instead.
+	// Try and see if this position string is negative.
+	// Cheap and easy way: see if it has '-'.
+	// This means we don't need to skip whitespace first, with no loss
+	// of suction: no valid position string will contain '-'.
+	if (pos_str.find('-') != std::string::npos) {
+		throw SeekError(MSG_SEEK_INVALID_VALUE);
+	}
+
+
 	std::uint64_t pos;
 	try {
-		pos = std::stoull(time_str, &cpos);
+		pos = std::stoull(pos_str, &cpos);
 	} catch (...) {
 		throw SeekError(MSG_SEEK_INVALID_VALUE);
 	}
@@ -221,106 +243,84 @@ CommandResult Player::Seek(const std::string &time_str)
 	// cpos will point to the first character in pos that wasn't a number.
 	// We don't want any such characters here, so bail if the position isn't
 	// at the end of the string.
-	auto sl = time_str.length();
+	auto sl = pos_str.length();
 	if (cpos != sl) throw SeekError(MSG_SEEK_INVALID_VALUE);
 
 	return pos;
 }
 
-void Player::SeekRaw(std::uint64_t pos)
+void Player::PosRaw(const std::string &tag, std::uint64_t pos)
 {
 	assert(this->file != nullptr);
 
-	this->file->Seek(pos);
-	this->Read("/player/time/elapsed", 0);
+	this->file->SetPosition(pos);
+
+	// This is required to make CanAnnounceTime() continue working.
+	this->last_pos = pos / 1000 / 1000;
+
+	this->Respond(0, Response(tag, Response::Code::POS)
+	                         .AddArg(std::to_string(pos)));
 }
 
-// Any resource with the single child "" (empty string) is an entry.
-// These need to be looked up via Audio, not handled by Player.
-const std::multimap<std::string, std::string> Player::RESOURCES = {
-	{"/", "/control"},
-	{"/", "/player"},
-	{"/control", "/control/state"},
-	{"/control/state", ""},
-	{"/player", "/player/file"},
-	{"/player", "/player/time"},
-	{"/player/file", ""},
-	{"/player/time", "/player/time/elapsed"},
-	{"/player/time/elapsed", ""}
-};
-
-CommandResult Player::Read(const std::string &path, size_t id) const
+void Player::DumpState(size_t id, const std::string &tag) const
 {
-	assert(this->file != nullptr);
+	Response::Code code = Response::Code::EJECT;
 
-	// Maybe the requested item is a directory?
-	auto count = Player::RESOURCES.count(path);
-	if (0 < count) {
-		auto range = Player::RESOURCES.equal_range(path);
-
-		// Is this an entry?  If so, delegate it to Audio to work on.
-		if (1 == count && "" == range.first->second) {
-			// The entry might be currently empty, in which case
-			// Emit will return nullptr.  This is fine, but we'll just
-			// act as if it doesn't exist at all.
-			auto response = this->file->Emit(path, id == 0);
-			if (!response) return CommandResult::Failure(MSG_NOT_FOUND);
-
-			if (this->sink != nullptr) this->sink->Respond(*response, id);
-			return CommandResult::Success();
-		}
-
-		// Otherwise, it's a directory.
-		// First, emit the directory resource.
-		auto res = Response::Res("Directory", path, std::to_string(count));
-		if (this->sink != nullptr) this->sink->Respond(*res, id);
-
-		// Next, the contents.
-		for (auto i = range.first; i != range.second; i++) {
-			this->Read(i->second, id);
-		}
-
-		return CommandResult::Success();
+	switch (this->file->CurrentState()) {
+		case Audio::State::AT_END:
+			code = Response::Code::END;
+			break;
+		case Audio::State::NONE:
+			code = Response::Code::EJECT;
+			break;
+		case Audio::State::PLAYING:
+			code = Response::Code::PLAY;
+			break;
+		case Audio::State::STOPPED:
+			code = Response::Code::STOP;
+			break;
+		default:
+			// Just don't dump anything in this case.
+			return;
 	}
 
-	// If we get here, the resource doesn't exist and never will do.
-	return CommandResult::Failure(MSG_NOT_FOUND);
+	this->Respond(id, Response(tag, code));
 }
 
-CommandResult Player::Write(const std::string &path, const std::string &payload)
+void Player::Respond(int id, Response rs) const
 {
-	if ("/control/state" == path) {
-		if ("Playing" == payload) return this->SetPlaying(true);
-		if ("Stopped" == payload) return this->SetPlaying(false);
-		if ("Ejected" == payload) return this->Eject();
-		if ("Quitting" == payload) return this->Quit();
-		return CommandResult::Invalid(MSG_INVALID_PAYLOAD);
+	if (this->io != nullptr) this->io->Respond(id, rs);
+}
+
+bool Player::CanAnnounceTime(std::uint64_t micros)
+{
+	std::uint64_t secs = micros / 1000 / 1000;
+
+	// We can announce if the last announced pos was in a previous second.
+	bool announce = this->last_pos < secs;
+	if (announce) this->last_pos = secs;
+
+	return announce;
+}
+
+std::unique_ptr<Audio> Player::LoadRaw(const std::string &path) const
+{
+	std::unique_ptr<AudioSource> source = this->LoadSource(path);
+	assert(source != nullptr);
+
+	auto sink = this->sink(*source, this->device_id);
+	return std::make_unique<PipeAudio>(std::move(source), std::move(sink));
+}
+
+std::unique_ptr<AudioSource> Player::LoadSource(const std::string &path) const
+{
+	size_t extpoint = path.find_last_of('.');
+	std::string ext = path.substr(extpoint + 1);
+
+	auto ibuilder = this->sources.find(ext);
+	if (ibuilder == this->sources.end()) {
+		throw FileError("Unknown file format: " + ext);
 	}
 
-	if ("/player/file" == path) return this->Load(payload);
-	if ("/player/time/elapsed" == path) return this->Seek(payload);
-
-	return this->ResourceFailure(path);
+	return (ibuilder->second)(path);
 }
-
-CommandResult Player::Delete(const std::string &path)
-{
-	if ("/control/state" == path) return this->Quit();
-	if ("/player/file" == path) return this->Eject();
-	if ("/player/time/elapsed" == path) return this->Seek("0");
-
-	return this->ResourceFailure(path);
-}
-
-CommandResult Player::ResourceFailure(const std::string &path) {
-	// In this case, we've either got a resource that exists but can't
-	// be written, or a resource that doesn't.  Let's find out which:
-	if (0 < this->RESOURCES.count(path)) {
-		// The resource is valid, but can't be written to.
-		return CommandResult::Failure(MSG_INVALID_ACTION);
-	}
-
-	// Else, the resource doesn't exist.
-	return CommandResult::Failure(MSG_NOT_FOUND);
-}
-

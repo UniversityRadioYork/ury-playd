@@ -14,14 +14,11 @@
 #include "../audio/audio_source.hpp"
 #include "dummy_audio_source.hpp"
 
-/* static */ std::unique_ptr<AudioSource> DummyAudioSource::Build(const std::string &path)
-{
-	return std::unique_ptr<AudioSource>(new DummyAudioSource(path));
-}
-
 AudioSource::DecodeResult DummyAudioSource::Decode()
 {
-	return std::make_pair(AudioSource::DecodeState::DECODING, AudioSource::DecodeVector());
+	auto state = run_out ? AudioSource::DecodeState::END_OF_FILE
+	                     : AudioSource::DecodeState::DECODING;
+	return std::make_pair(state, AudioSource::DecodeVector());
 }
 
 std::uint8_t DummyAudioSource::ChannelCount() const

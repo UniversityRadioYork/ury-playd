@@ -18,8 +18,8 @@ extern "C" {
 
 RingBuffer::RingBuffer(int power, int size)
 {
-	assert(0 < power);
-	assert(0 < size);
+	if (power <= 0) throw InternalError("ringbuffer power must be positive");
+	if (size <= 0) throw InternalError("ringbuffer element size must be positive");
 
 	this->rb = new PaUtilRingBuffer;
 	this->buffer = new char[(1 << power) * size];
@@ -53,10 +53,10 @@ unsigned long RingBuffer::ReadCapacity() const
 	return CountCast(PaUtil_GetRingBufferReadAvailable(this->rb));
 }
 
-unsigned long RingBuffer::Write(char *start, unsigned long count)
+unsigned long RingBuffer::Write(const char *start, unsigned long count)
 {
-	assert(0 < count);
-	assert(count <= WriteCapacity());
+	if (count == 0) throw InternalError("tried to store 0 items in ringbuffer");
+	if (WriteCapacity() < count) throw InternalError("ringbuffer overflow");
 
 	return CountCast(PaUtil_WriteRingBuffer(
 	        this->rb, start, static_cast<ring_buffer_size_t>(count)));
@@ -64,8 +64,8 @@ unsigned long RingBuffer::Write(char *start, unsigned long count)
 
 unsigned long RingBuffer::Read(char *start, unsigned long count)
 {
-	assert(0 < count);
-	assert(count <= ReadCapacity());
+	if (count == 0) throw InternalError("tried to read 0 items from ringbuffer");
+	if (ReadCapacity() < count) throw InternalError("ringbuffer underflow");
 
 	return CountCast(PaUtil_ReadRingBuffer(
 	        this->rb, start, static_cast<ring_buffer_size_t>(count)));

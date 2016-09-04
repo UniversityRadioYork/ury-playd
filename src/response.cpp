@@ -7,40 +7,32 @@
  * @see response.hpp
  */
 
+#include <array>
 #include <cctype>
-#include <initializer_list>
 #include <sstream>
 
 #include "errors.hpp"
 
 #include "response.hpp"
 
-const std::string Response::STRINGS[] = {
-        "OHAI",     // Code::OHAI
-        "STATE",    // Code::STATE
-        "TIME",     // Code::TIME
-        "FILE",     // Code::FILE
-        "FEATURES", // Code::FEATURES
-        "END",      // Code::END
-        "ACK",      // Code::ACK
-        "RES"       // Code::RES
-};
+/* static */ const std::string Response::NOREQUEST = "!";
 
-// Pre-made responses.
-std::unique_ptr<Response> Response::Res(const std::string &type,
-                                        const std::string &path,
-                                        const std::string &value)
-{
-	auto res = std::unique_ptr<Response>(
-		new Response(Response::Code::RES)
-	);
-	res->AddArg(path).AddArg(type).AddArg(value);
-	return res;
-}
+/* static */ const std::array<std::string, Response::CODE_COUNT> Response::STRINGS {{
+        "OHAI",  // Code::OHAI
+        "IAMA",  // Code::IAMA
+        "FLOAD", // Code::FLOAD
+        "EJECT", // Code::EJECT
+        "POS",   // Code::POS
+        "END",   // Code::END
+        "PLAY",  // Code::PLAY
+        "STOP",  // Code::STOP
+        "ACK"    // Code::ACK
+}};
 
-Response::Response(Response::Code code)
+Response::Response(const std::string &tag, Response::Code code)
 {
-	this->string = Response::STRINGS[static_cast<int>(code)];
+	this->string = Response::EscapeArg(tag) + " " +
+	               STRINGS[static_cast<uint8_t>(code)];
 }
 
 Response &Response::AddArg(const std::string &arg)
@@ -52,6 +44,25 @@ Response &Response::AddArg(const std::string &arg)
 std::string Response::Pack() const
 {
 	return this->string;
+}
+
+/* static */ Response Response::Success(const std::string &tag)
+{
+	return Response(tag, Response::Code::ACK)
+	        .AddArg("OK")
+	        .AddArg("success");
+}
+
+/* static */ Response Response::Invalid(const std::string &tag,
+                                        const std::string &msg)
+{
+	return Response(tag, Response::Code::ACK).AddArg("WHAT").AddArg(msg);
+}
+
+/* static */ Response Response::Failure(const std::string &tag,
+                                        const std::string &msg)
+{
+	return Response(tag, Response::Code::ACK).AddArg("FAIL").AddArg(msg);
 }
 
 /* static */ std::string Response::EscapeArg(const std::string &arg)
@@ -83,7 +94,7 @@ std::string Response::Pack() const
 // ResponseSink
 //
 
-void ResponseSink::Respond(const Response &, size_t) const
+void ResponseSink::Respond(size_t, const Response &) const
 {
 	// By default, do nothing.
 }

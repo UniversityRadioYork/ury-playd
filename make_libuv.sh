@@ -6,10 +6,10 @@
 
 # Requires GNU Autotools, gcc(/clang?), sudo, and write permissions to /tmp.
 
-wget https://github.com/joyent/libuv/archive/v0.11.29.tar.gz -O /tmp/libuv.tar.gz
+wget https://github.com/libuv/libuv/archive/v1.8.0.tar.gz -O /tmp/libuv.tar.gz
 cd /tmp
 tar xzf libuv.tar.gz
-cd libuv-0.11.29
+cd libuv-1.8.0
 sh autogen.sh
 ./configure
 make

@@ -1,19 +1,3 @@
-// This file is part of playd.
-// playd is licensed under the MIT licence: see LICENSE.txt.
-
-/**
- * @file
- * Tests for command results.
- */
-
-#include <sstream>
-
-#include "catch.hpp"
-#include "../cmd_result.hpp"
-#include "dummy_response_sink.hpp"
-// This file is part of playd.
-// playd is licensed under the MIT licence: see LICENSE.txt.
-
 /**
  * @file
  * Tests for error classes.
@@ -37,4 +21,3 @@ SCENARIO("Errors contain a retrievable message", "[error]") {
 		}
 	}
 }
-
