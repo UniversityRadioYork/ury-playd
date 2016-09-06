@@ -24,7 +24,7 @@ FIND_PATH(MPG123_INCLUDE_DIR
 )
 
 FIND_LIBRARY(MPG123_LIBRARY
-  NAMES mpg123 libmpg123
+  NAMES mpg123 libmpg123 libmpg123-0
   PATHS
   $ENV{MPG123_DIR}/lib
   /usr/local/lib
