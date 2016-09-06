@@ -29,7 +29,7 @@ message(STATUS "Supported formats: ${SUPPORTED_FMTS}")
 # Def if MP3 supported
 list (FIND SUPPORTED_FMTS "MP3" _index)
 if (${_index} GREATER -1)
-  add_definitions(-DWITH_MP3)
+  add_definitions(-DWITH_MP3 -DLINK_MPG123_DLL)
   set(SRCS ${SRCS} src/audio/sources/mp3.cpp)
 else()
   add_definitions(-DNO_MP3)
