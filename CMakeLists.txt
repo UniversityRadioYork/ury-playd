@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(playd)
 list(APPEND CMAKE_MODULE_PATH "${playd_SOURCE_DIR}/cmake_scripts")
 
+set(CMAKE_PREFIX_PATH "${playd_SOURCE_DIR}")
 include(set_compiler_flags)
 
 find_package(SDL2 REQUIRED)
