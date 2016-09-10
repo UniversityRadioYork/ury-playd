@@ -10,10 +10,10 @@ find_package(LibUV REQUIRED)
 
 # Declare formats provided by each lib
 set(MPG123_FMTS MP3)
-set(LIBSNDFILE_FMTS OGG WAV FLAC)
+set(SNDFILE_FMTS OGG WAV FLAC)
 
 set(SUPPORTED_FORMATS)
-foreach(loop_var MPG123 LIBSNDFILE)
+foreach(loop_var MPG123 SNDFILE)
   find_package(${loop_var})
   if(${loop_var}_FOUND)
     list(APPEND SUPPORTED_FMTS ${${loop_var}_FMTS})
@@ -36,7 +36,7 @@ else()
 endif()
 
 # Def if sndfile found
-if(LIBSNDFILE_FOUND)
+if(SNDFILE_FOUND)
   add_definitions(-DWITH_SNDFILE)
   set(SRCS ${SRCS} src/audio/sources/sndfile.cpp)
 else()
