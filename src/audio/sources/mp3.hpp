@@ -16,11 +16,6 @@
 #include <vector>
 
 extern "C" {
-// MPG123 seems to assume the whole world has ssize_t defined.
-// Naturally, MSVC doesn't.
-#ifdef _MSC_VER
-typedef ptrdiff_t ssize_t;
-#endif
 #include <mpg123.h>
 }
 
