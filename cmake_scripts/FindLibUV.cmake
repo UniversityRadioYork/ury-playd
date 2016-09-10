@@ -1,108 +1,33 @@
-# - Try to find libuv
-# Once done, this will define
+#=============================================================================
+#  Copyright 2016 The Luvit Authors. All Rights Reserved.
 #
-#  LIBUV_FOUND - system has libuv
-#  LIBUV_INCLUDE_DIRS - the libuv include directories
-#  LIBUV_LIBRARIES - link these to use libuv
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
 #
-# Set the LIBUV_USE_STATIC variable to specify if static libraries should
-# be preferred to shared ones.
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#=============================================================================
+# Locate libuv library
+# This module defines
+#  LIBUV_FOUND, if false, do not try to link to libuv
+#  LIBUV_LIBRARIES
+#  LIBUV_INCLUDE_DIR, where to find uv.h
 
-if(NOT LIBUV_USE_BUNDLED)
-  find_package(PkgConfig)
-  if (PKG_CONFIG_FOUND)
-    pkg_check_modules(PC_LIBUV QUIET libuv)
-  endif()
-else()
-  set(PC_LIBUV_INCLUDEDIR)
-  set(PC_LIBUV_INCLUDE_DIRS)
-  set(PC_LIBUV_LIBDIR)
-  set(PC_LIBUV_LIBRARY_DIRS)
-  set(LIMIT_SEARCH NO_DEFAULT_PATH)
-endif()
-
-find_path(LIBUV_INCLUDE_DIR uv.h
-  HINTS ${PC_LIBUV_INCLUDEDIR} ${PC_LIBUV_INCLUDE_DIRS}
-  ${LIMIT_SEARCH})
-
-# If we're asked to use static linkage, add libuv.a as a preferred library name.
-if(LIBUV_USE_STATIC)
-  list(APPEND LIBUV_NAMES
-    "${CMAKE_STATIC_LIBRARY_PREFIX}uv${CMAKE_STATIC_LIBRARY_SUFFIX}")
-endif(LIBUV_USE_STATIC)
-
-if(MSVC)
-  list(APPEND LIBUV_NAMES libuv)
-else()
-  list(APPEND LIBUV_NAMES uv)
-endif()
-
-find_library(LIBUV_LIBRARY NAMES ${LIBUV_NAMES}
-  HINTS ${PC_LIBUV_LIBDIR} ${PC_LIBUV_LIBRARY_DIRS}
-  ${LIMIT_SEARCH})
-
-mark_as_advanced(LIBUV_INCLUDE_DIR LIBUV_LIBRARY)
-
-if(PC_LIBUV_LIBRARIES)
-    list(REMOVE_ITEM PC_LIBUV_LIBRARIES uv)
-endif()
-
-set(LIBUV_LIBRARIES ${LIBUV_LIBRARY} ${PC_LIBUV_LIBRARIES})
-set(LIBUV_INCLUDE_DIRS ${LIBUV_INCLUDE_DIR})
-
-# Deal with the fact that libuv.pc is missing important dependency information.
-
-include(CheckLibraryExists)
-
-check_library_exists(dl dlopen "dlfcn.h" HAVE_LIBDL)
-if(HAVE_LIBDL)
-  list(APPEND LIBUV_LIBRARIES dl)
-endif()
-
-check_library_exists(kstat kstat_lookup "kstat.h" HAVE_LIBKSTAT)
-if(HAVE_LIBKSTAT)
-  list(APPEND LIBUV_LIBRARIES kstat)
-endif()
-
-check_library_exists(kvm kvm_open "kvm.h" HAVE_LIBKVM)
-if(HAVE_LIBKVM)
-  list(APPEND LIBUV_LIBRARIES kvm)
-endif()
-
-check_library_exists(nsl gethostbyname "nsl.h" HAVE_LIBNSL)
-if(HAVE_LIBNSL)
-  list(APPEND LIBUV_LIBRARIES nsl)
-endif()
-
-check_library_exists(perfstat perfstat_cpu "libperfstat.h" HAVE_LIBPERFSTAT)
-if(HAVE_LIBPERFSTAT)
-  list(APPEND LIBUV_LIBRARIES perfstat)
-endif()
-
-check_library_exists(rt clock_gettime "time.h" HAVE_LIBRT)
-if(HAVE_LIBRT)
-  list(APPEND LIBUV_LIBRARIES rt)
-endif()
-
-check_library_exists(sendfile sendfile "" HAVE_LIBSENDFILE)
-if(HAVE_LIBSENDFILE)
-  list(APPEND LIBUV_LIBRARIES sendfile)
-endif()
+FIND_PATH(LIBUV_INCLUDE_DIR NAMES uv.h)
+FIND_LIBRARY(LIBUV_LIBRARIES NAMES uv libuv)
 
 if(WIN32)
-  # check_library_exists() does not work for Win32 API calls in X86 due to name
-  # mangling calling conventions
   list(APPEND LIBUV_LIBRARIES iphlpapi)
   list(APPEND LIBUV_LIBRARIES psapi)
   list(APPEND LIBUV_LIBRARIES userenv)
   list(APPEND LIBUV_LIBRARIES ws2_32)
 endif()
 
-include(FindPackageHandleStandardArgs)
-
-# handle the QUIETLY and REQUIRED arguments and set LIBUV_FOUND to TRUE
-# if all listed variables are TRUE
-find_package_handle_standard_args(LibUV DEFAULT_MSG
-                                  LIBUV_LIBRARY LIBUV_INCLUDE_DIR)
-
-mark_as_advanced(LIBUV_INCLUDE_DIR LIBUV_LIBRARY)
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(LIBUV DEFAULT_MSG LIBUV_LIBRARIES LIBUV_INCLUDE_DIR)

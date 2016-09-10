@@ -1,23 +1,29 @@
-# Base Io build system
-# Written by Jeremy Tregunna <jeremy.tregunna@me.com>
+# - Try to find SndFile
+# Once done this will define
 #
-# Find libsndfile.
+#  SNDFILE_FOUND - system has SndFile
+#  SNDFILE_INCLUDE_DIRS - the SndFile include directory
+#  SNDFILE_LIBRARIES - Link these to use SndFile
+#
+#  Copyright © 2006  Wengo
+#  Copyright © 2009 Guillaume Martres
+#
+#  Redistribution and use is allowed according to the terms of the New
+#  BSD license.
+#  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#
 
-FIND_PATH(LIBSNDFILE_INCLUDE_DIR sndfile.h)
+find_path(SNDFILE_INCLUDE_DIR NAMES sndfile.h)
 
-SET(LIBSNDFILE_NAMES ${LIBSNDFILE_NAMES} sndfile libsndfile libsndfile-1)
-FIND_LIBRARY(LIBSNDFILE_LIBRARY NAMES ${LIBSNDFILE_NAMES} PATH)
+find_library(SNDFILE_LIBRARY NAMES sndfile sndfile-1 libsndfile libsndfile-1)
 
-IF(LIBSNDFILE_INCLUDE_DIR AND LIBSNDFILE_LIBRARY)
-	SET(LIBSNDFILE_FOUND TRUE)
-ENDIF(LIBSNDFILE_INCLUDE_DIR AND LIBSNDFILE_LIBRARY)
+set(SNDFILE_INCLUDE_DIRS ${SNDFILE_INCLUDE_DIR})
+set(SNDFILE_LIBRARIES ${SNDFILE_LIBRARY})
 
-IF(LIBSNDFILE_FOUND)
-	IF(NOT LibSndFile_FIND_QUIETLY)
-		MESSAGE(STATUS "Found LibSndFile: ${LIBSNDFILE_LIBRARY}")
-	ENDIF (NOT LibSndFile_FIND_QUIETLY)
-ELSE(LIBSNDFILE_FOUND)
-	IF(LibSndFile_FIND_REQUIRED)
-		MESSAGE(FATAL_ERROR "Could not find sndfile")
-	ENDIF(LibSndFile_FIND_REQUIRED)
-ENDIF (LIBSNDFILE_FOUND)
+INCLUDE(FindPackageHandleStandardArgs)
+# handle the QUIETLY and REQUIRED arguments and set SNDFILE_FOUND to TRUE if
+# all listed variables are TRUE
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SndFile DEFAULT_MSG SNDFILE_LIBRARY SNDFILE_INCLUDE_DIR)
+
+# show the SNDFILE_INCLUDE_DIRS and SNDFILE_LIBRARIES variables only in the advanced view
+mark_as_advanced(SNDFILE_INCLUDE_DIRS SNDFILE_LIBRARIES)
