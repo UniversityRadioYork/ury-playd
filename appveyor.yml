@@ -19,7 +19,7 @@ install:
   - set
   - echo cmake on AppVeyor
   - cmake -version
-  - set PYTHON="C:\Python27-x64"
+  - set PYTHON="C:\Python27-x64\python.exe"
   - python --version
   - ps: .\WindowsBuilder.ps1 deps
 
