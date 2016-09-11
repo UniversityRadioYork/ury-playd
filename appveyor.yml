@@ -28,5 +28,6 @@ build_script:
   - ps: .\WindowsBuilder.ps1 playd
 
 test_script:
+  - cd C:\projects\ury-playd\build
   - ctest --output-on-failure
     -C "%CONFIGURATION%"
