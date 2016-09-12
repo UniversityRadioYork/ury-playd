@@ -1,6 +1,6 @@
-# URY playd
+# playd
 
-URY playd (or just `playd`; short for _player daemon_) is a C++ audio
+`playd` (_player daemon_) is a C++ audio
 player developed by [University Radio York].  It's designed to be
 minimal, hackable, and composable into bigger systems (such as our
 ongoing BAPS3 project to build a new radio playout system).
@@ -57,10 +57,11 @@ do weird things in the presence of Telnet-isms.
 
 ### Requirements
 
-* [libuv] 0.10+
+* [libuv] 1.9.1+
 * [SDL2] 2.0.3
-* A C++11 compiler (recent versions of [clang], [gcc], and Visual Studio
+* A C++14 compiler (recent versions of [clang], [gcc], and Visual Studio
   work)
+* [CMake] 2.8+, for building.
 
 The following dependencies are used for file format support, and you'll need at
 least one of them:
@@ -72,9 +73,19 @@ least one of them:
 Certain operating systems may need additional dependencies; see the OS-specific
 build instructions below.
 
+### CMake
+
+`playd` can be built with cmake: just run `cmake .` in the root directory
+(with whichever additional flags you need: run `cmake --help` for additional
+information), then use your favourite build tool (`make`, Visual Studio, etc.)
+with the generated projects.
+
 ### POSIX (GNU/Linux, BSD, OS X)
 
-`playd` comes `config.sh`, a Bourne shell script that will generate a
+**Warning**: This method of building `playd` is liable to be removed in
+favour of cmake in future.
+
+`playd` comes with `config.sh`, a Bourne shell script that will generate a
 GNU-compatible Makefile that can be used both to make and install.
 
 To use the Makefile, you'll need [GNU Make] and `pkg-config` (or equivalent),
@@ -120,9 +131,12 @@ Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
 
 #### Visual Studio
 
+**Warning**: This method of building `playd` is liable to be removed in
+favour of cmake in future.
+
 _For more information, see `README.VisualStudio.md`._
 
-playd **can** be built with Visual Studio (tested with 2013 Premium), but
+playd **can** be built with Visual Studio (tested with 2015 Community), but
 you will need to source and configure the dependencies manually.  A Visual
 Studio project is provided, but will need tweaking for your environment.
 
@@ -142,9 +156,11 @@ philosophy.
 
 All original code is licenced under the [MIT licence] (see LICENSE.txt).
 Some code is taken from the [PortAudio] project (see LICENSE.portaudio),
-as well as [CATCH] (see LICENSE.catch).
+as well as [CATCH] (see LICENSE.catch).  The various CMake scripts come
+with their licence information attached.
 
 
+[CMake]:                 https://cmake.org/
 [CATCH]:                 http://catch-lib.net
 [clang]:                 http://clang.llvm.org
 [gcc]:                   https://gcc.gnu.org
