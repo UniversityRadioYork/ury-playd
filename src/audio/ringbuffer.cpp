@@ -43,12 +43,12 @@ RingBuffer::~RingBuffer()
 	delete[] this->buffer;
 }
 
-unsigned long RingBuffer::WriteCapacity() const
+size_t RingBuffer::WriteCapacity() const
 {
 	return CountCast(PaUtil_GetRingBufferWriteAvailable(this->rb));
 }
 
-unsigned long RingBuffer::ReadCapacity() const
+size_t RingBuffer::ReadCapacity() const
 {
 	return CountCast(PaUtil_GetRingBufferReadAvailable(this->rb));
 }

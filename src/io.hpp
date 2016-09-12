@@ -13,6 +13,12 @@
 #include <ostream>
 #include <set>
 
+// Use the same ssize_t as libmpg123 on Windows.
+#ifndef _MSC_VER
+typedef long ssize_t;
+#define _SSIZE_T_
+#define _SSIZE_T_DEFINED
+#endif
 #include <uv.h>
 
 #include "player.hpp"

@@ -23,7 +23,7 @@ SCENARIO("PipeAudio can be constructed with a DummyAudioSink and DummyAudioSourc
 		WHEN("a PipeAudio is created") {
 			THEN("no exceptions are thrown and queries return the expected initial values") {
 				PipeAudio pa(std::move(src), std::move(sink));
-				REQUIRE(pa.Position() == 0);
+				REQUIRE(pa.Position() == 0ULL);
 			}
 		}
 	}
@@ -55,7 +55,7 @@ SCENARIO("PipeAudio responds to getters with valid responses", "[pipe-audio]") {
 			AND_WHEN("the position is zero") {
 				pa.SetPosition(0);
 				THEN("the position is reported as 0") {
-					REQUIRE(pa.Position() == 0);
+					REQUIRE(pa.Position() == 0ULL);
 				}
 			}
 
@@ -67,7 +67,7 @@ SCENARIO("PipeAudio responds to getters with valid responses", "[pipe-audio]") {
 					// calculation is what a round-trip to
 					// and from samples should cause.
 					// This *won't* be 8675309!
-					auto expected = (((8675309L * 44100) / 1000000) * 1000000) / 44100;
+					auto expected = (((8675309ULL * 44100) / 1000000) * 1000000) / 44100;
 					REQUIRE(pa.Position() == expected);
 				}
 			}

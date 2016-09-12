@@ -175,7 +175,7 @@ void SdlAudioSink::Transfer(AudioSink::TransferIterator &start,
 	assert(bytes % bytes_per_sample == 0);
 	assert(0 < bytes);
 
-	auto samples = bytes / this->bytes_per_sample;
+	size_t samples = bytes / this->bytes_per_sample;
 
 	// Only transfer as many samples as the ring buffer can take.
 	// Don't bother trying to write 0 samples!
@@ -229,7 +229,7 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	}
 
 	// How many samples do we want to pull out of the ring buffer?
-	auto req_samples = lnbytes / this->bytes_per_sample;
+	size_t req_samples = lnbytes / this->bytes_per_sample;
 
 	// How many can we pull out?  Send this amount to SDL.
 	auto samples = std::min(req_samples, avail_samples);
