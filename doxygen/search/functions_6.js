@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['getdeviceid',['GetDeviceID',['../classPlayd.html#a62c452ba9e027d6503c15274f690a24c',1,'Playd']]],
-  ['getdevicesinfo',['GetDevicesInfo',['../classAudioSystem.html#a3998d65de0461a8bfaa72717fb2f38b2',1,'AudioSystem::GetDevicesInfo()'],['../classPaSoxAudioSystem.html#af783c4cd89a0dc522886c1d82861a885',1,'PaSoxAudioSystem::GetDevicesInfo()']]]
+  ['getdeviceid',['GetDeviceID',['../main_8cpp.html#ae47faf3acca2673908c073e0a2d2fc85',1,'main.cpp']]],
+  ['getdevicesinfo',['GetDevicesInfo',['../classSdlAudioSink.html#a14692929f2af692f18bb647611f15ec1',1,'SdlAudioSink']]],
+  ['gethostandport',['GetHostAndPort',['../main_8cpp.html#a7e3fd3337bbac9de775c17fbd6aa3100',1,'main.cpp']]]
 ];

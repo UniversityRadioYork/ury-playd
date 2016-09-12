@@ -1,9 +1,0 @@
-<map id="src/cmd.hpp" name="src/cmd.hpp">
-<area shape="rect" id="node2" href="$cmd_8cpp.html" title="Implementation of the CommandHandler class. " alt="" coords="5,80,103,107"/>
-<area shape="rect" id="node3" href="$io__core_8cpp.html" title="Implementation of the non&#45;virtual aspects of the IoCore class. " alt="" coords="118,229,251,256"/>
-<area shape="rect" id="node4" href="$io__core_8hpp.html" title="Declaration of the IoCore class. " alt="" coords="179,155,313,181"/>
-<area shape="rect" id="node5" href="$main_8cpp.html" title="Main entry point and implementation of the playd class. " alt="" coords="411,304,513,331"/>
-<area shape="rect" id="node6" href="$main_8hpp.html" title="Declaration of the playd class. " alt="" coords="411,229,513,256"/>
-<area shape="rect" id="node7" href="$tokeniser_8hpp.html" title="Declaration of the Tokeniser class. " alt="" coords="267,80,412,107"/>
-<area shape="rect" id="node8" href="$tokeniser_8cpp.html" title="Definition of the Tokeniser class. " alt="" coords="362,155,506,181"/>
-</map>

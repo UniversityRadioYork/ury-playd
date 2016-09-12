@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['last',['last',['../classPlayerPosition.html#a16b3bcfd5e013ee3d71e503ee239ca01',1,'PlayerPosition']]]
+  ['oss',['oss',['../classDebug.html#a45f5726114c0078b31b9a0f70199f51e',1,'Debug']]]
 ];

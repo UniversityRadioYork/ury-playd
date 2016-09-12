@@ -1,6 +1,0 @@
-<map id="PaSoxAudioSystem" name="PaSoxAudioSystem">
-<area shape="rect" id="node2" href="$classAudioSystem.html" title="An AudioSystem represents the entire audio stack used by playd. " alt="" coords="5,96,108,123"/>
-<area shape="rect" id="node3" href="$classAudioSinkConfigurator.html" title="Interface for objects that can configure a PortAudio stream from an AudioSource. " alt="" coords="133,96,295,123"/>
-<area shape="rect" id="node4" title="STL class. " alt="" coords="319,96,402,123"/>
-<area shape="rect" id="node5" title="STL class. " alt="" coords="295,5,426,47"/>
-</map>

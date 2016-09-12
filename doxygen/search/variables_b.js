@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['oss',['oss',['../classDebug.html#a45f5726114c0078b31b9a0f70199f51e',1,'Debug']]]
+  ['quote_5ftype',['quote_type',['../classTokeniser.html#a10b7147e055edd438fcb951fc41faf65',1,'Tokeniser']]]
 ];

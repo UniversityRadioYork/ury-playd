@@ -1,4 +1,4 @@
 <map id="Audio" name="Audio">
-<area shape="rect" id="node2" href="$classPipeAudio.html" title="A concrete implementation of Audio as a &#39;pipe&#39;. " alt="" coords="5,80,91,107"/>
-<area shape="rect" id="node3" href="$classPlayerFile.html" title="The subcomponent of a Player that stores the audio file. " alt="" coords="115,80,199,107"/>
+<area shape="rect" id="node2" href="$classNoAudio.html" title="A dummy Audio implementation representing a lack of file. " alt="" coords="5,80,80,107"/>
+<area shape="rect" id="node3" href="$classPipeAudio.html" title="A concrete implementation of Audio as a &#39;pipe&#39;. " alt="" coords="105,80,191,107"/>
 </map>

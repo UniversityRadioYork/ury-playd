@@ -1,2 +1,3 @@
 <map id="AudioSink" name="AudioSink">
+<area shape="rect" id="node2" href="$classSdlAudioSink.html" title="An output stream for audio, using SDL. " alt="" coords="5,80,109,107"/>
 </map>

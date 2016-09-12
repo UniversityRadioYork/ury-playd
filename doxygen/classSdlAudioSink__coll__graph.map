@@ -1,0 +1,4 @@
+<map id="SdlAudioSink" name="SdlAudioSink">
+<area shape="rect" id="node2" href="$classAudioSink.html" title="Abstract class for audio output sinks. " alt="" coords="5,13,91,40"/>
+<area shape="rect" id="node3" href="$classRingBuffer.html" title="A ring buffer. " alt="" coords="115,13,201,40"/>
+</map>

@@ -1,5 +1,5 @@
 <map id="src/audio/ringbuffer.cpp" name="src/audio/ringbuffer.cpp">
-<area shape="rect" id="node4" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="281,80,379,107"/>
-<area shape="rect" id="node7" href="$messages_8h.html" title="Constant human&#45;readable messages used within playd. " alt="" coords="403,80,510,107"/>
-<area shape="rect" id="node9" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="149,80,257,107"/>
+<area shape="rect" id="node4" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="285,80,384,107"/>
+<area shape="rect" id="node7" href="$messages_8h.html" title="Constant human&#45;readable messages used within playd. " alt="" coords="408,80,519,107"/>
+<area shape="rect" id="node9" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="150,80,260,107"/>
 </map>

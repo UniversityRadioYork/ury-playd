@@ -1,11 +1,10 @@
 <map id="src/messages.h" name="src/messages.h">
-<area shape="rect" id="node2" href="$audio_8cpp.html" title="Implementation of the Audio class. " alt="" coords="5,80,148,107"/>
-<area shape="rect" id="node3" href="$audio__sink_8cpp.html" title="Implementation of the AudioSink class. " alt="" coords="173,80,349,107"/>
-<area shape="rect" id="node4" href="$audio__source_8cpp.html" title="Implementation of the AudioSource class. " alt="" coords="373,80,567,107"/>
-<area shape="rect" id="node5" href="$audio__system_8cpp.html" title="Implementation of the PaSoxAudioSystem class. " alt="" coords="591,80,786,107"/>
-<area shape="rect" id="node6" href="$ringbuffer_8cpp.html" title="Implementation of the RingBuffer class. " alt="" coords="810,80,978,107"/>
-<area shape="rect" id="node7" href="$cmd_8cpp.html" title="Implementation of the CommandHandler class. " alt="" coords="1003,80,1100,107"/>
-<area shape="rect" id="node8" href="$io__core_8cpp.html" title="Implementation of the non&#45;virtual aspects of the IoCore class. " alt="" coords="1125,80,1258,107"/>
-<area shape="rect" id="node9" href="$main_8cpp.html" title="Main entry point and implementation of the playd class. " alt="" coords="1282,80,1383,107"/>
-<area shape="rect" id="node10" href="$player_8cpp.html" title="Main implementation file for the Player class. " alt="" coords="1408,80,1561,107"/>
+<area shape="rect" id="node2" href="$audio_8cpp.html" title="Implementation of the PipeAudio class. " alt="" coords="5,80,152,107"/>
+<area shape="rect" id="node3" href="$audio__sink_8cpp.html" title="Implementation of the AudioSink class. " alt="" coords="176,80,355,107"/>
+<area shape="rect" id="node4" href="$ringbuffer_8cpp.html" title="Implementation of the RingBuffer class. " alt="" coords="379,80,549,107"/>
+<area shape="rect" id="node5" href="$mp3_8cpp.html" title="Implementation of the Mp3AudioSource class. " alt="" coords="573,80,768,107"/>
+<area shape="rect" id="node6" href="$sndfile_8cpp.html" title="Implementation of the SndfileAudioSource class. " alt="" coords="793,80,999,107"/>
+<area shape="rect" id="node7" href="$io_8cpp.html" title="Implementation of the non&#45;virtual aspects of the IoCore class. " alt="" coords="1024,80,1105,107"/>
+<area shape="rect" id="node8" href="$main_8cpp.html" title="Main entry point and implementation of the playd class. " alt="" coords="1131,80,1235,107"/>
+<area shape="rect" id="node9" href="$player_8cpp.html" title="Main implementation file for the Player class. " alt="" coords="1259,80,1369,107"/>
 </map>

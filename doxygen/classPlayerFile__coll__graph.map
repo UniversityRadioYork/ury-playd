@@ -1,8 +1,0 @@
-<map id="PlayerFile" name="PlayerFile">
-<area shape="rect" id="node2" href="$classResponseSource.html" title="Abstract helper class for sources of responses. " alt="" coords="5,275,136,301"/>
-<area shape="rect" id="node3" href="$classResponseSink.html" title="Abstract class for anything that can be sent a response. " alt="" coords="14,185,127,212"/>
-<area shape="rect" id="node4" title="STL class. " alt="" coords="29,96,112,123"/>
-<area shape="rect" id="node5" title="STL class. " alt="" coords="5,5,136,47"/>
-<area shape="rect" id="node6" href="$classAudio.html" title="An audio item. " alt="" coords="190,185,247,212"/>
-<area shape="rect" id="node8" href="$classAudioSystem.html" title="An AudioSystem represents the entire audio stack used by playd. " alt="" coords="407,275,510,301"/>
-</map>

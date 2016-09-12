@@ -1,25 +1,10 @@
 var searchData=
 [
-  ['rb',['rb',['../classRingBuffer.html#ad9dc807da0c32d155645ae33ff31fe4a',1,'RingBuffer']]],
-  ['read',['Read',['../classRingBuffer.html#a00dd46d66bef019d57a1d72e76ea9101',1,'RingBuffer::Read()'],['../classConnection.html#a4a26926dc0b59e1c40519e8361a7903e',1,'Connection::Read()']]],
-  ['readcapacity',['ReadCapacity',['../classRingBuffer.html#a0303deb25e0c2b598df2ee1da894c89d',1,'RingBuffer']]],
-  ['readsamplestooutput',['ReadSamplesToOutput',['../classAudioSink.html#a00ed918435d6f65b9533869453d5ae56',1,'AudioSink']]],
-  ['ready_5flines',['ready_lines',['../classTokeniser.html#ac404b31c29dd5c9d64528672248f7d4d',1,'Tokeniser']]],
-  ['remove',['Remove',['../classConnectionPool.html#abaa7392c937fc61f0d8a8fb66cf4e909',1,'ConnectionPool']]],
-  ['req',['req',['../structWriteReq.html#a1ce5132e8813190d079864301a54090e',1,'WriteReq']]],
-  ['reset',['Reset',['../classPlayerPosition.html#a813e8eb40fdff815683fb7a5b1671ede',1,'PlayerPosition']]],
-  ['respond',['Respond',['../classResponseSink.html#ac2add6144c2804a6f0db34ad30046ed7',1,'ResponseSink']]],
-  ['respondargs',['RespondArgs',['../classResponseSink.html#a6be766133591311c31bfeddcf013161d',1,'ResponseSink']]],
-  ['respondraw',['RespondRaw',['../classConnectionPool.html#a54a078d2e663057a5ce02a5c4fb991d4',1,'ConnectionPool::RespondRaw()'],['../classConnection.html#a3760a974d02bbb4cbc829a67f591671d',1,'Connection::RespondRaw()'],['../classResponseSink.html#a128a514e39f23f2bcc97fea62e9de3c5',1,'ResponseSink::RespondRaw()'],['../classPlayd.html#aee726c9b0f61a3af31fcb6c3fe624342',1,'Playd::RespondRaw()']]],
-  ['responsecode',['ResponseCode',['../io__response_8hpp.html#a058ce393badfabc8297c691e5a1f6826',1,'io_response.hpp']]],
-  ['responsesink',['ResponseSink',['../classResponseSink.html',1,'']]],
-  ['responsesource',['ResponseSource',['../classResponseSource.html',1,'ResponseSource'],['../classResponseSource.html#a5e83acbbb99819e9583d472e462aec83',1,'ResponseSource::ResponseSource()']]],
-  ['ring_5fbuf',['ring_buf',['../classAudioSink.html#a8b189a2f3970682b082fb8763606b50d',1,'AudioSink']]],
-  ['ringbuf_5fpower',['RINGBUF_POWER',['../classAudioSink.html#a152e5a388d4570211509a2a19a38c321',1,'AudioSink']]],
-  ['ringbuffer',['RingBuffer',['../classRingBuffer.html',1,'RingBuffer'],['../classRingBuffer.html#af0150c275335e1f24ee6342f1e52db0f',1,'RingBuffer::RingBuffer(int power, int size)'],['../classRingBuffer.html#a0ac7985eb168a6f65e3fabfc6f31580c',1,'RingBuffer::RingBuffer(const RingBuffer &amp;)=delete']]],
-  ['ringbuffer_2ecpp',['ringbuffer.cpp',['../ringbuffer_8cpp.html',1,'']]],
-  ['ringbuffer_2ehpp',['ringbuffer.hpp',['../ringbuffer_8hpp.html',1,'']]],
-  ['run',['Run',['../classIoCore.html#ab470e87bb6cb22d3db0b94b371e621d4',1,'IoCore::Run()'],['../classPlayd.html#aa1c63efd8e79179126c2f1474cbdccb4',1,'Playd::Run()']]],
-  ['runnullary',['RunNullary',['../classCommandHandler.html#a8bf2eeb519f6b82bb7ae094aaa7a62c9',1,'CommandHandler']]],
-  ['rununary',['RunUnary',['../classCommandHandler.html#af61f4581b6becd62a0f67b9588596690',1,'CommandHandler']]]
+  ['tcp',['tcp',['../classConnection.html#afe64ba144b868800764fd0e7d975ba75',1,'Connection']]],
+  ['tokeniser',['Tokeniser',['../classTokeniser.html',1,'Tokeniser'],['../classTokeniser.html#ab10dbd73cfa45d765fd795d9c74735df',1,'Tokeniser::Tokeniser()'],['../classConnection.html#af342bc0c62027a1b12a6fbcc2ada45cb',1,'Connection::tokeniser()']]],
+  ['tokeniser_2ecpp',['tokeniser.cpp',['../tokeniser_8cpp.html',1,'']]],
+  ['tokeniser_2ehpp',['tokeniser.hpp',['../tokeniser_8hpp.html',1,'']]],
+  ['transfer',['Transfer',['../classAudioSink.html#a93bd6b80d500ceafe4bb2165752f6ff2',1,'AudioSink::Transfer()'],['../classSdlAudioSink.html#a2cf1172e4bdf20983783e2fac05b4b83',1,'SdlAudioSink::Transfer()']]],
+  ['transferframe',['TransferFrame',['../classPipeAudio.html#a14a7802dc451a3789177c4297385dc46',1,'PipeAudio']]],
+  ['transferiterator',['TransferIterator',['../classAudioSink.html#a60c1743d66e02b77f04791e72fa4cd0b',1,'AudioSink']]]
 ];

@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['main',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
-  ['message',['Message',['../classError.html#a006605b13a346cf019f60420f1b29b5a',1,'Error']]],
-  ['microsfromsamples',['MicrosFromSamples',['../classAudioSource.html#ab052964cb76e37be223f361914b0758e',1,'AudioSource']]]
+  ['name',['Name',['../classConnection.html#a3bc1c5fe764b7020498529081841fc4b',1,'Connection']]],
+  ['neterror',['NetError',['../classNetError.html#a2e378f57bc9d1a6604ef3cd9a60ceaa8',1,'NetError']]],
+  ['nextconnectionid',['NextConnectionID',['../classIoCore.html#a837f4e1b09a7337e7e607a7dd2ba39fc',1,'IoCore']]],
+  ['noaudioerror',['NoAudioError',['../classNoAudioError.html#adc28e4d1a7fd68a28c5ceb9a61407486',1,'NoAudioError']]]
 ];

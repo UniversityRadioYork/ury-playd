@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classAudioSource.html" title="An object responsible for decoding an audio file. " alt="" coords="5,5,107,32"/>
+<area shape="rect" id="node1" href="$classAudioSink.html" title="Abstract class for audio output sinks. " alt="" coords="5,5,91,32"/>
+<area shape="rect" id="node2" href="$classSdlAudioSink.html" title="An output stream for audio, using SDL. " alt="" coords="139,5,245,32"/>
 </map>

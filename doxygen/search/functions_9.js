@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['load',['Load',['../classAudioSystem.html#a038558423ed59f7b7070e6780bef6180',1,'AudioSystem::Load()'],['../classPaSoxAudioSystem.html#ad9225d1d26271227327e3ff0cf138d12',1,'PaSoxAudioSystem::Load()'],['../classPlayer.html#a0447325a1e3fcb51368a895d0ec5845e',1,'Player::Load()'],['../classPlayerFile.html#a92dd004d4ab034bf41f7d5c76847d3c2',1,'PlayerFile::Load()']]]
+  ['main',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
+  ['makeargvector',['MakeArgVector',['../main_8cpp.html#ac304afadcd4c58d3a2b4820948b7075c',1,'main.cpp']]],
+  ['message',['Message',['../classError.html#af2ba49e55c1720ce76c104c4370a0091',1,'Error']]],
+  ['microsfromsamples',['MicrosFromSamples',['../classAudioSource.html#a56752d48a72dc180dc5920020c90c713',1,'AudioSource']]]
 ];

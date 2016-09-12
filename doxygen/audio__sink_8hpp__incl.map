@@ -1,6 +1,8 @@
 <map id="src/audio/audio_sink.hpp" name="src/audio/audio_sink.hpp">
-<area shape="rect" id="node10" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="236,80,370,107"/>
-<area shape="rect" id="node17" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="1205,80,1313,107"/>
-<area shape="rect" id="node13" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="498,162,596,189"/>
-<area shape="rect" id="node16" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="158,162,317,189"/>
+<area shape="rect" id="node9" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="504,80,589,107"/>
+<area shape="rect" id="node16" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="247,163,381,189"/>
+<area shape="rect" id="node17" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration and related declarations. " alt="" coords="20,245,173,272"/>
+<area shape="rect" id="node18" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="1022,80,1132,107"/>
+<area shape="rect" id="node10" href="$response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="610,163,730,189"/>
+<area shape="rect" id="node13" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="585,245,673,272"/>
 </map>

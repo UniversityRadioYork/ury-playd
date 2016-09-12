@@ -1,7 +1,8 @@
 <map id="Error" name="Error">
-<area shape="rect" id="node2" href="$classConfigError.html" title="An Error signifying that playd has been improperly configured. " alt="" coords="5,80,100,107"/>
-<area shape="rect" id="node3" href="$classFileError.html" title="An Error signifying that playd can&#39;t read a file. " alt="" coords="124,80,200,107"/>
-<area shape="rect" id="node4" href="$classInternalError.html" title="An Error signifying that playd has hit an internal snag. " alt="" coords="224,80,327,107"/>
-<area shape="rect" id="node5" href="$classNetError.html" title="A network error. " alt="" coords="351,80,427,107"/>
-<area shape="rect" id="node6" href="$classSeekError.html" title="An Error signifying that playd can&#39;t seek in a file. " alt="" coords="451,80,537,107"/>
+<area shape="rect" id="node2" href="$classConfigError.html" title="An Error signifying that playd has been improperly configured. " alt="" coords="5,80,99,107"/>
+<area shape="rect" id="node3" href="$classFileError.html" title="An Error signifying that playd can&#39;t read a file. " alt="" coords="123,80,196,107"/>
+<area shape="rect" id="node4" href="$classInternalError.html" title="An Error signifying that playd has hit an internal snag. " alt="" coords="221,80,323,107"/>
+<area shape="rect" id="node5" href="$classNetError.html" title="A network error. " alt="" coords="347,80,423,107"/>
+<area shape="rect" id="node6" href="$classNoAudioError.html" title="An Error signifying that no audio is loaded. " alt="" coords="448,80,555,107"/>
+<area shape="rect" id="node7" href="$classSeekError.html" title="An Error signifying that playd can&#39;t seek in a file. " alt="" coords="579,80,664,107"/>
 </map>

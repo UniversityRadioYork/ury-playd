@@ -1,0 +1,11 @@
+<map id="src/io.hpp" name="src/io.hpp">
+<area shape="rect" id="node5" href="$player_8hpp.html" title="Declaration of the Player class, and associated types. " alt="" coords="493,80,581,107"/>
+<area shape="rect" id="node17" href="$response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="251,312,372,339"/>
+<area shape="rect" id="node25" href="$tokeniser_8hpp.html" title="Declaration of the Tokeniser class. " alt="" coords="258,155,365,181"/>
+<area shape="rect" id="node13" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="929,155,1084,181"/>
+<area shape="rect" id="node16" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="651,229,736,256"/>
+<area shape="rect" id="node21" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="601,312,735,339"/>
+<area shape="rect" id="node22" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration and related declarations. " alt="" coords="1307,395,1460,421"/>
+<area shape="rect" id="node23" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="998,229,1108,256"/>
+<area shape="rect" id="node18" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="268,395,356,421"/>
+</map>

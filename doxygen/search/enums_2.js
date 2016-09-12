@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['responsecode',['ResponseCode',['../io__response_8hpp.html#a058ce393badfabc8297c691e5a1f6826',1,'io_response.hpp']]]
+  ['quotetype',['QuoteType',['../classTokeniser.html#a71d622e60fae9d6c36c96ba69a4f62e4',1,'Tokeniser']]]
 ];

@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node2" href="$classAudioSink.html" title="An output stream for an Audio file. " alt="" coords="184,5,268,32"/>
+<area shape="rect" id="node1" href="$classAudio.html" title="An audio item. " alt="" coords="5,31,64,57"/>
+<area shape="rect" id="node2" href="$classNoAudio.html" title="A dummy Audio implementation representing a lack of file. " alt="" coords="117,5,193,32"/>
+<area shape="rect" id="node3" href="$classPipeAudio.html" title="A concrete implementation of Audio as a &#39;pipe&#39;. " alt="" coords="112,56,197,83"/>
 </map>

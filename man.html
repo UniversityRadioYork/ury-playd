@@ -1,49 +1,54 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="resource-type" content="document">
-<link rel="stylesheet" href="man.css" type="text/css" media="all">
+<meta charset="utf-8"/>
+<style>
+table.head, table.foot { width: 100%; }
+td.head-rtitle, td.foot-os { text-align: right; }
+td.head-vol { text-align: center; }
+table.foot td { width: 50%; }
+table.head td { width: 33%; }
+div.spacer { margin: 1em 0; }
+</style>
+<link rel="stylesheet" href="man.css" type="text/css" media="all"/>
 <title>
 PLAYD(1)</title>
 </head>
 <body>
 <div class="mandoc">
-<table summary="Document Header" class="head" width="100%">
-<col width="30%">
-<col width="30%">
-<col width="30%">
+<table class="head">
 <tbody>
 <tr>
 <td class="head-ltitle">
 PLAYD(1)</td>
-<td class="head-vol" align="center">
-FreeBSD General Commands Manual</td>
-<td class="head-rtitle" align="right">
+<td class="head-vol">
+General Commands Manual</td>
+<td class="head-rtitle">
 PLAYD(1)</td>
 </tr>
 </tbody>
 </table>
 <div class="section">
-<h1 id="x4e414d45">NAME</h1> <b class="name">playd</b> &#8212; <span class="desc">basic TCP/IP-driven audio player</span></div>
+<h1 id="NAME">NAME</h1> <b class="name">playd</b> &#8212; <span class="desc">basic TCP/IP-driven audio player</span></div>
 <div class="section">
-<h1 id="x53594e4f50534953">SYNOPSIS</h1><table class="synopsis">
-<col style="width: 5.00ex;">
-<col>
+<h1 id="SYNOPSIS">SYNOPSIS</h1><table class="synopsis">
+<col style="width: 5.00ex;"/>
+<col/>
 <tbody>
 <tr>
 <td>
-playd</td>
+<b class="name">playd</b></td>
 <td>
-&#91;<span class="opt"><i class="arg">device-id</i></span>&#93; &#91;<span class="opt"><i class="arg">address</i></span>&#93; &#91;<span class="opt"><i class="arg">port</i></span>&#93;</td>
+[<span class="opt"><i class="arg">device-id</i></span>] [<span class="opt"><i class="arg">address</i></span>] [<span class="opt"><i class="arg">port</i></span>]</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section">
-<h1 id="x4445534352495054494f4e">DESCRIPTION</h1> <b class="name">playd</b> is a simple audio player, intended to be driven by other software via a line-based TCP protocol. Its feature set is described in <i class="link-sec"><a class="link-sec" href="#x434f4d4d414e4453">COMMANDS</a></i>.<p>
+<h1 id="DESCRIPTION">DESCRIPTION</h1> <b class="name">playd</b> is a simple audio player, intended to be driven by other software via a line-based TCP protocol. Its feature set is described in <i class="link-sec"><a class="link-sec" href="#COMMANDS">COMMANDS</a></i>.<div class="spacer">
+</div>
 <b class="name">playd</b> has a simple feature list: it can load one audio file (given its path), play that file, pause playback of that file, seek and eject that file, and periodically emit the current position in that file.<div class="subsection">
-<h2 id="x496e766f636174696f6e">Invocation</h2> If no arguments are given, <b class="name">playd</b> lists all possible valid values for the <i class="arg">device</i> argument. Otherwise, it is launched as a daemon, with the arguments meaning:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 5.00ex;" class="list list-tag">
+<h2 id="Invocation">Invocation</h2> If no arguments are given, <b class="name">playd</b> lists all possible valid values for the <i class="arg">device</i> argument. Otherwise, it is launched as a daemon, with the arguments meaning:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 6.00ex;" class="list list-tag">
 <dt class="list-tag" style="margin-top: 1.00em;">
 <i class="arg">device</i></dt>
 <dd class="list-tag" style="margin-left: 7.00ex;">
@@ -59,11 +64,13 @@ The TCP port on which <b class="name">playd</b> will listen for client connectio
 </dl>
 </div>
 <div class="subsection">
-<h2 id="x50726f746f636f6c">Protocol</h2> <b class="name">playd</b> speaks a simple, textual protocol inspired by the POSIX shell:<ul style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 5.00ex;" class="list list-dash">
+<h2 id="Protocol">Protocol</h2> <b class="name">playd</b> speaks a simple, textual protocol inspired by the POSIX shell:<ul style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 6.00ex;" class="list list-dash">
 <li class="list-dash" style="margin-top: 0.00em;">
 Requests and responses consist of one or more whitespace-delimited <span class="emph">words</span>, followed by a line-feed.</li>
 <li class="list-dash" style="margin-top: 0.00em;">
-The first word, the <span class="emph">command word</span>, denotes the specific request or response. A command word in <span class="emph">lowercase</span> denotes a request; in <span class="emph">CAPITALS</span>, a response: <b class="name">playd</b> is case-sensitive.</li>
+The first word, the <span class="emph">tag</span>, uniquely identifies the request being sent or answered. Examples of good tags include UUIDs, or hashes of the command send time and originating host. Broadcasts from the server have the tag '!'.</li>
+<li class="list-dash" style="margin-top: 0.00em;">
+The next word, the <span class="emph">command word</span>, denotes the specific request (if in <span class="emph">lowercase</span>), or response (if in <span class="emph">CAPITALS</span>): <b class="name">playd</b> is case-sensitive.</li>
 <li class="list-dash" style="margin-top: 0.00em;">
 Words may contain backslashes, which <span class="emph">escape</span> the next character, reproducing it verbatim. This can be used to permit whitespace, which would otherwise end the word.</li>
 <li class="list-dash" style="margin-top: 0.00em;">
@@ -71,17 +78,17 @@ In addition, words may be <span class="emph">quoted</span> in either <span class
 </ul>
 </div>
 <div class="subsection">
-<h2 id="x436f6e74726f6c6c696e672066726f6d2061207465726d696e616c">Controlling from a terminal</h2> Since <b class="name">playd</b> only speaks TCP/IP (by design), it can be hard to speak with it from a terminal on the local machine. Programs such as <a class="link-man">nc(1)</a> may bridge this gap in functionality.</div>
+<h2 id="Controlling_from_a_terminal">Controlling from a terminal</h2> Since <b class="name">playd</b> only speaks TCP/IP (by design), it can be hard to speak with it from a terminal on the local machine. Programs such as <a class="link-man">nc(1)</a> or <a class="link-man">socat(1)</a> may bridge this gap in functionality.</div>
 </div>
 <div class="section">
-<h1 id="x434f4d4d414e4453">COMMANDS</h1> The sets of valid requests to, and responses from, a <b class="name">playd</b> session are:<div class="subsection">
-<h2 id="x5265717565737473">Requests</h2><dl style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 5.00ex;" class="list list-tag">
+<h1 id="COMMANDS">COMMANDS</h1> The sets of valid requests to, and responses from, a <b class="name">playd</b> session are:<div class="subsection">
+<h2 id="Requests">Requests</h2><dl style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 6.00ex;" class="list list-tag">
 <dt class="list-tag" style="margin-top: 1.00em;">
 eject</dt>
 <dd class="list-tag" style="margin-left: 9.00ex;">
 Unloads the current file, stopping any playback.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-load <i class="arg">path</i></dt>
+fload <i class="arg">path</i></dt>
 <dd class="list-tag" style="margin-left: 9.00ex;">
 Loads the file at <i class="arg">path</i>, which must be absolute.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
@@ -89,84 +96,83 @@ play</dt>
 <dd class="list-tag" style="margin-left: 9.00ex;">
 Starts, or resumes, playback of the current file.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-seek <i class="arg">pos</i></dt>
+pos <i class="arg">micros</i></dt>
 <dd class="list-tag" style="margin-left: 9.00ex;">
-Seeks to <i class="arg">pos</i> microseconds past the start of the file. Seeking past a file's end is equivalent to seeking to the end directly.</dd>
+Seeks to <i class="arg">micros</i> microseconds past the start of the file. Seeking past a file's end is equivalent to seeking to the end directly.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
 stop</dt>
 <dd class="list-tag" style="margin-left: 9.00ex;">
 Stops playback of the current file, keeping the current position.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-quit</dt>
+end</dt>
 <dd class="list-tag" style="margin-left: 9.00ex;">
-Makes <b class="name">playd</b> quit.</dd>
+Makes <b class="name">playd</b> behave as if the current file has just ended.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+dump</dt>
+<dd class="list-tag" style="margin-left: 9.00ex;">
+Asks <b class="name">playd</b> to emit all current state to this client as responses.</dd>
 </dl>
 </div>
 <div class="subsection">
-<h2 id="x526573706f6e736573">Responses</h2><dl style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 5.00ex;" class="list list-tag">
+<h2 id="Responses">Responses</h2><dl style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 6.00ex;" class="list list-tag">
+<dt class="list-tag" style="margin-top: 1.00em;">
+OHAI <i class="arg">id</i> <i class="arg">protocol</i> <i class="arg">server</i></dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+Sent upon connection. <i class="arg">id</i> is the ID assigned to the connected client. <i class="arg">protocol</i> is the name and version of the Bifrost protocol being used. <i class="arg">server</i> identifies the playd server and version number.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+IAMA <i class="arg">role</i></dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+Describes the Bifrost role <b class="name">playd</b> implements.  This identifies the features <b class="name">playd</b> provides to external clients.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+ACK OK <i class="arg">details</i></dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+<b class="name">playd</b> just finished processing a request, identified by the tag of this response. Further details are provided in <i class="arg">details</i>.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+ACK FAIL <i class="arg">details</i></dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+<b class="name">playd</b> failed to execute a request, identified by the tag of this response. Further details are provided in <i class="arg">details</i>.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+ACK WHAT <i class="arg">details</i></dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+<b class="name">playd</b> did not understand a request, identified by the tag of this response. Further details are provided in <i class="arg">details</i>.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+DUMP</dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+<b class="name">playd</b> has finished responding to a dump command.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
 END</dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
+<dd class="list-tag" style="margin-left: 11.00ex;">
 The loaded file has reached its physical end.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-FAIL <i class="arg">reason</i> <i class="arg">command...</i></dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
-<b class="name">playd</b> failed to execute <i class="arg">command</i>. A human-readable <i class="arg">reason</i> is provided.</dd>
+EJECT</dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+There is no currently loaded file.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-FEATURES <i class="arg">feature1</i> &#91;<span class="opt"><i class="arg">feature2...</i></span>&#93;</dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
-The set of BAPS3 feature flags <b class="name">playd</b> implements.  This identifies the features <b class="name">playd</b> provides to external clients.</dd>
+FLOAD <i class="arg">path</i></dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+The file at <i class="arg">path</i> is loaded.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-FILE <i class="arg">path</i></dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
-The loaded file has changed to the file at <i class="arg">path</i>.</dd>
+PLAY</dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+The currently loaded file is now playing.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-OHAI <i class="arg">ident</i></dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
-Sent upon connection; <i class="arg">ident</i> identifies the playd server and version number.</dd>
+STOP</dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
+The currently loaded file is now stopped.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-OK <i class="arg">command...</i></dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
-<b class="name">playd</b> just finished processing <i class="arg">command</i>.</dd>
-<dt class="list-tag" style="margin-top: 1.00em;">
-STATE <i class="arg">state</i></dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
-The playback state has changed to <i class="arg">state</i>. This may be one of the following:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 5.00ex;" class="list list-tag">
-<dt class="list-tag" style="margin-top: 1.00em;">
-Ejected</dt>
-<dd class="list-tag" style="margin-left: 8.00ex;">
-No file is loaded.</dd>
-<dt class="list-tag" style="margin-top: 1.00em;">
-Playing</dt>
-<dd class="list-tag" style="margin-left: 8.00ex;">
-A file is loaded and playing.</dd>
-<dt class="list-tag" style="margin-top: 1.00em;">
-Quitting</dt>
-<dd class="list-tag" style="margin-left: 8.00ex;">
-<b class="name">playd</b> is about to shut down.</dd>
-<dt class="list-tag" style="margin-top: 1.00em;">
-Stopped</dt>
-<dd class="list-tag" style="margin-left: 8.00ex;">
-A file is loaded, but is not playing.</dd>
-</dl>
-</dd>
-<dt class="list-tag" style="margin-top: 1.00em;">
-TIME <i class="arg">pos</i></dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
+POS <i class="arg">pos</i></dt>
+<dd class="list-tag" style="margin-left: 11.00ex;">
 Periodic announcement of the current file position in microseconds, <i class="arg">pos</i>.</dd>
-<dt class="list-tag" style="margin-top: 1.00em;">
-WHAT <i class="arg">message</i> <i class="arg">command...</i></dt>
-<dd class="list-tag" style="margin-left: 10.00ex;">
-<b class="name">playd</b> did not understand <i class="arg">command</i>. A human-readable <i class="arg">message</i> is provided.</dd>
 </dl>
 </div>
 </div>
 <div class="section">
-<h1 id="x4558414d504c4553">EXAMPLES</h1> Without arguments,<blockquote style="margin-top: 0.00em;margin-bottom: 0.00em;">
+<h1 id="EXAMPLES">EXAMPLES</h1> Without arguments,<blockquote style="margin-top: 0.00em;margin-bottom: 0.00em;">
 <div class="display">
 <code class="lit">% playd</code></div>
 </blockquote>
-will produce a list of available devices:<p>
+will produce a list of available devices:<div class="spacer">
+</div>
 <pre style="margin-left: 5.00ex;" class="lit display">
 0: HDA ATI SB: ALC892 Analog (hw:0,0) 
 1: HDA ATI SB: ALC892 Digital (hw:0,1) 
@@ -178,65 +184,69 @@ will produce a list of available devices:<p>
 7: surround40 
 8: default 
 9: dmix</pre>
-<p>
+<div class="spacer">
+</div>
 Say we want to output on the GameCon. The command<blockquote style="margin-top: 0.00em;margin-bottom: 0.00em;">
 <div class="display">
 <code class="lit">% playd 4</code></div>
 </blockquote>
-will start <b class="name">playd</b> on its default address (localhost) and port, outputting on device ID 4.<p>
+will start <b class="name">playd</b> on its default address (localhost) and port, outputting on device ID 4.<div class="spacer">
+</div>
 To change the address and port, we specify them as arguments:<blockquote style="margin-top: 0.00em;margin-bottom: 0.00em;">
 <div class="display">
 <code class="lit">% playd 4 127.0.0.1 1350</code></div>
 </blockquote>
-<p>
+<div class="spacer">
+</div>
 To connect to <b class="name">playd</b> from the terminal, we can use <a class="link-man">nc(1)</a>:<blockquote style="margin-top: 0.00em;margin-bottom: 0.00em;">
 <div class="display">
 <code class="lit">% nc 127.0.0.1 1350</code></div>
 </blockquote>
-<p>
-A session with <b class="name">playd</b> may look like the following:<p>
+<div class="spacer">
+</div>
+A session with <b class="name">playd</b> may look like the following:<div class="spacer">
+</div>
 <pre style="margin-left: 5.00ex;" class="lit display">
--&gt; OHAI 'playd v0.1.1' 
--&gt; FEATURES End FileLoad PlayStop Seek TimeReport 
--&gt; TIME 0 
--&gt; STATE Ejected 
-&lt;- load '/usr/home/foo/awesome-mix.mp3' 
--&gt; OK load '/usr/home/foo/awesome-mix.mp3' 
--&gt; FILE '/usr/home/foo/awesome-mix.mp3' 
--&gt; STATE Stopped 
-&lt;- play 
--&gt; OK play 
--&gt; STATE Playing 
+-&gt; ! OHAI 1 'bifrost-0.3.0' 'playd-0.3.0' 
+-&gt; ! IAMA player/file 
+-&gt; ! POS 0 
+-&gt; ! EJECT 
+&lt;- 1 fload '/usr/home/foo/awesome-mix.mp3' 
+-&gt; ! FLOAD '/usr/home/foo/awesome-mix.mp3' 
+-&gt; ! STOP 
+-&gt; 1 ACK OK success 
+&lt;- 2 play 
+-&gt; ! PLAY 
+-&gt; 2 ACK OK success 
 (file plays to end) 
--&gt; END 
--&gt; STATE Stopped 
--&gt; TIME 0 
--&gt; eject 
-&lt;- OK eject 
--&gt; STATE Ejected 
-(disconnect)</pre>
+-&gt; ! END 
+-&gt; ! STOP 
+-&gt; ! POS 0 
+-&gt; 3 eject 
+&lt;- ! EJECT 
+&lt;- 3 ACK OK success</pre>
 </div>
 <div class="section">
-<h1 id="x415554484f5253">AUTHORS</h1> In alphabetical surname order, the main contributors to <b class="name">playd</b> at time of writing are:<ul style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 5.00ex;" class="list list-item">
+<h1 id="AUTHORS">AUTHORS</h1> In alphabetical surname order, the main contributors to <b class="name">playd</b> at time of writing are:<ul style="margin-top: 0.00em;margin-bottom: 0.00em;margin-left: 6.00ex;" class="list list-item">
 <li class="list-item" style="margin-top: 1.00em;">
-<span class="author">Charles Pigott</span> &#60;charles.pigott@ury.org.uk&#62;</li>
+<span class="author">Charles Pigott</span> &#10216;charles.pigott@ury.org.uk&#10217;</li>
 <li class="list-item" style="margin-top: 1.00em;">
-<span class="author">Sam Willcocks</span> &#60;sam.w@ury.org.uk&#62;</li>
+<br/>
+<span class="author">Sam Willcocks</span> &#10216;sam.w@ury.org.uk&#10217;</li>
 <li class="list-item" style="margin-top: 1.00em;">
-<span class="author">Matt Windsor</span> &#60;matt.windsor@ury.org.uk&#62;</li>
+<br/>
+<span class="author">Matt Windsor</span> &#10216;matt.windsor@ury.org.uk&#10217;</li>
 </ul>
 </div>
 <div class="section">
-<h1 id="x42554753">BUGS</h1> Behaviour when escaping multi-byte UTF-8 characters with &#8220;&#92;&#8221; is undefined; this is intentional, for reasons of code simplicity.</div>
-<table summary="Document Footer" class="foot" width="100%">
-<col width="50%">
-<col width="50%">
+<h1 id="BUGS">BUGS</h1> Behaviour when escaping multi-byte UTF-8 characters with &#8220;\&#8221; is undefined; this is intentional, for reasons of code simplicity.</div>
+<table class="foot">
 <tbody>
 <tr>
 <td class="foot-date">
-December 5, 2014</td>
-<td class="foot-os" align="right">
-FreeBSD 10.0</td>
+February 14, 2016</td>
+<td class="foot-os">
+Linux 3.4.0+</td>
 </tr>
 </tbody>
 </table>

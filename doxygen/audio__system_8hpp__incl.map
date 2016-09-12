@@ -1,9 +1,0 @@
-<map id="src/audio/audio_system.hpp" name="src/audio/audio_system.hpp">
-<area shape="rect" id="node6" href="$sample__formats_8hpp.html" title="The SampleFormat enumeration. " alt="" coords="191,237,349,263"/>
-<area shape="rect" id="node8" href="$audio__sink_8hpp.html" title="Declaration of the AudioSink class. " alt="" coords="604,80,720,107"/>
-<area shape="rect" id="node13" href="$audio__source_8hpp.html" title="Declaration of the AudioSource class. " alt="" coords="441,155,574,181"/>
-<area shape="rect" id="node21" href="$audio_8hpp.html" title="Declaration of the Audio class. " alt="" coords="1026,80,1109,107"/>
-<area shape="rect" id="node19" href="$ringbuffer_8hpp.html" title="The RingBuffer class template. " alt="" coords="308,155,416,181"/>
-<area shape="rect" id="node16" href="$errors_8hpp.html" title="Declarations of the playd Error exception set. " alt="" coords="1203,237,1300,263"/>
-<area shape="rect" id="node22" href="$io__response_8hpp.html" title="Declaration of classes pertaining to responses to the client. " alt="" coords="1409,155,1561,181"/>
-</map>

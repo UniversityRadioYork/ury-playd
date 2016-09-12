@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['connections',['connections',['../classConnectionPool.html#abadccfe8fe0468304d43d047c8c4a93b',1,'ConnectionPool']]],
-  ['context',['context',['../classAudioSource.html#a2bbce89d4bef9cf46b1113de3245655a',1,'AudioSource']]],
-  ['current',['current',['../classPlayerPosition.html#a63cebbd13e4c69ff7fb9f0a5ffd8961c',1,'PlayerPosition::current()'],['../classPlayerState.html#add16beba271881c0e1e40430b80f5bd6',1,'PlayerState::current()']]],
-  ['current_5fword',['current_word',['../classTokeniser.html#a5d703e64476ccc8cbf42cc7c3ef8bc79',1,'Tokeniser']]]
+  ['dead',['dead',['../classPlayer.html#a8092377fdcc462194dce820e867d904a',1,'Player']]],
+  ['device',['device',['../classSdlAudioSink.html#a4cf90fbaa381b8435aff95c272a6f4ea',1,'SdlAudioSink']]],
+  ['device_5fid',['device_id',['../classPlayer.html#a3094887d0f9289095e68956d8c53e8a6',1,'Player']]]
 ];
