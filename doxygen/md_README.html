@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.12"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>URY playd: URY playd</title>
+<title>URY playd: playd</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -90,10 +90,10 @@ $(document).ready(function(){initNavTree('md_README.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">URY playd </div>  </div>
+<div class="title">playd </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>URY playd (or just <code>playd</code>; short for <em>player daemon</em>) is a C++ audio player developed by <a href="http://ury.org.uk">University Radio York</a>. It's designed to be minimal, hackable, and composable into bigger systems (such as our ongoing BAPS3 project to build a new radio playout system).</p>
+<div class="textblock"><p><code>playd</code> (<em>player daemon</em>) is a C++ audio player developed by <a href="http://ury.org.uk">University Radio York</a>. It's designed to be minimal, hackable, and composable into bigger systems (such as our ongoing BAPS3 project to build a new radio playout system).</p>
 <h2>Usage</h2>
 <p><code>playd DEVICE-ID [ADDRESS] [PORT]</code></p>
 <ul>
@@ -127,9 +127,10 @@ $ nc localhost 1350
 <h2>Compilation</h2>
 <h3>Requirements</h3>
 <ul>
-<li><a href="https://github.com/joyent/libuv">libuv</a> 0.10+</li>
+<li><a href="https://github.com/joyent/libuv">libuv</a> 1.9.1+</li>
 <li><a href="https://www.libsdl.org">SDL2</a> 2.0.3</li>
-<li>A C++11 compiler (recent versions of <a href="http://clang.llvm.org">clang</a>, <a href="https://gcc.gnu.org">gcc</a>, and Visual Studio work)</li>
+<li>A C++14 compiler (recent versions of <a href="http://clang.llvm.org">clang</a>, <a href="https://gcc.gnu.org">gcc</a>, and Visual Studio work)</li>
+<li><a href="https://cmake.org/">CMake</a> 2.8+, for building.</li>
 </ul>
 <p>The following dependencies are used for file format support, and you'll need at least one of them:</p>
 <ul>
@@ -138,8 +139,11 @@ $ nc localhost 1350
 <li><a href="http://www.mega-nerd.com/libsndfile/">libsndfile</a> 1.0.25+, for Ogg Vorbis, WAV, and FLAC support (if libflac++ isn't available).</li>
 </ul>
 <p>Certain operating systems may need additional dependencies; see the OS-specific build instructions below.</p>
+<h3>CMake</h3>
+<p><code>playd</code> can be built with cmake: just run <code>cmake .</code> in the root directory (with whichever additional flags you need: run <code>cmake --help</code> for additional information), then use your favourite build tool (<code>make</code>, Visual Studio, etc.) with the generated projects.</p>
 <h3>POSIX (GNU/Linux, BSD, OS X)</h3>
-<p><code>playd</code> comes <code>config.sh</code>, a Bourne shell script that will generate a GNU-compatible Makefile that can be used both to make and install.</p>
+<p><b>Warning</b>: This method of building <code>playd</code> is liable to be removed in favour of cmake in future.</p>
+<p><code>playd</code> comes with <code>config.sh</code>, a Bourne shell script that will generate a GNU-compatible Makefile that can be used both to make and install.</p>
 <p>To use the Makefile, you'll need <a href="https://www.gnu.org/software/make/">GNU Make</a> and <code>pkg-config</code> (or equivalent), and pkg-config packages for SDL2, libuv, and any needed decoder libraries. We've tested building playd on Gentoo, FreeBSD 10, and OS X, but other POSIX-style operating systems should work.</p>
 <p>Using the Makefile is straightforward:</p>
 <ul>
@@ -158,20 +162,21 @@ $ nc localhost 1350
 root@freebsd:~/ # gmake install
 </pre><h3>Windows</h3>
 <h4>Visual Studio</h4>
+<p><b>Warning</b>: This method of building <code>playd</code> is liable to be removed in favour of cmake in future.</p>
 <p><em>For more information, see <code><a class="el" href="README_8VisualStudio_8md_source.html">README.VisualStudio.md</a></code>.</em></p>
-<p>playd <b>can</b> be built with Visual Studio (tested with 2013 Premium), but you will need to source and configure the dependencies manually. A Visual Studio project is provided, but will need tweaking for your environment.</p>
+<p>playd <b>can</b> be built with Visual Studio (tested with 2015 Community), but you will need to source and configure the dependencies manually. A Visual Studio project is provided, but will need tweaking for your environment.</p>
 <h4>MinGW</h4>
 <p>We haven't managed ourselves, but assuming you can build all the dependencies, (libsox is the difficult one), it should work fine.</p>
 <h2>Contributing</h2>
 <p>We appreciate any and all pull requests made in accordance with our philosophy.</p>
 <h2>Legal</h2>
-<p>All original code is licenced under the <a href="see LICENSE.txt">MIT licence</a>. Some code is taken from the [PortAudio] project (see LICENSE.portaudio), as well as <a href="see LICENSE.catch">CATCH</a>. </p>
+<p>All original code is licenced under the <a href="see LICENSE.txt">MIT licence</a>. Some code is taken from the [PortAudio] project (see LICENSE.portaudio), as well as <a href="see LICENSE.catch">CATCH</a>. The various CMake scripts come with their licence information attached. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Sep 12 2016 21:01:20 for URY playd by
+    <li class="footer">Generated on Mon Sep 12 2016 22:53:08 for URY playd by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.12 </li>
   </ul>

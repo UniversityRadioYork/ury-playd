@@ -8,7 +8,7 @@ var indexSectionsWithContent =
   5: "dst",
   6: "cdqs",
   7: "adefinopsw",
-  8: "cuv"
+  8: "cpv"
 };
 
 var indexSectionNames =
