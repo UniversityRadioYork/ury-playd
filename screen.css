@@ -1,35 +1,50 @@
-@import url(//fonts.googleapis.com/css?family=Merriweather:400,700,400italic|Merriweather+Sans:700|Roboto+Slab:700);
+@import 'https://fonts.googleapis.com/css?family=Work+Sans:400,700';
+@import 'https://fonts.googleapis.com/css?family=Space+Mono:400,400i';
 
 html {
-	background-color: #fafafa;
+	background-color: #1d1f21;
+	margin: 0;
 }
 
 body {
-	color: rgba(0, 0, 0, 0.85);
-	font-family: 'Merriweather', serif;
+	color: #c5c8c6;
+	font-family: 'Work Sans', sans-serif;
 	font-size: 14pt;
 }
 
 header {
-	border-bottom: 3pt solid #c5cae9;
+	border-bottom: 3pt solid #b4b7b4;
 	padding-bottom: 1rem;
 	text-align: center;
 }
 header h1 {
-	color: #1a237e;
-	font-family: 'Roboto Slab', serif;
+	display: inline;
+	color: #e0e0e0;
+	font-family: 'Space Mono', monospace;
 	font-size: 3rem;
 	margin: 0;
 }
 header p {
-	color: #5c6bc0;
+	display: inline;
+	color: #c5c8c6;
+	font-family: 'Space Mono', monospace;
 	font-style: italic;
 	margin: 0;
 	margin-top: 6pt;
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: 'Merriweather Sans', sans-serif;
+	font-family: 'Space Mono', monospace;
+}
+
+pre {
+	background-color: #282a2e;
+	padding: 0.5rem;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+code {
+	font-family: 'Space Mono', monospace;
 }
 
 main {
@@ -38,12 +53,12 @@ main {
 }
 
 a:link {
-	color: #5677fc;
+	color: #81a2be;
 }
 a:active {
-	color: #e51c23;
+	color: #8abeb7;
 }
 a:visited {
-	color: #673ab7;
+	color: #b294bb;
 }
 

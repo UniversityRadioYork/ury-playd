@@ -1,34 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>URY playd</title>
+    <title>playd</title>
     <link href="screen.css" rel="stylesheet">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   </head>
   <body>
     <header role="banner">
-      <h1>URY playd</h1>
-      <p>University Radio York Player Daemon</p>
+      <h1>playd</h1>
+      <p>minimalist audio player</p>
     </header>
     <main role="main">
 <!-- Begin auto-generated HTML from index.md -->
 <h2>Welcome</h2>
 
-<p><strong>URY playd</strong> is a minimalist audio player written in <a href="https://isocpp.org/">C++11</a>.  It
-uses <a href="http://sox.sourceforge.net/libsox.html">libsox</a>, <a href="http://www.portaudio.com/">PortAudio</a>, and <a href="https://github.com/libuv/libuv">libuv</a> to decode audio, play it
+<p><strong>playd</strong> is a tiny cross-platform audio player developed by
+<a href="http://ury.org.uk">University Radio York</a>.  It uses <a href="https://isocpp.org">C++14</a> and libraries like
+<a href="http://www.mega-nerd.com/libsndfile">libsndfile</a>, <a href="https://mpg123.org">libmpg123</a>, <a href="https://www.libsdl.org">SDL2</a>, and <a href="https://github.com/libuv/libuv">libuv</a> to decode audio, play it
 to any output device, and take commands via a simple, line-based
 TCP protocol.</p>
 
-<p>playd is part of the <strong>BAPS3</strong> project at <a href="http://ury.org.uk">University
-Radio York</a>.  It is under <em>active development</em>, and we can&#39;t yet
-guarantee it won&#39;t try to strangle your cat.</p>
-
-<p>The latest release is <a href="https://github.com/UniversityRadioYork/ury-playd/releases/tag/v0.2.0">v0.2.0</a> <em>Edgware</em>; the documentation
-hosted here refers to it.</p>
+<p>The latest release at time of writing is <a href="https://github.com/UniversityRadioYork/ury-playd/releases/tag/v0.3.0">v0.3.0</a> <em>Archway</em>; the
+documentation hosted here refers to it.</p>
 
 <h2>Features</h2>
 
-<p>playd doesn&#39;t have many features, as it&#39;s intended to be a minimal
+<p><strong>playd</strong> doesn&#39;t have many features, as it&#39;s intended to be a minimal
 player core for use in bigger things.  Here are some features it
 <em>does</em> have:</p>
 
@@ -41,17 +38,55 @@ player core for use in bigger things.  Here are some features it
 some GNU/Linux distributions.</li>
 </ul>
 
+<h2>Example</h2>
+
+<p>Launching <strong>playd</strong>:</p>
+
+<pre><code>$ playd
+usage: playd ID [HOST] [PORT]
+where ID is one of the following numbers:
+        0: Speakers (Sound Blaster Z)
+        1: SPDIF-Out (Sound Blaster Z)
+        2: Realtek Digital Output(Optical) (Realtek High Definition Audio)
+        3: Realtek Digital Output (Realtek High Definition Audio)
+        4: ASUS VE278-4 (NVIDIA High Definition Audio)
+default HOST: 0.0.0.0
+default PORT: 1350
+$ playd 0
+</code></pre>
+
+<p>Connecting to <strong>playd</strong> through a TCP/IP client (commands in lowercase are
+sent by the client, commands in capitals from the server):</p>
+
+<pre><code>! OHAI 1 bifrost-0.3.0 playd-v0.2.0-278-g2d9f096
+! IAMA player/file
+! EJECT
+! ACK OK success
+! FLOAD &#39;/path/to/file.mp3&#39;
+! POS 0
+0 ACK OK success
+1 play
+! PLAY
+1 ACK OK success
+! POS 1021678
+! POS 2043356
+! POS 3018594
+2 stop
+! STOP
+2 ACK OK success
+</code></pre>
+
 <h2>Legal</h2>
 
-<p>playd itself is licensed under the <a href="https://raw.githubusercontent.com/UniversityRadioYork/ury-playd/master/LICENSE.txt">MIT licence</a>.  However, it
+<p><strong>playd</strong> itself is licensed under the <a href="https://raw.githubusercontent.com/UniversityRadioYork/ury-playd/master/LICENSE.txt">MIT licence</a>.  However, it
 includes, and uses, code under other licences, including the LGPL.
-A full build of playd is likely to come under the GPL, due to
-optional sound library dependencies.</p>
+The licences of software included as part of <strong>playd</strong> are available as part
+of the source distribution.</p>
 
 <h2>Installation</h2>
 
 <p>You can find the latest code, and instructions on how to use it,
-at playd&#39;s <a href="https://github.com/UniversityRadioYork/ury-playd">GitHub</a> page.</p>
+at <strong>playd</strong>&#39;s <a href="https://github.com/UniversityRadioYork/ury-playd">GitHub</a> page.</p>
 
 <h2>Usage</h2>
 
@@ -68,7 +103,7 @@ provides a concise description of how to run playd.</li>
 contains the READMEs included in the playd distribution, as
 well as auto-generated source code documentation.</li>
 <li><a href="https://github.com/UniversityRadioYork/ury-playd">GitHub</a> -
-source code for playd, as well as an issue tracker and resources
+source code for <strong>playd</strong>, as well as an issue tracker and resources
 for contributing.</li>
 <li><a href="https://github.com/UniversityRadioYork/baps3-spec">BAPS3 Spec</a> -
 a formal(ish) document on the playout system for which playd
@@ -77,7 +112,7 @@ was developed.</li>
 
 <h3>Similar projects</h3>
 
-<p>playd is not the first attempt at a minimalist audio player.  Here
+<p><strong>playd</strong> is not the first attempt at a minimalist audio player.  Here
 are resources on similar projects which may better suit your needs.</p>
 
 <ul>
@@ -90,7 +125,7 @@ network interface.</li>
 
 <h3>Further reading</h3>
 
-<p>Articles that are relevant, but not directly related, to playd.</p>
+<p>Articles that are relevant, but not directly related, to <strong>playd</strong>.</p>
 
 <ul>
 <li><a href="http://cr.yp.to/bib/1995/wirth.pdf">A Plea for Lean Software</a> (Wirth, 1995) -
