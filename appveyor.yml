@@ -24,8 +24,10 @@ install:
   - ps: >-
       If ($env:PLATFORM -Match "x64") {
         $env:PYTHON="C:\Python27-x64\python.exe"
+        $env:PlatformString="win64"
       } Else {
         $env:PYTHON="C:\Python27\python.exe"
+        $env:PlatformString="win32"
       }
   - python --version
   - ps: .\WindowsBuilder.ps1 -deps -arch "$env:PLATFORM"
@@ -41,11 +43,11 @@ test_script:
 
 after_build:
   - cd C:\projects\ury-playd
-  - 7z a playd_%PLATFORM%.zip C:\projects\ury-playd\%PLATFORM%\build\Release\playd.exe
+  - 7z a playd_%PlatformString%.zip C:\projects\ury-playd\%PLATFORM%\build\Release\playd.exe
 
 artifacts:
-  - path: playd_$(PLATFORM).zip
-    name: playd $(PLATFORM)
+  - path: playd_$(PlatformString).zip
+    name: playd $(PlatformString)
 
 deploy:
   release: $(APPVEYOR_REPO_TAG_NAME)
@@ -53,7 +55,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: g+7eD+rmWu28F2F7iswR5HtuLA39wnUajHLhMfhF/tXskWi/EtdERORXmrWZwZkh
-  artifact: playd_$(PLATFORM).zip
+  artifact: playd_$(PlatformString).zip
   draft: false
   prerelease: false
   force_update: true
