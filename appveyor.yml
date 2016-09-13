@@ -38,3 +38,11 @@ test_script:
   - cd C:\projects\ury-playd\%PLATFORM%\build
   - ctest --output-on-failure
     -C "%CONFIGURATION%"
+
+after_build:
+  - cd C:\projects\ury-playd
+  - 7z a playd_%PLATFORM%.zip C:\projects\ury-playd\%PLATFORM%\build\Release\playd.exe
+
+artifacts:
+  - path: playd_%PLATFORM%.zip
+    name: playd %PLATFORM%
