@@ -1,0 +1,32 @@
+#-----------------------------------------------------------------------------
+#
+#  Configuration for continuous integration service at appveyor.com
+#
+#-----------------------------------------------------------------------------
+
+# Operating system (build VM template)
+os: Visual Studio 2015
+
+# scripts that are called at very beginning, before repo cloning
+init:
+
+platform: x64
+
+configuration: Release
+
+install:
+  # show all available env vars
+  - set
+  - echo cmake on AppVeyor
+  - cmake -version
+  - set PYTHON="C:\Python27-x64"
+  - python --version
+  - ps: .\WindowsBuilder.ps1 deps
+
+build_script:
+  - cd c:\projects\ury-playd
+  - ps: .\WindowsBuilder.ps1 playd
+
+test_script:
+  - ctest --output-on-failure
+    -C "%CONFIGURATION%"
