@@ -44,5 +44,18 @@ after_build:
   - 7z a playd_%PLATFORM%.zip C:\projects\ury-playd\%PLATFORM%\build\Release\playd.exe
 
 artifacts:
-  - path: playd_%PLATFORM%.zip
-    name: playd %PLATFORM%
+  - path: playd_$(PLATFORM).zip
+    name: playd $(PLATFORM)
+
+deploy:
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  description: ''
+  provider: GitHub
+  auth_token:
+    secure: g+7eD+rmWu28F2F7iswR5HtuLA39wnUajHLhMfhF/tXskWi/EtdERORXmrWZwZkh
+  artifact: playd_$(PLATFORM).zip
+  draft: false
+  prerelease: false
+  on:
+    branch: appveyor-2
+    appveyor_repo_tag: true
