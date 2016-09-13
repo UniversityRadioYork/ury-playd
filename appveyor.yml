@@ -42,8 +42,11 @@ test_script:
     -C "%CONFIGURATION%"
 
 after_build:
-  - cd C:\projects\ury-playd
-  - 7z a playd_%APPVEYOR_REPO_TAG_NAME%_%PlatformString%.zip C:\projects\ury-playd\%PLATFORM%\build\Release\playd.exe
+  - set zipname="playd_%APPVEYOR_REPO_TAG_NAME%_%PlatformString%.zip"
+  - set zippath="C:\projects\ury-playd\%zipname%"
+  - 7z a "%zippath%" LICENSE*
+  - cd C:\projects\ury-playd\%PLATFORM%\build\Release
+  - 7z a "%zippath%" *
 
 artifacts:
   - path: playd_$(APPVEYOR_REPO_TAG_NAME)_$(PlatformString).zip

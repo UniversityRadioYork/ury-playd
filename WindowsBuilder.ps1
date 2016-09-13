@@ -4,7 +4,7 @@ param (
 	[string][alias("arch")]$arg_arch
 )
 
-function BuildDeps ($arch, $downloads, $libdir, $includedir)
+function BuildDeps ($arch, $downloads, $libdir, $includedir, $build)
 {
 	$oldpwd = $pwd
 	cd "$downloads"
@@ -28,21 +28,28 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir)
 	$url_sdl2 = "https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip"
 	$url_libuv = "https://github.com/libuv/libuv.git"
 
+	mkdir -Force "$build\Release"
+
 	$f = "$([System.IO.Path]::GetFileName($url_libsndfile))"
 	Invoke-WebRequest "$url_libsndfile" -OutFile "$f"
 	7z e -o"$libdir" "$f" "lib/*.lib" -r
 	7z e -o"$includedir" "$f" "include/*" -r
+	7z e -o"$build\Release" "$f" "bin/*.dll"
 
 	$f = "$([System.IO.Path]::GetFileName($url_sdl2))"
 	Invoke-WebRequest "$url_sdl2" -OutFile "$f"
-	7z e "-o$libdir" "$f" "SDL2-*/lib/$arch/*.lib" -r
-	7z e "-o$includedir" "$f" "SDL2-*/include/*" -r
+	7z e -o"$libdir" "$f" "SDL2-*/lib/$arch/*.lib" -r
+	7z e -o"$includedir" "$f" "SDL2-*/include/*" -r
+	7z e -o"$build\Release" "$f" "SDL2-*/COPYING.txt" "SDL2-*/lib/$arch/*.dll"
+	mv "$build\Release\COPYING.txt" "$build\Release\LICENSE.SDL2"
 
 	git clone "$url_libuv"
 	cd "libuv"
 	cmd /c "vcbuild.bat" "$arch" "release" "shared"
-	cp "Release/*.lib" "$libdir"
-	cp "include/*" "$includedir"
+	cp "Release/*.lib" "$libdir/"
+	cp "include/*" "$includedir/"
+	cp "Release/*.dll" "$build/Release/"
+	cp "LICENSE" "$build/Release/LICENSE.libuv"
 	cd "$oldpwd"
 }
 
@@ -92,12 +99,12 @@ mkdir -Force "$libdir"
 mkdir -Force "$includedir"
 
 if ($arg_deps) {
-	BuildDeps $arg_arch $deps $libdir $includedir
+	BuildDeps $arg_arch $deps $libdir $includedir $build
 }
 if ($arg_playd) {
 	BuildPlayd $arg_arch $archdir $build
 }
 if (!($arg_deps -or $arg_playd)) {
-	BuildDeps $arg_arch $deps $libdir $includedir
+	BuildDeps $arg_arch $deps $libdir $includedir $build
 	BuildPlayd $arg_arch $archdir $build
 }
