@@ -43,11 +43,11 @@ test_script:
 
 after_build:
   - cd C:\projects\ury-playd
-  - 7z a playd_%PlatformString%.zip C:\projects\ury-playd\%PLATFORM%\build\Release\playd.exe
+  - 7z a playd_%APPVEYOR_REPO_TAG_NAME%_%PlatformString%.zip C:\projects\ury-playd\%PLATFORM%\build\Release\playd.exe
 
 artifacts:
-  - path: playd_$(PlatformString).zip
-    name: playd $(PlatformString)
+  - path: playd_$(APPVEYOR_REPO_TAG_NAME)_$(PlatformString).zip
+    name: playd $(APPVEYOR_REPO_TAG_NAME) $(PlatformString)
 
 deploy:
   release: $(APPVEYOR_REPO_TAG_NAME)
@@ -55,7 +55,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: g+7eD+rmWu28F2F7iswR5HtuLA39wnUajHLhMfhF/tXskWi/EtdERORXmrWZwZkh
-  artifact: playd_$(PlatformString).zip
+  artifact: playd_$(APPVEYOR_REPO_TAG_NAME)_$(PlatformString).zip
   draft: true
   prerelease: true
   force_update: false
