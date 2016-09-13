@@ -56,8 +56,8 @@ deploy:
   auth_token:
     secure: g+7eD+rmWu28F2F7iswR5HtuLA39wnUajHLhMfhF/tXskWi/EtdERORXmrWZwZkh
   artifact: playd_$(PlatformString).zip
-  draft: false
-  prerelease: false
+  draft: true
+  prerelease: true
   force_update: true
   on:
     appveyor_repo_tag: true
