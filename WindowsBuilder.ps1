@@ -1,15 +1,15 @@
-$project="$pwd"
-$deps="$project\deps"
-$build="$project\build"
-$libdir="$project\lib"
-$includedir="$project\include"
-mkdir -Force "$deps"
-mkdir -Force "$build"
-mkdir -Force "$libdir"
-mkdir -Force "$includedir"
+param (
+	[switch][alias("deps")]$arg_deps,
+	[switch][alias("playd")]$arg_playd,
+	[string][alias("arch")]$arg_arch
+)
 
-function BuildDeps
+function BuildDeps ($arch, $downloads, $libdir, $includedir)
 {
+	$oldpwd = $pwd
+	cd "$downloads"
+	echo $downloads
+
 	# These screw up libuv searching for MSVC.
 	Remove-Item Env:\VCINSTALLDIR -ErrorAction SilentlyContinue
 	Remove-Item Env:\WindowsSDKDir -ErrorAction SilentlyContinue
@@ -17,25 +17,36 @@ function BuildDeps
 	echo "cmake on AppVeyor"
 	cmake -version
 
-	cd "$deps"
-	Invoke-WebRequest "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w64.zip" -OutFile "libsndfile-1.0.27-w64.zip"
-	7z e -o"$libdir" "libsndfile-1.0.27-w64.zip" "lib/*.lib" -r
-	7z e -o"$includedir" "libsndfile-1.0.27-w64.zip" "include/*" -r
+	switch($arch) {
+		"x86" {
+			$url_libsndfile = "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w32.zip"
+		}
+		"x64" {
+			$url_libsndfile = "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w64.zip"
+		}
+	}
+	$url_sdl2 = "https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip"
+	$url_libuv = "https://github.com/libuv/libuv.git"
 
-	Invoke-WebRequest "https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip" -OutFile "SDL2-devel-2.0.4-VC.zip"
-	7z e -o"$libdir" "SDL2-devel-2.0.4-VC.zip" "SDL2-2.0.4/lib/x64/*.lib" -r
-	7z e -o"$includedir" "SDL2-devel-2.0.4-VC.zip" "SDL2-2.0.4/include/*" -r
+	Invoke-WebRequest "$url_libsndfile" -OutFile "libsndfile.zip"
+	7z e -o"$libdir" "libsndfile.zip" "lib/*.lib" -r
+	7z e -o"$includedir" "libsndfile.zip" "include/*" -r
 
-	git clone "https://github.com/libuv/libuv.git"
+	Invoke-WebRequest "$url_sdl2" -OutFile "SDL2-devel-VC.zip"
+	7z e "-o$libdir" "SDL2-devel-VC.zip" "SDL2-2.0.4/lib/$arch/*.lib" -r
+	7z e "-o$includedir" "SDL2-devel-VC.zip" "SDL2-2.0.4/include/*" -r
+
+	git clone "$url_libuv"
 	cd "libuv"
-	cmd /c "vcbuild.bat" "x64" "release" "shared"
+	cmd /c "vcbuild.bat" "$arch" "release" "shared"
 	cp "Release/*.lib" "$libdir"
 	cp "include/*" "$includedir"
-	cd "$project"
+	cd "$oldpwd"
 }
 
-function BuildPlayd
+function BuildPlayd ($arch, $archdir, $build)
 {
+	$oldpwd = $pwd
 	cd "$build"
 
 	#Set environment variables for Visual Studio Command Prompt
@@ -49,17 +60,42 @@ function BuildPlayd
 	popd
 	write-host "`nVisual Studio 2015 Command Prompt variables set." -ForegroundColor Yellow
 
-	cmake "$project" -G "Visual Studio 14 2015 Win64"
-	msbuild playd.sln /p:Configuration="Release" /toolsversion:14.0 /p:Platform="x64" /p:PlatformToolset=v140
-	cd "$project"
+	switch($arch) {
+		"x86" { $cmake_generator = "Visual Studio 14 2015"; $msbuild_platform = "Win32" }
+		"x64" { $cmake_generator = "Visual Studio 14 2015 Win64"; $msbuild_platform = "x64" }
+	}
+	cmake "$project" -G "$cmake_generator" -DCMAKE_PREFIX_PATH="$archdir"
+	msbuild playd.sln /p:Configuration="Release" /toolsversion:14.0 /p:Platform="$msbuild_platform" /p:PlatformToolset=v140
+	cd "$oldpwd"
 }
 
 # Main
-if (!$args[0].CompareTo("deps")) {
-	BuildDeps
-} elseif (!$args[0].CompareTo("playd")) {
-	BuildPlayd
-} else {
-	BuildDeps
-	BuildPlayd
+switch($arg_arch) {
+	"" { $arg_arch = "x86" }
+	"x86" {}
+	"x64" {}
+	default { throw "Invalid architecture '$arg_arch'" }
+}
+
+$project = "$pwd"
+$archdir = "$project\$arg_arch"
+$deps = "$archdir\deps"
+$build = "$archdir\build"
+$libdir = "$archdir\lib"
+$includedir = "$archdir\include"
+
+mkdir -Force "$deps"
+mkdir -Force "$build"
+mkdir -Force "$libdir"
+mkdir -Force "$includedir"
+
+if ($arg_deps) {
+	BuildDeps $arg_arch $deps $libdir $includedir
+}
+if ($arg_playd) {
+	BuildPlayd $arg_arch $archdir $build
+}
+if (!($arg_deps -or $arg_playd)) {
+	BuildDeps $arg_arch $deps $libdir $includedir
+	BuildPlayd $arg_arch $archdir $build
 }

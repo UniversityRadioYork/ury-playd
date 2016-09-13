@@ -10,7 +10,9 @@ os: Visual Studio 2015
 # scripts that are called at very beginning, before repo cloning
 init:
 
-platform: x64
+platform:
+  - x64
+  - x86
 
 configuration: Release
 
@@ -19,15 +21,20 @@ install:
   - set
   - echo cmake on AppVeyor
   - cmake -version
-  - set PYTHON="C:\Python27-x64\python.exe"
+  - ps: >-
+      If ($env:PLATFORM -Match "x64") {
+        $env:PYTHON="C:\Python27-x64\python.exe"
+      } Else {
+        $env:PYTHON="C:\Python27\python.exe"
+      }
   - python --version
-  - ps: .\WindowsBuilder.ps1 deps
+  - ps: .\WindowsBuilder.ps1 -deps -arch "$env:PLATFORM"
 
 build_script:
   - cd c:\projects\ury-playd
-  - ps: .\WindowsBuilder.ps1 playd
+  - ps: .\WindowsBuilder.ps1 -playd -arch "$env:PLATFORM"
 
 test_script:
-  - cd C:\projects\ury-playd\build
+  - cd C:\projects\ury-playd\%PLATFORM%\build
   - ctest --output-on-failure
     -C "%CONFIGURATION%"
