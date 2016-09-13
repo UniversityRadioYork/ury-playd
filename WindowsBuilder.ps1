@@ -28,13 +28,15 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir)
 	$url_sdl2 = "https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip"
 	$url_libuv = "https://github.com/libuv/libuv.git"
 
-	Invoke-WebRequest "$url_libsndfile" -OutFile "libsndfile.zip"
-	7z e -o"$libdir" "libsndfile.zip" "lib/*.lib" -r
-	7z e -o"$includedir" "libsndfile.zip" "include/*" -r
+	$f = "$([System.IO.Path]::GetFileName($url_libsndfile))"
+	Invoke-WebRequest "$url_libsndfile" -OutFile "$f"
+	7z e -o"$libdir" "$f" "lib/*.lib" -r
+	7z e -o"$includedir" "$f" "include/*" -r
 
-	Invoke-WebRequest "$url_sdl2" -OutFile "SDL2-devel-VC.zip"
-	7z e "-o$libdir" "SDL2-devel-VC.zip" "SDL2-2.0.4/lib/$arch/*.lib" -r
-	7z e "-o$includedir" "SDL2-devel-VC.zip" "SDL2-2.0.4/include/*" -r
+	$f = "$([System.IO.Path]::GetFileName($url_sdl2))"
+	Invoke-WebRequest "$url_sdl2" -OutFile "$f"
+	7z e "-o$libdir" "$f" "SDL2-*/lib/$arch/*.lib" -r
+	7z e "-o$includedir" "$f" "SDL2-*/include/*" -r
 
 	git clone "$url_libuv"
 	cd "libuv"
