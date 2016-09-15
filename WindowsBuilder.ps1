@@ -60,6 +60,7 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch
 	& "$sh" "-lc" "cd $gendefdir && ./configure && make && cd $releasedir && $gendefdir/gendef.exe libmpg123*.dll"
 	cd "$releasedir"
 	lib /def:"libmpg123-0.def" /out:"$libdir\libmpg123-0.lib" /machine:"$arch"
+	rm "libmpg123-0.def"
 	cd "$downloads"
 
 	$f = "$([System.IO.Path]::GetFileName($url_libsndfile))"
