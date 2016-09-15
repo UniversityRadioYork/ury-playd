@@ -91,6 +91,17 @@ function BuildPlayd ($arch, $archdir, $build)
 	$oldpwd = $pwd
 	cd "$build"
 
+	switch($arch) {
+		"x86" { $cmake_generator = "Visual Studio 14 2015"; $msbuild_platform = "Win32" }
+		"x64" { $cmake_generator = "Visual Studio 14 2015 Win64"; $msbuild_platform = "x64" }
+	}
+	cmake "$project" -G "$cmake_generator" -DCMAKE_PREFIX_PATH="$archdir"
+	msbuild playd.sln /p:Configuration="Release" /toolsversion:14.0 /p:Platform="$msbuild_platform" /p:PlatformToolset=v140
+	cd "$oldpwd"
+}
+
+function Load-MSVC-Vars
+{
 	#Set environment variables for Visual Studio Command Prompt
 	pushd "$env:VS140COMNTOOLS"
 	cmd /c "vsvars32.bat&set" |
@@ -101,14 +112,6 @@ function BuildPlayd ($arch, $archdir, $build)
 	}
 	popd
 	write-host "`nVisual Studio 2015 Command Prompt variables set." -ForegroundColor Yellow
-
-	switch($arch) {
-		"x86" { $cmake_generator = "Visual Studio 14 2015"; $msbuild_platform = "Win32" }
-		"x64" { $cmake_generator = "Visual Studio 14 2015 Win64"; $msbuild_platform = "x64" }
-	}
-	cmake "$project" -G "$cmake_generator" -DCMAKE_PREFIX_PATH="$archdir"
-	msbuild playd.sln /p:Configuration="Release" /toolsversion:14.0 /p:Platform="$msbuild_platform" /p:PlatformToolset=v140
-	cd "$oldpwd"
 }
 
 # Main
@@ -118,6 +121,8 @@ switch($arg_arch) {
 	"x64" {}
 	default { throw "Invalid architecture '$arg_arch'" }
 }
+
+Load-MSVC-Vars
 
 $project = "$pwd"
 $archdir = "$project\$arg_arch"
