@@ -1,10 +1,11 @@
 param (
 	[switch][alias("deps")]$arg_deps,
 	[switch][alias("playd")]$arg_playd,
-	[string][alias("arch")]$arg_arch
+	[string][alias("arch")]$arg_arch,
+	[string][alias("sh")]$arg_sh
 )
 
-function BuildDeps ($arch, $downloads, $libdir, $includedir, $build)
+function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh)
 {
 	$oldpwd = $pwd
 	cd "$downloads"
@@ -20,15 +21,43 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build)
 	switch($arch) {
 		"x86" {
 			$url_libsndfile = "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w32.zip"
+			$url_mpg123 = "https://www.mpg123.de/download/win32/mpg123-1.23.4-x86.zip"
 		}
 		"x64" {
 			$url_libsndfile = "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w64.zip"
+			$url_mpg123 = "https://www.mpg123.de/download/win64/mpg123-1.23.4-x86-64.zip"
 		}
 	}
 	$url_sdl2 = "https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip"
 	$url_libuv = "https://github.com/libuv/libuv.git"
+	$url_mingw = "https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v4.0.6.zip"
+	$url_mpg123_src = "https://www.mpg123.de/download/mpg123-1.23.4.tar.bz2"
 
 	mkdir -Force "$build\Release"
+
+	$wc = New-Object System.Net.WebClient
+
+	$f = "$([System.IO.Path]::GetFileName($url_mpg123))"
+	$wc.DownloadFile("$url_mpg123", "$downloads\$f")
+	7z e -o"$build\Release" "$f" "mpg123*/libmpg123*.dll"
+
+	$f = "$([System.IO.Path]::GetFileName($url_mpg123_src))"
+	$wc.DownloadFile("$url_mpg123_src", "$downloads\$f")
+	7z e "$f"
+	$f = "mpg123*.tar"
+	7z e -o"$includedir" "$f" "mpg123*/ports/MSVC++/*.h"
+	7z e -o"$includedir" "$f" "mpg123*/src/libmpg123/*123*.h*" # mpg123.h.in and fmt123.h
+
+	$f = "$([System.IO.Path]::GetFileName($url_mingw))"
+	$wc.DownloadFile("$url_mingw", "$downloads\$f")
+	7z x "$f" "mingw*/mingw-w64-tools/gendef"
+
+	$gendefdir = "$downloads/mingw*/mingw-w64-tools/gendef".Replace("\", "\\\")
+	$releasedir = "$build/Release".Replace("\", "\\\")
+	& "$sh" "-lc" "cd $gendefdir && ./configure && make && cd $releasedir && $gendefdir/gendef.exe libmpg123*.dll"
+	cd "$releasedir"
+	lib /def:"libmpg123-0.def" /out:"$libdir\libmpg123-0.lib" /machine:"$arch"
+	cd "$downloads"
 
 	$f = "$([System.IO.Path]::GetFileName($url_libsndfile))"
 	Invoke-WebRequest "$url_libsndfile" -OutFile "$f"
@@ -100,12 +129,12 @@ mkdir -Force "$libdir"
 mkdir -Force "$includedir"
 
 if ($arg_deps) {
-	BuildDeps $arg_arch $deps $libdir $includedir $build
+	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh
 }
 if ($arg_playd) {
 	BuildPlayd $arg_arch $archdir $build
 }
 if (!($arg_deps -or $arg_playd)) {
-	BuildDeps $arg_arch $deps $libdir $includedir $build
+	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh
 	BuildPlayd $arg_arch $archdir $build
 }
