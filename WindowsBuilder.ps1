@@ -5,7 +5,7 @@ param (
 	[string][alias("sh")]$arg_sh
 )
 
-function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh)
+function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch)
 {
 	$oldpwd = $pwd
 	cd "$downloads"
@@ -47,6 +47,9 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh)
 	$f = "mpg123*.tar"
 	7z e -o"$includedir" "$f" "mpg123*/ports/MSVC++/*.h"
 	7z e -o"$includedir" "$f" "mpg123*/src/libmpg123/*123*.h*" # mpg123.h.in and fmt123.h
+	$includedir_cygwin = "$includedir".Replace("\", "\\\")
+	$patch_cygwin = "$patch".Replace("\", "\\\")
+	& "$sh" "-lc" "cd $includedir_cygwin && patch -p0 < $patch_cygwin/mpg123.patch"	
 
 	$f = "$([System.IO.Path]::GetFileName($url_mingw))"
 	$wc.DownloadFile("$url_mingw", "$downloads\$f")
@@ -122,6 +125,7 @@ $deps = "$archdir\deps"
 $build = "$archdir\build"
 $libdir = "$archdir\lib"
 $includedir = "$archdir\include"
+$patch = "$project\patch"
 
 mkdir -Force "$deps"
 mkdir -Force "$build"
@@ -129,12 +133,12 @@ mkdir -Force "$libdir"
 mkdir -Force "$includedir"
 
 if ($arg_deps) {
-	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh
+	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh $patch
 }
 if ($arg_playd) {
 	BuildPlayd $arg_arch $archdir $build
 }
 if (!($arg_deps -or $arg_playd)) {
-	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh
+	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh $patch
 	BuildPlayd $arg_arch $archdir $build
 }

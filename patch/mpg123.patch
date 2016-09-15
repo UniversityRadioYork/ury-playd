@@ -1,0 +1,29 @@
+--- mpg123.h	2016-05-11 09:31:14.000000000 +0100
++++ mpg123new.h	2016-09-15 07:52:24.152407900 +0100
+@@ -30,6 +30,26 @@
+ #define MPG123_NO_CONFIGURE
+ #include "mpg123.h.in" /* Yes, .h.in; we include the configure template! */
+ 
++/** Defines needed for MS Visual Studio(tm) DLL builds.
++ * Every public function must be prefixed with MPG123_EXPORT. When building 
++ * the DLL ensure to define BUILD_MPG123_DLL. This makes the function accessible
++ * for clients and includes it in the import library which is created together
++ * with the DLL. When consuming the DLL ensure to define LINK_MPG123_DLL which
++ * imports the functions from the DLL. 
++ */
++#ifdef BUILD_MPG123_DLL
++/* The dll exports. */
++#define MPG123_EXPORT __declspec(dllexport)
++#else
++#ifdef LINK_MPG123_DLL
++/* The exe imports. */
++#define MPG123_EXPORT __declspec(dllimport)
++#else
++/* Nothing on normal/UNIX builds */
++#define MPG123_EXPORT
++#endif
++#endif
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
