@@ -41,7 +41,8 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build)
 	7z e -o"$libdir" "$f" "SDL2-*/lib/$arch/*.lib" -r
 	7z e -o"$includedir" "$f" "SDL2-*/include/*" -r
 	7z e -o"$build\Release" "$f" "SDL2-*/COPYING.txt" "SDL2-*/lib/$arch/*.dll"
-	mv "$build\Release\COPYING.txt" "$build\Release\LICENSE.SDL2"
+	cp "$build\Release\COPYING.txt" "$build\Release\LICENSE.SDL2"
+	rm -Force "$build\Release\COPYING.txt"
 
 	git clone "$url_libuv"
 	cd "libuv"
