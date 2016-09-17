@@ -64,13 +64,13 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch
 	cd "$downloads"
 
 	$f = "$([System.IO.Path]::GetFileName($url_libsndfile))"
-	Invoke-WebRequest "$url_libsndfile" -OutFile "$f"
+	$wc.DownloadFile("$url_libsndfile", "$downloads\$f")
 	7z e -o"$libdir" "$f" "lib/*.lib" -r
 	7z e -o"$includedir" "$f" "include/*" -r
 	7z e -o"$build\Release" "$f" "bin/*.dll"
 
 	$f = "$([System.IO.Path]::GetFileName($url_sdl2))"
-	Invoke-WebRequest "$url_sdl2" -OutFile "$f"
+	$wc.DownloadFile("$url_sdl2", "$downloads\$f")
 	7z e -o"$libdir" "$f" "SDL2-*/lib/$arch/*.lib" -r
 	7z e -o"$includedir" "$f" "SDL2-*/include/*" -r
 	7z e -o"$build\Release" "$f" "SDL2-*/COPYING.txt" "SDL2-*/lib/$arch/*.dll"
