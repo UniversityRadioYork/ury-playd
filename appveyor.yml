@@ -16,6 +16,9 @@ platform:
 
 configuration: Release
 
+environment:
+  project: C:\projects\ury-playd
+
 install:
   # show all available env vars
   - set
@@ -33,19 +36,19 @@ install:
   - ps: .\WindowsBuilder.ps1 -deps -arch "$env:PLATFORM" -sh "C:\cygwin\bin\bash.exe"
 
 build_script:
-  - cd c:\projects\ury-playd
+  - cd "%project%"
   - ps: .\WindowsBuilder.ps1 -playd -arch "$env:PLATFORM"
 
 test_script:
-  - cd C:\projects\ury-playd\%PLATFORM%\build
+  - cd "%project%\%PLATFORM%\build"
   - ctest --output-on-failure
     -C "%CONFIGURATION%"
 
 after_build:
   - set zipname="playd_%APPVEYOR_REPO_TAG_NAME%_%PlatformString%.zip"
-  - set zippath="C:\projects\ury-playd\%zipname%"
+  - set zippath="%project%\%zipname%"
   - 7z a "%zippath%" LICENSE*
-  - cd C:\projects\ury-playd\%PLATFORM%\build\Release
+  - cd "%project%\%PLATFORM%\build\Release"
   - 7z a "%zippath%" *
 
 artifacts:
