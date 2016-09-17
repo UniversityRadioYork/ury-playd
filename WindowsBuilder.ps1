@@ -70,11 +70,12 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch
 
 	Write-Yellow "Compiling gendef..."
 	$gendef_cygwin = Path-Windows-to-Cygwin "$downloads/mingw*/mingw-w64-tools/gendef"
-	$releasedir_cygwin = Path-Windows-to-Cygwin "$build/Release"
 	& "$sh" "-lc" "cd $gendef_cygwin && ./configure && make"
 
 	Write-Yellow "Running gendef on MPG123..."
-	& "$sh" "-lc" "cd $releasedir && $gendefdir/gendef.exe libmpg123*.dll"
+	$releasedir = "$build\Release"
+	$releasedir_cygwin = Path-Windows-to-Cygwin "$releasedir"
+	& "$sh" "-lc" "cd $releasedir_cygwin && $gendef_cygwin/gendef.exe libmpg123*.dll"
 
 	Write-Yellow "Creating MPG123 lib..."
 	cd "$releasedir"
