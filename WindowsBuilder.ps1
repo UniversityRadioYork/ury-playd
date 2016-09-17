@@ -9,6 +9,10 @@ function Write-Yellow($message) {
 	write-host "`n$message`n" -ForegroundColor Yellow
 }
 
+function Path-Windows-to-Cygwin($path) {
+	return $path.Replace("\", "\\\")
+}
+
 function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch)
 {
 	Write-Yellow "Building dependencies for ury-playd on $arch..."
@@ -55,8 +59,8 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch
 	7z e -o"$includedir" "$f" "mpg123*/src/libmpg123/*123*.h*" # mpg123.h.in and fmt123.h
 
 	Write-Yellow "Patching MPG123..."
-	$includedir_cygwin = "$includedir".Replace("\", "\\\")
-	$patch_cygwin = "$patch".Replace("\", "\\\")
+	$includedir_cygwin = Path-Windows-to-Cygwin "$includedir"
+	$patch_cygwin = Path-Windows-to-Cygwin "$patch"
 	& "$sh" "-lc" "cd $includedir_cygwin && patch -p0 < $patch_cygwin/mpg123.patch"	
 
 	Write-Yellow "Downloading gendef..."
@@ -65,9 +69,9 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch
 	7z x "$f" "mingw*/mingw-w64-tools/gendef"
 
 	Write-Yellow "Compiling gendef..."
-	$gendefdir = "$downloads/mingw*/mingw-w64-tools/gendef".Replace("\", "\\\")
-	$releasedir = "$build/Release".Replace("\", "\\\")
-	& "$sh" "-lc" "cd $gendefdir && ./configure && make"
+	$gendef_cygwin = Path-Windows-to-Cygwin "$downloads/mingw*/mingw-w64-tools/gendef"
+	$releasedir_cygwin = Path-Windows-to-Cygwin "$build/Release"
+	& "$sh" "-lc" "cd $gendef_cygwin && ./configure && make"
 
 	Write-Yellow "Running gendef on MPG123..."
 	& "$sh" "-lc" "cd $releasedir && $gendefdir/gendef.exe libmpg123*.dll"
