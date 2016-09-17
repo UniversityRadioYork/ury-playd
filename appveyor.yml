@@ -48,7 +48,7 @@ after_build:
   - set zipname="playd_%APPVEYOR_REPO_TAG_NAME%_%PlatformString%.zip"
   - set zippath="%project%\%zipname%"
   - 7z a "%zippath%" LICENSE*
-  - cd "%project%\%PLATFORM%\build\Release"
+  - cd "%project%\%PLATFORM%\build\%CONFIGURATION%"
   - 7z a "%zippath%" *
 
 artifacts:
