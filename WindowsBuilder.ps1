@@ -150,6 +150,10 @@ switch($arg_arch) {
 	default { throw "Invalid architecture '$arg_arch'" }
 }
 
+if ($arg_deps -and !$arg_sh) {
+	throw "Cygwin shell required for building dependencies. Use -sh path\to\bash.exe"
+}
+
 Load-MSVC-Vars
 
 $project = "$pwd"
