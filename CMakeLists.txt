@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.8)
-cmake_policy(SET CMP0054 OLD)
 
 project(playd)
 list(APPEND CMAKE_MODULE_PATH "${playd_SOURCE_DIR}/cmake_scripts")
