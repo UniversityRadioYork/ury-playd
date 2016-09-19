@@ -1,8 +1,7 @@
 param (
 	[switch][alias("deps")]$arg_deps,
 	[switch][alias("playd")]$arg_playd,
-	[string][alias("arch")]$arg_arch,
-	[string][alias("sh")]$arg_sh
+	[string][alias("arch")]$arg_arch
 )
 
 function Write-Yellow($message) {
@@ -13,7 +12,7 @@ function Path-Windows-to-Cygwin($path) {
 	return $path.Replace("\", "\\\")
 }
 
-function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch)
+function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh)
 {
 	Write-Yellow "Building dependencies for ury-playd on $arch..."
 	$oldpwd = $pwd
@@ -29,56 +28,35 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch
 	switch($arch) {
 		"x86" {
 			$url_libsndfile = "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w32.zip"
-			$url_mpg123 = "https://www.mpg123.de/download/win32/mpg123-1.23.4-x86.zip"
+			$url_mpg123 = "https://www.mpg123.de/download/win32/mpg123-1.23.6-x86.zip"
 		}
 		"x64" {
 			$url_libsndfile = "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w64.zip"
-			$url_mpg123 = "https://www.mpg123.de/download/win64/mpg123-1.23.4-x86-64.zip"
+			$url_mpg123 = "https://www.mpg123.de/download/win64/mpg123-1.23.6-x86-64.zip"
 		}
 	}
 	$url_sdl2 = "https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip"
 	$url_libuv = "https://github.com/libuv/libuv.git"
 	$url_mingw = "https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v4.0.6.zip"
-	$url_mpg123_src = "https://www.mpg123.de/download/mpg123-1.23.4.tar.bz2"
 
-	mkdir -Force "$build\Release"
+	$releasedir = "$build\Release"
+	mkdir -Force "$releasedir"
 
 	$wc = New-Object System.Net.WebClient
 
 	Write-Yellow "Downloading MPG123 DLL..."
 	$f = "$([System.IO.Path]::GetFileName($url_mpg123))"
 	$wc.DownloadFile("$url_mpg123", "$downloads\$f")
-	7z e -o"$build\Release" "$f" "mpg123*/libmpg123*.dll"
-
-	Write-Yellow "Downloading MPG123 includes..."
-	$f = "$([System.IO.Path]::GetFileName($url_mpg123_src))"
-	$wc.DownloadFile("$url_mpg123_src", "$downloads\$f")
-	7z e "$f"
-	$f = "mpg123*.tar"
-	7z e -o"$includedir" "$f" "mpg123*/ports/MSVC++/*.h"
-	7z e -o"$includedir" "$f" "mpg123*/src/libmpg123/*123*.h*" # mpg123.h.in and fmt123.h
-
-	Write-Yellow "Patching MPG123..."
-	$includedir_cygwin = Path-Windows-to-Cygwin "$includedir"
-	$patch_cygwin = Path-Windows-to-Cygwin "$patch"
-	& "$sh" "-lc" "cd $includedir_cygwin && patch -p0 < $patch_cygwin/mpg123.patch"	
-
-	Write-Yellow "Downloading gendef..."
-	$f = "$([System.IO.Path]::GetFileName($url_mingw))"
-	$wc.DownloadFile("$url_mingw", "$downloads\$f")
-	7z x "$f" "mingw*/mingw-w64-tools/gendef"
-
-	Write-Yellow "Compiling gendef..."
-	$gendef_cygwin = Path-Windows-to-Cygwin "$downloads/mingw*/mingw-w64-tools/gendef"
-	& "$sh" "-lc" "cd $gendef_cygwin && ./configure && make"
-
-	Write-Yellow "Running gendef on MPG123..."
-	$releasedir = "$build\Release"
-	$releasedir_cygwin = Path-Windows-to-Cygwin "$releasedir"
-	& "$sh" "-lc" "cd $releasedir_cygwin && $gendef_cygwin/gendef.exe libmpg123*.dll"
+	7z e -o"$releasedir" "$f" "mpg123*/libmpg123*.dll"
+	7z e -o"$releasedir" "$f" "mpg123*/libmpg123*.def"
+	7z e -o"$includedir" "$f" "mpg123*/*.h"
+	7z e -o"$releasedir" "$f" "mpg123*/COPYING.txt"
+	cp "$releasedir\COPYING.txt" "$releasedir\LICENSE.MPG123"
+	rm -Force "$releasedir\COPYING.txt"
 
 	Write-Yellow "Creating MPG123 lib..."
 	cd "$releasedir"
+	mv "libmpg123-0.dll.def" "libmpg123-0.def"
 	lib /def:"libmpg123-0.def" /out:"$libdir\libmpg123-0.lib" /machine:"$arch"
 	rm "libmpg123-0.def"
 
@@ -88,16 +66,16 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch
 	$wc.DownloadFile("$url_libsndfile", "$downloads\$f")
 	7z e -o"$libdir" "$f" "lib/*.lib" -r
 	7z e -o"$includedir" "$f" "include/*" -r
-	7z e -o"$build\Release" "$f" "bin/*.dll"
+	7z e -o"$releasedir" "$f" "bin/*.dll"
 
 	Write-Yellow "Downloading SDL2..."
 	$f = "$([System.IO.Path]::GetFileName($url_sdl2))"
 	$wc.DownloadFile("$url_sdl2", "$downloads\$f")
 	7z e -o"$libdir" "$f" "SDL2-*/lib/$arch/*.lib" -r
 	7z e -o"$includedir" "$f" "SDL2-*/include/*" -r
-	7z e -o"$build\Release" "$f" "SDL2-*/COPYING.txt" "SDL2-*/lib/$arch/*.dll"
-	cp "$build\Release\COPYING.txt" "$build\Release\LICENSE.SDL2"
-	rm -Force "$build\Release\COPYING.txt"
+	7z e -o"$releasedir" "$f" "SDL2-*/COPYING.txt" "SDL2-*/lib/$arch/*.dll"
+	cp "$releasedir\COPYING.txt" "$releasedir\LICENSE.SDL2"
+	rm -Force "$releasedir\COPYING.txt"
 
 	Write-Yellow "Downloading libuv..."
 	git clone "$url_libuv"
@@ -106,8 +84,8 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh, $patch
 	cmd /c "vcbuild.bat" "$arch" "release" "shared"
 	cp "Release/*.lib" "$libdir/"
 	cp "include/*" "$includedir/"
-	cp "Release/*.dll" "$build/Release/"
-	cp "LICENSE" "$build/Release/LICENSE.libuv"
+	cp "Release/*.dll" "$releasedir/"
+	cp "LICENSE" "$releasedir/LICENSE.libuv"
 	cd "$oldpwd"
 }
 
@@ -150,10 +128,6 @@ switch($arg_arch) {
 	default { throw "Invalid architecture '$arg_arch'" }
 }
 
-if ($arg_deps -and !$arg_sh) {
-	throw "Cygwin shell required for building dependencies. Use -sh path\to\bash.exe"
-}
-
 Load-MSVC-Vars
 
 $project = "$pwd"
@@ -171,12 +145,12 @@ mkdir -Force "$libdir"
 mkdir -Force "$includedir"
 
 if ($arg_deps) {
-	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh $patch
+	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh
 }
 if ($arg_playd) {
 	BuildPlayd $arg_arch $archdir $build
 }
 if (!($arg_deps -or $arg_playd)) {
-	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh $patch
+	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh
 	BuildPlayd $arg_arch $archdir $build
 }

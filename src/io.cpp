@@ -26,7 +26,7 @@
 #undef UNICODE
 // Use the same ssize_t as libmpg123 on Windows.
 #ifdef _MSC_VER
-typedef long ssize_t;
+typedef ptrdiff_t ssize_t;
 #define _SSIZE_T_
 #define _SSIZE_T_DEFINED
 #endif
