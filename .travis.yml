@@ -35,4 +35,4 @@ script:
 
 # coveralls doesn't like gcc (segfaults)
 after_success:
-  - if [ "$CXX" == "clang++-3.6" ]; then coveralls -b . --exclude src/tests --exclude src/contrib --gcov="`which llvm-cov-3.6`"; fi
+  - if [ "$CXX" == "clang++-3.6" ] && [ "$USE_CMAKE" == "FALSE" ]; then coveralls -b . --exclude src/tests --exclude src/contrib --gcov="`which llvm-cov-3.6`"; fi
