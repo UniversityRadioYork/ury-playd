@@ -60,7 +60,7 @@ deploy:
   description: ''
   provider: GitHub
   auth_token:
-    secure: g+7eD+rmWu28F2F7iswR5HtuLA39wnUajHLhMfhF/tXskWi/EtdERORXmrWZwZkh
+    secure: 03tkU2QJcSu1MpxDa6+BKaq5Yq+t/JpO5SxTaW/HmdjrrJf8wJSxF/dECbCEfGfk
   artifact: playd_$(APPVEYOR_REPO_TAG_NAME)_$(PlatformString).zip
   draft: true
   prerelease: true
