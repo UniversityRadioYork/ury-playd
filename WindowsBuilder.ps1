@@ -77,7 +77,6 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build)
 	Remove-Item Env:\VCINSTALLDIR -ErrorAction SilentlyContinue
 	Remove-Item Env:\WindowsSDKDir -ErrorAction SilentlyContinue
 
-	echo "cmake on AppVeyor"
 	cmake -version
 
 	switch($arch) {
