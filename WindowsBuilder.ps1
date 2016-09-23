@@ -11,6 +11,12 @@
 
 	Currently, only the Release configuration is supported (and hard-coded), because we are not building debug libraries.
 
+	DEPENDENCIES:
+
+	Python 2.7 is required for building libuv.
+	Set the PYTHON environment variable to the path to python.exe, or add the path to the PATH environment vairable.
+	PS C:\>$env:PYTHON = "C:\Python27\python.exe"
+
 .PARAMETER arch
 	Architecture to build for: x86 or x64.
 .PARAMETER deps
@@ -60,6 +66,12 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build)
 	Write-Yellow "Building dependencies for ury-playd on $arch..."
 	$oldpwd = $pwd
 	cd "$downloads"
+
+	# Check for Python 2.7, for building libuv.
+	$vstring = "Python 2.7"
+	write-host "`nChecking for $vstring..." -ForegroundColor Yellow -NoNewline
+	Check-Python $vstring
+	write-host " found!`n" -ForegroundColor Yellow
 
 	# These screw up libuv searching for MSVC.
 	Remove-Item Env:\VCINSTALLDIR -ErrorAction SilentlyContinue
@@ -161,6 +173,46 @@ function Load-MSVC-Vars
 	}
 	popd
 	Write-Yellow "Visual Studio 2015 Command Prompt variables set."
+}
+
+# Check if an exe is Python 2.7.
+function Check-Python-Version ($pypath, $vstring)
+{
+	$python_version = & "$pypath" "--version" 2>&1
+	return $python_version -Match $vstring
+}
+
+# Check for Python 2.7, and throw an exception if not successful.
+function Check-Python ($vstring)
+{
+	if (Test-Path Env:\PYTHON)
+	{
+		if (!(Test-Path $env:PYTHON))
+		{
+			throw "Invalid path to Python '$env:PYTHON' in `$env:PYTHON."
+		}
+
+		if (Check-Python-Version $env:PYTHON $vstring)
+		{
+			return
+		}
+		else
+		{
+			throw "Invalid Python version for '$env:PYTHON' in `$env:PYTHON. We require 2.7."
+		}
+	}
+	if ((Get-Command "python.exe" -ErrorAction SilentlyContinue) -eq $null)
+	{
+		throw "Python not found in `$env:PATH or `$env:PYTHON."
+	}
+	else
+	{
+		$pypath = Get-Command "python.exe"
+		if (!(Check-Python-Version $pypath $vstring))
+		{
+			throw "Invalid Python version in `$env:PATH. We require 2.7."
+		}
+	}
 }
 
 # Main
