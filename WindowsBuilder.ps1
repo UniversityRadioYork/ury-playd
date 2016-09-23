@@ -1,7 +1,50 @@
+<#
+.SYNOPSIS
+	Script for building ury-playd and its dependencies on Windows.
+.DESCRIPTION
+	This script automates all the steps for building ury-playd on Windows.
+	It downloads the dependencies and compiles them where necessary.
+	It builds ury-playd using the downloaded import libraries and headers, and puts the built exes, library DLLs, and licenses in the same folder.
+
+	All files for a build go in a folder named after the target architecture, e.g. x86.
+	The directory containing exes is $arch\build\$configuration, e.g. x86\build\Release.
+
+	Currently, only the Release configuration is supported (and hard-coded), because we are not building debug libraries.
+
+.PARAMETER arch
+	Architecture to build for: x86 or x64.
+.PARAMETER deps
+	Enable to build ury-playd's dependencies.
+.PARAMETER playd
+	Enable to build ury-playd.
+
+.EXAMPLE
+	.\WindowsBuilder.ps1 -arch x86 -deps
+
+	Builds the dependencies for ury-playd for x86.
+.EXAMPLE
+	.\WindowsBuilder.ps1 -arch x86 -playd
+
+	Builds ury-playd for x86. Requires the dependencies to have already been built.
+.EXAMPLE
+	.\WindowsBuilder.ps1 -arch x64
+
+	Builds ury-playd and its dependencies for x64.
+
+.INPUTS
+	None. You cannot pipe objects to WindowsBuilder.
+.OUTPUTS
+	The build log.
+
+.LINK
+	https://github.com/UniversityRadioYork/ury-playd
+#>
+
+[CmdletBinding(PositionalBinding=$False)]
 param (
-	[switch][alias("deps")]$arg_deps,
-	[switch][alias("playd")]$arg_playd,
-	[string][alias("arch")]$arg_arch
+	[switch]$deps,
+	[switch]$playd,
+	[Parameter(Mandatory=$True)][string]$arch
 )
 
 function Write-Yellow($message) {
@@ -12,7 +55,7 @@ function Path-Windows-to-Cygwin($path) {
 	return $path.Replace("\", "\\\")
 }
 
-function BuildDeps ($arch, $downloads, $libdir, $includedir, $build, $sh)
+function BuildDeps ($arch, $downloads, $libdir, $includedir, $build)
 {
 	Write-Yellow "Building dependencies for ury-playd on $arch..."
 	$oldpwd = $pwd
@@ -121,36 +164,36 @@ function Load-MSVC-Vars
 }
 
 # Main
-switch($arg_arch) {
-	"" { $arg_arch = "x86" }
+switch($arch) {
+	"" { $arch = "x86" }
 	"x86" {}
 	"x64" {}
-	default { throw "Invalid architecture '$arg_arch'" }
+	default { throw "Invalid architecture '$arch'" }
 }
 
 Load-MSVC-Vars
 
 $project = "$pwd"
-$archdir = "$project\$arg_arch"
-$deps = "$archdir\deps"
+$archdir = "$project\$arch"
+$depsdir = "$archdir\deps"
 $build = "$archdir\build"
 $libdir = "$archdir\lib"
 $includedir = "$archdir\include"
 $patch = "$project\patch"
 
 Write-Yellow "Making directories..."
-mkdir -Force "$deps"
+mkdir -Force "$depsdir"
 mkdir -Force "$build"
 mkdir -Force "$libdir"
 mkdir -Force "$includedir"
 
-if ($arg_deps) {
-	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh
+if ($deps) {
+	BuildDeps $arch $depsdir $libdir $includedir $build
 }
-if ($arg_playd) {
-	BuildPlayd $arg_arch $archdir $build
+if ($playd) {
+	BuildPlayd $arch $archdir $build
 }
-if (!($arg_deps -or $arg_playd)) {
-	BuildDeps $arg_arch $deps $libdir $includedir $build $arg_sh
-	BuildPlayd $arg_arch $archdir $build
+if (!($deps -or $playd)) {
+	BuildDeps $arch $depsdir $libdir $includedir $build
+	BuildPlayd $arch $archdir $build
 }
