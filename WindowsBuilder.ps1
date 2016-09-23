@@ -168,7 +168,7 @@ switch($arch) {
 	"" { $arch = "x86" }
 	"x86" {}
 	"x64" {}
-	default { throw "Invalid architecture '$arch'" }
+	default { throw "Invalid architecture '$arch'. Run Get-Help on this script for more info." }
 }
 
 Load-MSVC-Vars
