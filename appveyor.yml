@@ -8,22 +8,27 @@
 os: Visual Studio 2015
 
 matrix:
-  fast_finish: true
+  # Abort all the builds as soon as one fails.
+  fast_finish: true 
 
+# Build for x86 and x64.
 platform:
   - x64
   - x86
 
+# Build only in the Release configuration, because we don't have debug libs.
 configuration: Release
 
+# Environment variables shared between all stanzas below.
 environment:
-  project: C:\projects\ury-playd
+  project: C:\projects\%APPVEYOR_PROJECT_NAME%
 
+# Build dependencies.
 install:
-  # show all available env vars
-  - set
-  - echo cmake on AppVeyor
+  # Show all env vars.
   - cmake -version
+  - set
+  # Set Python version, and PlatformString which goes in the zip filename.
   - ps: >-
       If ($env:PLATFORM -Match "x64") {
         $env:PYTHON="C:\Python27-x64\python.exe"
@@ -33,17 +38,22 @@ install:
         $env:PlatformString="win32"
       }
   - python --version
-  - ps: .\WindowsBuilder.ps1 -deps -arch "$env:PLATFORM" -sh "C:\cygwin\bin\bash.exe"
+  - ps: .\WindowsBuilder.ps1 -deps -arch "$env:PLATFORM"
 
+# Build playd.
 build_script:
   - cd "%project%"
   - ps: .\WindowsBuilder.ps1 -playd -arch "$env:PLATFORM"
 
+# Run tests.
 test_script:
   - cd "%project%\%PLATFORM%\build"
   - ctest --output-on-failure
     -C "%CONFIGURATION%"
 
+# Zip up all the exes, DLLs, and licenses.
+# If not building a tag, the zip name has two underscores,
+# e.g. playd__win32.zip. If it's a tag, it's like playd_v1.0.0_win32.zip.
 after_build:
   - set zipname="playd_%APPVEYOR_REPO_TAG_NAME%_%PlatformString%.zip"
   - set zippath="%project%\%zipname%"
@@ -51,10 +61,14 @@ after_build:
   - cd "%project%\%PLATFORM%\build\%CONFIGURATION%"
   - 7z a "%zippath%" *
 
+# Make an artifact out of the zip. Artifacts for all builds are available from
+# the Appveyor CI interface, or from the API.
 artifacts:
   - path: playd_$(APPVEYOR_REPO_TAG_NAME)_$(PlatformString).zip
     name: playd $(APPVEYOR_REPO_TAG_NAME) $(PlatformString)
 
+# When building a tag, create a GitHub release (if it doesn't already exist),
+# and push the zip to it.
 deploy:
   release: $(APPVEYOR_REPO_TAG_NAME)
   description: ''
