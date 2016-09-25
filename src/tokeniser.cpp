@@ -9,15 +9,14 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cctype>
-#include <cstdint>
+#include <locale>
 
 #include "response.hpp"
 
 #include "tokeniser.hpp"
 
 Tokeniser::Tokeniser()
-    : escape_next(false), in_word(false), quote_type(Tokeniser::QuoteType::NONE)
+    : escape_next(false), in_word(false), quote_type(QuoteType::NONE)
 {
 }
 
@@ -81,8 +80,7 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 						break;
 
 					default:
-						isspace(c) ? this->EndWord()
-						           : this->Push(c);
+						isspace(c, std::locale::classic()) ? this->EndWord() : this->Push(c);
 						break;
 				}
 				break;
@@ -98,7 +96,7 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 void Tokeniser::Push(const char c)
 {
 	assert(this->escape_next ||
-	       !(this->quote_type == QuoteType::NONE && isspace(c)));
+	       !(this->quote_type == QuoteType::NONE && isspace(c, std::locale::classic())));
 	this->in_word = true;
 	this->current_word.push_back(c);
 	this->escape_next = false;
