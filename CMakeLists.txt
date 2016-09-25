@@ -69,7 +69,6 @@ set(SRCS ${SRCS}
   src/audio/audio_source.cpp
   src/audio/ringbuffer.cpp
   src/audio/sample_formats.cpp
-  src/contrib/pa_ringbuffer/pa_ringbuffer.c
   )
 set(tests_SRCS ${tests_SRCS}
   src/tests/dummy_audio_sink.cpp

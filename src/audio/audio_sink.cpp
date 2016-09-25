@@ -60,7 +60,7 @@ static void SDLCallback(void *vsink, std::uint8_t *data, int len)
 
 SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
     : bytes_per_sample(source.BytesPerSample()),
-      ring_buf(RINGBUF_POWER, source.BytesPerSample()),
+      ring_buf((1 << RINGBUF_POWER) * source.BytesPerSample()),
       position_sample_count(0),
       source_out(false),
       state(Audio::State::STOPPED)
@@ -170,25 +170,27 @@ void SdlAudioSink::Transfer(AudioSink::TransferIterator &start,
 	// No point transferring 0 bytes.
 	if (start == end) return;
 
-	unsigned long bytes = std::distance(start, end);
+	size_t bytes = std::distance(start, end);
 	// There should be a whole number of samples being transferred.
 	assert(bytes % bytes_per_sample == 0);
 	assert(0 < bytes);
 
-	size_t samples = bytes / this->bytes_per_sample;
-
-	// Only transfer as many samples as the ring buffer can take.
+	// Only transfer as many bytes as the ring buffer can take.
 	// Don't bother trying to write 0 samples!
-	auto count = std::min(samples, this->ring_buf.WriteCapacity());
+	auto count = std::min(bytes, this->ring_buf.WriteCapacity());
 	if (count == 0) return;
+    // The above should give us back a whole number of samples,
+    // since we always store and read from the ringbuffer in samples.
+    assert (count % bytes_per_sample == 0);
 
 	auto start_ptr = reinterpret_cast<char *>(&*start);
 	unsigned long written_count = this->ring_buf.Write(start_ptr, count);
-	// Since we never write more than the ring buffer can take, the written
-	// count should equal the requested written count.
+	// Since we never write more than the ring buffer can take, and we're
+    // the only thread writing, the written count should equal the requested
+    // written count.
 	assert(written_count == count);
 
-	start += (written_count * this->bytes_per_sample);
+	start += written_count;
 	assert(start <= end);
 }
 
@@ -197,17 +199,18 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	assert(out != nullptr);
 
 	assert(0 <= nbytes);
-	unsigned long lnbytes = static_cast<unsigned long>(nbytes);
+    // How many bytes do we want to pull out of the ring buffer?
+	unsigned long req_bytes = static_cast<unsigned long>(nbytes);
 
 	// Make sure anything not filled up with sound later is set to silence.
 	// This is slightly inefficient (two writes to sound-filled regions
 	// instead of one), but more elegant in failure cases.
-	memset(out, 0, lnbytes);
+	memset(out, 0, req_bytes);
 
 	// If we're not supposed to be playing, don't play anything.
 	if (this->state != Audio::State::PLAYING) return;
 
-	// Let's find out how many samples are available in total to give SDL.
+	// Let's find out how many bytes are available in total to give SDL.
 	//
 	// Note: Since we run concurrently with the decoder, which is also
 	// trying to modify the read capacity of the ringbuf (by adding
@@ -216,10 +219,10 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	// actual read capacity can only be greater than or equal to
 	// `avail_samples`, as this is the only place where we can *decrease*
 	// it.
-	auto avail_samples = this->ring_buf.ReadCapacity();
+	auto avail_bytes = this->ring_buf.ReadCapacity();
 
 	// Have we run out of things to feed?
-	if (avail_samples == 0) {
+	if (avail_bytes == 0) {
 		// Is this a temporary condition, or have we genuinely played
 		// out all we can?  If the latter, we're now out too.
 		if (this->source_out) this->state = Audio::State::AT_END;
@@ -228,13 +231,17 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 		return;
 	}
 
-	// How many samples do we want to pull out of the ring buffer?
-	size_t req_samples = lnbytes / this->bytes_per_sample;
+	// Of the bytes available, how many do we need?  Send this amount to SDL.
+	auto bytes = std::min(req_bytes, avail_bytes);
+    // We should be asking for a whole number of samples.
+    assert(bytes % bytes_per_sample == 0);
+    
+	auto read_bytes = this->ring_buf.Read(reinterpret_cast<char *>(out), bytes);
 
-	// How many can we pull out?  Send this amount to SDL.
-	auto samples = std::min(req_samples, avail_samples);
-	auto read_samples =
-	        this->ring_buf.Read(reinterpret_cast<char *>(out), samples);
+    // We should have received a whole number of samples.
+    assert(read_bytes % this->bytes_per_sample == 0);
+    auto read_samples = read_bytes / this->bytes_per_sample;
+    
 	this->position_sample_count += read_samples;
 }
 

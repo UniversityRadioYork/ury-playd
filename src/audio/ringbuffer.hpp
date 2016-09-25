@@ -9,32 +9,24 @@
 #ifndef PLAYD_RINGBUFFER_HPP
 #define PLAYD_RINGBUFFER_HPP
 
-extern "C" {
-#include "../contrib/pa_ringbuffer/pa_ringbuffer.h"
-}
+#include <atomic>
+#include <mutex>
 
 /**
- * A ring buffer.
- * This ring buffer is based on the PortAudio ring buffer, provided in the
- * contrib/ directory.
- * This is stable and performs well, but, as it is C code, necessitates some
- * hoop jumping to integrate and could do with being replaced with a native
- * solution.
+ * A concurrent ring buffer.
+ * 
+ * This is not particularly efficient, but does the job for playd.
+ * It uses two release-acquire-atomic counters to store read and write
+ * 
  */
 class RingBuffer
 {
 public:
 	/**
 	 * Constructs a RingBuffer.
-	 *
-	 * * Precondition: 0 < power, 0 < size.
-	 * * Postcondition: The RingBuffer is fully initialised.
-	 *
-	 * @param power n, where 2^n is the number of elements in the ring
-	 *   buffer.
-	 * @param size The size of one element in the ring buffer.
+	 * @param capacity The capacity of the ringbuffer, in bytes.
 	 */
-	RingBuffer(int power, int size);
+	RingBuffer(size_t capacity);
 
 	/// Destructs a PaRingBuffer.
 	~RingBuffer();
@@ -81,7 +73,7 @@ public:
 	 * @return The number of samples written, which should not exceed count.
 	 * @see WriteCapacity
 	 */
-	unsigned long Write(const char *start, unsigned long count);
+	unsigned long Write(const char *start, size_t count);
 
 	/**
 	 * Reads samples from the ring buffer into an array.
@@ -102,21 +94,25 @@ public:
 	 * @return The number of samples read, which should not exceed count.
 	 * @see ReadCapacity
 	 */
-	unsigned long Read(char *start, unsigned long count);
+	size_t Read(char *start, size_t count);
 
 	/// Empties the ring buffer.
 	void Flush();
 
 private:
-	char *buffer;         ///< The array used by the ringbuffer.
-	PaUtilRingBuffer *rb; ///< The internal PortAudio ringbuffer.
+	/// Empties the ring buffer without acquiring locks.
+	void FlushInner();
 
-	/**
-	 * Converts a ring buffer size into an external size.
-	 * @param count The size/count in PortAudio form.
-	 * @return The size/count after casting to unsigned long.
-	 */
-	static unsigned long CountCast(ring_buffer_size_t count);
+    std::vector<uint8_t> buffer;  ///< The array used by the ringbuffer.
+
+    std::vector<uint8_t>::const_iterator r_it;  ///< The read iterator.
+    std::vector<uint8_t>::iterator w_it;  ///< The write iterator.
+    
+    std::atomic<size_t> count;  ///< The current read capacity.
+    // Write capacity is the total buffer capacity minus count.
+
+	std::mutex r_lock; ///< The read lock.
+	std::mutex w_lock; ///< The write lock.
 };
 
 #endif // PLAYD_RINGBUFFER_HPP

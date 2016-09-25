@@ -11,32 +11,9 @@
 #include "../errors.hpp"
 #include "../audio/ringbuffer.hpp"
 
-SCENARIO("RingBuffer cannot be instantiated with bad parameters", "[ringbuffer]") {
-	WHEN("a RingBuffer is instantiated with power 0") {
-		THEN("an InternalError is raised") {
-			REQUIRE_THROWS_AS(RingBuffer(0, 1), InternalError);
-		}
-	}
-	WHEN("a RingBuffer is instantiated with a negative power") {
-		THEN("an InternalError is raised") {
-			REQUIRE_THROWS_AS(RingBuffer(-1, 1), InternalError);
-		}
-	}
-	WHEN("a RingBuffer is instantiated with size 0") {
-		THEN("an InternalError is raised") {
-			REQUIRE_THROWS_AS(RingBuffer(1, 0), InternalError);
-		}
-	}
-	WHEN("a RingBuffer is instantiated with a negative size") {
-		THEN("an InternalError is raised") {
-			REQUIRE_THROWS_AS(RingBuffer(1, -1), InternalError);
-		}
-	}
-}
-
 SCENARIO("RingBuffer cannot be read from when empty", "[ringbuffer]") {
 	GIVEN("an empty RingBuffer and properly sized buffer") {
-		RingBuffer rb(5, 1);
+		RingBuffer rb(1<<5);
 		char buf[1 << 5];
 
 		WHEN("a read is called for one item") {
@@ -46,12 +23,12 @@ SCENARIO("RingBuffer cannot be read from when empty", "[ringbuffer]") {
 		}
 		WHEN("a read is called for 2^power items") {
 			THEN("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Read(buf, 1 << 5), InternalError);
+				REQUIRE_THROWS_AS(rb.Read(buf, 1<<5), InternalError);
 			}
 		}
 		WHEN("a read is called for 2^power + 1 items") {
 			THEN("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Read(buf, (1 << 5) + 1), InternalError);
+				REQUIRE_THROWS_AS(rb.Read(buf, (1<<5) + 1), InternalError);
 			}
 		}
 	}
@@ -59,7 +36,7 @@ SCENARIO("RingBuffer cannot be read from when empty", "[ringbuffer]") {
 
 SCENARIO("RingBuffer cannot be written to when full", "[ringbuffer]") {
 	GIVEN("an full RingBuffer") {
-		RingBuffer rb(5, 1);
+		RingBuffer rb(1<<5);
 		const char *msg = "this message is 2^5 chars long!\0this bit isn't\0";
 		rb.Write(msg, 1<<5);
 
@@ -83,8 +60,8 @@ SCENARIO("RingBuffer cannot be written to when full", "[ringbuffer]") {
 
 SCENARIO("RingBuffer reports capacities correctly", "[ringbuffer]") {
 	GIVEN("an empty RingBuffer and properly sized buffer") {
-		RingBuffer rb(5, 1);
-		char buf[1 << 5];
+		RingBuffer rb(1<<5);
+		char buf[1<<5];
 		const char *msg = "this message is 2^5 chars long!\0this bit isn't\0";
 
 		WHEN("nothing is written") {
