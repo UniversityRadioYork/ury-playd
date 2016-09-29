@@ -7,13 +7,13 @@
  * @see audio/pipe_audio.h
  */
 
-#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <climits>
 #include <cstdint>
 #include <string>
 
+#include "../gsl/gsl"
 #include "../errors.h"
 #include "../messages.h"
 #include "../response.h"
@@ -31,12 +31,12 @@ using namespace std::chrono;
 
 Audio::State NoAudio::Update()
 {
-	return Audio::State::NONE;
+	return State::NONE;
 }
 
 Audio::State NoAudio::CurrentState() const
 {
-	return Audio::State::NONE;
+	return State::NONE;
 }
 
 void NoAudio::SetPlaying(bool)
@@ -70,7 +70,7 @@ const std::string &NoAudio::File() const
 
 PipeAudio::PipeAudio(std::unique_ptr<AudioSource> src,
                      std::unique_ptr<AudioSink> sink)
-    : src(std::move(src)), sink(std::move(sink))
+    : src(move(src)), sink(move(sink))
 {
 	this->ClearFrame();
 }
@@ -98,8 +98,8 @@ Audio::State PipeAudio::CurrentState() const
 
 microseconds PipeAudio::Position() const
 {
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
 	return this->src->MicrosFromSamples(this->sink->Position());
 }
@@ -114,8 +114,8 @@ microseconds PipeAudio::Length() const
 
 void PipeAudio::SetPosition(microseconds position)
 {
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
 	auto in_samples = this->src->SamplesFromMicros(position);
 	auto out_samples = this->src->Seek(in_samples);
@@ -129,13 +129,13 @@ void PipeAudio::SetPosition(microseconds position)
 void PipeAudio::ClearFrame()
 {
 	this->frame.clear();
-	this->frame_iterator = this->frame.end();
+	this->frame_span = gsl::span<uint8_t, 0>();
 }
 
 Audio::State PipeAudio::Update()
 {
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
 	bool more_available = this->DecodeIfFrameEmpty();
 	if (!more_available) this->sink->SourceOut();
@@ -151,20 +151,18 @@ void PipeAudio::TransferFrame()
 	assert(this->sink != nullptr);
 	assert(this->src != nullptr);
 
-	this->sink->Transfer(this->frame_iterator, this->frame.end());
+	auto written = this->sink->Transfer(this->frame_span);
+	this->frame_span = this->frame_span.last(this->frame_span.length() - written);
 
 	// We empty the frame once we're done with it.  This
 	// maintains FrameFinished(), as an empty frame is a finished one.
 	if (this->FrameFinished()) {
 		this->ClearFrame();
-		assert(this->FrameFinished());
+		Ensures(this->FrameFinished());
 	}
 
-	// The frame iterator should be somewhere between the beginning and
-	// end of the frame, unless the frame was emptied.
-	assert(this->frame.empty() ||
-	       (this->frame.begin() <= this->frame_iterator &&
-	        this->frame_iterator < this->frame.end()));
+	// The frame span should not be empty unless the frame was emptied.
+	Ensures(this->frame.empty() || !this->frame_span.empty());
 }
 
 bool PipeAudio::DecodeIfFrameEmpty()
@@ -181,12 +179,12 @@ bool PipeAudio::DecodeIfFrameEmpty()
 	AudioSource::DecodeResult result = this->src->Decode();
 
 	this->frame = result.second;
-	this->frame_iterator = this->frame.begin();
+	this->frame_span = this->frame;
 
 	return result.first != AudioSource::DecodeState::END_OF_FILE;
 }
 
-bool PipeAudio::FrameFinished() const
+inline bool PipeAudio::FrameFinished() const
 {
-	return this->frame.end() <= this->frame_iterator;
+	return this->frame_span.empty();
 }

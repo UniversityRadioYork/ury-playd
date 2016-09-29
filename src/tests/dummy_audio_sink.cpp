@@ -8,8 +8,6 @@
  * @see tests/dummy_audio_sink.cpp
  */
 
-#include <cstdint>
-
 #include "../audio/audio.h"
 #include "../audio/audio_sink.h"
 #include "dummy_audio_sink.h"
@@ -44,7 +42,7 @@ void DummyAudioSink::SourceOut()
 	this->state = Audio::State::AT_END;
 }
 
-void DummyAudioSink::Transfer(AudioSink::TransferIterator &begin, const AudioSink::TransferIterator &end)
+size_t DummyAudioSink::Transfer(const gsl::span<const uint8_t> src)
 {
-	begin = end;
+	return src.length();
 }

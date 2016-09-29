@@ -10,8 +10,6 @@
 #include <array>
 #include <algorithm>
 #include <cassert>
-#include <climits>
-#include <cstring>
 #include <memory>
 #include <string>
 
@@ -51,11 +49,13 @@ const size_t SdlAudioSink::RINGBUF_POWER = 16;
  * The callback used by SDL_Audio.
  * Trampolines back into vsink, which must point to an SdlAudioSink.
  */
-static void SDLCallback(void *vsink, std::uint8_t *data, int len)
+static void SDLCallback(void *vsink, uint8_t *data, int len)
 {
-	assert(vsink != nullptr);
+	Expects(vsink != nullptr);
+	Expects(data != nullptr);
+
 	auto sink = static_cast<SdlAudioSink *>(vsink);
-	sink->Callback(data, len);
+	sink->Callback(gsl::span<uint8_t>(data, len));
 }
 
 SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
@@ -145,7 +145,7 @@ std::uint64_t SdlAudioSink::Position()
 	return this->position_sample_count;
 }
 
-void SdlAudioSink::SetPosition(std::uint64_t samples)
+void SdlAudioSink::SetPosition(uint64_t samples)
 {
 	this->position_sample_count = samples;
 
@@ -162,50 +162,43 @@ void SdlAudioSink::SetPosition(std::uint64_t samples)
 	this->ring_buf.Flush();
 }
 
-void SdlAudioSink::Transfer(AudioSink::TransferIterator &start,
-                            const AudioSink::TransferIterator &end)
+size_t SdlAudioSink::Transfer(const gsl::span<const uint8_t> src)
 {
-	assert(start <= end);
-
 	// No point transferring 0 bytes.
-	if (start == end) return;
+	if (src.empty()) return 0;
 
-	size_t bytes = std::distance(start, end);
 	// There should be a whole number of samples being transferred.
-	assert(bytes % bytes_per_sample == 0);
-	assert(0 < bytes);
+	Expects(src.length() % bytes_per_sample == 0);
+	Expects(0 < src.length());
+	auto total = static_cast<size_t>(src.length());
 
-	// Only transfer as many bytes as the ring buffer can take.
+	// Only transfer as many bytes as the ring buffer can take,
+	// truncated to the nearest sample.
 	// Don't bother trying to write 0 samples!
-	auto count = std::min(bytes, this->ring_buf.WriteCapacity());
-	if (count == 0) return;
-    // The above should give us back a whole number of samples,
-    // since we always store and read from the ringbuffer in samples.
-    assert (count % bytes_per_sample == 0);
+	auto count = std::min(total, this->ring_buf.WriteCapacity());
+	count -= (count % bytes_per_sample);
+	if (count == 0) return 0;
 
-	auto start_ptr = reinterpret_cast<char *>(&*start);
-	unsigned long written_count = this->ring_buf.Write(start_ptr, count);
+	auto written_count = this->ring_buf.Write(src.first(count));
 	// Since we never write more than the ring buffer can take, and we're
     // the only thread writing, the written count should equal the requested
     // written count.
-	assert(written_count == count);
-
-	start += written_count;
-	assert(start <= end);
+	Ensures(written_count == count);
+	Ensures(written_count % bytes_per_sample == 0);
+	return written_count;
 }
 
-void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
+void SdlAudioSink::Callback(gsl::span<uint8_t> dest)
 {
-	assert(out != nullptr);
+	Expects(0 <= dest.length());
 
-	assert(0 <= nbytes);
     // How many bytes do we want to pull out of the ring buffer?
-	unsigned long req_bytes = static_cast<unsigned long>(nbytes);
+	auto req_bytes = static_cast<size_t>(dest.length());
 
 	// Make sure anything not filled up with sound later is set to silence.
 	// This is slightly inefficient (two writes to sound-filled regions
 	// instead of one), but more elegant in failure cases.
-	memset(out, 0, req_bytes);
+	std::fill(dest.begin(), dest.end(), 0);
 
 	// If we're not supposed to be playing, don't play anything.
 	if (this->state != Audio::State::PLAYING) return;
@@ -235,8 +228,8 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	auto bytes = std::min(req_bytes, avail_bytes);
     // We should be asking for a whole number of samples.
     assert(bytes % bytes_per_sample == 0);
-
-	auto read_bytes = this->ring_buf.Read(reinterpret_cast<char *>(out), bytes);
+    
+	auto read_bytes = this->ring_buf.Read(dest.first(bytes));
 
     // We should have received a whole number of samples.
     assert(read_bytes % this->bytes_per_sample == 0);

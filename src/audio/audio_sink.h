@@ -29,9 +29,6 @@
 class AudioSink
 {
 public:
-	/// Type of iterators used in the Transfer() method.
-	using TransferIterator = AudioSource::DecodeVector::iterator;
-
 	/// Virtual, empty destructor for AudioSink.
 	virtual ~AudioSink() = default;
 
@@ -82,21 +79,17 @@ public:
 	virtual void SourceOut() = 0;
 
 	/**
-	 * Transfers a range of sample bytes into the AudioSink.
-	 * The range may be empty, but must be valid.
+	 * Transfers a span of sample bytes into the AudioSink.
+	 * The span may be empty, but must be valid.
 	 *
-	 * * Precondition: @a start <= @a end, @a start and @a end point to a
-	 *     valid contiguous block of sample bytes.
-	 * * Postcondition: @a start <= @a end, @a old(start) <= @a start,
-	 *     @a *start and @a end point to a valid contiguous block of sample
-	 *     bytes.
+	 * * Precondition: @a src must contain a whole number of samples.
+	 * * Postcondition: The return value is no greater than the size
+	 *     of @a src.
 	 *
-	 * @param start An iterator denoting the start of the range.  This
-	 *   iterator will be advanced by the number of bytes accepted.
-	 * @param end An iterator denoting the end of the range.
+	 * @param src A span representing the sample bytes to transfer.
+	 * @return The number of bytes transferred.
 	 */
-	virtual void Transfer(TransferIterator &start,
-	                      const TransferIterator &end) = 0;
+	virtual size_t Transfer(const gsl::span<const std::uint8_t> src) = 0;
 };
 
 /**
@@ -125,17 +118,15 @@ public:
 	Samples Position() override;
 	void SetPosition(Samples samples) override;
 	void SourceOut() override;
-	void Transfer(TransferIterator &start,
-	              const TransferIterator &end) override;
+	size_t Transfer(const gsl::span<const std::uint8_t> src) override;
 
 	/**
-	 * The callback proper.
+	 * The audio callback.
 	 * This is executed in a separate thread by SDL once a stream is
 	 * playing with the callback registered to it.
-	 * @param out The output buffer to which our samples should be written.
-	 * @param nbytes The number of bytes SDL wants to read from @a out.
+	 * @param dest The output span to which our samples should be written.
 	 */
-	void Callback(std::uint8_t *out, int nbytes);
+	void Callback(gsl::span<std::uint8_t> dest);
 
 	/**
 	 * Gets the number and name of each output device entry in the

@@ -12,6 +12,10 @@
 #include <atomic>
 #include <mutex>
 
+#undef max
+#include "../gsl/gsl"
+
+
 /**
  * A concurrent ring buffer.
  * 
@@ -52,49 +56,34 @@ public:
 	size_t ReadCapacity() const;
 
 	/**
-	 * Writes samples from an array into the ring buffer.
-	 * To write one sample, pass a count of 1 and take a pointer to the
-	 * sample variable.
-	 * Note that start pointer is not constant.  This is because the
-	 * underlying implementation of the ring buffer might not guarantee
-	 * that the array is left untouched.
+	 * Writes samples from a span into the ring buffer.
 	 *
-	 * * Precondition: start points to a valid array, 0 < count <= the size
-	 *     of the block of memory pointed to by start, count <=
-	 *     WriteCapacity().
+	 * * Precondition: @a src is a valid span.
 	 * * Postcondition: The ringbuffer has been written to with the contents
-	 *     of the memory pointed to by start and bounded by count and
-	 *     WriteCapacity().
+	 *     of the first WriteCapacity() bytes of @a src.
 	 *
-	 * @param start The start of the array buffer from which we read
-	 *   samples.  Must not be nullptr.
-	 * @param count The number of samples to write.  This must not exceed
-	 *   the minimum of WriteCapacity() and the length of the array.
-	 * @return The number of samples written, which should not exceed count.
+	 * @param src The span of bytes to write into the ring buffer.
+	 * @return The number of bytes written.
 	 * @see WriteCapacity
 	 */
-	unsigned long Write(const char *start, size_t count);
+	size_t Write(const gsl::span<const uint8_t> src);
 
 	/**
 	 * Reads samples from the ring buffer into an array.
 	 * To read one sample, pass a count of 1 and take a pointer to the
 	 * sample variable.
 	 *
-	 * * Precondition: start points to a valid array, 0 < count <= the size
-	 *     of the block of memory pointed to by start, count <=
-	 *     ReadCapacity().
-	 * * Postcondition: The block of memory pointed to by start and bounded
-	 *     by count and ReadCapacity() has been filled with the appropriate
-	 *     number of samples from the front of the ring buffer.
+	 * * Precondition: @a dest is a valid span.
+	 * * Postcondition: The first ReadCapacity() bytes of @a dest have been
+	 *     filled with the appropriate number of bytes from the front of the
+	 *     ring buffer.
 	 *
-	 * @param start The start of the array buffer to which we write samples.
-	 *   Must not be nullptr.
-	 * @param count The number of samples to read.  This must not exceed the
-	 *   minimum of ReadCapacity() and the length of the array.
-	 * @return The number of samples read, which should not exceed count.
+	 * @param dest The span of bytes to fill with bytes read from the ring
+	 *  buffer.
+	 * @return The number of bytes read.
 	 * @see ReadCapacity
 	 */
-	size_t Read(char *start, size_t count);
+	size_t Read(const gsl::span<uint8_t> dest);
 
 	/// Empties the ring buffer.
 	void Flush();

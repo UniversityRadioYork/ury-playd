@@ -17,10 +17,12 @@
 #include <utility>
 #include <vector>
 
+#undef max
+#include "../gsl/gsl"
+
 #include "../response.h"
 #include "audio_source.h"
 
-using namespace std::chrono;
 
 class AudioSink;
 
@@ -189,8 +191,8 @@ private:
 	/// The current decoded frame.
 	AudioSource::DecodeVector frame;
 
-	/// The current position in the current decoded frame.
-	AudioSource::DecodeVector::iterator frame_iterator;
+	/// A span representing the unclaimed part of the decoded frame.
+	gsl::span<const uint8_t> frame_span;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
