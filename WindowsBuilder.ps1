@@ -49,7 +49,9 @@
 [CmdletBinding(PositionalBinding = $False)]
 param([switch]$deps,
       [switch]$playd,
-      [Parameter(Mandatory = $True)] [string]$arch)
+      [Parameter(Mandatory = $True)]
+	  [ValidateSet('x86', 'x64')]
+	  [string]$arch)
 
 
 function Write-Yellow ($message) {
@@ -209,13 +211,6 @@ function Check-Python ($vstring) {
 
 
 # Main
-switch ($arch) {
-    "" { $arch = "x86" }
-    "x86" {}
-    "x64" {}
-    default { throw "Invalid architecture '$arch'. Run Get-Help on this script for more info." }
-}
-
 Load-MSVC-Vars
 
 $project = "$pwd"
