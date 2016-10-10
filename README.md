@@ -97,8 +97,11 @@ Additional dependencies for building without CMake:
 
 #### OS X
 
-All dependencies are available in [homebrew] - it is highly recommended that
-you use it!
+All dependencies are available in [homebrew].
+
+	URYs-Mac:ury-playd ury$ homebrew install cmake mpg123 libsndfile libuv sdl2
+
+_Note: URY does not actually have a Mac._
 
 #### Windows (Visual Studio 2015+)
 
@@ -131,6 +134,8 @@ You can override the default C and C++ compilers by setting the `CC` and `CXX` e
 	CC=clang CXX=clang++ cmake ..
 
 You can then run `make`, `make test`, or `sudo make install`.
+
+On OS X, you can even use Xcode! Just add the `-G Xcode` option to `cmake`.
 
 #### Windows (Visual Studio 2015+)
 
