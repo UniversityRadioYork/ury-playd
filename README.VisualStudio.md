@@ -2,16 +2,44 @@
 
 Here are some field notes for building `playd` with Microsoft Visual Studio.
 
-Visual Studio builds used to be much harder to pull off, but nowadays most
-of the dependencies are nicely packaged.  _Most_.
+Visual Studio builds used to be much harder to pull off, but nowadays all
+of the dependencies are nicely packaged for both x86 and x64.
+
+**Note**: The x64 build currently has a few warnings, but it appears to work!
 
 ## Visual Studio Versions
 
 At time of writing, `playd` has been tested with Visual Studio 2015 Update 3.
-As `playd` needs a C++11 compiler, earlier versions will likely fail;
+As `playd` needs a C++14 compiler, earlier versions will likely fail;
 newer versions may work, but this is not guaranteed.
 
-## Assembling Libraries and Includes
+## The Easy Way: WindowsBuilder.ps1
+
+Now you can sit back and relax whilst this script downloads the binary versions of all the libraries.
+
+Usage: `.\WindowsBuilder.ps1 [-deps] [-playd] -arch x86|x64 [<CommonParameters>]`
+
+Full help text: `Get-Help .\Windows-Builder.ps1`
+
+The build will be in a directory like: `x86\build\Release\` along with all the necessary DLLs.
+
+**Note**: Only the **Release** configuration is currently supported.
+Until that's supported, you're on your own. Use Linux or something.
+
+## The Manual Way
+
+### Directories
+
+Create a directory structure like this. `build\` and `cbuild\` can be named however you like.
+
+```
+build\
+├── cbuild\
+├── include\
+└── lib\
+```
+
+### Assembling Libraries and Includes
 
 The following instructions assume you are building an x86 _Release_ build.
 If you are building a _Debug_ build, or for x64, you will probably have to
@@ -24,16 +52,12 @@ You will need:
   build; for Debug builds, you will need to compile SDL2 yourself);
 * The 32-bit MSVC distribution of `libsndfile`;
 * The 32-bit MSVC distribution of `libuv`;
-* A reverse-engineered LIB from the `libmpg123` 32-bit binary distribution,
-  as well as the includes from its source distribution.  See below for tips.
-
-The Visual Studio project provided (`playd.vcxproj`) expects import libraries
-(`.lib` files) and library headers (`.h`, `.hpp`, `.hxx`) to be collected in
-the `lib` and `include` subdirectories respectively.
+* The includes, and a self-generated import library, from the `libmpg123` 32-bit binary distribution.
+  See below for tips.
 
 The `lib` directory should include:
 
-* `libmpg123-0.lib`, from doing the below dark arts to `libmpg123-0.dll`;
+* `libmpg123-0.lib`, see [below](#libmpg123);
 * `libsndfile-1.lib`, from the `libsndfile` Windows distribution;
 * `libuv.lib`, from the libuv `Windows` distribution;
 * `SDL2.lib` and `SDLmain.lib` from SDL2 (if you are building a `Debug` version
@@ -43,7 +67,7 @@ The `lib` directory should include:
 
 The `include` directory should include:
 
-* `mpg123.h` from libmpg123;
+* `mpg123.h` and `fmt123.h` from libmpg123;
 * The contents of SDL2's `include` directory (better safe than sorry);
 * `sndfile.h` and `sndfile.hh` from libsndfile;
 * These headers from `libuv`'s `include` directory:
@@ -54,25 +78,28 @@ The `include` directory should include:
   * `uv-version.h`
   * `uv-win.h`
 
-## `libmpg123`
+#### `libmpg123`
 
-Trying to compile modern versions of `libmpg123` using its old MSVC2010
-port is hopeless due to code rot.  Instead, a technique discovered by
-combining [this](http://zdoom.org/wiki/Compile_ZDoom_on_Windows) and
-[this](https://adrianhenke.wordpress.com/2008/12/05/create-lib-file-from-dll/)
-seems to work:
+The MSVC 2010 port of libmpg123 is in need of updating to make it work, but you can use the binary distribution.
+You need to make an import library for the DLL, using the included DEF file.
 
 * Get into a Visual Studio Command Prompt;
 * Change to the `mpg123` distribution directory;
-* Run `dumpbin /exports libmpg123-0.dll`;
-* Copy the output into your favourite text editor;
-* Strip down to the function names (`mpg123_`*) and add `EXPORTS` to the top
-  of the file;
-* Save as `libmpg123-0.def`;
+* Rename `libmpg123-0.dll.def` to `libmpg123-0.def`;
 * Run `lib /def:libmpg123-0.def /OUT:libmpg123-0.lib`;
 * Copy to `\lib` as above.
 
-## `libuv`
+#### `libuv`
 
 If you're building `libuv` from scratch, it _must_ be built as a shared library
 (`vcbuild.bat shared`).  Otherwise, it should work fine.
+
+### Run CMake
+
+In the `cbuild\` directory:
+
+`cmake ..\..\ -G "Visual Studio 15 2015" -DCMAKE_PREFIX_PATH="absolute\path\to\build\"`
+
+### Run MSVC
+
+Open `build\cbuild\playd.sln`, ensure that the **Release Win32** configuration is selected, and have fun building!
