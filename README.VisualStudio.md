@@ -7,17 +7,31 @@ of the dependencies are nicely packaged for both x86 and x64.
 
 **Note**: The x64 build currently has a few warnings, but it appears to work!
 
+
 ## Visual Studio Versions
 
 At time of writing, `playd` has been tested with Visual Studio 2015 Update 3.
 As `playd` needs a C++14 compiler, earlier versions will likely fail;
 newer versions may work, but this is not guaranteed.
 
+
 ## The Easy Way: WindowsBuilder.ps1
 
 Now you can sit back and relax whilst this script downloads the binary versions of all the libraries.
 
-Usage: `.\WindowsBuilder.ps1 [-deps] [-playd] -arch x86|x64 [<CommonParameters>]`
+### Requirements
+
+* [CMake], for generating the MSVC project;
+* [Python 2.7], for building libuv;
+* PowerShell (compatibility unknown, but works on 5.0)
+
+Set the PYTHON environment variable to the path to python.exe, or add the path to the PATH environment vairable.
+
+`C:\>$env:PYTHON = "C:\Python27\python.exe"`
+
+### Usage
+
+`.\WindowsBuilder.ps1 [-deps] [-playd] -arch x86|x64 [<CommonParameters>]`
 
 Full help text: `Get-Help .\Windows-Builder.ps1`
 
@@ -25,6 +39,7 @@ The build will be in a directory like: `x86\build\Release\` along with all the n
 
 **Note**: Only the **Release** configuration is currently supported.
 Debug will eventually be supported, but until then, you're on your own. Use Linux or something.
+
 
 ## The Manual Way
 
@@ -48,11 +63,11 @@ to work.
 
 You will need:
 
-* The 32-bit MSVC distribution of SDL2 (_only if_ you are building a Release
+* The 32-bit MSVC [distribution][SDL2] of SDL2 (_only if_ you are building a Release
   build; for Debug builds, you will need to compile SDL2 yourself);
-* The 32-bit MSVC distribution of `libsndfile`;
-* The 32-bit MSVC distribution of `libuv`;
-* The includes, and a self-generated import library, from the `libmpg123` 32-bit binary distribution.
+* The 32-bit MSVC [distribution][libsndfile] of `libsndfile`;
+* The 32-bit MSVC [distribution][libuv] of `libuv`;
+* The includes, and a self-generated import library, from the `libmpg123` 32-bit binary [distribution][libmpg123].
   See below for tips.
 
 The `lib` directory should include:
@@ -91,8 +106,16 @@ You need to make an import library for the DLL, using the included DEF file.
 
 #### `libuv`
 
-If you're building `libuv` from scratch, it _must_ be built as a shared library
-(`vcbuild.bat shared`).  Otherwise, it should work fine.
+To get the files from the binary distribution, you can install the exe, or extract it with [7-Zip].
+
+To compile `libuv` from [source][libuv] instead, see the official [readme][libuv-gh].
+You will need [Python 2.7].
+
+To compile the shared x86 release binary: `vcbuild.bat shared x86 release`
+
+#### `libsndfile`
+
+You must install the exe. Extracting it doesn't work at the time of writing.
 
 ### Run CMake
 
@@ -103,3 +126,12 @@ In the `cbuild\` directory:
 ### Run MSVC
 
 Open `build\cbuild\playd.sln`, ensure that the **Release Win32** configuration is selected, and have fun building!
+
+[CMake]: https://cmake.org/download/
+[Python 2.7]: https://www.python.org/downloads/
+[libuv]: http://dist.libuv.org/dist/
+[libuv-gh]: https://github.com/libuv/libuv
+[SDL2]: https://www.libsdl.org/download-2.0.php
+[libsndfile]: http://www.mega-nerd.com/libsndfile/#Download
+[libmpg123]: https://www.mpg123.de/download/win32/?V=1&O=D
+[7-Zip]: http://www.7-zip.org/download.html
