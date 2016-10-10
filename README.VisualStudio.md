@@ -24,7 +24,7 @@ Full help text: `Get-Help .\Windows-Builder.ps1`
 The build will be in a directory like: `x86\build\Release\` along with all the necessary DLLs.
 
 **Note**: Only the **Release** configuration is currently supported.
-Until that's supported, you're on your own. Use Linux or something.
+Debug will eventually be supported, but until then, you're on your own. Use Linux or something.
 
 ## The Manual Way
 
