@@ -115,7 +115,7 @@ To compile the shared x86 release binary: `vcbuild.bat shared x86 release`
 
 #### `libsndfile`
 
-You must install the exe. Extracting it doesn't work at the time of writing.
+You must install the exe. Extracting it doesn't work at the time of writing, on `libsndfile v1.0.27`.
 
 ### Run CMake
 
