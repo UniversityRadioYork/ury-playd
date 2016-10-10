@@ -61,7 +61,7 @@ do weird things in the presence of Telnet-isms.
 * [SDL2] 2.0.3;
 * A C++14 compiler (recent versions of [clang], [gcc], and Visual Studio
   work);
-* [CMake] 2.8+, for building [optional, but recommended].
+* [CMake] 2.8+, for building (optional, but recommended).
 
 The following dependencies are used for file format support, and you'll need at
 least one of them:
