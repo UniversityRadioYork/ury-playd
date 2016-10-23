@@ -17,8 +17,6 @@
 #include <algorithm>
 #include <cassert>
 #include <csignal>
-#include <cstring>
-#include <sstream>
 #include <string>
 
 // If UNICODE is defined on Windows, it'll select the wide-char gai_strerror.
@@ -196,15 +194,15 @@ void IoCore::Accept(uv_stream_t *server)
 	uv_tcp_init(this->loop, client);
 
 	// libuv does the 'nonzero is error' thing here
-	if (uv_accept(server, (uv_stream_t *)client)) {
-		uv_close((uv_handle_t *)client, UvCloseCallback);
+	if (uv_accept(server, reinterpret_cast<uv_stream_t *>(client))) {
+		uv_close(reinterpret_cast<uv_handle_t *>(client), UvCloseCallback);
 		return;
 	}
 
 	auto id = this->NextConnectionID();
 	auto conn = std::make_shared<Connection>(*this, client, this->player, id);
 	client->data = static_cast<void *>(conn.get());
-	this->pool[id - 1] = std::move(conn);
+	this->pool[id - 1] = move(conn);
 
 	// Begin initial responses
 	this->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI)
@@ -217,7 +215,7 @@ void IoCore::Accept(uv_stream_t *server)
 	this->Respond(id, Response::Success(Response::NOREQUEST));
 	// End initial responses
 
-	uv_read_start((uv_stream_t *)client, UvAlloc, UvReadCallback);
+	uv_read_start(reinterpret_cast<uv_stream_t *>(client), UvAlloc, UvReadCallback);
 }
 
 size_t IoCore::NextConnectionID()
@@ -357,10 +355,10 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 	assert(this->server.data != nullptr);
 
 	struct sockaddr_in bind_addr;
-	uv_ip4_addr(address.c_str(), std::stoi(port), &bind_addr);
-	uv_tcp_bind(&this->server, (const sockaddr *)&bind_addr, 0);
+	uv_ip4_addr(address.c_str(), stoi(port), &bind_addr);
+	uv_tcp_bind(&this->server, reinterpret_cast<const sockaddr *>(&bind_addr), 0);
 
-	int r = uv_listen((uv_stream_t *)&this->server, 128, UvListenCallback);
+	auto r = uv_listen(reinterpret_cast<uv_stream_t *>(&this->server), 128, UvListenCallback);
 	if (r) {
 		throw NetError("Could not listen on " + address + ":" + port +
 		               " (" + std::string(uv_err_name(r)) + ")");
@@ -371,7 +369,7 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 
 void IoCore::InitSignals()
 {
-	int r = uv_signal_init(this->loop, &this->sigint);
+	auto r = uv_signal_init(this->loop, &this->sigint);
 	if (r) {
 		throw InternalError(MSG_IO_CANNOT_ALLOC + ": " +
 		                    std::string(uv_err_name(r)));

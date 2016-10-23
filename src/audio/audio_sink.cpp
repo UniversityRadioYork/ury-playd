@@ -22,6 +22,7 @@
 #include "ringbuffer.h"
 #include "sample_formats.h"
 
+
 //
 // AudioSink
 //
@@ -65,7 +66,7 @@ SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
       source_out(false),
       state(Audio::State::STOPPED)
 {
-	const char *name = SDL_GetAudioDeviceName(device_id, 0);
+	auto name = SDL_GetAudioDeviceName(device_id, 0);
 	if (name == nullptr) {
 		throw ConfigError(std::string("invalid device id: ") +
 		                  std::to_string(device_id));
@@ -77,7 +78,7 @@ SdlAudioSink::SdlAudioSink(const AudioSource &source, int device_id)
 	want.format = FORMATS[static_cast<int>(source.OutputSampleFormat())];
 	want.channels = source.ChannelCount();
 	want.callback = &SDLCallback;
-	want.userdata = (void *)this;
+	want.userdata = static_cast<void *>(this);
 
 	SDL_AudioSpec have;
 	SDL_zero(have);
@@ -135,12 +136,12 @@ Audio::State SdlAudioSink::State()
 void SdlAudioSink::SourceOut()
 {
 	// The sink should only be out if the source is.
-	assert(this->source_out || this->state != Audio::State::AT_END);
+	Expects(this->source_out || this->state != Audio::State::AT_END);
 
 	this->source_out = true;
 }
 
-std::uint64_t SdlAudioSink::Position()
+uint64_t SdlAudioSink::Position()
 {
 	return this->position_sample_count;
 }
@@ -243,9 +244,9 @@ void SdlAudioSink::Callback(gsl::span<uint8_t> dest)
 	std::vector<std::pair<int, std::string>> list;
 
 	// The 0 in SDL_GetNumAudioDevices tells SDL we want playback devices.
-	int is = SDL_GetNumAudioDevices(0);
-	for (int i = 0; i < is; i++) {
-		const char *n = SDL_GetAudioDeviceName(i, 0);
+	auto is = SDL_GetNumAudioDevices(0);
+	for (auto i = 0; i < is; i++) {
+		auto n = SDL_GetAudioDeviceName(i, 0);
 		if (n != nullptr) list.emplace_back(i, std::string(n));
 	}
 
@@ -254,8 +255,8 @@ void SdlAudioSink::Callback(gsl::span<uint8_t> dest)
 
 /* static */ bool SdlAudioSink::IsOutputDevice(int id)
 {
-	int ids = SDL_GetNumAudioDevices(0);
+	auto ids = SDL_GetNumAudioDevices(0);
 
 	// See comment in GetDevicesInfo for why this is sufficient.
-	return (0 <= id && id < ids);
+	return 0 <= id && id < ids;
 }

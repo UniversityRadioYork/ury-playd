@@ -82,7 +82,7 @@ const std::string &PipeAudio::File() const
 
 void PipeAudio::SetPlaying(bool playing)
 {
-	assert(this->sink != nullptr);
+	Expects(this->sink != nullptr);
 
 	if (playing) {
 		this->sink->Start();
@@ -147,9 +147,9 @@ Audio::State PipeAudio::Update()
 
 void PipeAudio::TransferFrame()
 {
-	assert(!this->frame.empty());
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(!this->frame.empty());
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
 	auto written = this->sink->Transfer(this->frame_span);
 	this->frame_span = this->frame_span.last(this->frame_span.length() - written);
@@ -170,12 +170,12 @@ bool PipeAudio::DecodeIfFrameEmpty()
 	// Either the current frame is in progress, or has been emptied.
 	// AdvanceFrameIterator() establishes this assertion by emptying a
 	// frame as soon as it finishes.
-	assert(this->frame.empty() || !this->FrameFinished());
+	Expects(this->frame.empty() || !this->FrameFinished());
 
 	// If we still have a frame, don't bother decoding yet.
 	if (!this->FrameFinished()) return true;
 
-	assert(this->src != nullptr);
+	Expects(this->src != nullptr);
 	AudioSource::DecodeResult result = this->src->Decode();
 
 	this->frame = result.second;

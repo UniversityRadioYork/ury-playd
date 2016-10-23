@@ -8,7 +8,6 @@
  */
 
 #include <cstdint>
-#include <string>
 
 #include "audio_source.h"
 #include "sample_formats.h"
