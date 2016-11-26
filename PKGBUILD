@@ -55,14 +55,11 @@ build() {
 }
 
 package() {
-  install -d "${pkgdir}${MINGW_PREFIX}"/bin
-  install -d "${pkgdir}${MINGW_PREFIX}"/share/man/man1/
-  install -d "${pkgdir}${MINGW_PREFIX}"/share/licenses/${_basename}
-
   cd "${srcdir}/${_realname}"
-  install -m755 playd.exe "${pkgdir}${MINGW_PREFIX}/bin/"
-  install -Dm644 src/*.1 "${pkgdir}${MINGW_PREFIX}/share/man/man1/"
-  install -Dm644 LICENSE* "${pkgdir}${MINGW_PREFIX}/share/licenses/${_basename}/"
+  cmake -G "Unix Makefiles" "${srcdir}/${_realname}" \
+    -DCMAKE_INSTALL_PREFIX:PATH="${pkgdir}${MINGW_PREFIX}/"
+  make install \
+    MINGW_TARGET=${MINGW_CHOST}
 }
 
 check() {
