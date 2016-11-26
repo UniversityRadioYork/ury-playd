@@ -95,7 +95,7 @@ Additional dependencies for building without CMake:
 
 	root@freebsd:/ # pkg install gmake pkgconf
 
-#### OS X
+#### macOS
 
 All dependencies are available in [homebrew].
 
@@ -123,7 +123,7 @@ For example:
 
 	cmake . -DCMAKE_PREFIX_PATH="/path/to/prefix/;/another/prefix/"
 
-#### POSIX (GNU/Linux, BSD, OS X)
+#### POSIX (GNU/Linux, BSD, macOS)
 
 Create a directory for the build, for cleanliness, e.g. `cbuild/`. From this directory, run `cmake .. [options..]`.
 See `cmake --help` for additional options.
@@ -135,7 +135,7 @@ You can override the default C and C++ compilers by setting the `CC` and `CXX` e
 
 You can then run `make`, `make test`, or `sudo make install`.
 
-On OS X, you can even use Xcode! Just add the `-G Xcode` option to `cmake`.
+On macOS, you can even use Xcode! Just add the `-G Xcode` option to `cmake`.
 
 #### Windows (Visual Studio 2015+)
 
@@ -148,7 +148,7 @@ These environments aren't currently supported, but it shouldn't be much work to 
 
 ### Build without CMake
 
-#### POSIX (GNU/Linux, BSD, OS X)
+#### POSIX (GNU/Linux, BSD, macOS)
 
 **Warning**: This method of building `playd` is liable to be removed in
 favour of CMake in future.
@@ -158,7 +158,7 @@ GNU-compatible Makefile that can be used both to make and install.
 
 To use the Makefile, you'll need [GNU Make] and `pkg-config` (or equivalent),
 and pkg-config packages for SDL2, libuv, and any needed decoder libraries.
-We've tested building playd on Gentoo, FreeBSD 10, and OS X, but other
+We've tested building playd on Gentoo, FreeBSD 10, and macOS, but other
 POSIX-style operating systems should work.
 
 Using the Makefile is straightforward:
