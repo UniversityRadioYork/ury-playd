@@ -59,8 +59,8 @@ after_build:
       } Else {
         $zipname="playd_${env:PlatformString}.zip"
       }
-      $zippath="$env:project\$zipname"
-      cd "$env:project\$env:PLATFORM\build\$env:CONFIGURATION"
+      $zippath="$env:project\$zipname";
+      cd "$env:project\$env:PLATFORM\build\$env:CONFIGURATION";
       7z a "$zippath" *
 
 # Make an artifact out of the zip. Artifacts for all builds are available from
