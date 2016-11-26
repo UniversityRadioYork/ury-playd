@@ -24,6 +24,10 @@ Now you can sit back and relax whilst this script downloads the binary versions 
 * [CMake], for generating the MSVC project;
 * [Python 2.7], for building libuv;
 * PowerShell (compatibility unknown, but works on 5.0)
+* [7-Zip] command-line
+* [Git]
+
+All of these are available through [Chocolatey].
 
 Set the PYTHON environment variable to the path to python.exe, or add the path to the PATH environment vairable.
 
@@ -135,3 +139,5 @@ Open `build\cbuild\playd.sln`, ensure that the **Release Win32** configuration i
 [libsndfile]: http://www.mega-nerd.com/libsndfile/#Download
 [libmpg123]: https://www.mpg123.de/download/win32/?V=1&O=D
 [7-Zip]: http://www.7-zip.org/download.html
+[Git]: https://git-scm.com/downloads
+[Chocolatey]: https://chocolatey.org/
