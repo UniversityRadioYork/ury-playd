@@ -106,3 +106,10 @@ foreach(mylib SDL2 LIBUV MPG123 SNDFILE)
   endif()
   unset(libs)
 endforeach()
+
+# Install
+install(TARGETS playd RUNTIME DESTINATION bin)
+install(FILES src/playd.1       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
+install(FILES LICENSE.txt       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
+install(FILES LICENSE.portaudio DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
+install(FILES LICENSE.catch     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
