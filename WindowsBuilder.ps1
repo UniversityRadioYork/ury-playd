@@ -14,8 +14,12 @@
 	DEPENDENCIES:
 
 	Python 2.7 is required for building libuv.
-	Set the PYTHON environment variable to the path to python.exe, or add the path to the PATH environment vairable.
-	PS C:\>$env:PYTHON = "C:\Python27\python.exe"
+	  Set the PYTHON environment variable to the path to python.exe, or add the path to the PATH environment vairable.
+	  PS C:\>$env:PYTHON = "C:\Python27\python.exe"
+	Git
+	  A copy of git needs to be in your PATH environment variable.
+	7-Zip
+	  7z.exe needs to be in your PATH environment variable.
 
 .PARAMETER arch
 	Architecture to build for: x86 or x64.
