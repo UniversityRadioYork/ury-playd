@@ -84,7 +84,7 @@ set(tests_SRCS ${tests_SRCS}
   src/tests/tokeniser.cpp
 )
 add_executable(playd ${SRCS} "src/main.cpp")
-add_executable(playd_tests ${SRCS} ${tests_SRCS})
+add_executable(playd_tests EXCLUDE_FROM_ALL ${SRCS} ${tests_SRCS})
 add_test(NAME playd_tests COMMAND playd_tests)
 # `make check` to both compile and run tests
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
