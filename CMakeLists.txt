@@ -112,8 +112,13 @@ foreach(mylib SDL2 LIBUV MPG123 SNDFILE)
 endforeach()
 
 # Install
+set(mandir "man/man1")
+if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
+	set(mandir "share/${mandir}")
+endif(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
+
 install(TARGETS playd RUNTIME DESTINATION bin)
-install(FILES src/playd.1       DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
+install(FILES src/playd.1       DESTINATION ${CMAKE_INSTALL_PREFIX}/${mandir})
 install(FILES LICENSE.txt       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
 install(FILES LICENSE.portaudio DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
 install(FILES LICENSE.catch     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
