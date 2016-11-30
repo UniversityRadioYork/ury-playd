@@ -1,0 +1,6 @@
+playd (player daemon) is a C++ audio player developed by University
+Radio York. It's designed to be minimal, hackable, and composable into
+bigger systems (such as our ongoing BAPS3 project to build a new radio
+playout system).
+
+WWW: https://universityradioyork.github.io/ury-playd
