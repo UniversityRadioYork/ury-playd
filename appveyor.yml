@@ -52,20 +52,22 @@ test_script:
     -C "%CONFIGURATION%"
 
 # Zip up all the exes, DLLs, and licenses.
-# If not building a tag, the zip name has two underscores,
-# e.g. playd__win32.zip. If it's a tag, it's like playd_v1.0.0_win32.zip.
 after_build:
-  - set zipname="playd_%APPVEYOR_REPO_TAG_NAME%_%PlatformString%.zip"
-  - set zippath="%project%\%zipname%"
-  - 7z a "%zippath%" LICENSE*
-  - cd "%project%\%PLATFORM%\build\%CONFIGURATION%"
-  - 7z a "%zippath%" *
+  - ps: >-
+      If (Test-Path Env:\APPVEYOR_REPO_TAG_NAME) {
+        $zipname="playd_${env:APPVEYOR_REPO_TAG_NAME}_${env:PlatformString}.zip"
+      } Else {
+        $zipname="playd_${env:PlatformString}.zip"
+      }
+      $zippath="$env:project\$zipname";
+      cd "$env:project\$env:PLATFORM\build\$env:CONFIGURATION";
+      7z a "$zippath" *
 
 # Make an artifact out of the zip. Artifacts for all builds are available from
 # the Appveyor CI interface, or from the API.
 artifacts:
-  - path: playd_$(APPVEYOR_REPO_TAG_NAME)_$(PlatformString).zip
-    name: playd $(APPVEYOR_REPO_TAG_NAME) $(PlatformString)
+  - path: playd*.zip
+    name: playd $(PlatformString)
 
 # When building a tag, create a GitHub release (if it doesn't already exist),
 # and push the zip to it.

@@ -57,40 +57,108 @@ do weird things in the presence of Telnet-isms.
 
 ### Requirements
 
-* [libuv] 1.9.1+
-* [SDL2] 2.0.3
+* [libuv] 1.9.1+;
+* [SDL2] 2.0.3;
 * A C++14 compiler (recent versions of [clang], [gcc], and Visual Studio
-  work)
-* [CMake] 2.8+, for building.
+  work);
+* [CMake] 2.8+, for building (optional, but recommended).
 
 The following dependencies are used for file format support, and you'll need at
 least one of them:
 
 * [libmpg123] 1.20.1+, for MP3 support;
-* [libflac++] 1.3.0+, for FLAC support;
-* [libsndfile] 1.0.25+, for Ogg Vorbis, WAV, and FLAC support (if libflac++ isn't available).
+* [libsndfile] 1.0.25+, for Ogg Vorbis, WAV, and FLAC support.
 
 Certain operating systems may need additional dependencies; see the OS-specific
 build instructions below.
 
-### CMake
+You can build using the newer **CMake** scripts (recommended), or the older **`config.sh`**.
 
-`playd` can be built with cmake: just run `cmake .` in the root directory
-(with whichever additional flags you need: run `cmake --help` for additional
-information), then use your favourite build tool (`make`, Visual Studio, etc.)
-with the generated projects.
 
-### POSIX (GNU/Linux, BSD, OS X)
+### Acquire Dependencies
+
+If you have a package manager, use it to install the dependencies.
+
+#### Ubuntu (14.04+) / Debian (8+)
+
+	root@ubuntu:/ # apt-get install build-essential libmpg123-dev libsndfile-dev libuv1-dev libsdl2-dev
+
+Additional dependencies for building without CMake:
+
+	root@ubuntu:/ # apt-get install pkg-config
+
+#### FreeBSD (10+)
+
+	root@freebsd:/ # pkg install libmpg123 libsndfile libuv sdl2
+    
+Additional dependencies for building without CMake:
+
+	root@freebsd:/ # pkg install gmake pkgconf
+
+#### macOS
+
+All dependencies are available in [homebrew].
+
+	URYs-Mac:ury-playd ury$ homebrew install cmake mpg123 libsndfile libuv sdl2
+
+_Note: URY does not actually have a Mac._
+
+#### Windows (Visual Studio 2015+)
+
+See [README.VisualStudio.md].
+
+
+### Build with CMake
+
+This is the easiest way to build `playd`.
+
+CMake should automatically detect which generator to use (e.g. `Unix Makefiles` or `Visual Studio 14 2015`),
+but you can see a full list, and specify it manually, with the `-G` option.
+
+To manually specify a prefix directory for searching for library directories (`lib` and `include`), use the CMake option [CMAKE_PREFIX_PATH].
+The paths must be absolute.
+Newer versions of CMake support this being a ;-separated list.
+
+For example:
+
+	cmake . -DCMAKE_PREFIX_PATH="/path/to/prefix/;/another/prefix/"
+
+#### POSIX (GNU/Linux, BSD, macOS)
+
+Create a directory for the build, for cleanliness, e.g. `cbuild/`. From this directory, run `cmake .. [options..]`.
+See `cmake --help` for additional options.
+
+You can override the default C and C++ compilers by setting the `CC` and `CXX` environment variables.
+
+	CC=gcc CXX=g++ cmake ..
+	CC=clang CXX=clang++ cmake ..
+
+You can then run `make`, `make test`, or `sudo make install`.
+
+On macOS, you can even use Xcode! Just add the `-G Xcode` option to `cmake`.
+
+#### Windows (Visual Studio 2015+)
+
+playd can be built with Visual Studio (tested with 2015 Community). See [README.VisualStudio.md].
+
+#### Windows (Cygwin, MSYS2)
+
+These environments aren't currently supported, but it shouldn't be much work to make that happen.
+
+
+### Build without CMake
+
+#### POSIX (GNU/Linux, BSD, macOS)
 
 **Warning**: This method of building `playd` is liable to be removed in
-favour of cmake in future.
+favour of CMake in future.
 
 `playd` comes with `config.sh`, a Bourne shell script that will generate a
 GNU-compatible Makefile that can be used both to make and install.
 
 To use the Makefile, you'll need [GNU Make] and `pkg-config` (or equivalent),
 and pkg-config packages for SDL2, libuv, and any needed decoder libraries.
-We've tested building playd on Gentoo, FreeBSD 10, and OS X, but other
+We've tested building playd on Gentoo, FreeBSD 10, and macOS, but other
 POSIX-style operating systems should work.
 
 Using the Makefile is straightforward:
@@ -103,11 +171,6 @@ Using the Makefile is straightforward:
   example, it'd be `gmake`), and, optionally, `sudo make install`.
   The latter will globally install playd and its man page.
 
-#### OS X
-
-All dependencies are available in [homebrew] - it is highly recommended that
-you use it!
-
 #### FreeBSD (10+)
 
 FreeBSD 10 and above come with `clang` 3.3 as standard, which should be able to
@@ -116,34 +179,15 @@ and package repositories.
 
 You will need `gmake`, as `Makefile` is incompatible with BSD make.  Sorry!
 
-All of `playd`'s dependencies are available through both the FreeBSD Ports
-Collection and standard package repository.  To install them as packages:
-
-    root@freebsd:/ # pkg install gmake libmpg123 libsndfile libflac libuv sdl2 pkgconf
-
 Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
 `playd` (as root):
 
     user@freebsd:~/ % gmake
     root@freebsd:~/ # gmake install
 
-### Windows
+#### Windows
 
-#### Visual Studio
-
-**Warning**: This method of building `playd` is liable to be removed in
-favour of cmake in future.
-
-_For more information, see `README.VisualStudio.md`._
-
-playd **can** be built with Visual Studio (tested with 2015 Community), but
-you will need to source and configure the dependencies manually.  A Visual
-Studio project is provided, but will need tweaking for your environment.
-
-#### MinGW
-
-We haven't managed ourselves, but assuming you can build all the dependencies,
-(libsox is the difficult one), it should work fine.
+You should use CMake.
 
 
 ## Contributing
@@ -160,19 +204,21 @@ as well as [CATCH] (see LICENSE.catch).  The various CMake scripts come
 with their licence information attached.
 
 
-[CMake]:                 https://cmake.org/
-[CATCH]:                 http://catch-lib.net
-[clang]:                 http://clang.llvm.org
-[gcc]:                   https://gcc.gnu.org
-[GNU Make]:              https://www.gnu.org/software/make/
-[Homebrew]:              http://brew.sh
-[libmpg123]:             http://www.mpg123.de
-[libflac++]:             https://xiph.org/flac/
-[libsndfile]:            http://www.mega-nerd.com/libsndfile/
-[libsox]:                http://sox.sourceforge.net
-[libuv]:                 https://github.com/joyent/libuv
-[MIT licence]:           http://opensource.org/licenses/MIT
-[netcat]:                http://nc110.sourceforge.net
-[SDL2]:                  https://www.libsdl.org
-[PuTTY]:                 http://www.chiark.greenend.org.uk/~sgtatham/putty/
-[University Radio York]: http://ury.org.uk
+[CMake]:                  https://cmake.org/
+[CATCH]:                  http://catch-lib.net
+[clang]:                  http://clang.llvm.org
+[gcc]:                    https://gcc.gnu.org
+[GNU Make]:               https://www.gnu.org/software/make/
+[Homebrew]:               http://brew.sh
+[libmpg123]:              http://www.mpg123.de
+[libsndfile]:             http://www.mega-nerd.com/libsndfile/
+[libsox]:                 http://sox.sourceforge.net
+[libuv]:                  https://github.com/joyent/libuv
+[MIT licence]:            http://opensource.org/licenses/MIT
+[netcat]:                 http://nc110.sourceforge.net
+[SDL2]:                   https://www.libsdl.org
+[PuTTY]:                  http://www.chiark.greenend.org.uk/~sgtatham/putty/
+[University Radio York]:  http://ury.org.uk
+
+[CMAKE_PREFIX_PATH]:      https://cmake.org/cmake/help/latest/variable/CMAKE_PREFIX_PATH.html
+[README.VisualStudio.md]: README.VisualStudio.md
