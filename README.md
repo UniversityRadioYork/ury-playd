@@ -144,8 +144,8 @@ playd can be built with Visual Studio (tested with 2015 Community). See [README.
 
 #### Windows (MSYS2)
 
-Using the [PKGBUILD](#MSYS2-PKGBUILD) is an easy way to install the dependencies and build a package from a git branch.
-Building your working copy is just like on any other POSIX system. The [PKGBUILD](#MSYS2-PKGBUILD) is very easy to read.
+Using the [PKGBUILD](#msys2-pkgbuild) is an easy way to install the dependencies and build a package from a git branch.
+Building your working copy is just like on any other POSIX system. The [PKGBUILD](#msys2-pkgbuild) is very easy to read.
 
 #### Windows (Cygwin)
 
