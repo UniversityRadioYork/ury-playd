@@ -199,17 +199,22 @@ You should use CMake.
 The `ports/` directory contains files for performing fully automated
 builds on certain operating systems and platforms.
 
-#### [MSYS2] `PKGBUILD`
+#### [MSYS2] and [Arch Linux] `PKGBUILD`s
 
-This builds from the `HEAD` of the remote `master` branch.
+These build from the `HEAD` of the remote `master` branch.
 
 Run the following in a MinGW32 or MinGW64 shell to build for each platform:
-
 ```
 cd ports/msys2
 makepkg -si
-
 ```
+
+Or on Arch:
+```
+cd ports/arch
+makepkg -si
+```
+
 See `man makepkg` for more information.
 
 #### FreeBSD `Makefile`
@@ -252,6 +257,7 @@ as well as [CATCH] (see LICENSE.catch).  The various CMake scripts come
 with their licence information attached.
 
 
+[Arch Linux]:             https://www.archlinux.org/
 [CMake]:                  https://cmake.org/
 [CATCH]:                  http://catch-lib.net
 [clang]:                  http://clang.llvm.org
