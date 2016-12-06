@@ -57,7 +57,7 @@ do weird things in the presence of Telnet-isms.
 
 You can build using the newer **CMake** scripts (recommended), or the older **`config.sh`**.
 
-Some [ports](#Ports) are provided for automatically building packages on certain operating systems and platforms.
+Some [ports](#ports) are provided for automatically building packages on certain operating systems and platforms.
 
 ### Requirements
 
