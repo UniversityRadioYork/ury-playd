@@ -232,14 +232,15 @@ cp ports/freebsd/* /usr/ports/audio/playd
 cd /usr/ports/audio/playd
 sudo make makesum
 ```
+
 Then build it like any other port.
 ```
 cd /usr/ports/audio/playd
 make
 sudo make install
 ```
-or
 
+or
 `portmaster audio/playd`
 
 
