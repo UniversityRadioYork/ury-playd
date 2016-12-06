@@ -28,13 +28,13 @@ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-libuv"
-		     "${MINGW_PACKAGE_PREFIX}-mpg123"
-		     "${MINGW_PACKAGE_PREFIX}-libsndfile"
-		     "${MINGW_PACKAGE_PREFIX}-SDL2")
+                     "${MINGW_PACKAGE_PREFIX}-mpg123"
+                     "${MINGW_PACKAGE_PREFIX}-libsndfile"
+                     "${MINGW_PACKAGE_PREFIX}-SDL2")
 depends=("${MINGW_PACKAGE_PREFIX}-libuv"
-		 "${MINGW_PACKAGE_PREFIX}-mpg123"
-		 "${MINGW_PACKAGE_PREFIX}-libsndfile"
-		 "${MINGW_PACKAGE_PREFIX}-SDL2")
+                 "${MINGW_PACKAGE_PREFIX}-mpg123"
+                 "${MINGW_PACKAGE_PREFIX}-libsndfile"
+                 "${MINGW_PACKAGE_PREFIX}-SDL2")
 
 provides=("${MINGW_PACKAGE_PREFIX}-ury-playd")
 conflicts=("${MINGW_PACKAGE_PREFIX}-ury-playd")
