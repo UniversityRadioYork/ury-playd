@@ -55,6 +55,10 @@ do weird things in the presence of Telnet-isms.
 
 ## Compilation
 
+You can build using the newer **CMake** scripts (recommended), or the older **`config.sh`**.
+
+Some [ports](#Ports) are provided for automatically building packages on certain operating systems and platforms.
+
 ### Requirements
 
 * [libuv] 1.9.1+;
@@ -71,9 +75,6 @@ least one of them:
 
 Certain operating systems may need additional dependencies; see the OS-specific
 build instructions below.
-
-You can build using the newer **CMake** scripts (recommended), or the older **`config.sh`**.
-
 
 ### Acquire Dependencies
 
@@ -133,7 +134,7 @@ You can override the default C and C++ compilers by setting the `CC` and `CXX` e
 	CC=gcc CXX=g++ cmake ..
 	CC=clang CXX=clang++ cmake ..
 
-You can then run `make`, `make test`, or `sudo make install`.
+You can then run `make`, `make test`, `make check`, or `sudo make install`.
 
 On macOS, you can even use Xcode! Just add the `-G Xcode` option to `cmake`.
 
@@ -141,10 +142,14 @@ On macOS, you can even use Xcode! Just add the `-G Xcode` option to `cmake`.
 
 playd can be built with Visual Studio (tested with 2015 Community). See [README.VisualStudio.md].
 
-#### Windows (Cygwin, MSYS2)
+#### Windows (MSYS2)
 
-These environments aren't currently supported, but it shouldn't be much work to make that happen.
+Using the [PKGBUILD](#MSYS2-PKGBUILD) is an easy way to install the dependencies and build a package from a git branch.
+Building your working copy is just like on any other POSIX system. The [PKGBUILD](#MSYS2-PKGBUILD) is very easy to read.
 
+#### Windows (Cygwin)
+
+This environment isn't currently supported, but it shouldn't be much work to make that happen.
 
 ### Build without CMake
 
@@ -189,6 +194,49 @@ Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
 
 You should use CMake.
 
+### Ports
+
+The `ports/` directory contains files for performing fully automated
+builds on certain operating systems and platforms.
+
+#### [MSYS2] `PKGBUILD`
+
+This builds from the `HEAD` of the remote `master` branch.
+
+Run the following in a MinGW32 or MinGW64 shell to build for each platform:
+
+```
+cd ports/msys2
+makepkg -si
+
+```
+See `man makepkg` for more information.
+
+#### FreeBSD `Makefile`
+
+This builds from a remote tag specified in the `Makefile` by `GH_TAGNAME`. If you
+change this, you should change `DISTVERSION` as appropriate.
+
+You need a copy of the ports tree, e.g. in `/usr/ports`.
+
+NOTE: You must run `make makesum` (probably as su) to generate the
+distinfo file, which contains the SHA256 and filesize of the code.
+```
+mkdir /usr/ports/audio/playd
+cp ports/freebsd/* /usr/ports/audio/playd
+cd /usr/ports/audio/playd
+sudo make makesum
+```
+Then build it like any other port.
+```
+cd /usr/ports/audio/playd
+make
+sudo make install
+```
+or
+
+`portmaster audio/playd`
+
 
 ## Contributing
 
@@ -215,6 +263,7 @@ with their licence information attached.
 [libsox]:                 http://sox.sourceforge.net
 [libuv]:                  https://github.com/joyent/libuv
 [MIT licence]:            http://opensource.org/licenses/MIT
+[MSYS2]:		  https://msys2.github.io/
 [netcat]:                 http://nc110.sourceforge.net
 [SDL2]:                   https://www.libsdl.org
 [PuTTY]:                  http://www.chiark.greenend.org.uk/~sgtatham/putty/
