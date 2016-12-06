@@ -39,7 +39,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-libuv"
 provides=("${MINGW_PACKAGE_PREFIX}-ury-playd")
 conflicts=("${MINGW_PACKAGE_PREFIX}-ury-playd")
 
-source=("ury-playd-git::git+http://github.com/UniversityRadioYork/ury-playd.git#branch=mingw")
+source=("ury-playd-git::git+http://github.com/UniversityRadioYork/ury-playd.git#branch=master")
 md5sums=("SKIP")
 
 pkgver() {
