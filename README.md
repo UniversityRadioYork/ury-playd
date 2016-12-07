@@ -270,7 +270,7 @@ with their licence information attached.
 [libsox]:                 http://sox.sourceforge.net
 [libuv]:                  https://github.com/joyent/libuv
 [MIT licence]:            http://opensource.org/licenses/MIT
-[MSYS2]:		  https://msys2.github.io/
+[MSYS2]:                  https://msys2.github.io/
 [netcat]:                 http://nc110.sourceforge.net
 [SDL2]:                   https://www.libsdl.org
 [PuTTY]:                  http://www.chiark.greenend.org.uk/~sgtatham/putty/
