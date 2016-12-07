@@ -6,7 +6,7 @@ DISTVERSIONPREFIX=	v
 DISTVERSION=		0.3.1
 CATEGORIES=		audio
 
-MAINTAINER=	din@ury.york.ac.uk
+MAINTAINER=	din@ury.org.uk
 COMMENT=	Minimal C++ audio player
 
 LICENSE=		MIT BSL
