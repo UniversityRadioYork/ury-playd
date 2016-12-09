@@ -149,7 +149,7 @@ void ExitWithError(const std::string &msg)
  */
 int main(int argc, char *argv[])
 {
-#ifndef _MSC_VER
+#ifndef _WIN32
 	// If we don't ignore SIGPIPE, certain classes of connection droppage
 	// will crash our program with it.
 	// TODO(CaptainHayashi): a more rigorous ifndef here.

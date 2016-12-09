@@ -31,7 +31,7 @@ env:
 
 script:
   - if [ "$USE_CMAKE" = "FALSE" ]; then ./config.sh && make coverage; fi
-  - if [ "$USE_CMAKE" = "TRUE" ]; then mkdir cbuild && cd cbuild; cmake .. && make && make test; fi
+  - if [ "$USE_CMAKE" = "TRUE" ]; then mkdir cbuild && cd cbuild; cmake .. && make && make check; fi
 
 # coveralls doesn't like gcc (segfaults)
 after_success:

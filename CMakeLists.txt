@@ -14,11 +14,15 @@ set(MPG123_FMTS MP3)
 set(SNDFILE_FMTS OGG WAV FLAC)
 
 set(SUPPORTED_FORMATS)
+set(WITH_MPG123 TRUE CACHE BOOL "Enable MPG123 support")
+set(WITH_SNDFILE TRUE CACHE BOOL "Enable libsndfile support")
 foreach(loop_var MPG123 SNDFILE)
-  find_package(${loop_var})
-  if(${loop_var}_FOUND)
-    list(APPEND SUPPORTED_FMTS ${${loop_var}_FMTS})
-  endif(${loop_var}_FOUND)
+  if(WITH_${loop_var})
+    find_package(${loop_var})
+    if(${loop_var}_FOUND)
+      list(APPEND SUPPORTED_FMTS ${${loop_var}_FMTS})
+    endif(${loop_var}_FOUND)
+  endif(WITH_${loop_var})
 endforeach()
 
 if("${SUPPORTED_FMTS}" STREQUAL "")
@@ -84,7 +88,7 @@ set(tests_SRCS ${tests_SRCS}
   src/tests/tokeniser.cpp
 )
 add_executable(playd ${SRCS} "src/main.cpp")
-add_executable(playd_tests ${SRCS} ${tests_SRCS})
+add_executable(playd_tests EXCLUDE_FROM_ALL ${SRCS} ${tests_SRCS})
 add_test(NAME playd_tests COMMAND playd_tests)
 # `make check` to both compile and run tests
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
@@ -106,3 +110,15 @@ foreach(mylib SDL2 LIBUV MPG123 SNDFILE)
   endif()
   unset(libs)
 endforeach()
+
+# Install
+set(mandir "man/man1")
+if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
+	set(mandir "share/${mandir}")
+endif(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
+
+install(TARGETS playd RUNTIME DESTINATION bin)
+install(FILES src/playd.1       DESTINATION ${CMAKE_INSTALL_PREFIX}/${mandir})
+install(FILES LICENSE.txt       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
+install(FILES LICENSE.portaudio DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
+install(FILES LICENSE.catch     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
