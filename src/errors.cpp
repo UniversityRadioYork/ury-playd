@@ -4,10 +4,10 @@
 /**
  * @file
  * Implementation of the playd Error exception set.
- * @see errors.hpp
+ * @see errors.h
  */
 
-#include "errors.hpp"
+#include "errors.h"
 
 Error::Error(const std::string &msg) : message(msg)
 {

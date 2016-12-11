@@ -7,8 +7,8 @@
  * @see audio/audio.cpp
  */
 
-#ifndef PLAYD_AUDIO_SINK_HPP
-#define PLAYD_AUDIO_SINK_HPP
+#ifndef PLAYD_AUDIO_SINK_H
+#define PLAYD_AUDIO_SINK_H
 
 #include <array>
 #include <cstdint>
@@ -19,10 +19,10 @@
 
 #include "SDL.h"
 
-#include "audio.hpp"
-#include "audio_source.hpp"
-#include "ringbuffer.hpp"
-#include "sample_formats.hpp"
+#include "audio.h"
+#include "audio_source.h"
+#include "ringbuffer.h"
+#include "sample_formats.h"
 
 
 /// Abstract class for audio output sinks.
@@ -184,4 +184,4 @@ private:
 	Audio::State state;
 };
 
-#endif // PLAYD_AUDIO_SINK_HPP
+#endif // PLAYD_AUDIO_SINK_H

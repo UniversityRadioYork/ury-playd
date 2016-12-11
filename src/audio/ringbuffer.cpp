@@ -12,9 +12,9 @@
 #include <vector>
 
 #include "../gsl/gsl"
-#include "../errors.hpp"
+#include "../errors.h"
 #include "../messages.h"
-#include "ringbuffer.hpp"
+#include "ringbuffer.h"
 
 /* Assumptions:
 
@@ -39,7 +39,7 @@ RingBuffer::RingBuffer(size_t capacity)
     // Only one thread can hold this at the moment, so we're ok to
     // do this without locks.
 	this->FlushInner();
-    
+
     Ensures(ReadCapacity() == 0);
     Ensures(WriteCapacity() == capacity);
 }
@@ -93,10 +93,10 @@ unsigned long RingBuffer::Write(const char *start, size_t count)
 	auto bytes_to_end = distance(this->w_it, this->buffer.end());
 	// Make sure we got the iterators the right way round.
 	assert(0 <= bytes_to_end);
-	
+
 	auto write_end_count = std::min(write_count, static_cast<size_t>(bytes_to_end));
 	this->w_it = copy_n(start, write_end_count, this->w_it);
-	
+
 	// Do we need to loop?  If so, do that.
 	auto write_start_count = write_count - write_end_count;
 	if (0 < write_start_count) {
@@ -107,7 +107,7 @@ unsigned long RingBuffer::Write(const char *start, size_t count)
 
 	/* Now tell the consumer it can read some more data (this HAS to be done here,
 	 * to avoid the consumer over-reading).
-	 * 
+	 *
 	 * Because the other thread might have moved count since we last checked it,
 	 * this needs to be acquire-release.
 	 */
@@ -143,7 +143,7 @@ size_t RingBuffer::Read(char *start, size_t count)
 
 	auto bytes_to_end = distance(this->r_it, this->buffer.cend());
 	assert(0 <= bytes_to_end);
-    
+
 	auto read_end_count = std::min(read_count, static_cast<size_t>(bytes_to_end));
 	start = copy_n(this->r_it, read_end_count, start);
 	this->r_it += read_end_count;

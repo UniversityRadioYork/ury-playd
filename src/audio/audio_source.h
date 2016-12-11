@@ -7,16 +7,16 @@
  * @see audio/audio_source.cpp
  */
 
-#ifndef PLAYD_AUDIO_SOURCE_HPP
-#define PLAYD_AUDIO_SOURCE_HPP
+#ifndef PLAYD_AUDIO_SOURCE_H
+#define PLAYD_AUDIO_SOURCE_H
 
 #include <cstdint>
 #include <chrono>
 #include <string>
 #include <vector>
 
-#include "../errors.hpp"
-#include "sample_formats.hpp"
+#include "../errors.h"
+#include "sample_formats.h"
 
 using namespace std::chrono;
 
@@ -144,4 +144,4 @@ protected:
 	std::string path;
 };
 
-#endif // PLAYD_AUDIO_SOURCE_HPP
+#endif // PLAYD_AUDIO_SOURCE_H

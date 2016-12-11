@@ -8,7 +8,7 @@
 
 #include <ostream>
 #include <string>
-#include "dummy_response_sink.hpp"
+#include "dummy_response_sink.h"
 
 DummyResponseSink::DummyResponseSink(std::ostream &os) : os(os)
 {

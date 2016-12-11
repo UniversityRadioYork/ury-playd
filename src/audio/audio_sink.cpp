@@ -4,7 +4,7 @@
 /**
  * @file
  * Implementation of the AudioSink class.
- * @see audio/audio_sink.hpp
+ * @see audio/audio_sink.h
  */
 
 #include <array>
@@ -17,12 +17,12 @@
 
 #include "SDL.h"
 
-#include "../errors.hpp"
+#include "../errors.h"
 #include "../messages.h"
-#include "audio_sink.hpp"
-#include "audio_source.hpp"
-#include "ringbuffer.hpp"
-#include "sample_formats.hpp"
+#include "audio_sink.h"
+#include "audio_source.h"
+#include "ringbuffer.h"
+#include "sample_formats.h"
 
 //
 // AudioSink
@@ -235,13 +235,13 @@ void SdlAudioSink::Callback(std::uint8_t *out, int nbytes)
 	auto bytes = std::min(req_bytes, avail_bytes);
     // We should be asking for a whole number of samples.
     assert(bytes % bytes_per_sample == 0);
-    
+
 	auto read_bytes = this->ring_buf.Read(reinterpret_cast<char *>(out), bytes);
 
     // We should have received a whole number of samples.
     assert(read_bytes % this->bytes_per_sample == 0);
     auto read_samples = read_bytes / this->bytes_per_sample;
-    
+
 	this->position_sample_count += read_samples;
 }
 

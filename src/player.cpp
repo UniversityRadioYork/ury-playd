@@ -4,7 +4,7 @@
 /**
  * @file player.cpp
  * Main implementation file for the Player class.
- * @see player.hpp
+ * @see player.h
  */
 
 #include <cassert>
@@ -15,13 +15,13 @@
 #include <string>
 #include <vector>
 
-#include "audio/audio_sink.hpp"
-#include "audio/audio_source.hpp"
-#include "audio/audio.hpp"
-#include "errors.hpp"
-#include "response.hpp"
+#include "audio/audio_sink.h"
+#include "audio/audio_source.h"
+#include "audio/audio.h"
+#include "errors.h"
+#include "response.h"
 #include "messages.h"
-#include "player.hpp"
+#include "player.h"
 
 using namespace std::chrono;
 

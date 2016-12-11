@@ -4,13 +4,13 @@
 /**
  * @file
  * Implementation of sample format tables.
- * @see audio/sample_formats.hpp
+ * @see audio/sample_formats.h
  */
 
 #include <array>
 #include <cstddef>
 
-#include "sample_formats.hpp"
+#include "sample_formats.h"
 
 const std::array<std::size_t, SAMPLE_FORMAT_COUNT> SAMPLE_FORMAT_BPS {{
         1, // PACKED_UNSIGNED_INT_8

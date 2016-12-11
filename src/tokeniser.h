@@ -7,10 +7,10 @@
  * @see tokeniser.cpp
  */
 
-#ifndef PLAYD_TOKENISER_HPP
-#define PLAYD_TOKENISER_HPP
+#ifndef PLAYD_TOKENISER_H
+#define PLAYD_TOKENISER_H
 
-#include "response.hpp"
+#include "response.h"
 
 /**
  * A string tokeniser.
@@ -80,4 +80,4 @@ private:
 	void Push(char c);
 };
 
-#endif // PLAYD_TOKENISER_HPP
+#endif // PLAYD_TOKENISER_H

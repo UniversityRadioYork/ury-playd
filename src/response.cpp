@@ -4,16 +4,16 @@
 /**
  * @file
  * Implementation of client response classes.
- * @see response.hpp
+ * @see response.h
  */
 
 #include <array>
 #include <cctype>
 #include <sstream>
 
-#include "errors.hpp"
+#include "errors.h"
 
-#include "response.hpp"
+#include "response.h"
 
 /* static */ const std::string Response::NOREQUEST = "!";
 

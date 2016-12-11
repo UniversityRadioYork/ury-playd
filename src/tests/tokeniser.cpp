@@ -7,7 +7,7 @@
  */
 
 #include "catch.hpp"
-#include "../tokeniser.hpp"
+#include "../tokeniser.h"
 
 SCENARIO("Tokenisers can handle complete, unquoted commands", "[tokeniser]") {
 	GIVEN("A fresh Tokeniser") {

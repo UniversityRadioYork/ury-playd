@@ -7,8 +7,8 @@
  * @see player.cpp
  */
 
-#ifndef PLAYD_PLAYER_HPP
-#define PLAYD_PLAYER_HPP
+#ifndef PLAYD_PLAYER_H
+#define PLAYD_PLAYER_H
 
 #include <cstdint>
 #include <chrono>
@@ -19,10 +19,10 @@
 #include <utility>
 #include <vector>
 
-#include "audio/audio_sink.hpp"
-#include "audio/audio_source.hpp"
-#include "audio/audio.hpp"
-#include "response.hpp"
+#include "audio/audio_sink.h"
+#include "audio/audio_source.h"
+#include "audio/audio.h"
+#include "response.h"
 
 using namespace std::chrono;
 
@@ -252,4 +252,4 @@ private:
 	std::unique_ptr<AudioSource> LoadSource(const std::string &path) const;
 };
 
-#endif // PLAYD_PLAYER_HPP
+#endif // PLAYD_PLAYER_H

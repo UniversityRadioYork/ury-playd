@@ -4,7 +4,7 @@
 /**
  * @file
  * Implementation of the PipeAudio class.
- * @see audio/pipe_audio.hpp
+ * @see audio/pipe_audio.h
  */
 
 #include <algorithm>
@@ -14,13 +14,13 @@
 #include <cstdint>
 #include <string>
 
-#include "../errors.hpp"
+#include "../errors.h"
 #include "../messages.h"
-#include "../response.hpp"
-#include "audio.hpp"
-#include "audio_sink.hpp"
-#include "audio_source.hpp"
-#include "sample_formats.hpp"
+#include "../response.h"
+#include "audio.h"
+#include "audio_sink.h"
+#include "audio_source.h"
+#include "sample_formats.h"
 
 using namespace std::chrono;
 

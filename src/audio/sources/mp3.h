@@ -7,8 +7,8 @@
  * @see audio/sources/mp3.cpp
  */
 
-#ifndef PLAYD_AUDIO_SOURCE_MP3_HPP
-#define PLAYD_AUDIO_SOURCE_MP3_HPP
+#ifndef PLAYD_AUDIO_SOURCE_MP3_H
+#define PLAYD_AUDIO_SOURCE_MP3_H
 #ifdef WITH_MP3
 
 #include <cstdint>
@@ -19,8 +19,8 @@ extern "C" {
 #include <mpg123.h>
 }
 
-#include "../audio_source.hpp"
-#include "../sample_formats.hpp"
+#include "../audio_source.h"
+#include "../sample_formats.h"
 
 /// AudioSource for use on MP3 files.
 class Mp3AudioSource : public AudioSource
@@ -63,4 +63,4 @@ private:
 };
 
 #endif // WITH_MP3
-#endif // PLAYD_AUDIO_SOURCE_MP3_HPP
+#endif // PLAYD_AUDIO_SOURCE_MP3_H

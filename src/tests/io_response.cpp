@@ -11,7 +11,7 @@
 #include <string>
 
 #include "catch.hpp"
-#include "../response.hpp"
+#include "../response.h"
 
 SCENARIO("Response's convenience constructors create correct Responses", "[command-result]") {
 	GIVEN("A Response created via Response::Success()") {

@@ -11,10 +11,11 @@
 
 #include "catch.hpp"
 
-#include "../audio/audio.hpp"
-#include "../errors.hpp"
-#include "../response.hpp"
-#include "dummy_response_sink.hpp"
+#include "../audio/audio.h"
+#include "../errors.h"
+#include "../response.h"
+#include "dummy_response_sink.h"
+
 
 using namespace std::chrono;
 

@@ -6,12 +6,12 @@
  * Dummy classes for response class tests.
  */
 
-#ifndef PLAYD_TESTS_IO_RESPONSE_HPP
-#define PLAYD_TESTS_IO_RESPONSE_HPP
+#ifndef PLAYD_TESTS_IO_RESPONSE_H
+#define PLAYD_TESTS_IO_RESPONSE_H
 
 #include <ostream>
 
-#include "../response.hpp"
+#include "../response.h"
 
 // A dummy class for testing the ResponseSink abstract class methods.
 class DummyResponseSink : public ResponseSink {
@@ -30,4 +30,4 @@ private:
 	std::ostream &os;
 };
 
-#endif // PLAYD_TESTS_IO_RESPONSE_HPP
+#endif // PLAYD_TESTS_IO_RESPONSE_H

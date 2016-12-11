@@ -7,8 +7,8 @@
  * @see io.cpp
  */
 
-#ifndef PLAYD_IO_CORE_HPP
-#define PLAYD_IO_CORE_HPP
+#ifndef PLAYD_IO_CORE_H
+#define PLAYD_IO_CORE_H
 
 #include <ostream>
 #include <set>
@@ -21,9 +21,9 @@ typedef ptrdiff_t ssize_t;
 #endif
 #include <uv.h>
 
-#include "player.hpp"
-#include "response.hpp"
-#include "tokeniser.hpp"
+#include "player.h"
+#include "response.h"
+#include "tokeniser.h"
 
 class Player;
 class Connection;
@@ -266,4 +266,4 @@ private:
 	Response RunCommand(const std::vector<std::string> &msg);
 };
 
-#endif // PLAYD_IO_CORE_HPP
+#endif // PLAYD_IO_CORE_H

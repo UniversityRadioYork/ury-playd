@@ -12,16 +12,16 @@
 #include <iostream>
 #include <tuple>
 
-#include "io.hpp"
-#include "response.hpp"
-#include "player.hpp"
+#include "io.h"
+#include "response.h"
+#include "player.h"
 #include "messages.h"
 
 #ifdef WITH_MP3
-#include "audio/sources/mp3.hpp"
+#include "audio/sources/mp3.h"
 #endif // WITH_MP3
 #ifdef WITH_SNDFILE
-#include "audio/sources/sndfile.hpp"
+#include "audio/sources/sndfile.h"
 #endif // WITH_SNDFILE
 
 /// The default IP hostname on which playd will bind.

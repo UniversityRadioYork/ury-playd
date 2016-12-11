@@ -4,14 +4,14 @@
 /**
  * @file
  * Declaration of the DummyAudioSource class.
- * @see audio/audio_source.hpp
+ * @see audio/audio_source.h
  * @see tests/dummy_audio_source.cpp
  */
 
 #include <cstdint>
 
-#include "../audio/audio.hpp"
-#include "../audio/audio_source.hpp"
+#include "../audio/audio.h"
+#include "../audio/audio_source.h"
 
 /// Dummy AudioSource, for testing PipeAudio.
 class DummyAudioSource : public AudioSource

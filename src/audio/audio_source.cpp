@@ -4,14 +4,14 @@
 /**
  * @file
  * Implementation of the AudioSource class.
- * @see audio/audio_source.hpp
+ * @see audio/audio_source.h
  */
 
 #include <cstdint>
 #include <string>
 
-#include "audio_source.hpp"
-#include "sample_formats.hpp"
+#include "audio_source.h"
+#include "sample_formats.h"
 
 AudioSource::AudioSource(const std::string &path) : path(path)
 {

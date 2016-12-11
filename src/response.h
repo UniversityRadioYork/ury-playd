@@ -7,8 +7,8 @@
  * @see response.cpp
  */
 
-#ifndef PLAYD_IO_RESPONSE_HPP
-#define PLAYD_IO_RESPONSE_HPP
+#ifndef PLAYD_IO_RESPONSE_H
+#define PLAYD_IO_RESPONSE_H
 
 #include <cstdint>
 #include <map>
@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "errors.hpp"
+#include "errors.h"
 
 /// A response.
 class Response
@@ -131,4 +131,4 @@ public:
 	virtual void Respond(size_t id, const Response &response) const;
 };
 
-#endif // PLAYD_IO_RESPONSE_HPP
+#endif // PLAYD_IO_RESPONSE_H

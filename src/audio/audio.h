@@ -7,8 +7,8 @@
  * @see audio/audio.cpp
  */
 
-#ifndef PLAYD_AUDIO_HPP
-#define PLAYD_AUDIO_HPP
+#ifndef PLAYD_AUDIO_H
+#define PLAYD_AUDIO_H
 
 #include <chrono>
 #include <cstdint>
@@ -17,8 +17,8 @@
 #include <utility>
 #include <vector>
 
-#include "../response.hpp"
-#include "audio_source.hpp"
+#include "../response.h"
+#include "audio_source.h"
 
 using namespace std::chrono;
 
@@ -214,4 +214,4 @@ private:
 	void TransferFrame();
 };
 
-#endif // PLAYD_AUDIO_HPP
+#endif // PLAYD_AUDIO_H

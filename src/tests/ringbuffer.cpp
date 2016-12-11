@@ -8,8 +8,8 @@
 
 #include "catch.hpp"
 
-#include "../errors.hpp"
-#include "../audio/ringbuffer.hpp"
+#include "../errors.h"
+#include "../audio/ringbuffer.h"
 
 SCENARIO("RingBuffer cannot be read from when empty", "[ringbuffer]") {
 	GIVEN("an empty RingBuffer and properly sized buffer") {

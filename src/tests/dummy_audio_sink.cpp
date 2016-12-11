@@ -4,15 +4,15 @@
 /**
  * @file
  * Definition of the DummyAudioSink class.
- * @see audio/audio_sink.hpp
+ * @see audio/audio_sink.h
  * @see tests/dummy_audio_sink.cpp
  */
 
 #include <cstdint>
 
-#include "../audio/audio.hpp"
-#include "../audio/audio_sink.hpp"
-#include "dummy_audio_sink.hpp"
+#include "../audio/audio.h"
+#include "../audio/audio_sink.h"
+#include "dummy_audio_sink.h"
 
 void DummyAudioSink::Start()
 {

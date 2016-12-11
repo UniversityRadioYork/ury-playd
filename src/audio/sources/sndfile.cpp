@@ -4,7 +4,7 @@
 /**
  * @file
  * Implementation of the SndfileAudioSource class.
- * @see audio/audio_source.hpp
+ * @see audio/audio_source.h
  */
 
 #include <cassert>
@@ -18,11 +18,11 @@
 
 #include <sndfile.h>
 
-#include "../../errors.hpp"
+#include "../../errors.h"
 #include "../../messages.h"
-#include "../sample_formats.hpp"
-#include "../audio_source.hpp"
-#include "sndfile.hpp"
+#include "../sample_formats.h"
+#include "../audio_source.h"
+#include "sndfile.h"
 
 SndfileAudioSource::SndfileAudioSource(const std::string &path)
     : AudioSource(path), file(nullptr), buffer()

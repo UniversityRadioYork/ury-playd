@@ -11,7 +11,7 @@
  * [libuv]: https://github.com/joyent/libuv
  * [the uvbook]: https://nikhilm.github.io/uvbook
  *
- * @see io.hpp
+ * @see io.h
  */
 
 #include <algorithm>
@@ -32,12 +32,12 @@ typedef ptrdiff_t ssize_t;
 #endif
 #include <uv.h>
 
-#include "errors.hpp"
+#include "errors.h"
 #include "messages.h"
-#include "player.hpp"
-#include "response.hpp"
+#include "player.h"
+#include "response.h"
 
-#include "io.hpp"
+#include "io.h"
 
 const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
 

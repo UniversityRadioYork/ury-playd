@@ -9,12 +9,12 @@
 #include <sstream>
 
 #include "catch.hpp"
-#include "../errors.hpp"
+#include "../errors.h"
 #include "../messages.h"
-#include "../player.hpp"
-#include "dummy_audio_sink.hpp"
-#include "dummy_audio_source.hpp"
-#include "dummy_response_sink.hpp"
+#include "../player.h"
+#include "dummy_audio_sink.h"
+#include "dummy_audio_source.h"
+#include "dummy_response_sink.h"
 
 using namespace std::string_literals;
 
@@ -30,7 +30,7 @@ SCENARIO("Player announces changes in state correctly", "[player]") {
 		Player p(0,
 			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
 			 DUMMY_SRCS);
-		
+
 		WHEN("the player has nothing loaded") {
 			GIVEN("a DummyResponseSink") {
 				std::ostringstream os;
@@ -41,7 +41,7 @@ SCENARIO("Player announces changes in state correctly", "[player]") {
 					p.Eject("tag");
 					REQUIRE(os.str() == "");
 				}
-	
+
 				THEN("loading a file should emit all state") {
 					p.Load("tag", "baz.mp3");
 					REQUIRE(os.str() == "! STOP\n! FLOAD baz.mp3\n! POS 0\n! LEN 0\n");
@@ -179,7 +179,7 @@ SCENARIO("Player refuses absurd seek positions", "[seek]") {
 		Player p(0,
 			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
 			 DUMMY_SRCS);
-		
+
 		p.Load("tag", "blah.mp3");
 
 		auto response = "tag ACK WHAT '"s + MSG_SEEK_INVALID_VALUE + "'"s;
@@ -258,14 +258,14 @@ SCENARIO("Player refuses commands when quitting", "[player]") {
 		Player p(0,
 			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
 			 DUMMY_SRCS);
-		
+
 		p.Load("tag", "blah.mp3");
 
 		auto response = "tag ACK FAIL '"s + MSG_CMD_PLAYER_CLOSING + "'"s;
 
 		WHEN("the player is told to quit") {
 			p.Quit("t");
-			
+
 			THEN("loading returns a player-closing failure") {
 				REQUIRE(p.Load("tag", "barbaz.mp3").Pack() == response);
 			}
@@ -299,7 +299,7 @@ SCENARIO("Player handles load errors properly", "[seek]") {
 		Player p(0,
 			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
 			 DUMMY_SRCS);
-		
+
 		WHEN("no file is loaded") {
 			std::ostringstream os;
 			DummyResponseSink drs(os);
@@ -319,7 +319,7 @@ SCENARIO("Player handles load errors properly", "[seek]") {
 
 			AND_WHEN("a load fails with InternalError") {
 				THEN("the error propagates outwards") {
-					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), InternalError);	
+					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), InternalError);
 				}
 			}
 		}
@@ -345,7 +345,7 @@ SCENARIO("Player handles load errors properly", "[seek]") {
 
 			AND_WHEN("a load fails with InternalError") {
 				THEN("the error propagates outwards") {
-					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), InternalError);	
+					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), InternalError);
 				}
 			}
 		}

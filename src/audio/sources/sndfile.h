@@ -7,8 +7,8 @@
  * @see audio/sources/sndfile.cpp
  */
 
-#ifndef PLAYD_AUDIO_SOURCE_SNDFILE_HPP
-#define PLAYD_AUDIO_SOURCE_SNDFILE_HPP
+#ifndef PLAYD_AUDIO_SOURCE_SNDFILE_H
+#define PLAYD_AUDIO_SOURCE_SNDFILE_H
 #ifdef WITH_SNDFILE
 
 #include <cstdint>
@@ -17,8 +17,8 @@
 
 #include <sndfile.h>
 
-#include "../audio_source.hpp"
-#include "../sample_formats.hpp"
+#include "../audio_source.h"
+#include "../sample_formats.h"
 
 /// AudioSource for use on files supported by libsndfile.
 class SndfileAudioSource : public AudioSource
@@ -52,4 +52,4 @@ private:
 };
 
 #endif // WITH_SNDFILE
-#endif // PLAYD_AUDIO_SOURCE_SNDFILE_HPP
+#endif // PLAYD_AUDIO_SOURCE_SNDFILE_H

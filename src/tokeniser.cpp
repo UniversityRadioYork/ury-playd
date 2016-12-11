@@ -4,16 +4,16 @@
 /**
  * @file
  * Definition of the Tokeniser class.
- * @see tokeniser.hpp
+ * @see tokeniser.h
  */
 
 #include <algorithm>
 #include <cassert>
 #include <locale>
 
-#include "response.hpp"
+#include "response.h"
 
-#include "tokeniser.hpp"
+#include "tokeniser.h"
 
 Tokeniser::Tokeniser()
     : escape_next(false), in_word(false), quote_type(QuoteType::NONE)

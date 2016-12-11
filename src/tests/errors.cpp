@@ -5,7 +5,7 @@
 
 #include "catch.hpp"
 
-#include "../errors.hpp"
+#include "../errors.h"
 
 
 SCENARIO("Errors contain a retrievable message", "[error]") {
