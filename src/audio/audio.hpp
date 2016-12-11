@@ -10,6 +10,7 @@
 #ifndef PLAYD_AUDIO_HPP
 #define PLAYD_AUDIO_HPP
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -18,6 +19,8 @@
 
 #include "../response.hpp"
 #include "audio_source.hpp"
+
+using namespace std::chrono;
 
 class AudioSink;
 
@@ -78,7 +81,7 @@ public:
 	 * @exception NoAudioError if the current state is NONE.
 	 * @see Position
 	 */
-	virtual void SetPosition(std::uint64_t position) = 0;
+	virtual void SetPosition(microseconds position) = 0;
 
 	//
 	// Property access
@@ -107,9 +110,16 @@ public:
 	 * @exception NoAudioError if the current state is NONE.
 	 * @see Seek
 	 */
-	virtual std::uint64_t Position() const = 0;
+    virtual microseconds Position() const = 0;
 
-	virtual std::uint64_t Length() const = 0;
+    /**
+     * This Audio's length.
+     *
+     * @return The length, in microseconds.
+     * @exception NoAudioError if the current state is NONE.
+     * @see Seek
+     */
+    virtual microseconds Length() const = 0;
 };
 
 /**
@@ -130,9 +140,9 @@ public:
 	// The following all raise an exception:
 
 	void SetPlaying(bool playing) override;
-	void SetPosition(std::uint64_t position) override;
-	std::uint64_t Position() const override;
-	std::uint64_t Length() const override;
+	void SetPosition(microseconds position) override;
+	microseconds Position() const override;
+    microseconds Length() const override;
 	const std::string &File() const override;
 };
 
@@ -165,10 +175,9 @@ public:
 	void SetPlaying(bool playing) override;
 	Audio::State CurrentState() const override;
 
-	void SetPosition(std::uint64_t position) override;
-	std::uint64_t Position() const override;
-
-	std::uint64_t Length() const override;
+	void SetPosition(microseconds position) override;
+	microseconds Position() const override;
+    microseconds Length() const override;
 
 private:
 	/// The source of audio data.

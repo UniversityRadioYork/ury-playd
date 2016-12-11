@@ -24,6 +24,7 @@
 #include "ringbuffer.hpp"
 #include "sample_formats.hpp"
 
+
 /// Abstract class for audio output sinks.
 class AudioSink
 {
@@ -61,7 +62,7 @@ public:
 	 * do not expect it to be highly accurate.
 	 * @return The current position, as a count of elapsed samples.
 	 */
-	virtual std::uint64_t Position() = 0;
+	virtual Samples Position() = 0;
 
 	/**
 	 * Sets the current played position, given a position in samples.
@@ -70,7 +71,7 @@ public:
 	 * @param samples The new position, as a count of elapsed samples.
 	 * @see Position
 	 */
-	virtual void SetPosition(std::uint64_t samples) = 0;
+	virtual void SetPosition(Samples samples) = 0;
 
 	/**
 	 * Tells this AudioSink that the source has run out.
@@ -121,8 +122,8 @@ public:
 	void Start() override;
 	void Stop() override;
 	Audio::State State() override;
-	std::uint64_t Position() override;
-	void SetPosition(std::uint64_t samples) override;
+	Samples Position() override;
+	void SetPosition(Samples samples) override;
 	void SourceOut() override;
 	void Transfer(TransferIterator &start,
 	              const TransferIterator &end) override;
@@ -174,7 +175,7 @@ private:
 	RingBuffer ring_buf;
 
 	/// The current position, in samples.
-	std::uint64_t position_sample_count;
+	Samples position_sample_count;
 
 	/// Whether the source has run out of things to feed the sink.
 	bool source_out;

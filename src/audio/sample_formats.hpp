@@ -13,6 +13,9 @@
 #include <array>
 #include <cstdint>
 
+/// Type definition for samples.
+using Samples = std::uint64_t;
+
 /**
  * Sample formats available in playd.
  *

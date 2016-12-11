@@ -11,6 +11,7 @@
 #define PLAYD_PLAYER_HPP
 
 #include <cstdint>
+#include <chrono>
 #include <functional>
 #include <map>
 #include <memory>
@@ -22,6 +23,9 @@
 #include "audio/audio_source.hpp"
 #include "audio/audio.hpp"
 #include "response.hpp"
+
+using namespace std::chrono;
+
 
 /**
  * A Player contains a loaded audio file and a command API for manipulating it.
@@ -142,9 +146,9 @@ private:
 	SinkFn sink;                             ///< The sink create function.
 	std::map<std::string, SourceFn> sources; ///< The file formats map.
 	std::unique_ptr<Audio> file;             ///< The loaded audio file.
-	bool dead;              ///< Whether the Player is closing.
-	const ResponseSink *io; ///< The sink for responses.
-	std::uint64_t last_pos; ///< The last-sent position.
+	bool dead;                               ///< Whether the Player is closing.
+	const ResponseSink *io;                  ///< The sink for responses.
+	seconds last_pos;                        ///< The last-sent position.
 
 	/**
 	 * Parses pos_str as a seek timestamp.
@@ -157,7 +161,7 @@ private:
 	 * @exception SeekError
 	 *   Raised if checks beyond those done by stoull fail.
 	 */
-	static std::uint64_t PosParse(const std::string &pos_str);
+	static microseconds PosParse(const std::string &pos_str);
 
 	/**
 	 * Performs an actual seek.
@@ -169,7 +173,7 @@ private:
 	 *   Raised if the seek is out of range (usually EOF).
 	 * @see Player::Seek
 	 */
-	void PosRaw(const std::string &tag, std::uint64_t pos);
+	void PosRaw(const std::string &tag, microseconds pos);
 
 	/**
 	 * Emits a response for the current audio state to the sink.
@@ -194,19 +198,38 @@ private:
 	void Respond(int id, Response rs) const;
 
 	/**
+	 * Sends a timestamp response.
+	 *
+	 * @param code The command code for the response.
+	 * @param id The client ID to send towards.
+	 * @param tag The tag to send with the response.
+	 * @param ts The value of the response, in microseconds.
+	 */
+	void AnnounceTimestamp(Response::Code code, int id, const std::string &tag, microseconds ts) const;
+
+	/**
 	 * Determines whether we can broadcast a POS response.
 	 *
 	 * To prevent spewing massive amounts of POS responses, we only send a
-	 * broadcast if the number of seconds has changed since the last
-	 * time CanAnnounceTime() was called.
+	 * broadcast if the current position, truncated to the last second,
+	 * is higher than the last one stored with a broadcast AnnouncePos().
 	 *
-	 * This is *not* idempotent.  A CanAnnounceTime(x) less than one second
-	 * before a CanAnnounceTime(x) will _always_ be false.
-	 *
-	 * @param micros The value of the POS response, in microseconds.
+	 * @param pos The value of the POS response, in microseconds.
 	 * @return Whether it is polite to broadcast POS.
 	 */
-	bool CanAnnounceTime(std::uint64_t micros);
+	bool CanBroadcastPos(microseconds pos) const;
+
+	/**
+	 * Broadcasts a POS response.
+	 *
+	 * This updates the last broadcast time, so that CanBroadcastPos()
+	 * prevents further broadcasts from happening too soon after this one.
+	 *
+	 * @param tag The tag of the request causing a POS change.
+	 *   For unsolicited seeks, use Response::NOREQUEST.
+	 * @param pos The value of the POS response, in microseconds.
+	 */
+	void BroadcastPos(const std::string &tag, microseconds pos);
 
 	//
 	// Audio subsystem

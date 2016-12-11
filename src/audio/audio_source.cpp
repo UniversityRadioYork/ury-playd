@@ -28,18 +28,16 @@ const std::string &AudioSource::Path() const
 	return this->path;
 }
 
-std::uint64_t AudioSource::SamplesFromMicros(std::uint64_t micros) const
+Samples AudioSource::SamplesFromMicros(microseconds micros) const
 {
 	// The sample rate is expressed in terms of samples per second, so we
 	// need to convert the position to seconds then multiply by the rate.
 	// We do things in a slightly peculiar order to minimise rounding.
-
-	return (micros * this->SampleRate()) / 1000000;
+	return (micros.count() * this->SampleRate()) / 1000000;
 }
 
-std::uint64_t AudioSource::MicrosFromSamples(std::uint64_t samples) const
+microseconds AudioSource::MicrosFromSamples(Samples samples) const
 {
 	// This is basically SamplesFromMicros but backwards.
-
-	return (samples * 1000000) / this->SampleRate();
+	return microseconds { (samples * 1000000) / this->SampleRate() };
 }

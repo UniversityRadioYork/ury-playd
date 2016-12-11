@@ -8,6 +8,7 @@
  */
 
 #include <cassert>
+#include <chrono>
 #include <cstdint>
 #include <sstream>
 #include <stdexcept>
@@ -21,6 +22,8 @@
 #include "response.hpp"
 #include "messages.h"
 #include "player.hpp"
+
+using namespace std::chrono;
 
 Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sources)
     : device_id(device_id),
@@ -48,11 +51,7 @@ bool Player::Update()
 		// Since the audio is currently playing, the position may have
 		// advanced since last update.  So we need to update it.
 		auto pos = this->file->Position();
-		if (this->CanAnnounceTime(pos)) {
-			this->Respond(0, Response(Response::NOREQUEST,
-			                          Response::Code::POS)
-			                         .AddArg(std::to_string(pos)));
-		}
+		if (this->CanBroadcastPos(pos)) this->BroadcastPos(Response::NOREQUEST, pos);
 	}
 
 	return !this->dead;
@@ -75,12 +74,9 @@ Response Player::Dump(size_t id, const std::string &tag) const
 		        id, Response(tag, Response::Code::FLOAD).AddArg(file));
 
 		auto pos = this->file->Position();
-		this->Respond(id, Response(tag, Response::Code::POS)
-		                          .AddArg(std::to_string(pos)));
-
-	auto len = this->file->Length();
-	this->Respond(id, Response(tag, Response::Code::LEN)
-	                         .AddArg(std::to_string(len)));
+        this->AnnounceTimestamp(Response::Code::POS, id, tag, pos);
+        auto len = this->file->Length();
+        this->AnnounceTimestamp(Response::Code::LEN, id, tag, len);
 	}
 
 	return Response::Success(tag);
@@ -118,7 +114,7 @@ Response Player::End(const std::string &tag)
 	// Rewind the file back to the start.  We can't use Player::Pos() here
 	// in case End() is called from Pos(); a seek failure could start an
 	// infinite loop.
-	this->PosRaw(Response::NOREQUEST, 0);
+	this->PosRaw(Response::NOREQUEST, microseconds {0});
 
 	return Response::Success(tag);
 }
@@ -144,7 +140,7 @@ Response Player::Load(const std::string &tag, const std::string &path)
 	}
 
 	assert(this->file != nullptr);
-	this->last_pos = 0;
+	this->last_pos = seconds {0};
 
 	// A load will change all of the player's state in one go,
 	// so just send a Dump() instead of writing out all of the responses
@@ -160,7 +156,7 @@ Response Player::Pos(const std::string &tag, const std::string &pos_str)
 {
 	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
-	std::uint64_t pos = 0;
+	microseconds pos {0};
 	try {
 		pos = PosParse(pos_str);
 	} catch (SeekError &e) {
@@ -224,7 +220,7 @@ Response Player::Quit(const std::string &tag)
 // Command implementations
 //
 
-/* static */ std::uint64_t Player::PosParse(const std::string &pos_str)
+/* static */ microseconds Player::PosParse(const std::string &pos_str)
 {
 	size_t cpos = 0;
 
@@ -250,20 +246,14 @@ Response Player::Quit(const std::string &tag)
 	auto sl = pos_str.length();
 	if (cpos != sl) throw SeekError(MSG_SEEK_INVALID_VALUE);
 
-	return pos;
+	return microseconds {pos};
 }
 
-void Player::PosRaw(const std::string &tag, std::uint64_t pos)
+void Player::PosRaw(const std::string &tag, microseconds pos)
 {
 	assert(this->file != nullptr);
-
 	this->file->SetPosition(pos);
-
-	// This is required to make CanAnnounceTime() continue working.
-	this->last_pos = pos / 1000 / 1000;
-
-	this->Respond(0, Response(tag, Response::Code::POS)
-	                         .AddArg(std::to_string(pos)));
+	this->BroadcastPos(tag, pos);
 }
 
 void Player::DumpState(size_t id, const std::string &tag) const
@@ -296,15 +286,27 @@ void Player::Respond(int id, Response rs) const
 	if (this->io != nullptr) this->io->Respond(id, rs);
 }
 
-bool Player::CanAnnounceTime(std::uint64_t micros)
+void Player::AnnounceTimestamp(Response::Code code, int id, const std::string &tag,
+			 microseconds ts) const
 {
-	std::uint64_t secs = micros / 1000 / 1000;
+	this->Respond(id, Response(tag, code)
+		                  .AddArg(std::to_string(ts.count())));
+}
 
-	// We can announce if the last announced pos was in a previous second.
-	bool announce = this->last_pos < secs;
-	if (announce) this->last_pos = secs;
+bool Player::CanBroadcastPos(microseconds pos) const
+{
+	// Because last_pos is counted in seconds, this condition becomes
+	// true whenever pos 'ticks over' to a different second from last_pos.
+	// The result is that we broadcast at most roughly once a second.
+	return this->last_pos < duration_cast<seconds>(pos);
+}
 
-	return announce;
+void Player::BroadcastPos(const std::string &tag, microseconds pos)
+{
+	// This ensures we don't broadcast too often:
+	// see CanBroadcastPos.
+	this->last_pos = duration_cast<seconds>(pos);
+	this->AnnounceTimestamp(Response::Code::POS, 0, tag, pos);
 }
 
 std::unique_ptr<Audio> Player::LoadRaw(const std::string &path) const

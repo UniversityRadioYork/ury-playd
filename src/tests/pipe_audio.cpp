@@ -6,14 +6,18 @@
  * Tests for PipeAudio.
  */
 
-#include "catch.hpp"
-
+#include <chrono>
 #include <sstream>
+
+#include "catch.hpp"
 
 #include "../audio/audio.hpp"
 #include "dummy_response_sink.hpp"
 #include "dummy_audio_source.hpp"
 #include "dummy_audio_sink.hpp"
+
+using namespace std::chrono;
+
 
 SCENARIO("PipeAudio can be constructed with a DummyAudioSink and DummyAudioSource", "[pipe-audio]") {
 	GIVEN("unique pointers to a sink and source") {
@@ -23,7 +27,7 @@ SCENARIO("PipeAudio can be constructed with a DummyAudioSink and DummyAudioSourc
 		WHEN("a PipeAudio is created") {
 			THEN("no exceptions are thrown and queries return the expected initial values") {
 				PipeAudio pa(std::move(src), std::move(sink));
-				REQUIRE(pa.Position() == 0ULL);
+				REQUIRE(pa.Position().count() == 0ULL);
 			}
 		}
 	}
@@ -53,14 +57,14 @@ SCENARIO("PipeAudio responds to getters with valid responses", "[pipe-audio]") {
 
 		WHEN("the position is requested") {
 			AND_WHEN("the position is zero") {
-				pa.SetPosition(0);
+				pa.SetPosition(microseconds {0});
 				THEN("the position is reported as 0") {
-					REQUIRE(pa.Position() == 0ULL);
+					REQUIRE(pa.Position().count() == 0ULL);
 				}
 			}
 
 			AND_WHEN("the position is not zero") {
-				pa.SetPosition(8675309);
+				pa.SetPosition(microseconds {8675309});
 				THEN("the position is reported as (rounded-off position)") {
 					// The DummyAudioSource has 44100Hz
 					// sample rate.  The following
@@ -68,7 +72,7 @@ SCENARIO("PipeAudio responds to getters with valid responses", "[pipe-audio]") {
 					// and from samples should cause.
 					// This *won't* be 8675309!
 					auto expected = (((8675309ULL * 44100) / 1000000) * 1000000) / 44100;
-					REQUIRE(pa.Position() == expected);
+					REQUIRE(pa.Position().count() == expected);
 				}
 			}
 		}
@@ -124,7 +128,7 @@ SCENARIO("PipeAudio acquires state from the sink correctly", "[pipe-audio]") {
 				REQUIRE(pa.Update() == Audio::State::PLAYING);
 			}
 		}
-	
+
 		WHEN("the DummyResponseSink's state is AT_END") {
 			snk->state = Audio::State::AT_END;
 
