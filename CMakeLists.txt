@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(playd)
+list(APPEND CMAKE_PREFIX_PATH "${playd_SOURCE_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${playd_SOURCE_DIR}/cmake_scripts")
 
-list(APPEND CMAKE_PREFIX_PATH "${playd_SOURCE_DIR}")
-include(set_compiler_flags)
+# Set version from git tag
+include(version)
 
+# Find mandatory libraries
 find_package(SDL2 REQUIRED)
 find_package(LibUV REQUIRED)
 
@@ -51,16 +53,7 @@ else()
   add_definitions(-DNO_SNDFILE)
 endif()
 
-# TODO: Manual versioning?
-execute_process(COMMAND "git" "describe" "--tags" "--always" WORKING_DIRECTORY "${playd_SOURCE_DIR}" RESULT_VARIABLE NOT_GIT_REPO OUTPUT_VARIABLE PROGVER OUTPUT_STRIP_TRAILING_WHITESPACE)
-if(NOT_GIT_REPO)
-  message(FATAL "Not a git repo")
-else()
-  add_definitions(-DPD_VERSION="${PROGVER}")
-endif()
-
-##
-
+# Add sources
 set(SRCS ${SRCS}
   src/errors.cpp
   src/io.cpp
@@ -99,6 +92,7 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} ${ctest_opts}
   DEPENDS playd_tests)
 enable_testing()
 
+# Link and include libraries
 foreach(mylib SDL2 LIBUV MPG123 SNDFILE)
   if(${mylib}_LIBRARY)
     set(libs ${mylib}_LIBRARY)
@@ -116,13 +110,7 @@ foreach(mylib SDL2 LIBUV MPG123 SNDFILE)
 endforeach()
 
 # Install
-set(mandir "man/man1")
-if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
-	set(mandir "share/${mandir}")
-endif(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
+include(installation)
 
-install(TARGETS playd RUNTIME DESTINATION bin)
-install(FILES src/playd.1       DESTINATION ${CMAKE_INSTALL_PREFIX}/${mandir})
-install(FILES LICENSE.txt       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
-install(FILES LICENSE.portaudio DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
-install(FILES LICENSE.catch     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
+# Set compiler flags
+include(set_compiler_flags)
