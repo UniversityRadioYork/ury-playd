@@ -179,18 +179,18 @@ function BuildPlayd ($arch, $archdir, $build, $tests, $check) {
         "x86" { $cmake_generator = "Visual Studio 14 2015"; $msbuild_platform = "Win32" }
         "x64" { $cmake_generator = "Visual Studio 14 2015 Win64"; $msbuild_platform = "x64" }
     }
-        $targets = "playd"
-        if ($tests -Or $check) {
-                $targets="$targets;playd_tests"
-        }
+    $targets = "playd"
+    if ($tests -Or $check) {
+        $targets="$targets;playd_tests"
+    }
 
     Write-Yellow "Running cmake..."
     cmake "$project" -G "$cmake_generator" -DCMAKE_PREFIX_PATH="$archdir"
     Write-Yellow "Running msbuild..."
     msbuild playd.sln /p:Configuration="Release" /toolsversion:14.0 /p:Platform="$msbuild_platform" /p:PlatformToolset=v140 /t:"$targets" /m
-        if ($check) {
-                ctest --force-new-ctest-process -C Release
-        }
+    if ($check) {
+        ctest --force-new-ctest-process -C Release
+    }
     cd "$oldpwd"
 }
 
