@@ -14,8 +14,12 @@
 	DEPENDENCIES:
 
 	Python 2.7 is required for building libuv.
-	Set the PYTHON environment variable to the path to python.exe, or add the path to the PATH environment vairable.
-	PS C:\>$env:PYTHON = "C:\Python27\python.exe"
+	  Set the PYTHON environment variable to the path to python.exe, or add the path to the PATH environment vairable.
+	  PS C:\>$env:PYTHON = "C:\Python27\python.exe"
+	Git
+	  A copy of git needs to be in your PATH environment variable.
+	7-Zip
+	  7z.exe needs to be in your PATH environment variable.
 
 .PARAMETER arch
 	Architecture to build for: x86 or x64.
@@ -23,7 +27,15 @@
 	Enable to build ury-playd's dependencies.
 .PARAMETER playd
 	Enable to build ury-playd.
+.PARAMETER tests
+	Enable to build ury-playd and its tests.
+.PARAMETER check
+	Enable to build ury-playd and its tests, and run the tests.
 
+.EXAMPLE
+	.\WindowsBuilder.ps1 -arch x64
+
+	Builds ury-playd and its dependencies for x64.
 .EXAMPLE
 	.\WindowsBuilder.ps1 -arch x86 -deps
 
@@ -31,12 +43,22 @@
 .EXAMPLE
 	.\WindowsBuilder.ps1 -arch x86 -playd
 
-	Builds ury-playd for x86. Requires the dependencies to have already been built.
+	Builds ury-playd for x86. Requires the
+	dependencies to have already been built.
 .EXAMPLE
-	.\WindowsBuilder.ps1 -arch x64
+	.\WindowsBuilder.ps1 -arch x64 -tests
 
-	Builds ury-playd and its dependencies for x64.
+	Builds ury-playd and its tests for x64.
+	Requires the dependencies to have already been built.
+.EXAMPLE
+	.\WindowsBuilder.ps1 -arch x64 -check
 
+	Builds ury-playd and its tests, and runs the tests.
+	Requires the dependencies to have already been built.
+.EXAMPLE
+	.\WindowsBuilder.ps1 -arch x64 -check -deps
+
+	Builds ury-playd, its tests, and its dependencies, and runs the tests.
 .INPUTS
 	None. You cannot pipe objects to WindowsBuilder.
 .OUTPUTS
@@ -49,9 +71,11 @@
 [CmdletBinding(PositionalBinding = $False)]
 param([switch]$deps,
       [switch]$playd,
+      [switch]$tests,
+      [switch]$check,
       [Parameter(Mandatory = $True)]
-	  [ValidateSet('x86', 'x64')]
-	  [string]$arch)
+      [ValidateSet('x86', 'x64')]
+      [string]$arch)
 
 
 function Write-Yellow ($message) {
@@ -146,7 +170,7 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
 }
 
 
-function BuildPlayd ($arch, $archdir, $build) {
+function BuildPlayd ($arch, $archdir, $build, $tests, $check) {
     Write-Yellow "Building ury-playd on $arch..."
     $oldpwd = $pwd
     cd "$build"
@@ -155,10 +179,18 @@ function BuildPlayd ($arch, $archdir, $build) {
         "x86" { $cmake_generator = "Visual Studio 14 2015"; $msbuild_platform = "Win32" }
         "x64" { $cmake_generator = "Visual Studio 14 2015 Win64"; $msbuild_platform = "x64" }
     }
+    $targets = "playd"
+    if ($tests -Or $check) {
+        $targets="$targets;playd_tests"
+    }
+
     Write-Yellow "Running cmake..."
     cmake "$project" -G "$cmake_generator" -DCMAKE_PREFIX_PATH="$archdir"
     Write-Yellow "Running msbuild..."
-    msbuild playd.sln /p:Configuration="Release" /toolsversion:14.0 /p:Platform="$msbuild_platform" /p:PlatformToolset=v140
+    msbuild playd.sln /p:Configuration="Release" /toolsversion:14.0 /p:Platform="$msbuild_platform" /p:PlatformToolset=v140 /t:"$targets" /m
+    if ($check) {
+        ctest --force-new-ctest-process -C Release
+    }
     cd "$oldpwd"
 }
 
@@ -230,10 +262,10 @@ mkdir -Force "$includedir"
 if ($deps) {
     BuildDeps $arch $depsdir $libdir $includedir $build
 }
-if ($playd) {
-    BuildPlayd $arch $archdir $build
+if ($playd -Or $tests -Or $check) {
+    BuildPlayd $arch $archdir $build $tests $check
 }
-if (!($deps -or $playd)) {
+if (!($deps -Or $playd -Or $check -Or $tests)) {
     BuildDeps $arch $depsdir $libdir $includedir $build
-    BuildPlayd $arch $archdir $build
+    BuildPlayd $arch $archdir $build $tests $check
 }

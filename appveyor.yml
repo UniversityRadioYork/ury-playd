@@ -43,7 +43,7 @@ install:
 # Build playd.
 build_script:
   - cd "%project%"
-  - ps: .\WindowsBuilder.ps1 -playd -arch "$env:PLATFORM"
+  - ps: .\WindowsBuilder.ps1 -playd -tests -arch "$env:PLATFORM"
 
 # Run tests.
 test_script:
