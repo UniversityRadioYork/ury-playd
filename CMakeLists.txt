@@ -38,8 +38,8 @@ list(REMOVE_DUPLICATES SUPPORTED_FMTS)
 message(STATUS "Supported formats: ${SUPPORTED_FMTS}")
 
 # Def if MP3 supported
-list (FIND SUPPORTED_FMTS "MP3" _index)
-if (${_index} GREATER -1)
+list(FIND SUPPORTED_FMTS "MP3" _index)
+if(${_index} GREATER -1)
   add_definitions(-DWITH_MP3)
   if(WIN32)
     add_definitions(-DLINK_MPG123_DLL)
