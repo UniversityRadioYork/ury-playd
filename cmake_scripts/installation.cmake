@@ -5,7 +5,7 @@ install(TARGETS playd RUNTIME DESTINATION bin)
 set(mandir "man/man1")
 if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
   set(mandir "share/${mandir}")
-endif(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
+endif()
 install(FILES src/playd.1       DESTINATION ${CMAKE_INSTALL_PREFIX}/${mandir})
 
 # Licenses
