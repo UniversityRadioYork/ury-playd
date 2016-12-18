@@ -4,6 +4,11 @@ project(playd)
 list(APPEND CMAKE_PREFIX_PATH "${playd_SOURCE_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${playd_SOURCE_DIR}/cmake_scripts")
 
+# Try to build with mpg123 and sndfile by default
+# Override on the CLI: `cmake -DWITH_MPG123:BOOL=FALSE`
+set(WITH_MPG123 TRUE CACHE BOOL "Enable MPG123 support")
+set(WITH_SNDFILE TRUE CACHE BOOL "Enable libsndfile support")
+
 # Set version from git tag
 include(version)
 
@@ -15,9 +20,8 @@ find_package(LibUV REQUIRED)
 set(MPG123_FMTS MP3)
 set(SNDFILE_FMTS OGG WAV FLAC)
 
+# Find desired libraries, and add the formats they provide to SUPPORTED_FORMATS
 set(SUPPORTED_FORMATS)
-set(WITH_MPG123 TRUE CACHE BOOL "Enable MPG123 support")
-set(WITH_SNDFILE TRUE CACHE BOOL "Enable libsndfile support")
 foreach(loop_var MPG123 SNDFILE)
   if(WITH_${loop_var})
     find_package(${loop_var})
