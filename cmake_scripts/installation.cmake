@@ -4,7 +4,7 @@ install(TARGETS playd RUNTIME DESTINATION bin)
 # Manpages
 set(mandir "man/man1")
 if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
-	set(mandir "share/${mandir}")
+  set(mandir "share/${mandir}")
 endif(NOT ${CMAKE_SYSTEM_NAME} STREQUAL FreeBSD)
 install(FILES src/playd.1       DESTINATION ${CMAKE_INSTALL_PREFIX}/${mandir})
 
