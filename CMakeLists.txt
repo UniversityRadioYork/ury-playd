@@ -14,7 +14,7 @@ include(version)
 
 # Find mandatory libraries
 find_package(SDL2 REQUIRED)
-find_package(LibUV REQUIRED)
+find_package(LIBUV REQUIRED)
 
 # Declare formats provided by each lib
 set(MPG123_FMTS MP3)
