@@ -38,6 +38,7 @@ install:
         $env:PlatformString="win32"
       }
   - python --version
+  - git submodule update --init --recursive
   - ps: .\WindowsBuilder.ps1 -deps -arch "$env:PLATFORM"
 
 # Build playd.
