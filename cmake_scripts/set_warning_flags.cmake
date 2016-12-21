@@ -2,6 +2,11 @@
 include(cmake_scripts/sugar/cmake/Sugar)
 include(sugar_generate_warning_flags)
 
+option(MAKE_WARNINGS_INTO_ERRORS "Make warnings into errors" ON)
+if(MAKE_WARNINGS_INTO_ERRORS)
+   set(werror "ALL")
+endif()
+
 function(playd_set_warning_flags)
   # Determine compiler
   set(is_msvc ${MSVC})
@@ -21,7 +26,7 @@ function(playd_set_warning_flags)
     playd_compile_options
     playd_properties
     ENABLE ALL
-    TREAT_AS_ERROR ALL
+    TREAT_AS_ERROR ${werror}
   )
 
   # Reduce -Weverything to -Wextra on Clang
