@@ -117,3 +117,5 @@ include(installation)
 
 # Set compiler flags
 include(set_compiler_flags)
+include(set_warning_flags)
+playd_set_warning_flags()
