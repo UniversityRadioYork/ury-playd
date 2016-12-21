@@ -16,27 +16,20 @@ function(playd_set_warning_flags)
     set(is_clang FALSE)
   endif()
 
-  # Enable -Werror on all but Clang.
-  if(is_clang)
-    set(werror "")
-  else()
-    set(werror "ALL")
-  endif()
-
   # Generate those flags
   sugar_generate_warning_flags(
     playd_compile_options
     playd_properties
     ENABLE ALL
-    TREAT_AS_ERROR ${werror}
+    TREAT_AS_ERROR ALL
   )
 
   # Reduce -Weverything to -Wextra on Clang
   if(is_clang)
-    list(FIND playd_compile_options "everything" _index)
+    list(FIND playd_compile_options "-Weverything" _index)
     if(${_index} GREATER -1)
-      list(REMOVE_ITEM playd_compile_options "everything")
-      list(APPEND playd_compile_options "extra")
+      list(REMOVE_ITEM playd_compile_options "-Weverything")
+      list(APPEND playd_compile_options "-Wextra")
     endif()
   endif()
 
