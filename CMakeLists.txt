@@ -5,9 +5,9 @@ list(APPEND CMAKE_PREFIX_PATH "${playd_SOURCE_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${playd_SOURCE_DIR}/cmake_scripts")
 
 # Try to build with mpg123 and sndfile by default
-# Override on the CLI: `cmake -DWITH_MPG123:BOOL=FALSE`
-set(WITH_MPG123 TRUE CACHE BOOL "Enable MPG123 support")
-set(WITH_SNDFILE TRUE CACHE BOOL "Enable libsndfile support")
+# Override on the CLI: `cmake -DWITH_MPG123=OFF`
+option(WITH_MPG123 "Enable MPG123 support" ON)
+option(WITH_SNDFILE "Enable libsndfile support" ON)
 
 # Set version from git tag
 include(version)
