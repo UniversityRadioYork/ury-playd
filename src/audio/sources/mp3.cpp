@@ -57,7 +57,7 @@ Mp3AudioSource::~Mp3AudioSource()
 	this->context = nullptr;
 }
 
-const std::uint64_t Mp3AudioSource::Length() const
+std::uint64_t Mp3AudioSource::Length() const
 {
     assert(this->context != nullptr);
     
