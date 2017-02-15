@@ -132,7 +132,7 @@ public:
 	void SetPlaying(bool playing) override;
 	void SetPosition(std::uint64_t position) override;
 	std::uint64_t Position() const override;
-    std::uint64_t Length() const override;
+	std::uint64_t Length() const override;
 	const std::string &File() const override;
 };
 
@@ -168,7 +168,7 @@ public:
 	void SetPosition(std::uint64_t position) override;
 	std::uint64_t Position() const override;
 
-    std::uint64_t Length() const override;
+	std::uint64_t Length() const override;
 
 private:
 	/// The source of audio data.

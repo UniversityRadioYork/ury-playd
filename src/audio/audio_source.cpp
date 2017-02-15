@@ -35,7 +35,7 @@ std::uint64_t AudioSource::SamplesFromMicros(std::uint64_t micros) const
 	// need to convert the position to seconds then multiply by the rate.
 	// We do things in a slightly peculiar order to minimise rounding.
 
-    return (micros * this->SampleRate()) / 1000000;
+	return (micros * this->SampleRate()) / 1000000;
 }
 
 std::uint64_t AudioSource::MicrosFromSamples(std::uint64_t samples) const
