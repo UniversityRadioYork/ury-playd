@@ -7,7 +7,6 @@
  * @see audio/audio_source.hpp
  */
 
-#include <cmath>
 #include <cstdint>
 #include <string>
 
