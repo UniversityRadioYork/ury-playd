@@ -59,9 +59,9 @@ Mp3AudioSource::~Mp3AudioSource()
 
 std::uint64_t Mp3AudioSource::Length() const
 {
-    assert(this->context != nullptr);
-    
-    return mpg123_length(this->context);
+	assert(this->context != nullptr);
+
+	return mpg123_length(this->context);
 }
 
 void Mp3AudioSource::AddFormat(long rate)

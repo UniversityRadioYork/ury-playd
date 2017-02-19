@@ -109,7 +109,7 @@ public:
 	 */
 	virtual std::uint64_t Position() const = 0;
 
-    virtual std::uint64_t Length() const = 0;
+	virtual std::uint64_t Length() const = 0;
 };
 
 /**

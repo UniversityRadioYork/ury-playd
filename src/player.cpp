@@ -78,9 +78,9 @@ Response Player::Dump(size_t id, const std::string &tag) const
 		this->Respond(id, Response(tag, Response::Code::POS)
 		                          .AddArg(std::to_string(pos)));
 
-        auto len = this->file->Length();
-        this->Respond(id, Response(tag, Response::Code::LEN)
-                                 .AddArg(std::to_string(len)));
+	auto len = this->file->Length();
+	this->Respond(id, Response(tag, Response::Code::LEN)
+	                         .AddArg(std::to_string(len)));
 	}
 
 	return Response::Success(tag);

@@ -85,7 +85,7 @@ std::uint64_t SndfileAudioSource::Seek(std::uint64_t in_samples)
 
 std::uint64_t SndfileAudioSource::Length() const
 {
-    return(this->info.frames); 
+	return(this->info.frames);
 }
 
 SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()
