@@ -41,11 +41,12 @@ public:
 		END,   ///< The loaded file just ended.
 		PLAY,  ///< The loaded file is playing.
 		STOP,  ///< The loaded file has stopped.
-		ACK    ///< Command result.
+		ACK,   ///< Command result.
+        LEN
 	};
 
 	/// The number of codes, which should agree with Response::Code.
-	static constexpr std::uint8_t CODE_COUNT = 9;
+	static constexpr std::uint8_t CODE_COUNT = 10;
 
 	/**
 	 * Constructs a Response with no arguments.

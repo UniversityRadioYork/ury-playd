@@ -31,6 +31,9 @@ public:
 	/// @return The path of the DummyAudioSource.
 	const std::string &Path() const override;
 
+	/// @return The length of the DummyAudioSource.
+	std::uint64_t Length() const override;
+
 	/// The position of the AudioSource, in samples.
 	std::uint64_t position;
 

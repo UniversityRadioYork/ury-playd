@@ -39,6 +39,9 @@ public:
 	DecodeResult Decode() override;
 	std::uint64_t Seek(std::uint64_t position) override;
 
+	/// The length of the audio, in samples.
+	std::uint64_t Length() const override;
+
 	std::uint8_t ChannelCount() const override;
 	std::uint32_t SampleRate() const override;
 	SampleFormat OutputSampleFormat() const override;

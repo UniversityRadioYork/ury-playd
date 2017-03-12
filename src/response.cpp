@@ -26,7 +26,8 @@
         "END",   // Code::END
         "PLAY",  // Code::PLAY
         "STOP",  // Code::STOP
-        "ACK"    // Code::ACK
+        "ACK",   // Code::ACK
+        "LEN"    // Code::LEN
 }};
 
 Response::Response(const std::string &tag, Response::Code code)

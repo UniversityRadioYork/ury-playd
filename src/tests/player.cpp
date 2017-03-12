@@ -44,7 +44,7 @@ SCENARIO("Player announces changes in state correctly", "[player]") {
 	
 				THEN("loading a file should emit all state") {
 					p.Load("tag", "baz.mp3");
-					REQUIRE(os.str() == "! STOP\n! FLOAD baz.mp3\n! POS 0\n");
+					REQUIRE(os.str() == "! STOP\n! FLOAD baz.mp3\n! POS 0\n! LEN 0\n");
 				}
 			}
 		}

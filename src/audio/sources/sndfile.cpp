@@ -83,6 +83,11 @@ std::uint64_t SndfileAudioSource::Seek(std::uint64_t in_samples)
 	return out_samples;
 }
 
+std::uint64_t SndfileAudioSource::Length() const
+{
+	return(this->info.frames);
+}
+
 SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()
 {
 	auto read = sf_read_int(this->file, &*this->buffer.begin(),

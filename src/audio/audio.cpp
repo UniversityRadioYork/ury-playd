@@ -50,6 +50,11 @@ std::uint64_t NoAudio::Position() const
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
 }
 
+std::uint64_t NoAudio::Length() const
+{
+	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
+}
+
 const std::string &NoAudio::File() const
 {
 	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
@@ -93,6 +98,14 @@ std::uint64_t PipeAudio::Position() const
 	assert(this->src != nullptr);
 
 	return this->src->MicrosFromSamples(this->sink->Position());
+}
+
+std::uint64_t PipeAudio::Length() const
+{
+	assert(this->sink != nullptr);
+	assert(this->src != nullptr);
+
+	return this->src->MicrosFromSamples(this->src->Length());
 }
 
 void PipeAudio::SetPosition(std::uint64_t position)

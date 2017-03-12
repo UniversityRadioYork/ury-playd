@@ -126,6 +126,8 @@ public:
 	 */
 	virtual std::uint64_t SamplesFromMicros(std::uint64_t micros) const;
 
+	virtual std::uint64_t Length() const = 0;
+
 	/**
 	 * Converts an elapsed sample count to a position in microseconds.
 	 * @param samples The number of elapsed samples.
