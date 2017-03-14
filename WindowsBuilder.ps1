@@ -108,16 +108,16 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     switch ($arch) {
         "x86" {
             $url_libsndfile = "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w32.zip"
-            $url_mpg123 = "https://www.mpg123.de/download/win32/mpg123-1.23.6-x86.zip"
+            $url_mpg123 = "https://www.mpg123.de/download/win32/mpg123-1.24.0-x86.zip"
         }
         "x64" {
             $url_libsndfile = "http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27-w64.zip"
-            $url_mpg123 = "https://www.mpg123.de/download/win64/mpg123-1.23.6-x86-64.zip"
+            $url_mpg123 = "https://www.mpg123.de/download/win64/1.24.0/mpg123-1.24.0-x86-64.zip"
         }
     }
-    $url_sdl2 = "https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip"
+    $url_sdl2 = "https://www.libsdl.org/release/SDL2-devel-2.0.5-VC.zip"
     $url_libuv = "https://github.com/libuv/libuv.git"
-    $url_mingw = "https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v4.0.6.zip"
+    $url_mingw = "https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v5.0.1.zip"
 
     $releasedir = "$build\Release"
     mkdir -Force "$releasedir"
