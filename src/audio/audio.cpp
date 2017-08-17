@@ -12,8 +12,8 @@
 #include <climits>
 #include <cstdint>
 #include <string>
+#include <gsl/gsl>
 
-#include "../gsl/gsl"
 #include "../errors.h"
 #include "../messages.h"
 #include "../response.h"

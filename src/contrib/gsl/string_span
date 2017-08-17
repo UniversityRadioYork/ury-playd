@@ -19,19 +19,15 @@
 #ifndef GSL_STRING_SPAN_H
 #define GSL_STRING_SPAN_H
 
-#include "gsl_assert"
-#include "gsl_util"
-#include "span"
+#include <gsl/gsl_assert>
+#include <gsl/gsl_util>
+#include <gsl/span>
+
 #include <cstdint>
 #include <cstring>
 #include <string>
 
 #ifdef _MSC_VER
-
-// No MSVC does constexpr fully yet
-#pragma push_macro("constexpr")
-#define constexpr /*constexpr*/
-
 #pragma warning(push)
 
 // blanket turn off warnings from CppCoreCheck for now
@@ -39,32 +35,18 @@
 // more targeted suppressions will be added in a future update to the GSL
 #pragma warning(disable : 26481 26482 26483 26485 26490 26491 26492 26493 26495)
 
-// VS 2013 workarounds
-#if _MSC_VER <= 1800
+#if _MSC_VER < 1910
+#pragma push_macro("constexpr")
+#define constexpr /*constexpr*/
 
-#define GSL_MSVC_HAS_TYPE_DEDUCTION_BUG
-#define GSL_MSVC_HAS_SFINAE_SUBSTITUTION_ICE
-#define GSL_MSVC_NO_CPP14_STD_EQUAL
-#define GSL_MSVC_NO_DEFAULT_MOVE_CTOR
-
-// noexcept is not understood
-#ifndef GSL_THROW_ON_CONTRACT_VIOLATION
-#pragma push_macro("noexcept")
-#define noexcept /*noexcept*/
-#endif
-
-#endif // _MSC_VER <= 1800
-#endif // _MSC_VER
+#endif           // _MSC_VER < 1910
+#endif           // _MSC_VER
 
 // In order to test the library, we need it to throw exceptions that we can catch
 #ifdef GSL_THROW_ON_CONTRACT_VIOLATION
-
-#ifdef _MSC_VER
-#pragma push_macro("noexcept")
-#endif
-
-#define noexcept /*noexcept*/
-
+#define GSL_NOEXCEPT /*noexcept*/
+#else
+#define GSL_NOEXCEPT noexcept
 #endif // GSL_THROW_ON_CONTRACT_VIOLATION
 
 namespace gsl
@@ -72,7 +54,7 @@ namespace gsl
 //
 // czstring and wzstring
 //
-// These are "tag" typedef's for C-style strings (i.e. null-terminated character arrays)
+// These are "tag" typedefs for C-style strings (i.e. null-terminated character arrays)
 // that allow static analysis to help find bugs.
 //
 // There are no additional features/semantics that we can find a way to add inside the
@@ -97,30 +79,26 @@ using wzstring = basic_zstring<wchar_t, Extent>;
 
 namespace details
 {
-    inline std::ptrdiff_t string_length(const char *str, std::ptrdiff_t n)
+    inline std::ptrdiff_t string_length(const char* str, std::ptrdiff_t n)
     {
-        if (str == nullptr || n <= 0)
-            return 0;
+        if (str == nullptr || n <= 0) return 0;
 
         span<const char> str_span{str, n};
 
         std::ptrdiff_t len = 0;
-        while (len < n && str_span[len])
-            len++;
+        while (len < n && str_span[len]) len++;
 
         return len;
     }
 
-    inline std::ptrdiff_t wstring_length(const wchar_t *str, std::ptrdiff_t n)
+    inline std::ptrdiff_t wstring_length(const wchar_t* str, std::ptrdiff_t n)
     {
-        if (str == nullptr || n <= 0)
-            return 0;
+        if (str == nullptr || n <= 0) return 0;
 
         span<const wchar_t> str_span{str, n};
 
         std::ptrdiff_t len = 0;
-        while (len < n && str_span[len])
-            len++;
+        while (len < n && str_span[len]) len++;
 
         return len;
     }
@@ -184,7 +162,7 @@ inline span<const wchar_t, dynamic_extent> ensure_z(const wchar_t* const& sz, st
     return {sz, len};
 }
 
-template <typename T, size_t N>
+template <typename T, std::size_t N>
 span<T, dynamic_extent> ensure_z(T (&sz)[N])
 {
     return ensure_z(&sz[0], static_cast<std::ptrdiff_t>(N));
@@ -225,7 +203,7 @@ namespace details
     template <>
     struct length_func<char>
     {
-        std::ptrdiff_t operator()(char* const ptr, std::ptrdiff_t length) noexcept
+        std::ptrdiff_t operator()(const char* const ptr, std::ptrdiff_t length) GSL_NOEXCEPT
         {
             return details::string_length(ptr, length);
         }
@@ -234,7 +212,7 @@ namespace details
     template <>
     struct length_func<wchar_t>
     {
-        std::ptrdiff_t operator()(wchar_t* const ptr, std::ptrdiff_t length) noexcept
+        std::ptrdiff_t operator()(const wchar_t* const ptr, std::ptrdiff_t length) GSL_NOEXCEPT
         {
             return details::wstring_length(ptr, length);
         }
@@ -243,7 +221,7 @@ namespace details
     template <>
     struct length_func<const char>
     {
-        std::ptrdiff_t operator()(const char* const ptr, std::ptrdiff_t length) noexcept
+        std::ptrdiff_t operator()(const char* const ptr, std::ptrdiff_t length) GSL_NOEXCEPT
         {
             return details::string_length(ptr, length);
         }
@@ -252,7 +230,7 @@ namespace details
     template <>
     struct length_func<const wchar_t>
     {
-        std::ptrdiff_t operator()(const wchar_t* const ptr, std::ptrdiff_t length) noexcept
+        std::ptrdiff_t operator()(const wchar_t* const ptr, std::ptrdiff_t length) GSL_NOEXCEPT
         {
             return details::wstring_length(ptr, length);
         }
@@ -279,52 +257,41 @@ public:
     using const_reverse_iterator = typename impl_type::const_reverse_iterator;
 
     // default (empty)
-    constexpr basic_string_span() noexcept = default;
+    constexpr basic_string_span() GSL_NOEXCEPT = default;
 
     // copy
-    constexpr basic_string_span(const basic_string_span& other) noexcept = default;
+    constexpr basic_string_span(const basic_string_span& other) GSL_NOEXCEPT = default;
 
 // move
-#ifndef GSL_MSVC_NO_DEFAULT_MOVE_CTOR
-    constexpr basic_string_span(basic_string_span&& other) noexcept = default;
-#else
-    constexpr basic_string_span(basic_string_span&& other) : span_(std::move(other.span_)) {}
-#endif
+    constexpr basic_string_span(basic_string_span&& other) GSL_NOEXCEPT = default;
 
     // assign
-    constexpr basic_string_span& operator=(const basic_string_span& other) noexcept = default;
+    constexpr basic_string_span& operator=(const basic_string_span& other) GSL_NOEXCEPT = default;
 
 // move assign
-#ifndef GSL_MSVC_NO_DEFAULT_MOVE_CTOR
-    constexpr basic_string_span& operator=(basic_string_span&& other) noexcept = default;
-#else
-    constexpr basic_string_span& operator=(basic_string_span&& other) noexcept
-    {
-        span_ = std::move(other.span_);
-        return *this;
-    }
-#endif
+    constexpr basic_string_span& operator=(basic_string_span&& other) GSL_NOEXCEPT = default;
 
     // from nullptr
-    constexpr basic_string_span(std::nullptr_t ptr) noexcept : span_(ptr) {}
+    constexpr basic_string_span(std::nullptr_t ptr) GSL_NOEXCEPT : span_(ptr) {}
 
     constexpr basic_string_span(pointer ptr, index_type length) : span_(ptr, length) {}
     constexpr basic_string_span(pointer firstElem, pointer lastElem) : span_(firstElem, lastElem) {}
 
     // From static arrays - if 0-terminated, remove 0 from the view
     // All other containers allow 0s within the length, so we do not remove them
-    template <size_t N>
+    template <std::size_t N>
     constexpr basic_string_span(element_type (&arr)[N]) : span_(remove_z(arr))
     {
     }
 
-    template <size_t N, class ArrayElementType = std::remove_const_t<element_type>>
-    constexpr basic_string_span(std::array<ArrayElementType, N>& arr) noexcept : span_(arr)
+    template <std::size_t N, class ArrayElementType = std::remove_const_t<element_type>>
+    constexpr basic_string_span(std::array<ArrayElementType, N>& arr) GSL_NOEXCEPT : span_(arr)
     {
     }
 
-    template <size_t N, class ArrayElementType = std::remove_const_t<element_type>>
-    constexpr basic_string_span(const std::array<ArrayElementType, N>& arr) noexcept : span_(arr)
+    template <std::size_t N, class ArrayElementType = std::remove_const_t<element_type>>
+    constexpr basic_string_span(const std::array<ArrayElementType, N>& arr) GSL_NOEXCEPT
+        : span_(arr)
     {
     }
 
@@ -411,23 +378,23 @@ public:
 
     constexpr pointer data() const { return span_.data(); }
 
-    constexpr index_type length() const noexcept { return span_.size(); }
-    constexpr index_type size() const noexcept { return span_.size(); }
-    constexpr index_type size_bytes() const noexcept { return span_.size_bytes(); }
-    constexpr index_type length_bytes() const noexcept { return span_.length_bytes(); }
-    constexpr bool empty() const noexcept { return size() == 0; }
+    constexpr index_type length() const GSL_NOEXCEPT { return span_.size(); }
+    constexpr index_type size() const GSL_NOEXCEPT { return span_.size(); }
+    constexpr index_type size_bytes() const GSL_NOEXCEPT { return span_.size_bytes(); }
+    constexpr index_type length_bytes() const GSL_NOEXCEPT { return span_.length_bytes(); }
+    constexpr bool empty() const GSL_NOEXCEPT { return size() == 0; }
 
-    constexpr iterator begin() const noexcept { return span_.begin(); }
-    constexpr iterator end() const noexcept { return span_.end(); }
+    constexpr iterator begin() const GSL_NOEXCEPT { return span_.begin(); }
+    constexpr iterator end() const GSL_NOEXCEPT { return span_.end(); }
 
-    constexpr const_iterator cbegin() const noexcept { return span_.cbegin(); }
-    constexpr const_iterator cend() const noexcept { return span_.cend(); }
+    constexpr const_iterator cbegin() const GSL_NOEXCEPT { return span_.cbegin(); }
+    constexpr const_iterator cend() const GSL_NOEXCEPT { return span_.cend(); }
 
-    constexpr reverse_iterator rbegin() const noexcept { return span_.rbegin(); }
-    constexpr reverse_iterator rend() const noexcept { return span_.rend(); }
+    constexpr reverse_iterator rbegin() const GSL_NOEXCEPT { return span_.rbegin(); }
+    constexpr reverse_iterator rend() const GSL_NOEXCEPT { return span_.rend(); }
 
-    constexpr const_reverse_iterator crbegin() const noexcept { return span_.crbegin(); }
-    constexpr const_reverse_iterator crend() const noexcept { return span_.crend(); }
+    constexpr const_reverse_iterator crbegin() const GSL_NOEXCEPT { return span_.crbegin(); }
+    constexpr const_reverse_iterator crend() const GSL_NOEXCEPT { return span_.crend(); }
 
 private:
     static impl_type remove_z(pointer const& sz, std::ptrdiff_t max)
@@ -435,7 +402,7 @@ private:
         return {sz, details::length_func<element_type>()(sz, max)};
     }
 
-    template <size_t N>
+    template <std::size_t N>
     static impl_type remove_z(element_type (&sz)[N])
     {
         return remove_z(&sz[0], narrow_cast<std::ptrdiff_t>(N));
@@ -459,49 +426,21 @@ using cwstring_span = basic_string_span<const wchar_t, Extent>;
 //
 // to_string() allow (explicit) conversions from string_span to string
 //
-#ifndef GSL_MSVC_HAS_TYPE_DEDUCTION_BUG
 
 template <typename CharT, std::ptrdiff_t Extent>
 std::basic_string<typename std::remove_const<CharT>::type>
 to_string(basic_string_span<CharT, Extent> view)
 {
-    return {view.data(), static_cast<size_t>(view.length())};
+    return {view.data(), static_cast<std::size_t>(view.length())};
 }
 
-#else
-
-inline std::string to_string(cstring_span<> view)
-{
-    return {view.data(), static_cast<size_t>(view.length())};
-}
-
-inline std::string to_string(string_span<> view)
-{
-    return {view.data(), static_cast<size_t>(view.length())};
-}
-
-inline std::wstring to_string(cwstring_span<> view)
-{
-    return {view.data(), static_cast<size_t>(view.length())};
-}
-
-inline std::wstring to_string(wstring_span<> view)
-{
-    return {view.data(), static_cast<size_t>(view.length())};
-}
-
-#endif
-
-template <typename CharT,
-	  typename Traits = typename std::char_traits<CharT>,
-	  typename Allocator = std::allocator<CharT>,
-	  typename gCharT,
-	  std::ptrdiff_t Extent>
+template <typename CharT, typename Traits = typename std::char_traits<CharT>,
+          typename Allocator = std::allocator<CharT>, typename gCharT, std::ptrdiff_t Extent>
 std::basic_string<CharT, Traits, Allocator> to_basic_string(basic_string_span<gCharT, Extent> view)
 {
-  return {view.data(), static_cast<size_t>(view.length())};
+    return {view.data(), static_cast<std::size_t>(view.length())};
 }
-  
+
 // zero-terminated string span, used to convert
 // zero-terminated spans to legacy strings
 template <typename CharT, std::ptrdiff_t Extent = dynamic_extent>
@@ -520,7 +459,7 @@ public:
     using impl_type = span<value_type, Extent>;
     using string_span_type = basic_string_span<value_type, Extent>;
 
-    constexpr basic_zstring_span(impl_type s) noexcept : span_(s)
+    constexpr basic_zstring_span(impl_type s) GSL_NOEXCEPT : span_(s)
     {
         // expects a zero-terminated span
         Expects(s[s.size() - 1] == '\0');
@@ -530,37 +469,25 @@ public:
     constexpr basic_zstring_span(const basic_zstring_span& other) = default;
 
 // move
-#ifndef GSL_MSVC_NO_DEFAULT_MOVE_CTOR
     constexpr basic_zstring_span(basic_zstring_span&& other) = default;
-#else
-    constexpr basic_zstring_span(basic_zstring_span&& other) : span_(std::move(other.span_)) {}
-#endif
 
     // assign
     constexpr basic_zstring_span& operator=(const basic_zstring_span& other) = default;
 
 // move assign
-#ifndef GSL_MSVC_NO_DEFAULT_MOVE_CTOR
     constexpr basic_zstring_span& operator=(basic_zstring_span&& other) = default;
-#else
-    constexpr basic_zstring_span& operator=(basic_zstring_span&& other)
-    {
-        span_ = std::move(other.span_);
-        return *this;
-    }
-#endif
 
-    constexpr bool empty() const noexcept { return span_.size() == 0; }
+    constexpr bool empty() const GSL_NOEXCEPT { return span_.size() == 0; }
 
-    constexpr string_span_type as_string_span() const noexcept
+    constexpr string_span_type as_string_span() const GSL_NOEXCEPT
     {
         auto sz = span_.size();
         return span_.first(sz <= 0 ? 0 : sz - 1);
     }
 
-    constexpr string_span_type ensure_z() const noexcept { return gsl::ensure_z(span_); }
+    constexpr string_span_type ensure_z() const GSL_NOEXCEPT { return gsl::ensure_z(span_); }
 
-    constexpr const_zstring_type assume_z() const noexcept { return span_.data(); }
+    constexpr const_zstring_type assume_z() const GSL_NOEXCEPT { return span_.data(); }
 
 private:
     impl_type span_;
@@ -583,35 +510,27 @@ template <class CharT, std::ptrdiff_t Extent, class T,
           class = std::enable_if_t<
               details::is_basic_string_span<T>::value ||
               std::is_convertible<T, gsl::basic_string_span<std::add_const_t<CharT>>>::value>>
-bool operator==(const gsl::basic_string_span<CharT, Extent>& one, const T& other) noexcept
+bool operator==(const gsl::basic_string_span<CharT, Extent>& one, const T& other) GSL_NOEXCEPT
 {
-    gsl::basic_string_span<std::add_const_t<CharT>> tmp(other);
-#ifdef GSL_MSVC_NO_CPP14_STD_EQUAL
-    return (one.size() == tmp.size()) && std::equal(one.begin(), one.end(), tmp.begin());
-#else
+    const gsl::basic_string_span<std::add_const_t<CharT>> tmp(other);
     return std::equal(one.begin(), one.end(), tmp.begin(), tmp.end());
-#endif
 }
 
 template <class CharT, std::ptrdiff_t Extent, class T,
           class = std::enable_if_t<
               !details::is_basic_string_span<T>::value &&
               std::is_convertible<T, gsl::basic_string_span<std::add_const_t<CharT>>>::value>>
-bool operator==(const T& one, const gsl::basic_string_span<CharT, Extent>& other) noexcept
+bool operator==(const T& one, const gsl::basic_string_span<CharT, Extent>& other) GSL_NOEXCEPT
 {
     gsl::basic_string_span<std::add_const_t<CharT>> tmp(one);
-#ifdef GSL_MSVC_NO_CPP14_STD_EQUAL
-    return (tmp.size() == other.size()) && std::equal(tmp.begin(), tmp.end(), other.begin());
-#else
     return std::equal(tmp.begin(), tmp.end(), other.begin(), other.end());
-#endif
 }
 
 // operator !=
 template <typename CharT, std::ptrdiff_t Extent = gsl::dynamic_extent, typename T,
           typename = std::enable_if_t<std::is_convertible<
               T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value>>
-bool operator!=(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator!=(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
     return !(one == other);
 }
@@ -621,7 +540,7 @@ template <
     typename Dummy = std::enable_if_t<
         std::is_convertible<T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value &&
         !gsl::details::is_basic_string_span<T>::value>>
-bool operator!=(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator!=(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     return !(one == other);
 }
@@ -630,9 +549,9 @@ bool operator!=(const T& one, gsl::basic_string_span<CharT, Extent> other) noexc
 template <typename CharT, std::ptrdiff_t Extent = gsl::dynamic_extent, typename T,
           typename = std::enable_if_t<std::is_convertible<
               T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value>>
-bool operator<(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator<(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
-    gsl::basic_string_span<std::add_const_t<CharT>, Extent> tmp(other);
+    const gsl::basic_string_span<std::add_const_t<CharT>, Extent> tmp(other);
     return std::lexicographical_compare(one.begin(), one.end(), tmp.begin(), tmp.end());
 }
 
@@ -641,7 +560,7 @@ template <
     typename Dummy = std::enable_if_t<
         std::is_convertible<T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value &&
         !gsl::details::is_basic_string_span<T>::value>>
-bool operator<(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator<(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     gsl::basic_string_span<std::add_const_t<CharT>, Extent> tmp(one);
     return std::lexicographical_compare(tmp.begin(), tmp.end(), other.begin(), other.end());
@@ -660,7 +579,7 @@ template <
         std::is_convertible<DataType*, CharT*>::value &&
         std::is_same<std::decay_t<decltype(std::declval<T>().size(), *std::declval<T>().data())>,
                      DataType>::value>>
-bool operator<(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator<(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
     gsl::basic_string_span<std::add_const_t<CharT>, Extent> tmp(other);
     return std::lexicographical_compare(one.begin(), one.end(), tmp.begin(), tmp.end());
@@ -674,7 +593,7 @@ template <
         std::is_convertible<DataType*, CharT*>::value &&
         std::is_same<std::decay_t<decltype(std::declval<T>().size(), *std::declval<T>().data())>,
                      DataType>::value>>
-bool operator<(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator<(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     gsl::basic_string_span<std::add_const_t<CharT>, Extent> tmp(one);
     return std::lexicographical_compare(tmp.begin(), tmp.end(), other.begin(), other.end());
@@ -685,7 +604,7 @@ bool operator<(const T& one, gsl::basic_string_span<CharT, Extent> other) noexce
 template <typename CharT, std::ptrdiff_t Extent = gsl::dynamic_extent, typename T,
           typename = std::enable_if_t<std::is_convertible<
               T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value>>
-bool operator<=(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator<=(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
     return !(other < one);
 }
@@ -695,7 +614,7 @@ template <
     typename Dummy = std::enable_if_t<
         std::is_convertible<T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value &&
         !gsl::details::is_basic_string_span<T>::value>>
-bool operator<=(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator<=(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     return !(other < one);
 }
@@ -713,7 +632,7 @@ template <
         std::is_convertible<DataType*, CharT*>::value &&
         std::is_same<std::decay_t<decltype(std::declval<T>().size(), *std::declval<T>().data())>,
                      DataType>::value>>
-bool operator<=(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator<=(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
     return !(other < one);
 }
@@ -726,7 +645,7 @@ template <
         std::is_convertible<DataType*, CharT*>::value &&
         std::is_same<std::decay_t<decltype(std::declval<T>().size(), *std::declval<T>().data())>,
                      DataType>::value>>
-bool operator<=(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator<=(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     return !(other < one);
 }
@@ -736,7 +655,7 @@ bool operator<=(const T& one, gsl::basic_string_span<CharT, Extent> other) noexc
 template <typename CharT, std::ptrdiff_t Extent = gsl::dynamic_extent, typename T,
           typename = std::enable_if_t<std::is_convertible<
               T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value>>
-bool operator>(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator>(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
     return other < one;
 }
@@ -746,7 +665,7 @@ template <
     typename Dummy = std::enable_if_t<
         std::is_convertible<T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value &&
         !gsl::details::is_basic_string_span<T>::value>>
-bool operator>(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator>(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     return other < one;
 }
@@ -764,7 +683,7 @@ template <
         std::is_convertible<DataType*, CharT*>::value &&
         std::is_same<std::decay_t<decltype(std::declval<T>().size(), *std::declval<T>().data())>,
                      DataType>::value>>
-bool operator>(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator>(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
     return other < one;
 }
@@ -777,7 +696,7 @@ template <
         std::is_convertible<DataType*, CharT*>::value &&
         std::is_same<std::decay_t<decltype(std::declval<T>().size(), *std::declval<T>().data())>,
                      DataType>::value>>
-bool operator>(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator>(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     return other < one;
 }
@@ -787,7 +706,7 @@ bool operator>(const T& one, gsl::basic_string_span<CharT, Extent> other) noexce
 template <typename CharT, std::ptrdiff_t Extent = gsl::dynamic_extent, typename T,
           typename = std::enable_if_t<std::is_convertible<
               T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value>>
-bool operator>=(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator>=(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
     return !(one < other);
 }
@@ -797,7 +716,7 @@ template <
     typename Dummy = std::enable_if_t<
         std::is_convertible<T, gsl::basic_string_span<std::add_const_t<CharT>, Extent>>::value &&
         !gsl::details::is_basic_string_span<T>::value>>
-bool operator>=(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator>=(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     return !(one < other);
 }
@@ -815,7 +734,7 @@ template <
         std::is_convertible<DataType*, CharT*>::value &&
         std::is_same<std::decay_t<decltype(std::declval<T>().size(), *std::declval<T>().data())>,
                      DataType>::value>>
-bool operator>=(gsl::basic_string_span<CharT, Extent> one, const T& other) noexcept
+bool operator>=(gsl::basic_string_span<CharT, Extent> one, const T& other) GSL_NOEXCEPT
 {
     return !(one < other);
 }
@@ -828,43 +747,23 @@ template <
         std::is_convertible<DataType*, CharT*>::value &&
         std::is_same<std::decay_t<decltype(std::declval<T>().size(), *std::declval<T>().data())>,
                      DataType>::value>>
-bool operator>=(const T& one, gsl::basic_string_span<CharT, Extent> other) noexcept
+bool operator>=(const T& one, gsl::basic_string_span<CharT, Extent> other) GSL_NOEXCEPT
 {
     return !(one < other);
 }
 #endif
 } // namespace GSL
 
-#ifdef _MSC_VER
+#undef GSL_NOEXCEPT
 
+#ifdef _MSC_VER
 #pragma warning(pop)
 
+#if _MSC_VER < 1910
 #undef constexpr
 #pragma pop_macro("constexpr")
 
-// VS 2013 workarounds
-#if _MSC_VER <= 1800
-
-#ifndef GSL_THROW_ON_CONTRACT_VIOLATION
-#undef noexcept
-#pragma pop_macro("noexcept")
-#endif // GSL_THROW_ON_CONTRACT_VIOLATION
-
-#undef GSL_MSVC_HAS_TYPE_DEDUCTION_BUG
-#undef GSL_MSVC_HAS_SFINAE_SUBSTITUTION_ICE
-#undef GSL_MSVC_NO_CPP14_STD_EQUAL
-#undef GSL_MSVC_NO_DEFAULT_MOVE_CTOR
-
-#endif // _MSC_VER <= 1800
+#endif // _MSC_VER < 1910
 #endif // _MSC_VER
 
-#if defined(GSL_THROW_ON_CONTRACT_VIOLATION)
-
-#undef noexcept
-
-#ifdef _MSC_VER
-#pragma pop_macro("noexcept")
-#endif
-
-#endif // GSL_THROW_ON_CONTRACT_VIOLATION
 #endif // GSL_STRING_SPAN_H

@@ -103,7 +103,7 @@ CXXFLAGS += -D PD_VERSION=\"%%PROGVER%%\"
 # The -I/usr/include, incidentally, is to stop certain misbehaving libraries from
 # overriding the C standard library with their own badly named files.
 CFLAGS   += -c $(WARNS) $(PKG_CFLAGS) %%FCFLAGS%% -g -std=$(C_STD)
-CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS) %%FCFLAGS%% -I/usr/include -g -std=$(CXX_STD)
+CXXFLAGS += -c $(WARNS) $(PKG_CFLAGS) %%FCFLAGS%% -I/usr/include -I$(srcdir)/contrib -g -std=$(CXX_STD)
 LDFLAGS  += $(PKG_LDFLAGS)
 
 ## BEGIN RULES ##

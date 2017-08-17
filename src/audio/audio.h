@@ -18,7 +18,7 @@
 #include <vector>
 
 #undef max
-#include "../gsl/gsl"
+#include <gsl/gsl>
 
 #include "../response.h"
 #include "audio_sink.h"

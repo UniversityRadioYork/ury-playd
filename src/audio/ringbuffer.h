@@ -13,7 +13,7 @@
 #include <mutex>
 
 #undef max
-#include "../gsl/gsl"
+#include <gsl/gsl>
 
 
 /**

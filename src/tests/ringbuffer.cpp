@@ -6,9 +6,10 @@
  * Tests for the Ring_buffer class.
  */
 
+#include <gsl/gsl>
+
 #include "catch.hpp"
 
-#include "../gsl/gsl"
 #include "../errors.h"
 #include "../audio/ringbuffer.h"
 
