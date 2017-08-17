@@ -12,7 +12,7 @@
 
 #include "sample_format.h"
 
-const std::array<std::size_t, sample_format_count> sample_format_bps {{
+const std::array<std::size_t, sample_format_count> sample_format_bps{{
         1, // PACKED_UNSIGNED_INT_8
         1, // PACKED_SIGNED_INT_8
         2, // PACKED_SIGNED_INT_16

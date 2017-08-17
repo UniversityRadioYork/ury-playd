@@ -195,7 +195,8 @@ void Io_core::Accept(uv_stream_t *server)
 
 	// libuv does the 'nonzero is error' thing here
 	if (uv_accept(server, reinterpret_cast<uv_stream_t *>(client))) {
-		uv_close(reinterpret_cast<uv_handle_t *>(client), UvCloseCallback);
+		uv_close(reinterpret_cast<uv_handle_t *>(client),
+		         UvCloseCallback);
 		return;
 	}
 
@@ -215,7 +216,8 @@ void Io_core::Accept(uv_stream_t *server)
 	this->Respond(id, Response::Success(Response::NOREQUEST));
 	// End initial responses
 
-	uv_read_start(reinterpret_cast<uv_stream_t *>(client), UvAlloc, UvReadCallback);
+	uv_read_start(reinterpret_cast<uv_stream_t *>(client), UvAlloc,
+	              UvReadCallback);
 }
 
 size_t Io_core::NextConnectionID()
@@ -356,9 +358,11 @@ void Io_core::InitAcceptor(const std::string &address, const std::string &port)
 
 	struct sockaddr_in bind_addr;
 	uv_ip4_addr(address.c_str(), stoi(port), &bind_addr);
-	uv_tcp_bind(&this->server, reinterpret_cast<const sockaddr *>(&bind_addr), 0);
+	uv_tcp_bind(&this->server,
+	            reinterpret_cast<const sockaddr *>(&bind_addr), 0);
 
-	auto r = uv_listen(reinterpret_cast<uv_stream_t *>(&this->server), 128, UvListenCallback);
+	auto r = uv_listen(reinterpret_cast<uv_stream_t *>(&this->server), 128,
+	                   UvListenCallback);
 	if (r) {
 		throw Net_error("Could not listen on " + address + ":" + port +
 		                " (" + std::string(uv_err_name(r)) + ")");

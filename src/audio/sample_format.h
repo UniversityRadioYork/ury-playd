@@ -31,11 +31,11 @@ using Samples = std::uint64_t;
  * sample_formats.cpp and audio_sink.cpp.
  */
 enum class Sample_format : std::uint8_t {
-	uint8,   ///< Packed 8-bit unsigned integer.
-	sint8,   ///< Packed 8-bit signed integer.
-	sint16,  ///< Packed 16-bit signed integer.
-	sint32,  ///< Packed 32-bit signed integer.
-	float32  ///< Packed 32-bit floating point.
+	uint8,  ///< Packed 8-bit unsigned integer.
+	sint8,  ///< Packed 8-bit signed integer.
+	sint16, ///< Packed 16-bit signed integer.
+	sint32, ///< Packed 32-bit signed integer.
+	float32 ///< Packed 32-bit floating point.
 };
 
 /// Number of sample formats available; should agree with SampleFormat.

@@ -80,7 +80,9 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 						break;
 
 					default:
-						isspace(c, std::locale::classic()) ? this->EndWord() : this->Push(c);
+						isspace(c, std::locale::classic())
+						        ? this->EndWord()
+						        : this->Push(c);
 						break;
 				}
 				break;
@@ -95,8 +97,8 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 
 void Tokeniser::Push(const char c)
 {
-	assert(this->escape_next ||
-	       !(this->quote_type == QuoteType::NONE && isspace(c, std::locale::classic())));
+	assert(this->escape_next || !(this->quote_type == QuoteType::NONE &&
+	                              isspace(c, std::locale::classic())));
 	this->in_word = true;
 	this->current_word.push_back(c);
 	this->escape_next = false;

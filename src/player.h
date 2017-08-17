@@ -10,8 +10,8 @@
 #ifndef PLAYD_PLAYER_H
 #define PLAYD_PLAYER_H
 
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
@@ -19,14 +19,12 @@
 #include <utility>
 #include <vector>
 
+#include "audio/audio.h"
 #include "audio/audio_sink.h"
 #include "audio/audio_source.h"
-#include "audio/audio.h"
 #include "response.h"
 
-
 using namespace std::chrono;
-
 
 /**
  * A Player contains a loaded audio file and a command API for manipulating it.
@@ -147,9 +145,9 @@ private:
 	SinkFn sink;                             ///< The sink create function.
 	std::map<std::string, SourceFn> sources; ///< The file formats map.
 	std::unique_ptr<Audio> file;             ///< The loaded audio file.
-	bool dead;                               ///< Whether the Player is closing.
-	const Response_sink *io;                 ///< The sink for responses.
-	seconds last_pos;                        ///< The last-sent position.
+	bool dead;               ///< Whether the Player is closing.
+	const Response_sink *io; ///< The sink for responses.
+	seconds last_pos;        ///< The last-sent position.
 
 	/**
 	 * Parses pos_str as a seek timestamp.
@@ -167,8 +165,8 @@ private:
 	/**
 	 * Performs an actual seek.
 	 * This does not do any EOF handling.
-     * @param tag The tag of the request calling this command.
-     *   For unsolicited dumps, use Response::NOREQUEST.
+	 * @param tag The tag of the request calling this command.
+	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param pos The new position, in microseconds.
 	 * @exception Seek_error
 	 *   Raised if the seek is out of range (usually EOF).
@@ -226,9 +224,9 @@ private:
 	 * This updates the last broadcast time, so that CanBroadcastPos()
 	 * prevents further broadcasts from happening too soon after this one.
 	 *
-     * @param tag The tag of the request that changed the position, if any.
-     *   For regularly scheduled position updates, use Response::NOREQUEST.
-     * @param pos The new position, in microseconds.
+	 * @param tag The tag of the request that changed the position, if any.
+	 *   For regularly scheduled position updates, use Response::NOREQUEST.
+	 * @param pos The new position, in microseconds.
 	 * @param pos The value of the POS response, in microseconds.
 	 */
 	void BroadcastPos(const std::string &tag, microseconds pos);

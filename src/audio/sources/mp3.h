@@ -47,9 +47,9 @@ public:
 	Sample_format OutputSampleFormat() const override;
 
 private:
-    // This value is somewhat arbitrary, but corresponds to the minimum buffer size
-    // used by ffmpeg, so it's probably sensible.
-    static constexpr size_t buffer_size = 16384;
+	// This value is somewhat arbitrary, but corresponds to the minimum
+	// buffer size used by ffmpeg, so it's probably sensible.
+	static constexpr size_t buffer_size = 16384;
 
 	std::array<std::uint8_t, buffer_size> buffer; ///< The decoding buffer.
 

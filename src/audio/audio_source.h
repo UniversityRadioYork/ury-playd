@@ -10,8 +10,8 @@
 #ifndef PLAYD_AUDIO_SOURCE_H
 #define PLAYD_AUDIO_SOURCE_H
 
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 #include <string>
 #include <vector>
 

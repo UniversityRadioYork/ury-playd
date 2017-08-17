@@ -20,8 +20,8 @@
 
 #include "../../errors.h"
 #include "../../messages.h"
-#include "../sample_format.h"
 #include "../audio_source.h"
+#include "../sample_format.h"
 #include "sndfile.h"
 
 Sndfile_audio_source::Sndfile_audio_source(const std::string &path)
@@ -106,14 +106,14 @@ Sndfile_audio_source::Decode_result Sndfile_audio_source::Decode()
 	// (from 8-bit up to 32-bit, and maybe even 32-bit float)!
 	//
 	// So, we reinterpret the decoded bits as a vector of bytes, which is
-	// relatively safe--they'll be interpreted by the Audio_sink in the exact
-	// same way once we tell it how long the samples really are.
+	// relatively safe--they'll be interpreted by the Audio_sink in the
+	// exact same way once we tell it how long the samples really are.
 	uint8_t *begin = reinterpret_cast<uint8_t *>(&*this->buffer.begin());
 
 	// The end is 'read' 32-bit items--read*4 bytes--after.
 	uint8_t *end = begin + (read * 4);
 
-    return std::make_pair(Decode_state::decoding, Decode_vector(begin, end));
+	return std::make_pair(Decode_state::decoding, Decode_vector(begin, end));
 }
 
 Sample_format Sndfile_audio_source::OutputSampleFormat() const
@@ -123,5 +123,5 @@ Sample_format Sndfile_audio_source::OutputSampleFormat() const
 	// Really, we shouldn't assume int is 32-bit!
 	static_assert(sizeof(int) == 4,
 	              "sndfile outputs int, which we need to be 4 bytes");
-    return Sample_format::sint32;
+	return Sample_format::sint32;
 }

@@ -13,9 +13,9 @@
 #include <tuple>
 
 #include "io.h"
-#include "response.h"
-#include "player.h"
 #include "messages.h"
+#include "player.h"
+#include "response.h"
 
 #ifdef WITH_MP3
 #include "audio/sources/mp3.h"
@@ -174,9 +174,10 @@ int main(int argc, char *argv[])
 	auto device_id = GetDeviceID(args);
 	if (device_id < 0) ExitWithUsage(args.at(0));
 
-	Player player(device_id,
-	              &std::make_unique<Sdl_audio_sink, const Audio_source &, int>,
-	              SOURCES);
+	Player player(
+	        device_id,
+	        &std::make_unique<Sdl_audio_sink, const Audio_source &, int>,
+	        SOURCES);
 
 	// Set up the IO now (to avoid a circular dependency).
 	// Make sure the player broadcasts its responses back to the IoCore.

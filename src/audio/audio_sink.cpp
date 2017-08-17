@@ -7,8 +7,8 @@
  * @see audio/audio_sink.h
  */
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <memory>
 #include <string>
@@ -22,27 +22,27 @@
 #include "ringbuffer.h"
 #include "sample_format.h"
 
-
 //
 // Audio_sink
 //
 
 Audio_sink::State Audio_sink::CurrentState()
 {
-    return Audio_sink::State::none;
+	return Audio_sink::State::none;
 }
 
 //
 // Sdl_audio_sink
 //
 
-/* static */ const std::array<SDL_AudioFormat, sample_format_count> Sdl_audio_sink::formats {{
-	AUDIO_U8,  // uint8
-	AUDIO_S8,  // sint8
-	AUDIO_S16, // sint16
-	AUDIO_S32, // sint32
-	AUDIO_F32  // float32
-}};
+/* static */ const std::array<SDL_AudioFormat, sample_format_count>
+        Sdl_audio_sink::formats{{
+                AUDIO_U8,  // uint8
+                AUDIO_S8,  // sint8
+                AUDIO_S16, // sint16
+                AUDIO_S32, // sint32
+                AUDIO_F32  // float32
+        }};
 
 /**
  * The callback used by SDL_Audio.
@@ -112,7 +112,7 @@ Sdl_audio_sink::~Sdl_audio_sink()
 
 void Sdl_audio_sink::Start()
 {
-    if (this->state != Audio_sink::State::stopped) return;
+	if (this->state != Audio_sink::State::stopped) return;
 
 	SDL_PauseAudioDevice(this->device, 0);
 	this->state = Audio_sink::State::playing;
@@ -120,7 +120,7 @@ void Sdl_audio_sink::Start()
 
 void Sdl_audio_sink::Stop()
 {
-    if (this->state == Audio_sink::State::stopped) return;
+	if (this->state == Audio_sink::State::stopped) return;
 
 	SDL_PauseAudioDevice(this->device, 1);
 	this->state = Audio_sink::State::stopped;
@@ -180,8 +180,8 @@ size_t Sdl_audio_sink::Transfer(const gsl::span<const uint8_t> src)
 
 	auto written_count = this->ring_buf.Write(src.first(count));
 	// Since we never write more than the ring buffer can take, and we're
-    // the only thread writing, the written count should equal the requested
-    // written count.
+	// the only thread writing, the written count should equal the requested
+	// written count.
 	Ensures(written_count == count);
 	Ensures(written_count % bytes_per_sample == 0);
 	return written_count;
@@ -191,7 +191,7 @@ void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
 {
 	Expects(0 <= dest.length());
 
-    // How many bytes do we want to pull out of the ring buffer?
+	// How many bytes do we want to pull out of the ring buffer?
 	auto req_bytes = static_cast<size_t>(dest.length());
 
 	// Make sure anything not filled up with sound later is set to silence.
@@ -223,16 +223,17 @@ void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
 		return;
 	}
 
-	// Of the bytes available, how many do we need?  Send this amount to SDL.
+	// Of the bytes available, how many do we need?  Send this amount to
+	// SDL.
 	auto bytes = std::min(req_bytes, avail_bytes);
-    // We should be asking for a whole number of samples.
-    assert(bytes % bytes_per_sample == 0);
-    
+	// We should be asking for a whole number of samples.
+	assert(bytes % bytes_per_sample == 0);
+
 	auto read_bytes = this->ring_buf.Read(dest.first(bytes));
 
-    // We should have received a whole number of samples.
-    assert(read_bytes % this->bytes_per_sample == 0);
-    auto read_samples = read_bytes / this->bytes_per_sample;
+	// We should have received a whole number of samples.
+	assert(read_bytes % this->bytes_per_sample == 0);
+	auto read_samples = read_bytes / this->bytes_per_sample;
 
 	this->position_sample_count += read_samples;
 }

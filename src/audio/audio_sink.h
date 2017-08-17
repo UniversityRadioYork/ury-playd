@@ -27,17 +27,17 @@
 class Audio_sink
 {
 public:
-    /**
-     * Enumeration of possible states for audio.
-     * @see Update
-     */
-    enum class State : uint8_t {
-        none,    ///< There is no audio.
-        stopped, ///< The audio has been stopped, or not yet played.
-        playing, ///< The audio is currently playing.
-        at_end,  ///< The audio has ended and can't play without a seek.
-    };
-    
+	/**
+	 * Enumeration of possible states for audio.
+	 * @see Update
+	 */
+	enum class State : uint8_t {
+		none,    ///< There is no audio.
+		stopped, ///< The audio has been stopped, or not yet played.
+		playing, ///< The audio is currently playing.
+		at_end,  ///< The audio has ended and can't play without a seek.
+	};
+
 	/// Virtual, empty destructor for Audio_sink.
 	virtual ~Audio_sink() = default;
 
@@ -162,7 +162,7 @@ private:
 	SDL_AudioDeviceID device;
 
 	/// n, where 2^n is the capacity of the Audio ring buffer.
-    static constexpr size_t ringbuf_power = 16;
+	static constexpr size_t ringbuf_power = 16;
 
 	/// Mapping from SampleFormats to their equivalent SDL_AudioFormats.
 	static const std::array<SDL_AudioFormat, sample_format_count> formats;

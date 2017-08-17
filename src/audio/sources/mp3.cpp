@@ -26,7 +26,6 @@
 #include "../sample_format.h"
 #include "mp3.h"
 
-
 Mp3_audio_source::Mp3_audio_source(const std::string &path)
     : Audio_source(path), buffer(), context(nullptr)
 {
@@ -44,7 +43,7 @@ Mp3_audio_source::Mp3_audio_source(const std::string &path)
 
 	if (mpg123_open(this->context, path.c_str()) == MPG123_ERR) {
 		throw File_error("mp3: can't open " + path + ": " +
-		                mpg123_strerror(this->context));
+		                 mpg123_strerror(this->context));
 	}
 }
 

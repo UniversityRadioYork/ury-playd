@@ -38,5 +38,5 @@ Samples Audio_source::SamplesFromMicros(microseconds micros) const
 microseconds Audio_source::MicrosFromSamples(Samples samples) const
 {
 	// This is basically SamplesFromMicros but backwards.
-	return microseconds { (samples * 1000000) / this->SampleRate() };
+	return microseconds{(samples * 1000000) / this->SampleRate()};
 }

@@ -11,8 +11,8 @@
 #include <chrono>
 #include <climits>
 #include <cstdint>
-#include <string>
 #include <gsl/gsl>
+#include <string>
 
 #include "../errors.h"
 #include "../messages.h"
@@ -23,7 +23,6 @@
 #include "sample_format.h"
 
 using namespace std::chrono;
-
 
 //
 // Null_audio
@@ -86,14 +85,14 @@ void Basic_audio::SetPlaying(bool playing)
 
 	if (playing) {
 		this->sink->Start();
-        
-        // It's ok for the sink to be playing, ejected or at-end here.
-        Ensures(this->sink->CurrentState() != Audio::State::stopped);
+
+		// It's ok for the sink to be playing, ejected or at-end here.
+		Ensures(this->sink->CurrentState() != Audio::State::stopped);
 	} else {
 		this->sink->Stop();
-        
-        // It's ok for the sink to be stopped, ejected or at-end here.
-        Ensures(this->sink->CurrentState() != Audio::State::playing);
+
+		// It's ok for the sink to be stopped, ejected or at-end here.
+		Ensures(this->sink->CurrentState() != Audio::State::playing);
 	}
 }
 
@@ -158,7 +157,8 @@ void Basic_audio::TransferFrame()
 	Expects(this->src != nullptr);
 
 	auto written = this->sink->Transfer(this->frame_span);
-	this->frame_span = this->frame_span.last(this->frame_span.length() - written);
+	this->frame_span =
+	        this->frame_span.last(this->frame_span.length() - written);
 
 	// We empty the frame once we're done with it.  This
 	// maintains FrameFinished(), as an empty frame is a finished one.
@@ -187,7 +187,7 @@ bool Basic_audio::DecodeIfFrameEmpty()
 	this->frame = result.second;
 	this->frame_span = this->frame;
 
-    return result.first != Audio_source::Decode_state::eof;
+	return result.first != Audio_source::Decode_state::eof;
 }
 
 inline bool Basic_audio::FrameFinished() const

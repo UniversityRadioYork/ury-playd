@@ -15,10 +15,9 @@
 #undef max
 #include <gsl/gsl>
 
-
 /**
  * A concurrent ring buffer.
- * 
+ *
  * This is not particularly efficient, but does the job for playd.
  * It uses two release-acquire-atomic counters to store read and write.
  */
@@ -91,13 +90,13 @@ private:
 	/// Empties the ring buffer without acquiring locks.
 	void FlushInner();
 
-    std::vector<uint8_t> buffer;  ///< The array used by the ringbuffer.
+	std::vector<uint8_t> buffer; ///< The array used by the ringbuffer.
 
-    std::vector<uint8_t>::const_iterator r_it;  ///< The read iterator.
-    std::vector<uint8_t>::iterator w_it;  ///< The write iterator.
-    
-    std::atomic<size_t> count;  ///< The current read capacity.
-    // Write capacity is the total buffer capacity minus count.
+	std::vector<uint8_t>::const_iterator r_it; ///< The read iterator.
+	std::vector<uint8_t>::iterator w_it;       ///< The write iterator.
+
+	std::atomic<size_t> count; ///< The current read capacity.
+	// Write capacity is the total buffer capacity minus count.
 
 	std::mutex r_lock; ///< The read lock.
 	std::mutex w_lock; ///< The write lock.

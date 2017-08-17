@@ -17,7 +17,7 @@
 
 /* static */ const std::string Response::NOREQUEST = "!";
 
-/* static */ const std::array<std::string, Response::CODE_COUNT> Response::STRINGS {{
+/* static */ const std::array<std::string, Response::CODE_COUNT> Response::STRINGS{{
         "OHAI",  // Code::OHAI
         "IAMA",  // Code::IAMA
         "FLOAD", // Code::FLOAD

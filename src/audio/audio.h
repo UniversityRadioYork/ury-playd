@@ -24,7 +24,6 @@
 #include "audio_sink.h"
 #include "audio_source.h"
 
-
 /**
  * An audio item.
  *
@@ -39,9 +38,9 @@
 class Audio
 {
 public:
-    /// Enumeration of possible states for Audio.
-    using State = Audio_sink::State;
-    
+	/// Enumeration of possible states for Audio.
+	using State = Audio_sink::State;
+
 	/// Virtual, empty destructor for Audio.
 	virtual ~Audio() = default;
 
@@ -159,7 +158,8 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	Basic_audio(std::unique_ptr<Audio_source> src, std::unique_ptr<Audio_sink> sink);
+	Basic_audio(std::unique_ptr<Audio_source> src,
+	            std::unique_ptr<Audio_sink> sink);
 
 	Audio::State Update() override;
 	const std::string &File() const override;
