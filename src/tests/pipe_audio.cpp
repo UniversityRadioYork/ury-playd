@@ -27,7 +27,7 @@ SCENARIO("Basic_audio can be constructed with a DummyAudio_sink and DummyAudio_s
 		WHEN("a Basic_audio is created") {
 			THEN("no exceptions are thrown and queries return the expected initial values") {
 				Basic_audio pa(std::move(src), std::move(sink));
-				REQUIRE(pa.Position().count() == 0ULL);
+				REQUIRE(pa.Position() == 0us);
 			}
 		}
 	}
@@ -59,7 +59,7 @@ SCENARIO("Basic_audio responds to getters with valid responses", "[pipe-audio]")
 			AND_WHEN("the position is zero") {
 				pa.SetPosition(microseconds {0});
 				THEN("the position is reported as 0") {
-					REQUIRE(pa.Position().count() == 0ULL);
+					REQUIRE(pa.Position() == 0us);
 				}
 			}
 
@@ -71,8 +71,8 @@ SCENARIO("Basic_audio responds to getters with valid responses", "[pipe-audio]")
 					// calculation is what a round-trip to
 					// and from samples should cause.
 					// This *won't* be 8675309!
-					auto expected = (((8675309ULL * 44100) / 1000000) * 1000000) / 44100;
-					REQUIRE(pa.Position().count() == expected);
+                    auto expected = microseconds { (((8675309ULL * 44100) / 1000000) * 1000000) / 44100 };
+					REQUIRE(pa.Position() == expected);
 				}
 			}
 		}
