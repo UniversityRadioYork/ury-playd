@@ -159,7 +159,7 @@ private:
 	 *   See http://www.cplusplus.com/reference/string/stoull/#exceptions
 	 * @exception std::invalid_argument
 	 *   See http://www.cplusplus.com/reference/string/stoull/#exceptions
-	 * @exception SeekError
+	 * @exception Seek_error
 	 *   Raised if checks beyond those done by stoull fail.
 	 */
 	static microseconds PosParse(const std::string &pos_str);
@@ -167,10 +167,10 @@ private:
 	/**
 	 * Performs an actual seek.
 	 * This does not do any EOF handling.
-	 * @param tag The tag of the request calling this command.
-	 *   For unsolicited seeks, use Response::NOREQUEST.
+     * @param tag The tag of the request calling this command.
+     *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @param pos The new position, in microseconds.
-	 * @exception SeekError
+	 * @exception Seek_error
 	 *   Raised if the seek is out of range (usually EOF).
 	 * @see Player::Seek
 	 */
@@ -226,8 +226,9 @@ private:
 	 * This updates the last broadcast time, so that CanBroadcastPos()
 	 * prevents further broadcasts from happening too soon after this one.
 	 *
-	 * @param tag The tag of the request causing a POS change.
-	 *   For unsolicited seeks, use Response::NOREQUEST.
+     * @param tag The tag of the request that changed the position, if any.
+     *   For regularly scheduled position updates, use Response::NOREQUEST.
+     * @param pos The new position, in microseconds.
 	 * @param pos The value of the POS response, in microseconds.
 	 */
 	void BroadcastPos(const std::string &tag, microseconds pos);
@@ -246,8 +247,8 @@ private:
 	/**
 	 * Loads a file, creating an AudioSource.
 	 * @param path The path to the file to load.
-	 * @return An AudioSource pointer (may be nullptr, if no available
-	 *   and suitable AudioSource was found).
+	 * @return An Audio_source pointer (may be nullptr, if no available
+	 *   and suitable Audio_source was found).
 	 * @see Load
 	 */
 	std::unique_ptr<Audio_source> LoadSource(const std::string &path) const;

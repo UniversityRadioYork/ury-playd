@@ -62,7 +62,6 @@ MAN_HTML  = $(builddir)/$(NAME).1.html
 # excluding any special ones defined below.  The root source directory is
 # implied.
 OWN_SUBDIRS = audio audio/sources io player
-SUBDIRS     = $(OWN_SUBDIRS) contrib/pa_ringbuffer
 
 # Now we work out which libraries to use, using pkg-config.
 PKGS = %%PACKAGES%%
@@ -94,9 +93,8 @@ TEST_BIN      = $(builddir)/$(NAME)_test
 OWN_SRC_SUBDIRS = $(srcdir) $(addprefix $(srcdir)/,$(OWN_SUBDIRS))
 OWN_SOURCES     = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.cpp))
 OWN_CSOURCES    = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.c))
-OWN_HEADERS     = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.hpp))
-OWN_CHEADERS    = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.h))
-TO_FORMAT       = $(OWN_SOURCES) $(OWN_CSOURCES) $(OWN_HEADERS) $(OWN_CHEADERS)
+OWN_HEADERS     = $(foreach dir,$(OWN_SRC_SUBDIRS),$(wildcard $(dir)/*.h))
+TO_FORMAT       = $(OWN_SOURCES) $(OWN_CSOURCES) $(OWN_HEADERS)
 
 # Version stuff
 CXXFLAGS += -D PD_VERSION=\"%%PROGVER%%\"
