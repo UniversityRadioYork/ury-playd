@@ -3,11 +3,11 @@
 
 /**
  * @file
- * The RingBuffer class template.
+ * The Ring_buffer class.
  */
 
-#ifndef PLAYD_RINGBUFFER_HPP
-#define PLAYD_RINGBUFFER_HPP
+#ifndef PLAYD_RING_BUFFER_HPP
+#define PLAYD_RING_BUFFER_HPP
 
 #include <atomic>
 #include <mutex>
@@ -20,26 +20,25 @@
  * A concurrent ring buffer.
  * 
  * This is not particularly efficient, but does the job for playd.
- * It uses two release-acquire-atomic counters to store read and write
- * 
+ * It uses two release-acquire-atomic counters to store read and write.
  */
-class RingBuffer
+class Ring_buffer
 {
 public:
 	/**
-	 * Constructs a RingBuffer.
-	 * @param capacity The capacity of the ringbuffer, in bytes.
+	 * Constructs a Ring_buffer.
+	 * @param capacity The capacity of the ring buffer, in bytes.
 	 */
-	RingBuffer(size_t capacity);
+	Ring_buffer(size_t capacity);
 
-	/// Destructs a PaRingBuffer.
-	~RingBuffer();
+	/// Destructs a Ring_buffer.
+	~Ring_buffer();
 
 	/// Deleted copy constructor.
-	RingBuffer(const RingBuffer &) = delete;
+	Ring_buffer(const Ring_buffer &) = delete;
 
 	/// Deleted copy-assignment.
-	RingBuffer &operator=(const RingBuffer &) = delete;
+	Ring_buffer &operator=(const Ring_buffer &) = delete;
 
 	/**
 	 * The current write capacity.

@@ -10,22 +10,22 @@
 
 #include <cstdint>
 
-#include "../audio/audio.h"
 #include "../audio/audio_source.h"
+#include "../audio/sample_format.h"
 
-/// Dummy AudioSource, for testing PipeAudio.
-class DummyAudioSource : public AudioSource
+/// Dummy audio source, for testing audio pipelines.
+class Dummy_audio_source : public Audio_source
 {
 public:
 	/**
-	 * Constructs a DummyAudioSource.
-	 * @param path The path of the file this DummyAudioSource 'represents'.
+	 * Constructs a Dummy_audio_source.
+	 * @param path The path of the file this Dummy_audio_source 'represents'.
 	 */
-	DummyAudioSource(const std::string &path) : AudioSource(path) {};
-	AudioSource::DecodeResult Decode() override;
+	Dummy_audio_source(const std::string &path) : Audio_source(path) {};
+	Audio_source::Decode_result Decode() override;
 	std::uint8_t ChannelCount() const override;
 	std::uint32_t SampleRate() const override;
-	SampleFormat OutputSampleFormat() const override;
+	Sample_format OutputSampleFormat() const override;
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	/// @return The path of the DummyAudioSource.

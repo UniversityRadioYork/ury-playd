@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of the Mp3AudioSource class.
+ * Implementation of the Mp3_audio_source class.
  * @see audio/sources/mp3.h
  */
 
@@ -23,15 +23,12 @@
 #include "../../errors.h"
 #include "../../messages.h"
 #include "../audio_source.h"
-#include "../sample_formats.h"
+#include "../sample_format.h"
 #include "mp3.h"
 
-// This value is somewhat arbitrary, but corresponds to the minimum buffer size
-// used by ffmpeg, so it's probably sensible.
-const size_t Mp3AudioSource::BUFFER_SIZE = 16384;
 
-Mp3AudioSource::Mp3AudioSource(const std::string &path)
-    : AudioSource(path), buffer(BUFFER_SIZE), context(nullptr)
+Mp3_audio_source::Mp3_audio_source(const std::string &path)
+    : Audio_source(path), buffer(), context(nullptr)
 {
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
@@ -46,25 +43,25 @@ Mp3AudioSource::Mp3AudioSource(const std::string &path)
 	}
 
 	if (mpg123_open(this->context, path.c_str()) == MPG123_ERR) {
-		throw FileError("mp3: can't open " + path + ": " +
+		throw File_error("mp3: can't open " + path + ": " +
 		                mpg123_strerror(this->context));
 	}
 }
 
-Mp3AudioSource::~Mp3AudioSource()
+Mp3_audio_source::~Mp3_audio_source()
 {
 	mpg123_delete(this->context);
 	this->context = nullptr;
 }
 
-std::uint64_t Mp3AudioSource::Length() const
+std::uint64_t Mp3_audio_source::Length() const
 {
 	assert(this->context != nullptr);
 
 	return mpg123_length(this->context);
 }
 
-void Mp3AudioSource::AddFormat(long rate)
+void Mp3_audio_source::AddFormat(long rate)
 {
 	// The requested encodings correspond to the sample formats available in
 	// the SampleFormat enum.
@@ -79,7 +76,7 @@ void Mp3AudioSource::AddFormat(long rate)
 	};
 }
 
-std::uint8_t Mp3AudioSource::ChannelCount() const
+std::uint8_t Mp3_audio_source::ChannelCount() const
 {
 	assert(this->context != nullptr);
 
@@ -89,7 +86,7 @@ std::uint8_t Mp3AudioSource::ChannelCount() const
 	return static_cast<std::uint8_t>(chans);
 }
 
-std::uint32_t Mp3AudioSource::SampleRate() const
+std::uint32_t Mp3_audio_source::SampleRate() const
 {
 	assert(this->context != nullptr);
 
@@ -104,7 +101,7 @@ std::uint32_t Mp3AudioSource::SampleRate() const
 	return static_cast<std::uint32_t>(rate);
 }
 
-std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
+std::uint64_t Mp3_audio_source::Seek(std::uint64_t in_samples)
 {
 	assert(this->context != nullptr);
 
@@ -113,13 +110,13 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 	if (clen < in_samples) {
 		Debug() << "mp3: seek at" << in_samples << "past EOF at" << clen
 		        << std::endl;
-		throw SeekError(MSG_SEEK_FAIL);
+		throw Seek_error(MSG_SEEK_FAIL);
 	}
 
 	if (mpg123_seek(this->context, in_samples, SEEK_SET) == MPG123_ERR) {
 		Debug() << "mp3: seek failed:" << mpg123_strerror(this->context)
 		        << std::endl;
-		throw SeekError(MSG_SEEK_FAIL);
+		throw Seek_error(MSG_SEEK_FAIL);
 	}
 
 	// The actual seek position may not be the same as the requested
@@ -128,7 +125,7 @@ std::uint64_t Mp3AudioSource::Seek(std::uint64_t in_samples)
 	return mpg123_tell(this->context);
 }
 
-Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()
+Mp3_audio_source::Decode_result Mp3_audio_source::Decode()
 {
 	assert(this->context != nullptr);
 
@@ -136,27 +133,27 @@ Mp3AudioSource::DecodeResult Mp3AudioSource::Decode()
 	size_t rbytes = 0;
 	int err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
 
-	DecodeVector decoded;
-	DecodeState decode_state;
+	Decode_vector decoded;
+	Decode_state decode_state;
 
 	if (err == MPG123_DONE) {
-		decode_state = DecodeState::END_OF_FILE;
+		decode_state = Decode_state::eof;
 	} else if (err != MPG123_OK && err != MPG123_NEW_FORMAT) {
 		Debug() << "mp3: decode error:" << mpg123_strerror(this->context)
 		        << std::endl;
-		decode_state = DecodeState::END_OF_FILE;
+		decode_state = Decode_state::eof;
 	} else {
-		decode_state = DecodeState::DECODING;
+		decode_state = Decode_state::decoding;
 
 		// Copy only the bit of the buffer occupied by decoded data
 		auto front = this->buffer.begin();
-		decoded = DecodeVector(front, front + rbytes);
+		decoded = Decode_vector(front, front + rbytes);
 	}
 
 	return std::make_pair(decode_state, decoded);
 }
 
-SampleFormat Mp3AudioSource::OutputSampleFormat() const
+Sample_format Mp3_audio_source::OutputSampleFormat() const
 {
 	assert(this->context != nullptr);
 
@@ -165,19 +162,19 @@ SampleFormat Mp3AudioSource::OutputSampleFormat() const
 
 	switch (encoding) {
 		case MPG123_ENC_UNSIGNED_8:
-			return SampleFormat::PACKED_UNSIGNED_INT_8;
+			return Sample_format::uint8;
 		case MPG123_ENC_SIGNED_8:
-			return SampleFormat::PACKED_SIGNED_INT_8;
+			return Sample_format::sint8;
 		case MPG123_ENC_SIGNED_16:
-			return SampleFormat::PACKED_SIGNED_INT_16;
+			return Sample_format::sint16;
 		case MPG123_ENC_SIGNED_32:
-			return SampleFormat::PACKED_SIGNED_INT_32;
+			return Sample_format::sint32;
 		case MPG123_ENC_FLOAT_32:
-			return SampleFormat::PACKED_FLOAT_32;
+			return Sample_format::float32;
 		default:
 			// We shouldn't get here, if the format was set up
 			// correctly earlier.
-			throw InternalError(
+			throw Internal_error(
 			        "unsupported sample rate, should not "
 			        "happen");
 	}

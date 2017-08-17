@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Declaration of the AudioSource class.
+ * Declaration of the Audio_source class.
  * @see audio/audio_source.cpp
  */
 
@@ -16,10 +16,9 @@
 #include <vector>
 
 #include "../errors.h"
-#include "sample_formats.h"
+#include "sample_format.h"
 
 using namespace std::chrono;
-
 
 /**
  * An object responsible for decoding an audio file.
@@ -27,8 +26,8 @@ using namespace std::chrono;
  * AudioSource is an abstract base class, implemented separately for each
  * supported audio file format.
  *
- * @see Mp3AudioSource
- * @see SndfileAudioSource
+ * @see Mp3_audio_source
+ * @see Sndfile_audio_source
  *
  * @note When we refer to 'samples' in this class, this usually refers to
  *   the smallest unit of data for *all* channels.  Some audio decoders
@@ -36,34 +35,34 @@ using namespace std::chrono;
  *   there are exactly ChannelCount() of their samples to one of ours.
  *   We usually call this a 'mono sample'.
  */
-class AudioSource
+class Audio_source
 {
 public:
 	/// An enumeration of possible states the decoder can be in.
-	enum class DecodeState : std::uint8_t {
+	enum class Decode_state : std::uint8_t {
 		/// The decoder is currently trying to acquire a frame.
-		WAITING_FOR_FRAME,
+		need_frame,
 		/// The decoder is currently decoding a frame.
-		DECODING,
+		decoding,
 		/// The decoder has run out of things to decode.
-		END_OF_FILE
+		eof
 	};
 
 	/// Type of decoded sample vectors.
-	using DecodeVector = std::vector<std::uint8_t>;
+	using Decode_vector = std::vector<std::uint8_t>;
 
 	/// Type of the result of Decode().
-	using DecodeResult = std::pair<DecodeState, DecodeVector>;
+	using Decode_result = std::pair<Decode_state, Decode_vector>;
 
 	/**
-	 * Constructs an AudioSource.
+	 * Constructs an Audio_source.
 	 * @param path The path to the file from which this AudioSource is
 	 *   decoding.
 	 */
-	AudioSource(const std::string &path);
+	Audio_source(const std::string &path);
 
 	/// Virtual, empty destructor for AudioSource.
-	virtual ~AudioSource() = default;
+	virtual ~Audio_source() = default;
 
 	//
 	// Methods that must be overridden
@@ -75,7 +74,7 @@ public:
 	 *   round and the vector of bytes decoded.  The vector may be empty,
 	 *   if the decoding round did not finish off a frame.
 	 */
-	virtual DecodeResult Decode() = 0;
+	virtual Decode_result Decode() = 0;
 
 	/**
 	 * Returns the channel count.
@@ -95,7 +94,7 @@ public:
 	 * Returns the output sample format.
 	 * @return The output sample format, as a SampleFormat.
 	 */
-	virtual SampleFormat OutputSampleFormat() const = 0;
+	virtual Sample_format OutputSampleFormat() const = 0;
 
 	/**
 	 * Seeks to the given position, in samples.

@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Declaration of the Audio class.
+ * Declaration of the Basic_audio, Null_audio and Audio classes.
  * @see audio/audio.cpp
  */
 
@@ -21,10 +21,9 @@
 #include "../gsl/gsl"
 
 #include "../response.h"
+#include "audio_sink.h"
 #include "audio_source.h"
 
-
-class AudioSink;
 
 /**
  * An audio item.
@@ -40,17 +39,9 @@ class AudioSink;
 class Audio
 {
 public:
-	/**
-	 * Enumeration of possible states for this Audio.
-	 * @see Update
-	 */
-	enum class State : uint8_t {
-		NONE,    ///< There is no Audio.
-		STOPPED, ///< The Audio has been stopped, or not yet played.
-		PLAYING, ///< The Audio is currently playing.
-		AT_END,  ///< The Audio has ended and can't play without a seek.
-	};
-
+    /// Enumeration of possible states for Audio.
+    using State = Audio_sink::State;
+    
 	/// Virtual, empty destructor for Audio.
 	virtual ~Audio() = default;
 
@@ -100,7 +91,7 @@ public:
 	 * The state of this Audio.
 	 * @return this Audio's current state.
 	 */
-	virtual Audio::State CurrentState() const = 0;
+	virtual State CurrentState() const = 0;
 
 	/**
 	 * This Audio's current position.
@@ -133,7 +124,7 @@ public:
  *
  * @see Audio
  */
-class NoAudio : public Audio
+class Null_audio : public Audio
 {
 public:
 	Audio::State Update() override;
@@ -159,17 +150,16 @@ public:
  * @see AudioSink
  * @see AudioSource
  */
-class PipeAudio : public Audio
+class Basic_audio : public Audio
 {
 public:
 	/**
-	 * Constructs a PipeAudio from a source and a sink.
+	 * Constructs audio from a source and a sink.
 	 * @param src The source of decoded audio frames.
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	PipeAudio(std::unique_ptr<AudioSource> src,
-	          std::unique_ptr<AudioSink> sink);
+	Basic_audio(std::unique_ptr<Audio_source> src, std::unique_ptr<Audio_sink> sink);
 
 	Audio::State Update() override;
 	const std::string &File() const override;
@@ -183,13 +173,13 @@ public:
 
 private:
 	/// The source of audio data.
-	std::unique_ptr<AudioSource> src;
+	std::unique_ptr<Audio_source> src;
 
 	/// The sink to which audio data is sent.
-	std::unique_ptr<AudioSink> sink;
+	std::unique_ptr<Audio_sink> sink;
 
 	/// The current decoded frame.
-	AudioSource::DecodeVector frame;
+	Audio_source::Decode_vector frame;
 
 	/// A span representing the unclaimed part of the decoded frame.
 	gsl::span<const uint8_t> frame_span;

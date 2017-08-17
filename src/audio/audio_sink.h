@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Declaration of the AudioSink class.
+ * Declaration of the Audio_sink class.
  * @see audio/audio.cpp
  */
 
@@ -19,18 +19,27 @@
 
 #include "SDL.h"
 
-#include "audio.h"
 #include "audio_source.h"
 #include "ringbuffer.h"
-#include "sample_formats.h"
-
+#include "sample_format.h"
 
 /// Abstract class for audio output sinks.
-class AudioSink
+class Audio_sink
 {
 public:
-	/// Virtual, empty destructor for AudioSink.
-	virtual ~AudioSink() = default;
+    /**
+     * Enumeration of possible states for audio.
+     * @see Update
+     */
+    enum class State : uint8_t {
+        none,    ///< There is no audio.
+        stopped, ///< The audio has been stopped, or not yet played.
+        playing, ///< The audio is currently playing.
+        at_end,  ///< The audio has ended and can't play without a seek.
+    };
+    
+	/// Virtual, empty destructor for Audio_sink.
+	virtual ~Audio_sink() = default;
 
 	/**
 	 * Starts the audio stream.
@@ -47,11 +56,11 @@ public:
 	virtual void Stop() = 0;
 
 	/**
-	 * Gets this AudioSink's current state (playing/stopped/at end).
-	 * @return The Audio::State representing this AudioSink's state.
-	 * @see Audio::State
+	 * Gets this sink's current state (playing/stopped/at end).
+	 * @return The Audio_sink::State representing this sink's state.
+	 * @see Audio_sink::State
 	 */
-	virtual Audio::State State();
+	virtual State CurrentState();
 
 	/**
 	 * Gets the current played position in the song, in samples.
@@ -63,7 +72,7 @@ public:
 
 	/**
 	 * Sets the current played position, given a position in samples.
-	 * This flushes out the AudioSink ready to receive sample data from the
+	 * This flushes out the audio sink ready to receive sample data from the
 	 * new position.
 	 * @param samples The new position, as a count of elapsed samples.
 	 * @see Position
@@ -79,7 +88,7 @@ public:
 	virtual void SourceOut() = 0;
 
 	/**
-	 * Transfers a span of sample bytes into the AudioSink.
+	 * Transfers a span of sample bytes into the audio sink.
 	 * The span may be empty, but must be valid.
 	 *
 	 * * Precondition: @a src must contain a whole number of samples.
@@ -95,26 +104,26 @@ public:
 /**
  * An output stream for audio, using SDL.
  *
- * An SdlAudioSink consists of an SDL output device and a buffer that stores
- * decoded samples from the Audio object.  While active, the SdlAudioSink
+ * An Sdl_audio_sink consists of an SDL output device and a buffer that stores
+ * decoded samples from the Audio object.  While active, the Sdl_audio_sink
  * periodically transfers samples from its buffer to SDL2 in a separate thread.
  */
-class SdlAudioSink : public AudioSink
+class Sdl_audio_sink : public Audio_sink
 {
 public:
 	/**
-	 * Constructs an SdlAudioSink.
+	 * Constructs an Sdl_audio_sink.
 	 * @param source The source from which this sink will receive audio.
 	 * @param device_id The device ID to which this sink will output.
 	 */
-	SdlAudioSink(const AudioSource &source, int device_id);
+	Sdl_audio_sink(const Audio_source &source, int device_id);
 
-	/// Destructs an SdlAudioSink.
-	~SdlAudioSink() override;
+	/// Destructs an Sdl_audio_sink.
+	~Sdl_audio_sink() override;
 
 	void Start() override;
 	void Stop() override;
-	Audio::State State() override;
+	Audio_sink::State CurrentState() override;
 	Samples Position() override;
 	void SetPosition(Samples samples) override;
 	void SourceOut() override;
@@ -153,17 +162,16 @@ private:
 	SDL_AudioDeviceID device;
 
 	/// n, where 2^n is the capacity of the Audio ring buffer.
-	/// @see RINGBUF_SIZE
-	static const size_t RINGBUF_POWER;
+    static constexpr size_t ringbuf_power = 16;
 
 	/// Mapping from SampleFormats to their equivalent SDL_AudioFormats.
-	static const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> FORMATS;
+	static const std::array<SDL_AudioFormat, sample_format_count> formats;
 
 	/// Number of bytes in one sample.
 	size_t bytes_per_sample;
 
 	/// The ring buffer used to transfer samples to the playing callback.
-	RingBuffer ring_buf;
+	Ring_buffer ring_buf;
 
 	/// The current position, in samples.
 	Samples position_sample_count;
@@ -172,7 +180,7 @@ private:
 	bool source_out;
 
 	/// The decoder's current state.
-	Audio::State state;
+	Audio_sink::State state;
 };
 
 #endif // PLAYD_AUDIO_SINK_H

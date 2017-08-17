@@ -36,21 +36,21 @@ class Connection;
  * via their IDs inside the pool.  It ensures that each connection is given an
  * ID that is unique up until the removal of said connection.
  */
-class IoCore : public ResponseSink
+class Io_core : public Response_sink
 {
 public:
 	/**
-	 * Constructs an IoCore.
+	 * Constructs an IO core.
 	 * @param player The player to which update requests, commands, and new
 	 *   connection state dump requests shall be sent.
 	 */
-	explicit IoCore(Player &player);
+	explicit Io_core(Player &player);
 
 	/// Deleted copy constructor.
-	IoCore(const IoCore &) = delete;
+	Io_core(const Io_core &) = delete;
 
 	/// Deleted copy-assignment.
-	IoCore &operator=(const IoCore &) = delete;
+	Io_core &operator=(const Io_core &) = delete;
 
 	/**
 	 * Runs the reactor.
@@ -193,7 +193,7 @@ public:
 	 * @param player The player to which read commands should be sent.
 	 * @param id The ID of this Connection in the IoCore.
 	 */
-	Connection(IoCore &parent, uv_tcp_t *tcp, Player &player, size_t id);
+	Connection(Io_core &parent, uv_tcp_t *tcp, Player &player, size_t id);
 
 	/**
 	 * Destructs a Connection.
@@ -244,7 +244,7 @@ public:
 
 private:
 	/// The pool on which this connection is running.
-	IoCore &parent;
+	Io_core &parent;
 
 	/// The libuv handle for the TCP connection.
 	uv_tcp_t *tcp;

@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Tests for the RingBuffer class.
+ * Tests for the Ring_buffer class.
  */
 
 #include "catch.hpp"
@@ -12,32 +12,32 @@
 #include "../errors.h"
 #include "../audio/ringbuffer.h"
 
-SCENARIO("RingBuffer cannot be read from when empty", "[ringbuffer]") {
-	GIVEN("an empty RingBuffer and properly sized buffer") {
-		RingBuffer rb(1<<5);
+SCENARIO("Ring buffer cannot be read from when empty", "[ringbuffer]") {
+	GIVEN("an empty ring buffer and properly sized buffer") {
+		Ring_buffer rb(1<<5);
 		uint8_t buf[1 << 5];
 
 		WHEN("a read is called for one item") {
 			THEN("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Read(gsl::span<uint8_t>(buf, 1)), InternalError);
+				REQUIRE_THROWS_AS(rb.Read(gsl::span<uint8_t>(buf, 1)), Internal_error);
 			}
 		}
 		WHEN("a read is called for 2^power items") {
 			THEN("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Read(gsl::span<uint8_t>(buf, 1<<5)), InternalError);
+				REQUIRE_THROWS_AS(rb.Read(gsl::span<uint8_t>(buf, 1<<5)), Internal_error);
 			}
 		}
 		WHEN("a read is called for 2^power + 1 items") {
 			THEN("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Read(gsl::span<uint8_t>(buf, (1<<5) + 1)), InternalError);
+				REQUIRE_THROWS_AS(rb.Read(gsl::span<uint8_t>(buf, (1<<5) + 1)), Internal_error);
 			}
 		}
 	}
 }
 
-SCENARIO("RingBuffer cannot be written to when full", "[ringbuffer]") {
-	GIVEN("an full RingBuffer") {
-		RingBuffer rb(1<<5);
+SCENARIO("Ring buffer cannot be written to when full", "[ringbuffer]") {
+	GIVEN("a full ring buffer") {
+		Ring_buffer rb(1<<5);
 		const char *msg = "this message is 2^5 chars long!\0this bit isn't\0";
 		// TODO(MattWindsor91): this is technically not portable in the slightest.
 		const uint8_t *m8 = reinterpret_cast<const uint8_t *>(msg);
@@ -45,27 +45,27 @@ SCENARIO("RingBuffer cannot be written to when full", "[ringbuffer]") {
 		rb.Write(gsl::span<const uint8_t>(m8, 1<<5));
 
 		WHEN("a write is called for one item") {
-			THEN("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Write(gsl::span<const uint8_t>(m8, 1)), InternalError);
+			THEN("an internal error is raised") {
+				REQUIRE_THROWS_AS(rb.Write(gsl::span<const uint8_t>(m8, 1)), Internal_error);
 			}
 		}
 		WHEN("a write is called for 2^power items") {
-			THEN("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Write(gsl::span<const uint8_t>(m8, 1 << 5)), InternalError);
+			THEN("an internal error is raised") {
+				REQUIRE_THROWS_AS(rb.Write(gsl::span<const uint8_t>(m8, 1 << 5)), Internal_error);
 			}
 		}
 		WHEN("a write is called for 2^power + 1 items") {
-			THEN("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Write(gsl::span<const uint8_t>(m8, (1 << 5) + 1)), InternalError);
+			THEN("an internal error is raised") {
+				REQUIRE_THROWS_AS(rb.Write(gsl::span<const uint8_t>(m8, (1 << 5) + 1)), Internal_error);
 			}
 		}
 	}
 }
 
-SCENARIO("RingBuffer reports capacities correctly", "[ringbuffer]") {
-	GIVEN("an empty RingBuffer and properly sized buffer") {
-		RingBuffer rb(1<<5);
-		uint8_t buf[1<<5];
+SCENARIO("Ring buffer reports capacities correctly", "[ringbuffer]") {
+	GIVEN("an empty ring buffer and properly sized buffer") {
+        Ring_buffer rb(1<<5);
+        uint8_t buf[1<<5];
 		const char *msg = "this message is 2^5 chars long!\0this bit isn't\0";
 		// TODO(MattWindsor91): this is technically not portable in the slightest.
 		const uint8_t *m8 = reinterpret_cast<const uint8_t *>(msg);

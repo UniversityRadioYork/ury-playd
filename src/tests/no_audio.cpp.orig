@@ -20,7 +20,7 @@
 using namespace std::chrono;
 
 
-SCENARIO("Null_audio reports the state as none", "[no-audio]") {
+SCENARIO("Null_audio reports the state as NONE", "[no-audio]") {
 	GIVEN("A Null_audio object") {
 		Null_audio n;
 
@@ -28,7 +28,7 @@ SCENARIO("Null_audio reports the state as none", "[no-audio]") {
 			auto state = n.Update();
 
 			THEN("the resulting state is NONE") {
-				REQUIRE(state == Audio::State::none);
+				REQUIRE(state == Audio::State::NONE);
 			}
 		}
 	}
@@ -42,7 +42,7 @@ SCENARIO("Null_audio returns a state of NONE", "[no-audio]") {
 			auto state = n.CurrentState();
 
 			THEN("the state is NONE") {
-				REQUIRE(state == Audio::State::none);
+				REQUIRE(state == Audio::State::NONE);
 			}
 		}
 	}
@@ -65,8 +65,13 @@ SCENARIO("Null_audio throws exceptions when asked to do audio-type things", "[no
 		}
 
 		WHEN("SetPosition() is called") {
+<<<<<<< Updated upstream
+			THEN("NoAudioError is thrown") {
+				REQUIRE_THROWS_AS(n.SetPosition(microseconds {100}), NoAudioError);
+=======
 			THEN("Null_audio_error is thrown") {
-				REQUIRE_THROWS_AS(n.SetPosition(microseconds {100}), Null_audio_error);
+				REQUIRE_THROWS_AS(n.SetPosition(100), Null_audio_error);
+>>>>>>> Stashed changes
 			}
 		}
 

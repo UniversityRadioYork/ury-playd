@@ -3,46 +3,45 @@
 
 /**
  * @file
- * Definition of the DummyAudioSink class.
+ * Definition of the DummyAudio_sink class.
  * @see audio/audio_sink.h
  * @see tests/dummy_audio_sink.cpp
  */
 
-#include "../audio/audio.h"
 #include "../audio/audio_sink.h"
 #include "dummy_audio_sink.h"
 
-void DummyAudioSink::Start()
+void Dummy_audio_sink::Start()
 {
-	this->state = Audio::State::PLAYING;
+	this->state = Audio_sink::State::playing;
 }
 
-void DummyAudioSink::Stop()
+void Dummy_audio_sink::Stop()
 {
-	this->state = Audio::State::STOPPED;
+	this->state = Audio_sink::State::stopped;
 }
 
-Audio::State DummyAudioSink::State()
+Audio_sink::State Dummy_audio_sink::CurrentState()
 {
 	return this->state;
 }
 
-std::uint64_t DummyAudioSink::Position()
+std::uint64_t Dummy_audio_sink::Position()
 {
 	return this->position;
 }
 
-void DummyAudioSink::SetPosition(std::uint64_t samples)
+void Dummy_audio_sink::SetPosition(uint64_t samples)
 {
 	this->position = samples;
 }
 
-void DummyAudioSink::SourceOut()
+void Dummy_audio_sink::SourceOut()
 {
-	this->state = Audio::State::AT_END;
+	this->state = Audio_sink::State::at_end;
 }
 
-size_t DummyAudioSink::Transfer(const gsl::span<const uint8_t> src)
+size_t Dummy_audio_sink::Transfer(const gsl::span<const uint8_t> src)
 {
 	return src.length();
 }

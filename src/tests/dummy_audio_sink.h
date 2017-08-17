@@ -10,30 +10,30 @@
 
 #include <cstdint>
 
-#include "../audio/audio.h"
+#include "../audio/audio_source.h"
 #include "../audio/audio_sink.h"
 
-/// Dummy AudioSink, for testing PipeAudio.
-class DummyAudioSink : public AudioSink
+/// Dummy audio sink, for testing audio pipelines.
+class Dummy_audio_sink : public Audio_sink
 {
 public:
 	/**
-	 * Constructs a DummyAudioSink.
+	 * Constructs a Dummy_audio_sink.
 	 * @param source Ignored.
 	 * @param device_id Ignored.
 	 */
-	DummyAudioSink(const AudioSource &, int) {};
+	Dummy_audio_sink(const Audio_source &, int) {};
 
 	void Start() override;
 	void Stop() override;
-	Audio::State State() override;
+	Audio_sink::State CurrentState() override;
 	std::uint64_t Position() override;
-	void SetPosition(std::uint64_t samples) override;
+	void SetPosition(uint64_t samples) override;
 	void SourceOut() override;
 	size_t Transfer(const gsl::span<const uint8_t> src) override;
 
 	/// The current state of the DummyAudioSink.
-	Audio::State state = Audio::State::STOPPED;
+	Audio_sink::State state = Audio_sink::State::stopped;
 
 	/// The current position, in samples.
 	uint64_t position = 0;

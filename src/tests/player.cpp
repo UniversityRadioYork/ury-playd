@@ -19,22 +19,22 @@
 using namespace std::string_literals;
 
 const std::map<std::string, Player::SourceFn> DUMMY_SRCS {
-	{"mp3", &std::make_unique<DummyAudioSource, const std::string &>},
-	{"ogg", [](const std::string &) -> std::unique_ptr<AudioSource> { throw FileError("test failure 1"); }},
-	{"flac", [](const std::string &) -> std::unique_ptr<AudioSource> { throw InternalError("test failure 2"); }}
+	{"mp3", &std::make_unique<Dummy_audio_source, const std::string &>},
+	{"ogg", [](const std::string &) -> std::unique_ptr<Audio_source> { throw File_error("test failure 1"); }},
+	{"flac", [](const std::string &) -> std::unique_ptr<Audio_source> { throw Internal_error("test failure 2"); }}
 };
 
 
 SCENARIO("Player announces changes in state correctly", "[player]") {
-	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
+	GIVEN("a fresh Player using dummy audio sources and sinks") {
 		Player p(0,
-			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 &std::make_unique<Dummy_audio_sink, const Audio_source &, int>,
 			 DUMMY_SRCS);
 
 		WHEN("the player has nothing loaded") {
-			GIVEN("a DummyResponseSink") {
+			GIVEN("a dummy response sink") {
 				std::ostringstream os;
-				DummyResponseSink drs(os);
+				Dummy_response_sink drs(os);
 				p.SetIo(drs);
 
 				THEN("ejecting should emit nothing") {
@@ -52,9 +52,9 @@ SCENARIO("Player announces changes in state correctly", "[player]") {
 }
 
 SCENARIO("Player accurately represents whether it is running", "[player]") {
-	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
+	GIVEN("a fresh Player using dummy audio sources and sinks") {
 		Player p(0,
-			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 &std::make_unique<Dummy_audio_sink, const Audio_source &, int>,
 			 DUMMY_SRCS);
 
 		WHEN("the player has not been asked to quit") {
@@ -78,9 +78,9 @@ SCENARIO("Player accurately represents whether it is running", "[player]") {
 }
 
 SCENARIO("Player interacts correctly with the audio system", "[player]") {
-	GIVEN("a fresh Player using AudioSystem, DummyAudioSink and DummyAudioSource") {
+	GIVEN("a fresh Player using dummy audio sources and sinks") {
 		Player p(0,
-			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 &std::make_unique<Dummy_audio_sink, const Audio_source &, int>,
 			 DUMMY_SRCS);
 
 		WHEN("there is no audio loaded") {
@@ -177,7 +177,7 @@ SCENARIO("Player interacts correctly with the audio system", "[player]") {
 SCENARIO("Player refuses absurd seek positions", "[seek]") {
 	GIVEN("a loaded Player") {
 		Player p(0,
-			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 &std::make_unique<Dummy_audio_sink, const Audio_source &, int>,
 			 DUMMY_SRCS);
 
 		p.Load("tag", "blah.mp3");
@@ -232,13 +232,13 @@ SCENARIO("Player refuses absurd seek positions", "[seek]") {
 SCENARIO("Player handles End requests correctly", "[player]") {
 	GIVEN("a loaded Player") {
 		Player p(0,
-			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 &std::make_unique<Dummy_audio_sink, const Audio_source &, int>,
 			 DUMMY_SRCS);
 
 		p.Load("tag", "blah.mp3");
 
 		std::ostringstream os;
-		DummyResponseSink drs(os);
+		Dummy_response_sink drs(os);
 		p.SetIo(drs);
 
 		WHEN("End is sent to the player") {
@@ -256,7 +256,7 @@ SCENARIO("Player handles End requests correctly", "[player]") {
 SCENARIO("Player refuses commands when quitting", "[player]") {
 	GIVEN("a loaded Player") {
 		Player p(0,
-			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 &std::make_unique<Dummy_audio_sink, const Audio_source &, int>,
 			 DUMMY_SRCS);
 
 		p.Load("tag", "blah.mp3");
@@ -297,12 +297,12 @@ SCENARIO("Player refuses commands when quitting", "[player]") {
 SCENARIO("Player handles load errors properly", "[seek]") {
 	GIVEN("a Player") {
 		Player p(0,
-			 &std::make_unique<DummyAudioSink, const AudioSource &, int>,
+			 &std::make_unique<Dummy_audio_sink, const Audio_source &, int>,
 			 DUMMY_SRCS);
 
 		WHEN("no file is loaded") {
 			std::ostringstream os;
-			DummyResponseSink drs(os);
+			Dummy_response_sink drs(os);
 			p.SetIo(drs);
 
 			AND_WHEN("a load fails with FileError") {
@@ -319,7 +319,7 @@ SCENARIO("Player handles load errors properly", "[seek]") {
 
 			AND_WHEN("a load fails with InternalError") {
 				THEN("the error propagates outwards") {
-					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), InternalError);
+					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), Internal_error);
 				}
 			}
 		}
@@ -328,7 +328,7 @@ SCENARIO("Player handles load errors properly", "[seek]") {
 			p.Load("tag", "foo.mp3");
 
 			std::ostringstream os;
-			DummyResponseSink drs(os);
+			Dummy_response_sink drs(os);
 			p.SetIo(drs);
 
 			AND_WHEN("a load fails with FileError") {
@@ -345,7 +345,7 @@ SCENARIO("Player handles load errors properly", "[seek]") {
 
 			AND_WHEN("a load fails with InternalError") {
 				THEN("the error propagates outwards") {
-					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), InternalError);
+					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), Internal_error);
 				}
 			}
 		}

@@ -33,16 +33,16 @@ public:
 	 * @see Response::STRINGS
 	 */
 	enum class Code : std::uint8_t {
-		OHAI,  ///< Server starting up.
-		IAMA,  ///< Server sending its role.
-		FLOAD, ///< The loaded file just changed.
-		EJECT, ///< The loaded file just ejected.
-		POS,   ///< Server sending current song time.
-		END,   ///< The loaded file just ended.
-		PLAY,  ///< The loaded file is playing.
-		STOP,  ///< The loaded file has stopped.
-		ACK,   ///< Command result.
-        LEN
+		ohai,  ///< Server starting up.
+		iama,  ///< Server sending its role.
+		fload, ///< The loaded file just changed.
+		eject, ///< The loaded file just ejected.
+		pos,   ///< Server sending current song time.
+		end,   ///< The loaded file just ended.
+		play,  ///< The loaded file is playing.
+		stop,  ///< The loaded file has stopped.
+		ack,   ///< Command result.
+		len    ///< Server sending song length.
 	};
 
 	/// The number of codes, which should agree with Response::Code.
@@ -115,15 +115,15 @@ private:
 /**
  * Abstract class for anything that can be sent a response.
  */
-class ResponseSink
+class Response_sink
 {
 public:
-	/// Empty virtual destructor for ResponseSink.
-	virtual ~ResponseSink() = default;
+	/// Empty virtual destructor for Response_sink.
+	virtual ~Response_sink() = default;
 
 	/**
 	 * Outputs a response.
-	 * @param id The ID of the client of the ResponseSink receiving this
+	 * @param id The ID of the client of the Response_sink receiving this
 	 * response.
 	 *   Use 0 for broadcasts.
 	 * @param response The Response to output.

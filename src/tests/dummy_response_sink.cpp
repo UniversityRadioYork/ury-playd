@@ -3,18 +3,18 @@
 
 /**
  * @file
- * Implementation of DummyResponseSink.
+ * Implementation of Dummy_response_sink.
  */
 
 #include <ostream>
 #include <string>
 #include "dummy_response_sink.h"
 
-DummyResponseSink::DummyResponseSink(std::ostream &os) : os(os)
+Dummy_response_sink::Dummy_response_sink(std::ostream &os) : os(os)
 {
 }
 
-void DummyResponseSink::Respond(size_t, const Response &response) const
+void Dummy_response_sink::Respond(size_t, const Response &response) const
 {
 	this->os << response.Pack() << std::endl;
 }

@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of the RingBuffer class.
+ * Implementation of the Ring_buffer class.
  */
 
 #include <cassert>
@@ -30,7 +30,7 @@
                       write capacity may be lower than actual
       - always atomically read capacities */
 
-RingBuffer::RingBuffer(size_t capacity)
+Ring_buffer::Ring_buffer(size_t capacity)
 {
     this->buffer = std::vector<uint8_t>(capacity);
     this->r_it = this->buffer.cbegin();
@@ -44,11 +44,11 @@ RingBuffer::RingBuffer(size_t capacity)
     Ensures(WriteCapacity() == capacity);
 }
 
-RingBuffer::~RingBuffer()
+Ring_buffer::~Ring_buffer()
 {
 }
 
-inline size_t RingBuffer::ReadCapacity() const
+inline size_t Ring_buffer::ReadCapacity() const
 {
 	/* Acquire order here means two things:
 	 *
@@ -60,16 +60,16 @@ inline size_t RingBuffer::ReadCapacity() const
 	return this->count.load(std::memory_order_acquire);
 }
 
-inline size_t RingBuffer::WriteCapacity() const
+inline size_t Ring_buffer::WriteCapacity() const
 {
 	return this->buffer.size() - ReadCapacity();
 }
 
-size_t RingBuffer::Write(const gsl::span<const uint8_t> src)
+size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
 {
 	// This shouldn't be called with an empty (or backwards!) span.
-	Expects(0 < src.length());
-	auto src_count = static_cast<size_t>(src.length());
+    auto src_count = static_cast<size_t>(src.length());
+	Expects(0 < src_count);
 
 	/* Acquire write lock to make sure only one write can occur at a given time,
 	 * and also that we can't be flushed in the middle of writing.
@@ -83,7 +83,7 @@ size_t RingBuffer::Write(const gsl::span<const uint8_t> src)
 	 * the write capacity can be increased after this point by a consumer.
 	 */
 	auto write_capacity_estimate = WriteCapacity();
-	if (write_capacity_estimate < src_count) throw InternalError("ringbuffer overflow");
+	if (write_capacity_estimate < src_count) throw Internal_error("ringbuffer overflow");
 
 	// Trim the span down to the amount we can write.
 	auto write_count = std::min(write_capacity_estimate, src_count);
@@ -124,10 +124,10 @@ size_t RingBuffer::Write(const gsl::span<const uint8_t> src)
 	return write_count;
 }
 
-size_t RingBuffer::Read(gsl::span<uint8_t> dest)
+size_t Ring_buffer::Read(gsl::span<uint8_t> dest)
 {
-	Expects(0 < dest.length());
-	auto dest_count = static_cast<size_t>(dest.length());
+    auto dest_count = static_cast<size_t>(dest.length());
+	Expects(0 < dest_count);
 
 	/* Acquire read lock to make sure only one read can occur at a given time,
 	 * and also that we can't be flushed in the middle of reading.
@@ -141,7 +141,7 @@ size_t RingBuffer::Read(gsl::span<uint8_t> dest)
 	 * the read capacity can be increased after this point by a producer.
 	 */
 	auto read_capacity_estimate = ReadCapacity();
-	if (read_capacity_estimate < dest_count) throw InternalError("ringbuffer underflow");
+	if (read_capacity_estimate < dest_count) throw Internal_error("ringbuffer underflow");
 
 	/* See Write() for explanatory comments on what happens here:
  	 * the two functions mirror each other almost perfectly. 
@@ -166,13 +166,13 @@ size_t RingBuffer::Read(gsl::span<uint8_t> dest)
 	}
 
 	if (this->count.fetch_sub(read_count, std::memory_order_acq_rel) < read_count)
-		throw InternalError("capacity decreased unexpectedly");
+		throw Internal_error("capacity decreased unexpectedly");
 
 	Ensures(read_start_count + read_end_count == read_count);
 	return read_count;
 }
 
-void RingBuffer::Flush()
+void Ring_buffer::Flush()
 {
 	// Make sure nothing is reading or writing.
 	std::lock_guard<std::mutex> r_guard(this->r_lock);
@@ -183,7 +183,7 @@ void RingBuffer::Flush()
 	Ensures(this->ReadCapacity() == 0);
 }
 
-inline void RingBuffer::FlushInner()
+inline void Ring_buffer::FlushInner()
 {
 	this->count.store(0, std::memory_order_release);
 }

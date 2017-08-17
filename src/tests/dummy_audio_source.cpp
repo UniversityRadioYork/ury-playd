@@ -3,46 +3,46 @@
 
 /**
  * @file
- * Definition of the DummyAudioSource class.
+ * Definition of the DummyAudio_source class.
  * @see audio/audio_source.h
  * @see tests/dummy_audio_source.cpp
  */
 
 #include <cstdint>
 
-#include "../audio/audio.h"
 #include "../audio/audio_source.h"
+#include "../audio/sample_format.h"
 #include "dummy_audio_source.h"
 
-AudioSource::DecodeResult DummyAudioSource::Decode()
+Audio_source::Decode_result Dummy_audio_source::Decode()
 {
-	auto state = run_out ? AudioSource::DecodeState::END_OF_FILE
-	                     : AudioSource::DecodeState::DECODING;
-	return std::make_pair(state, AudioSource::DecodeVector());
+	auto state = run_out ? Audio_source::Decode_state::eof
+	                     : Audio_source::Decode_state::decoding;
+	return std::make_pair(state, Audio_source::Decode_vector());
 }
 
-std::uint8_t DummyAudioSource::ChannelCount() const
+std::uint8_t Dummy_audio_source::ChannelCount() const
 {
 	return 2;
 }
 
-std::uint32_t DummyAudioSource::SampleRate() const
+std::uint32_t Dummy_audio_source::SampleRate() const
 {
 	return 44100;
 }
 
-SampleFormat DummyAudioSource::OutputSampleFormat() const
+Sample_format Dummy_audio_source::OutputSampleFormat() const
 {
-	return SampleFormat::PACKED_SIGNED_INT_32;
+	return Sample_format::sint32;
 }
 
-std::uint64_t DummyAudioSource::Seek(std::uint64_t position)
+std::uint64_t Dummy_audio_source::Seek(std::uint64_t position)
 {
 	this->position = position;
 	return this->position;
 }
 
-const std::string &DummyAudioSource::Path() const
+const std::string &Dummy_audio_source::Path() const
 {
 	return this->path;
 }

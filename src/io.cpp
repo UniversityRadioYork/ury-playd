@@ -37,7 +37,7 @@ typedef ptrdiff_t ssize_t;
 
 #include "io.h"
 
-const std::uint16_t IoCore::PLAYER_UPDATE_PERIOD = 5; // ms
+const std::uint16_t Io_core::PLAYER_UPDATE_PERIOD = 5; // ms
 
 //
 // libuv callbacks
@@ -80,7 +80,7 @@ void UvListenCallback(uv_stream_t *server, int status)
 	assert(server != nullptr);
 	if (status < 0) return;
 
-	auto *io = static_cast<IoCore *>(server->data);
+	auto *io = static_cast<Io_core *>(server->data);
 	assert(io != nullptr);
 
 	io->Accept(server);
@@ -114,7 +114,7 @@ void UvUpdateTimerCallback(uv_timer_t *handle)
 {
 	assert(handle != nullptr);
 
-	auto *io = static_cast<IoCore *>(handle->data);
+	auto *io = static_cast<Io_core *>(handle->data);
 	assert(io != nullptr);
 
 	io->UpdatePlayer();
@@ -165,14 +165,14 @@ void UvShutdownCallback(uv_shutdown_t *handle, int status)
 // IoCore
 //
 
-IoCore::IoCore(Player &player) : loop(nullptr), player(player)
+Io_core::Io_core(Player &player) : loop(nullptr), player(player)
 {
 }
 
-void IoCore::Run(const std::string &host, const std::string &port)
+void Io_core::Run(const std::string &host, const std::string &port)
 {
 	this->loop = uv_default_loop();
-	if (this->loop == nullptr) throw InternalError(MSG_IO_CANNOT_ALLOC);
+	if (this->loop == nullptr) throw Internal_error(MSG_IO_CANNOT_ALLOC);
 
 	this->InitAcceptor(host, port);
 	this->InitSignals();
@@ -185,7 +185,7 @@ void IoCore::Run(const std::string &host, const std::string &port)
 	uv_loop_close(this->loop);
 }
 
-void IoCore::Accept(uv_stream_t *server)
+void Io_core::Accept(uv_stream_t *server)
 {
 	assert(server != nullptr);
 	assert(this->loop != nullptr);
@@ -205,11 +205,11 @@ void IoCore::Accept(uv_stream_t *server)
 	this->pool[id - 1] = move(conn);
 
 	// Begin initial responses
-	this->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI)
+	this->Respond(id, Response(Response::NOREQUEST, Response::Code::ohai)
 	                          .AddArg(std::to_string(id))
 	                          .AddArg(MSG_OHAI_BIFROST)
 	                          .AddArg(MSG_OHAI_PLAYD));
-	this->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA)
+	this->Respond(id, Response(Response::NOREQUEST, Response::Code::iama)
 	                          .AddArg("player/file"));
 	this->player.Dump(id, Response::NOREQUEST);
 	this->Respond(id, Response::Success(Response::NOREQUEST));
@@ -218,7 +218,7 @@ void IoCore::Accept(uv_stream_t *server)
 	uv_read_start(reinterpret_cast<uv_stream_t *>(client), UvAlloc, UvReadCallback);
 }
 
-size_t IoCore::NextConnectionID()
+size_t Io_core::NextConnectionID()
 {
 	// We'll want to try and use an existing, empty ID in the connection
 	// pool.  If there aren't any (we've exceeded the maximum-so-far number
@@ -238,7 +238,7 @@ size_t IoCore::NextConnectionID()
 	return id;
 }
 
-void IoCore::ExpandPool()
+void Io_core::ExpandPool()
 {
 	// If we already have SIZE_MAX-1 simultaneous connections, we bail out.
 	// Since this is at least 65,534, and likely to be 2^32-2 or 2^64-2,
@@ -248,14 +248,14 @@ void IoCore::ExpandPool()
 	// Why -1?  Because slot 0 in the connection pool is reserved for
 	// broadcasts.
 	bool full = this->pool.size() == (SIZE_MAX - 1);
-	if (full) throw InternalError(MSG_TOO_MANY_CONNS);
+	if (full) throw Internal_error(MSG_TOO_MANY_CONNS);
 
 	this->pool.emplace_back(nullptr);
 	// This isn't an off-by-one error; slots index from 1.
 	this->free_list.push_back(this->pool.size());
 }
 
-void IoCore::Remove(size_t slot)
+void Io_core::Remove(size_t slot)
 {
 	assert(0 < slot && slot <= this->pool.size());
 
@@ -269,13 +269,13 @@ void IoCore::Remove(size_t slot)
 	assert(!this->pool.at(slot - 1));
 }
 
-void IoCore::UpdatePlayer()
+void Io_core::UpdatePlayer()
 {
 	bool running = this->player.Update();
 	if (!running) this->Shutdown();
 }
 
-void IoCore::Shutdown()
+void Io_core::Shutdown()
 {
 	Debug() << "Shutting down..." << std::endl;
 
@@ -300,7 +300,7 @@ void IoCore::Shutdown()
 	uv_close(reinterpret_cast<uv_handle_t *>(&this->sigint), nullptr);
 }
 
-void IoCore::Respond(size_t id, const Response &response) const
+void Io_core::Respond(size_t id, const Response &response) const
 {
 	if (this->pool.empty()) return;
 
@@ -311,7 +311,7 @@ void IoCore::Respond(size_t id, const Response &response) const
 	}
 }
 
-void IoCore::Broadcast(const Response &response) const
+void Io_core::Broadcast(const Response &response) const
 {
 	Debug() << "broadcast:" << response.Pack() << std::endl;
 
@@ -322,7 +322,7 @@ void IoCore::Broadcast(const Response &response) const
 	}
 }
 
-void IoCore::Unicast(size_t id, const Response &response) const
+void Io_core::Unicast(size_t id, const Response &response) const
 {
 	assert(0 < id && id <= this->pool.size());
 
@@ -333,7 +333,7 @@ void IoCore::Unicast(size_t id, const Response &response) const
 	if (c) c->Respond(response);
 }
 
-void IoCore::InitUpdateTimer()
+void Io_core::InitUpdateTimer()
 {
 	assert(this->loop != nullptr);
 
@@ -344,12 +344,12 @@ void IoCore::InitUpdateTimer()
 	               PLAYER_UPDATE_PERIOD);
 }
 
-void IoCore::InitAcceptor(const std::string &address, const std::string &port)
+void Io_core::InitAcceptor(const std::string &address, const std::string &port)
 {
 	assert(this->loop != nullptr);
 
 	if (uv_tcp_init(this->loop, &this->server)) {
-		throw InternalError(MSG_IO_CANNOT_ALLOC);
+		throw Internal_error(MSG_IO_CANNOT_ALLOC);
 	}
 	this->server.data = static_cast<void *>(this);
 	assert(this->server.data != nullptr);
@@ -360,19 +360,19 @@ void IoCore::InitAcceptor(const std::string &address, const std::string &port)
 
 	auto r = uv_listen(reinterpret_cast<uv_stream_t *>(&this->server), 128, UvListenCallback);
 	if (r) {
-		throw NetError("Could not listen on " + address + ":" + port +
-		               " (" + std::string(uv_err_name(r)) + ")");
+		throw Net_error("Could not listen on " + address + ":" + port +
+		                " (" + std::string(uv_err_name(r)) + ")");
 	}
 
 	Debug() << "Listening at" << address << "on" << port << std::endl;
 }
 
-void IoCore::InitSignals()
+void Io_core::InitSignals()
 {
 	auto r = uv_signal_init(this->loop, &this->sigint);
 	if (r) {
-		throw InternalError(MSG_IO_CANNOT_ALLOC + ": " +
-		                    std::string(uv_err_name(r)));
+		throw Internal_error(MSG_IO_CANNOT_ALLOC + ": " +
+		                     std::string(uv_err_name(r)));
 	}
 
 	// We pass the player, not the IoCore.
@@ -387,7 +387,7 @@ void IoCore::InitSignals()
 // Connection
 //
 
-Connection::Connection(IoCore &parent, uv_tcp_t *tcp, Player &player, size_t id)
+Connection::Connection(Io_core &parent, uv_tcp_t *tcp, Player &player, size_t id)
     : parent(parent), tcp(tcp), tokeniser(), player(player), id(id)
 {
 	Debug() << "Opening connection from" << Name() << std::endl;

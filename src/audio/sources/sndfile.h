@@ -18,31 +18,31 @@
 #include <sndfile.h>
 
 #include "../audio_source.h"
-#include "../sample_formats.h"
+#include "../sample_format.h"
 
-/// AudioSource for use on files supported by libsndfile.
-class SndfileAudioSource : public AudioSource
+/// Audio source for use on files supported by libsndfile.
+class Sndfile_audio_source : public Audio_source
 {
 public:
 	/**
-	 * Constructs a SndfileAudioSource.
+	 * Constructs a Sndfile_audio_source.
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.
 	 * @see http://www.mega-nerd.com/libsndfile/api.html#open
 	 */
-	SndfileAudioSource(const std::string &path);
+	Sndfile_audio_source(const std::string &path);
 
-	/// Destructs an Mp3AudioSource.
-	~SndfileAudioSource();
+	/// Destructs a Sndfile_audio_source.
+	~Sndfile_audio_source();
 
-	DecodeResult Decode() override;
+	Decode_result Decode() override;
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	std::uint64_t Length() const override;
 
 	std::uint8_t ChannelCount() const override;
 	std::uint32_t SampleRate() const override;
-	SampleFormat OutputSampleFormat() const override;
+	Sample_format OutputSampleFormat() const override;
 
 private:
 	SF_INFO info;  ///< The libsndfile info structure.

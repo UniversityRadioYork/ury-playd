@@ -20,23 +20,23 @@ extern "C" {
 }
 
 #include "../audio_source.h"
-#include "../sample_formats.h"
+#include "../sample_format.h"
 
 /// AudioSource for use on MP3 files.
-class Mp3AudioSource : public AudioSource
+class Mp3_audio_source : public Audio_source
 {
 public:
 	/**
-	 * Constructs an Mp3AudioSource.
+	 * Constructs an Mp3_audio_source.
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.
 	 */
-	Mp3AudioSource(const std::string &path);
+	Mp3_audio_source(const std::string &path);
 
 	/// Destructs an Mp3AudioSource.
-	~Mp3AudioSource();
+	~Mp3_audio_source();
 
-	DecodeResult Decode() override;
+	Decode_result Decode() override;
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	/// The length of the audio, in samples.
@@ -44,13 +44,14 @@ public:
 
 	std::uint8_t ChannelCount() const override;
 	std::uint32_t SampleRate() const override;
-	SampleFormat OutputSampleFormat() const override;
+	Sample_format OutputSampleFormat() const override;
 
 private:
-	/// The size of the internal decoding buffer, in bytes.
-	static const size_t BUFFER_SIZE;
+    // This value is somewhat arbitrary, but corresponds to the minimum buffer size
+    // used by ffmpeg, so it's probably sensible.
+    static constexpr size_t buffer_size = 16384;
 
-	std::vector<std::uint8_t> buffer; ///< The decoding buffer.
+	std::array<std::uint8_t, buffer_size> buffer; ///< The decoding buffer.
 
 	/// Pointer to the mpg123 context associated with this source.
 	mpg123_handle *context;

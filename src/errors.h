@@ -7,8 +7,8 @@
  * @see errors.cpp
  */
 
-#ifndef PLAYD_ERRORS_HPP
-#define PLAYD_ERRORS_HPP
+#ifndef PLAYD_ERRORS_H
+#define PLAYD_ERRORS_H
 
 #include <iostream>
 #include <sstream>
@@ -42,14 +42,14 @@ private:
 /**
  * An Error signifying that playd has been improperly configured.
  */
-class ConfigError : public Error
+class Config_error : public Error
 {
 public:
 	/**
 	 * Constructs an ConfigError.
 	 * @param msg The human-readable message of the error.
 	 */
-	ConfigError(const std::string &msg) : Error(msg)
+	Config_error(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -57,14 +57,14 @@ public:
 /**
  * An Error signifying that playd has hit an internal snag.
  */
-class InternalError : public Error
+class Internal_error : public Error
 {
 public:
 	/**
 	 * Constructs an InternalError.
 	 * @param msg The human-readable message of the error.
 	 */
-	InternalError(const std::string &msg) : Error(msg)
+	Internal_error(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -72,14 +72,14 @@ public:
 /**
  * An Error signifying that playd can't read a file.
  */
-class FileError : public Error
+class File_error : public Error
 {
 public:
 	/**
 	 * Constructs a FileError.
 	 * @param msg The human-readable message of the error.
 	 */
-	FileError(const std::string &msg) : Error(msg)
+	File_error(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -87,14 +87,14 @@ public:
 /**
  * An Error signifying that playd can't seek in a file.
  */
-class SeekError : public Error
+class Seek_error : public Error
 {
 public:
 	/**
 	 * Constructs a SeekError.
 	 * @param msg The human-readable message of the error.
 	 */
-	SeekError(const std::string &msg) : Error(msg)
+	Seek_error(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -102,14 +102,14 @@ public:
 /**
  * A network error.
  */
-class NetError : public Error
+class Net_error : public Error
 {
 public:
 	/**
 	 * Constructs a NetError.
 	 * @param msg The human-readable message of the error.
 	 */
-	NetError(const std::string &msg) : Error(msg)
+	Net_error(const std::string &msg) : Error(msg)
 	{
 	}
 };
@@ -117,14 +117,14 @@ public:
 /**
  * An Error signifying that no audio is loaded.
  */
-class NoAudioError : public Error
+class Null_audio_error : public Error
 {
 public:
 	/**
 	 * Constructs an NoAudioError.
 	 * @param msg The human-readable message of the error.
 	 */
-	NoAudioError(const std::string &msg) : Error(msg)
+	Null_audio_error(const std::string &msg) : Error(msg)
 	{
 	}
 };

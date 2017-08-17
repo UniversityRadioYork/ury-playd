@@ -7,8 +7,8 @@
  * @see audio/sample_formats.cpp
  */
 
-#ifndef PLAYD_SAMPLE_FORMATS_HPP
-#define PLAYD_SAMPLE_FORMATS_HPP
+#ifndef PLAYD_SAMPLE_FORMATS_H
+#define PLAYD_SAMPLE_FORMATS_H
 
 #include <array>
 #include <cstdint>
@@ -30,18 +30,18 @@ using Samples = std::uint64_t;
  * REMEMBER: changes here will require changes in lookup tables in both
  * sample_formats.cpp and audio_sink.cpp.
  */
-enum class SampleFormat : std::uint8_t {
-	PACKED_UNSIGNED_INT_8, ///< Packed 8-bit unsigned integer.
-	PACKED_SIGNED_INT_8,   ///< Packed 8-bit signed integer.
-	PACKED_SIGNED_INT_16,  ///< Packed 16-bit signed integer.
-	PACKED_SIGNED_INT_32,  ///< Packed 32-bit signed integer.
-	PACKED_FLOAT_32        ///< Packed 32-bit floating point.
+enum class Sample_format : std::uint8_t {
+	uint8,   ///< Packed 8-bit unsigned integer.
+	sint8,   ///< Packed 8-bit signed integer.
+	sint16,  ///< Packed 16-bit signed integer.
+	sint32,  ///< Packed 32-bit signed integer.
+	float32  ///< Packed 32-bit floating point.
 };
 
 /// Number of sample formats available; should agree with SampleFormat.
-constexpr std::size_t SAMPLE_FORMAT_COUNT = 5;
+constexpr std::size_t sample_format_count = 5;
 
 /// Map from SampleFormats to bytes-per-mono-sample.
-extern const std::array<std::size_t, SAMPLE_FORMAT_COUNT> SAMPLE_FORMAT_BPS;
+extern const std::array<std::size_t, sample_format_count> sample_format_bps;
 
-#endif // PLAYD_SAMPLE_FORMATS_HPP
+#endif // PLAYD_SAMPLE_FORMATS_H

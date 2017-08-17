@@ -10,7 +10,7 @@
 
 SCENARIO("Errors contain a retrievable message", "[error]") {
 	GIVEN("An Error") {
-		Error e = NetError("need an RS-232 Interface Lead");
+		Error e = Net_error("need an RS-232 Interface Lead");
 
 		WHEN("Message() is called") {
 			auto s = e.Message();
