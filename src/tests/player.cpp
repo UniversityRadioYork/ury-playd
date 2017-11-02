@@ -19,7 +19,7 @@
 using namespace std::string_literals;
 
 const std::map<std::string, Player::SourceFn> DUMMY_SRCS {
-	{"mp3", &std::make_unique<Dummy_audio_source, const std::string &>},
+	{"mp3",[](const std::string &path) -> std::unique_ptr<Audio_source> { return std::make_unique<Dummy_audio_source, const std::string &>(path); } },
 	{"ogg", [](const std::string &) -> std::unique_ptr<Audio_source> { throw File_error("test failure 1"); }},
 	{"flac", [](const std::string &) -> std::unique_ptr<Audio_source> { throw Internal_error("test failure 2"); }}
 };

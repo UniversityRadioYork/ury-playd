@@ -178,3 +178,9 @@ Sample_format Mp3_audio_source::OutputSampleFormat() const
 			        "happen");
 	}
 }
+
+std::unique_ptr<Mp3_audio_source> Mp3_audio_source::MakeUnique(const std::string & path)
+{
+	// This is in a separate function to let it be put into a jump table.
+	return std::make_unique<Mp3_audio_source, const std::string &>(path);
+}

@@ -44,6 +44,14 @@ public:
 	std::uint32_t SampleRate() const override;
 	Sample_format OutputSampleFormat() const override;
 
+	/**
+	 * Constructs an Sndfile_audio_source and returns a unique pointer to it.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 * @returns A unique pointer to a Sndfile_audio_source.
+	 */
+	static std::unique_ptr<Sndfile_audio_source> MakeUnique(const std::string &path);
+
 private:
 	SF_INFO info;  ///< The libsndfile info structure.
 	SNDFILE *file; ///< The libsndfile file structure.

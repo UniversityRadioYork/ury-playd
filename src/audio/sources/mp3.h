@@ -46,6 +46,14 @@ public:
 	std::uint32_t SampleRate() const override;
 	Sample_format OutputSampleFormat() const override;
 
+	/**
+	 * Constructs an Mp3_audio_source and returns a unique pointer to it.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 * @returns A unique pointer to a Mp3_audio_source.
+	 */
+	static std::unique_ptr<Mp3_audio_source> MakeUnique(const std::string &path);
+
 private:
 	// This value is somewhat arbitrary, but corresponds to the minimum
 	// buffer size used by ffmpeg, so it's probably sensible.

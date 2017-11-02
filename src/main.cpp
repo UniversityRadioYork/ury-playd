@@ -33,13 +33,13 @@ static const std::string DEFAULT_PORT = "1350";
 /// Map from file extensions to Audio_source builder functions.
 static const std::map<std::string, Player::SourceFn> SOURCES = {
 #ifdef WITH_MP3
-        {"mp3", &std::make_unique<Mp3_audio_source, const std::string &>},
+        {"mp3", Mp3_audio_source::MakeUnique},
 #endif // WITH_MP3
 
 #ifdef WITH_SNDFILE
-        {"flac", &std::make_unique<Sndfile_audio_source, const std::string &>},
-        {"ogg", &std::make_unique<Sndfile_audio_source, const std::string &>},
-        {"wav", &std::make_unique<Sndfile_audio_source, const std::string &>},
+        {"flac", Sndfile_audio_source::MakeUnique},
+        {"ogg", Sndfile_audio_source::MakeUnique},
+        {"wav", Sndfile_audio_source::MakeUnique},
 #endif // WITH_SNDFILE
 };
 

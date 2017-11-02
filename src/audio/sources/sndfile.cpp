@@ -125,3 +125,8 @@ Sample_format Sndfile_audio_source::OutputSampleFormat() const
 	              "sndfile outputs int, which we need to be 4 bytes");
 	return Sample_format::sint32;
 }
+
+std::unique_ptr<Sndfile_audio_source> Sndfile_audio_source::MakeUnique(const std::string &path)
+{
+	return std::make_unique<Sndfile_audio_source, const std::string &>(path);
+}
