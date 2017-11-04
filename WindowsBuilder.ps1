@@ -103,7 +103,7 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     Remove-Item Env:\VCINSTALLDIR -ErrorAction SilentlyContinue
     Remove-Item Env:\WindowsSDKDir -ErrorAction SilentlyContinue
 
-    cmake -Version
+    cmake --version
 
     switch ($arch) {
         "x86" {
