@@ -112,7 +112,7 @@ void ExitWithUsage(const std::string &progname)
 std::pair<std::string, std::string> GetHostAndPort(
         const std::vector<std::string> &args)
 {
-	auto size = args.size();
+	const auto size = args.size();
 	return std::make_pair(size > 2 ? args.at(2) : DEFAULT_HOST,
 	                      size > 3 ? args.at(3) : DEFAULT_PORT);
 }

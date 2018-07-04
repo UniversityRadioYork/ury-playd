@@ -69,7 +69,7 @@ inline size_t Ring_buffer::WriteCapacity() const
 size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
 {
 	// This shouldn't be called with an empty (or backwards!) span.
-	auto src_count = static_cast<size_t>(src.length());
+	const auto src_count = static_cast<size_t>(src.length());
 	Expects(0 < src_count);
 
 	/* Acquire write lock to make sure only one write can occur at a given
@@ -83,13 +83,13 @@ size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
 	/* Remember, this is pessimistic:
 	 * the write capacity can be increased after this point by a consumer.
 	 */
-	auto write_capacity_estimate = WriteCapacity();
+	const auto write_capacity_estimate = WriteCapacity();
 	if (write_capacity_estimate < src_count)
 		throw Internal_error("ringbuffer overflow");
 
 	// Trim the span down to the amount we can write.
 	auto write_count = std::min(write_capacity_estimate, src_count);
-	auto src_to_write = src.first(write_count);
+	const auto src_to_write = src.first(write_count);
 
 	/* At this stage, we're the only thread that can be accessing this part
 	 * of the buffer, so we can proceed non-atomically.  The release we do
@@ -97,21 +97,21 @@ size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
 	 */
 	// Ringbuffers loop, so how many bytes can we store until we have to
 	// loop?
-	auto bytes_to_end = distance(this->w_it, this->buffer.end());
+	const auto bytes_to_end = distance(this->w_it, this->buffer.end());
 	// Make sure we got the iterators the right way round.
 	assert(0 <= bytes_to_end);
 
 	auto write_end_count =
 	        std::min(write_count, static_cast<size_t>(bytes_to_end));
 
-	auto src_end = src_to_write.first(write_end_count);
+	const auto src_end = src_to_write.first(write_end_count);
 	this->w_it = copy(src_end.cbegin(), src_end.cend(), this->w_it);
 
 	// Do we need to loop?  If so, do that.
 	auto write_start_count = write_count - write_end_count;
 	if (0 < write_start_count) {
 		Expects(this->w_it == this->buffer.end());
-		auto src_start = src_to_write.last(write_start_count);
+		const auto src_start = src_to_write.last(write_start_count);
 		this->w_it = copy(src_start.cbegin(), src_start.cend(),
 		                  this->buffer.begin());
 		Ensures(this->w_it > this->buffer.begin());
@@ -131,7 +131,7 @@ size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
 
 size_t Ring_buffer::Read(gsl::span<uint8_t> dest)
 {
-	auto dest_count = static_cast<size_t>(dest.length());
+	const auto dest_count = static_cast<size_t>(dest.length());
 	Expects(0 < dest_count);
 
 	/* Acquire read lock to make sure only one read can occur at a given
@@ -145,7 +145,7 @@ size_t Ring_buffer::Read(gsl::span<uint8_t> dest)
 	/* Remember, this is pessimistic:
 	 * the read capacity can be increased after this point by a producer.
 	 */
-	auto read_capacity_estimate = ReadCapacity();
+	const auto read_capacity_estimate = ReadCapacity();
 	if (read_capacity_estimate < dest_count)
 		throw Internal_error("ringbuffer underflow");
 
@@ -154,9 +154,9 @@ size_t Ring_buffer::Read(gsl::span<uint8_t> dest)
 	 */
 
 	auto read_count = std::min(read_capacity_estimate, dest_count);
-	auto dest_to_read = dest.first(read_count);
+	const auto dest_to_read = dest.first(read_count);
 
-	auto bytes_to_end = distance(this->r_it, this->buffer.cend());
+	const auto bytes_to_end = distance(this->r_it, this->buffer.cend());
 	assert(0 <= bytes_to_end);
 
 	auto read_end_count =

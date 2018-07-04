@@ -249,7 +249,7 @@ void Io_core::ExpandPool()
 	//
 	// Why -1?  Because slot 0 in the connection pool is reserved for
 	// broadcasts.
-	bool full = this->pool.size() == (SIZE_MAX - 1);
+	const auto full = this->pool.size() == (SIZE_MAX - 1);
 	if (full) throw Internal_error(MSG_TOO_MANY_CONNS);
 
 	this->pool.emplace_back(nullptr);
@@ -273,7 +273,7 @@ void Io_core::Remove(size_t slot)
 
 void Io_core::UpdatePlayer()
 {
-	bool running = this->player.Update();
+	const auto running = this->player.Update();
 	if (!running) this->Shutdown();
 }
 
@@ -361,8 +361,8 @@ void Io_core::InitAcceptor(const std::string &address, const std::string &port)
 	uv_tcp_bind(&this->server,
 	            reinterpret_cast<const sockaddr *>(&bind_addr), 0);
 
-	auto r = uv_listen(reinterpret_cast<uv_stream_t *>(&this->server), 128,
-	                   UvListenCallback);
+	const auto r = uv_listen(reinterpret_cast<uv_stream_t *>(&this->server), 128,
+	                         UvListenCallback);
 	if (r) {
 		throw Net_error("Could not listen on " + address + ":" + port +
 		                " (" + std::string(uv_err_name(r)) + ")");
@@ -373,7 +373,7 @@ void Io_core::InitAcceptor(const std::string &address, const std::string &port)
 
 void Io_core::InitSignals()
 {
-	auto r = uv_signal_init(this->loop, &this->sigint);
+	const auto r = uv_signal_init(this->loop, &this->sigint);
 	if (r) {
 		throw Internal_error(MSG_IO_CANNOT_ALLOC + ": " +
 		                     std::string(uv_err_name(r)));
@@ -410,7 +410,7 @@ void Connection::Respond(const Response &response)
 	auto string = response.Pack();
 	string.push_back('\n');
 
-	unsigned int l = string.length();
+	const auto l = string.length();
 
 	// Make a libuv buffer and pour the request into it.
 	// The onus is on UvRespondCallback to free buf.base.
@@ -441,7 +441,7 @@ std::string Connection::Name()
 	// Turns out if you don't do this, Windows (and only Windows?) is upset.
 	socklen_t namelen = sizeof(s);
 
-	int pe = uv_tcp_getpeername(this->tcp, sp, (int *)&namelen);
+	const auto pe = uv_tcp_getpeername(this->tcp, sp, (int *)&namelen);
 	// These std::string()s are needed as, otherwise, the compiler would
 	// think we're trying to add const char*s together.  We need AT LEAST
 	// ONE of the sides of the first + to be a std::string.
@@ -454,8 +454,8 @@ std::string Connection::Name()
 	// We use NI_NUMERICSERV to ensure a port number comes out.
 	// Otherwise, we could get a (likely erroneous) string description of
 	// what the network stack *thinks* the port is used for.
-	int ne = getnameinfo(sp, namelen, host, sizeof(host), serv,
-	                     sizeof(serv), NI_NUMERICSERV);
+	const auto ne = getnameinfo(sp, namelen, host, sizeof(host), serv,
+	                            sizeof(serv), NI_NUMERICSERV);
 	// See comment for above error.
 	if (ne) return "<error@name: " + std::string(gai_strerror(ne)) + ">";
 
@@ -506,8 +506,8 @@ Response Connection::RunCommand(const std::vector<std::string> &cmd)
 	if (cmd.size() <= 1) return Response::Invalid(tag, MSG_CMD_SHORT);
 
 	// The next words are the actual command, and any other arguments.
-	auto word = cmd[1];
-	auto nargs = cmd.size() - 2;
+	const auto word = cmd[1];
+	const auto nargs = cmd.size() - 2;
 
 	if (nargs == 0) {
 		if ("play" == word) return this->player.SetPlaying(tag, true);

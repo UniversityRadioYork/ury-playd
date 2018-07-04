@@ -75,7 +75,7 @@ std::string Response::Pack() const
 		// These are the characters (including all whitespace, via
 		// isspace())  whose presence means we need to single-quote
 		// escape the argument.
-		bool is_escaper = c == '"' || c == '\'' || c == '\\';
+		const bool is_escaper = c == '"' || c == '\'' || c == '\\';
 		if (isspace(c) || is_escaper) escaping = true;
 
 		// Since we use single-quote escaping, the only thing we need

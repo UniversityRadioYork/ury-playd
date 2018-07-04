@@ -142,7 +142,7 @@ Audio::State Basic_audio::Update()
 	Expects(this->sink != nullptr);
 	Expects(this->src != nullptr);
 
-	bool more_available = this->DecodeIfFrameEmpty();
+	const auto more_available = this->DecodeIfFrameEmpty();
 	if (!more_available) this->sink->SourceOut();
 
 	if (!this->FrameFinished()) this->TransferFrame();

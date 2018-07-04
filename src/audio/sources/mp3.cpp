@@ -16,6 +16,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <gsl/gsl>
 
 // We don't include mpg123.h directly here, because mp3.h does some polyfills
 // before including it.
@@ -32,14 +33,8 @@ Mp3_audio_source::Mp3_audio_source(const std::string &path)
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
 
-	const long *rates = nullptr;
-	size_t nrates = 0;
-	mpg123_rates(&rates, &nrates);
-	for (size_t r = 0; r < nrates; r++) {
-		Debug() << "trying to enable formats at " << rates[r]
-		        << std::endl;
-		AddFormat(rates[r]);
-	}
+	auto rates = AvailableRates();
+	std::for_each(std::begin(rates), std::end(rates), std::bind(&Mp3_audio_source::AddFormat, this, std::placeholders::_1));
 
 	if (mpg123_open(this->context, path.c_str()) == MPG123_ERR) {
 		throw File_error("mp3: can't open " + path + ": " +
@@ -55,13 +50,23 @@ Mp3_audio_source::~Mp3_audio_source()
 
 std::uint64_t Mp3_audio_source::Length() const
 {
-	assert(this->context != nullptr);
+    assert(this->context != nullptr);
 
-	return mpg123_length(this->context);
+    return mpg123_length(this->context);
+}
+
+/* static */ gsl::span<const long> Mp3_audio_source::AvailableRates()
+{
+	const long *rawrates = nullptr;
+	size_t nrates = 0;
+	mpg123_rates(&rawrates, &nrates);
+	return gsl::make_span(rawrates, nrates);
 }
 
 void Mp3_audio_source::AddFormat(long rate)
 {
+	Debug() << "trying to enable formats at " << rate << std::endl;
+
 	// The requested encodings correspond to the sample formats available in
 	// the SampleFormat enum.
 	if (mpg123_format(this->context, rate, MPG123_STEREO | MPG123_MONO,
@@ -130,10 +135,10 @@ Mp3_audio_source::Decode_result Mp3_audio_source::Decode()
 
 	auto buf = reinterpret_cast<unsigned char *>(&this->buffer.front());
 	size_t rbytes = 0;
-	int err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
+	const auto err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
 
 	Decode_vector decoded;
-	Decode_state decode_state;
+	Decode_state decode_state = Decode_state::decoding;
 
 	if (err == MPG123_DONE) {
 		decode_state = Decode_state::eof;
@@ -142,8 +147,6 @@ Mp3_audio_source::Decode_result Mp3_audio_source::Decode()
 		        << std::endl;
 		decode_state = Decode_state::eof;
 	} else {
-		decode_state = Decode_state::decoding;
-
 		// Copy only the bit of the buffer occupied by decoded data
 		auto front = this->buffer.begin();
 		decoded = Decode_vector(front, front + rbytes);

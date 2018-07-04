@@ -65,6 +65,11 @@ private:
 	mpg123_handle *context;
 
 	/**
+	 * @returns A span containing the available sample rates.
+	 */
+	static gsl::span<const long> AvailableRates();
+
+	/**
 	 * Adds a format for the given sample rate to mpg123.
 	 * @param rate The sample rate to add.
 	 */

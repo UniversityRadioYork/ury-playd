@@ -169,7 +169,7 @@ size_t Sdl_audio_sink::Transfer(const gsl::span<const uint8_t> src)
 	// There should be a whole number of samples being transferred.
 	Expects(src.length() % bytes_per_sample == 0);
 	Expects(0 < src.length());
-	auto total = static_cast<size_t>(src.length());
+	const auto total = static_cast<size_t>(src.length());
 
 	// Only transfer as many bytes as the ring buffer can take,
 	// truncated to the nearest sample.
@@ -192,7 +192,7 @@ void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
 	Expects(0 <= dest.length());
 
 	// How many bytes do we want to pull out of the ring buffer?
-	auto req_bytes = static_cast<size_t>(dest.length());
+	const auto req_bytes = static_cast<size_t>(dest.length());
 
 	// Make sure anything not filled up with sound later is set to silence.
 	// This is slightly inefficient (two writes to sound-filled regions
@@ -211,7 +211,7 @@ void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
 	// actual read capacity can only be greater than or equal to
 	// `avail_samples`, as this is the only place where we can *decrease*
 	// it.
-	auto avail_bytes = this->ring_buf.ReadCapacity();
+	const auto avail_bytes = this->ring_buf.ReadCapacity();
 
 	// Have we run out of things to feed?
 	if (avail_bytes == 0) {
@@ -243,7 +243,7 @@ void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
 	std::vector<std::pair<int, std::string>> list;
 
 	// The 0 in SDL_GetNumAudioDevices tells SDL we want playback devices.
-	auto is = SDL_GetNumAudioDevices(0);
+	const auto is = SDL_GetNumAudioDevices(0);
 	for (auto i = 0; i < is; i++) {
 		auto n = SDL_GetAudioDeviceName(i, 0);
 		if (n != nullptr) list.emplace_back(i, std::string(n));
@@ -254,7 +254,7 @@ void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
 
 /* static */ bool Sdl_audio_sink::IsOutputDevice(int id)
 {
-	auto ids = SDL_GetNumAudioDevices(0);
+	const auto ids = SDL_GetNumAudioDevices(0);
 
 	// See comment in GetDevicesInfo for why this is sufficient.
 	return 0 <= id && id < ids;

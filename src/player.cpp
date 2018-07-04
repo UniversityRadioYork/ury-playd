@@ -36,7 +36,7 @@ Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sourc
 {
 }
 
-void Player::SetIo(Response_sink &io)
+void Player::SetIo(const Response_sink &io)
 {
 	this->io = &io;
 }
@@ -44,7 +44,7 @@ void Player::SetIo(Response_sink &io)
 bool Player::Update()
 {
 	assert(this->file != nullptr);
-	auto as = this->file->Update();
+	const auto as = this->file->Update();
 
 	if (as == Audio::State::at_end) this->End(Response::NOREQUEST);
 	if (as == Audio::State::playing) {
@@ -243,7 +243,7 @@ Response Player::Quit(const std::string &tag)
 	// cpos will point to the first character in pos that wasn't a number.
 	// We don't want any such characters here, so bail if the position isn't
 	// at the end of the string.
-	auto sl = pos_str.length();
+	const auto sl = pos_str.length();
 	if (cpos != sl) throw Seek_error(MSG_SEEK_INVALID_VALUE);
 
 	return microseconds{pos};
