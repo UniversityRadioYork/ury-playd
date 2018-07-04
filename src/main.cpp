@@ -185,9 +185,7 @@ int main(int argc, char *argv[])
 	player.SetIo(io);
 
 	// Now, actually run the IO loop.
-	std::string host;
-	std::string port;
-	std::tie(host, port) = GetHostAndPort(args);
+	auto [host, port] = GetHostAndPort(args);
 	try {
 		io.Run(host, port);
 	} catch (Net_error &e) {
