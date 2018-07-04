@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.11) # for workgroups
 
 project(playd)
 list(APPEND CMAKE_PREFIX_PATH "${playd_SOURCE_DIR}")
@@ -87,7 +87,11 @@ set(tests_SRCS ${tests_SRCS}
   src/tests/tokeniser.cpp
 )
 add_executable(playd ${SRCS} "src/main.cpp")
+target_compile_features(playd PUBLIC cxx_std_17)
+
 add_executable(playd_tests EXCLUDE_FROM_ALL ${SRCS} ${tests_SRCS})
+target_compile_features(playd_tests PUBLIC cxx_std_17)
+
 add_test(NAME playd_tests COMMAND playd_tests)
 
 # `make check` to both compile and run tests
