@@ -110,8 +110,8 @@ std::uint64_t Mp3_audio_source::Seek(std::uint64_t in_samples)
 	assert(this->context != nullptr);
 
 	// Have we tried to seek past the end of the file?
-	auto clen = static_cast<unsigned long>(mpg123_length(this->context));
-	if (clen < in_samples) {
+	if (auto clen = static_cast<unsigned long>(mpg123_length(this->context));
+	    clen < in_samples) {
 		Debug() << "mp3: seek at" << in_samples << "past EOF at" << clen
 		        << std::endl;
 		throw Seek_error(MSG_SEEK_FAIL);
