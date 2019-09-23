@@ -182,9 +182,21 @@ private:
 	 * @param tag The tag of the request calling this command.
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 *
-	 * @see DumpRaw
+	 * @see DumpFileInfo
 	 */
 	void DumpState(size_t id, const std::string &tag) const;
+
+    /**
+     * Emits responses for the current audio file's metrics to the sink.
+     *
+     * @param id The ID of the connection to which the Player should
+     *   route any responses.  For broadcasts, use 0.
+     * @param tag The tag of the request calling this command.
+     *   For unsolicited dumps, use Response::NOREQUEST.
+     *
+     * @see DumpState
+     */
+    void DumpFileInfo(size_t id, const std::string &tag) const;
 
 	/**
 	 * @return The player's current state as a response code.

@@ -67,20 +67,24 @@ Response Player::Dump(size_t id, const std::string &tag) const
 	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 
 	this->DumpState(id, tag);
+    this->DumpFileInfo(id, tag);
 
-	// This information won't exist if there is no file.
-	if (this->file->CurrentState() != Audio::State::none) {
-		auto file = this->file->File();
-		this->Respond(
-		        id, Response(tag, Response::Code::fload).AddArg(file));
+    return Response::Success(tag);
+}
 
-		auto pos = this->file->Position();
-        this->AnnounceTimestamp(Response::Code::pos, id, tag, pos);
-        auto len = this->file->Length();
-        this->AnnounceTimestamp(Response::Code::len, id, tag, len);
-	}
+void Player::DumpFileInfo(size_t id, const std::string &tag) const
+{
+    // This information won't exist if there is no file.
+    if (this->file->CurrentState() == Audio::State::none) return;
 
-	return Response::Success(tag);
+    auto filename = this->file->File();
+    Respond(id, Response(tag, Response::Code::fload).AddArg(filename));
+
+    auto pos = this->file->Position();
+    AnnounceTimestamp(Response::Code::pos, id, tag, pos);
+
+    auto len = this->file->Length();
+    AnnounceTimestamp(Response::Code::len, id, tag, len);
 }
 
 Response Player::Eject(const std::string &tag)
