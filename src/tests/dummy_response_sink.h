@@ -14,7 +14,8 @@
 #include "../response.h"
 
 // A dummy class for testing the Response_sink abstract class methods.
-class Dummy_response_sink : public Response_sink {
+class Dummy_response_sink : public Response_sink
+{
 public:
 	/**
 	 * Constructs a Dummy_response_sink.

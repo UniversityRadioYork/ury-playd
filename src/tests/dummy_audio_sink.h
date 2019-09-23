@@ -10,8 +10,8 @@
 
 #include <cstdint>
 
-#include "../audio/audio_source.h"
 #include "../audio/audio_sink.h"
+#include "../audio/audio_source.h"
 
 /// Dummy audio sink, for testing audio pipelines.
 class Dummy_audio_sink : public Audio_sink
@@ -22,7 +22,7 @@ public:
 	 * @param source Ignored.
 	 * @param device_id Ignored.
 	 */
-	Dummy_audio_sink(const Audio_source &, int) {};
+	Dummy_audio_sink(const Audio_source &, int){};
 
 	void Start() override;
 	void Stop() override;

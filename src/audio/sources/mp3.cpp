@@ -11,12 +11,12 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <gsl/gsl>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <sstream>
 #include <string>
-#include <gsl/gsl>
 
 // We don't include mpg123.h directly here, because mp3.h does some polyfills
 // before including it.
@@ -34,7 +34,9 @@ Mp3_audio_source::Mp3_audio_source(const std::string &path)
 	mpg123_format_none(this->context);
 
 	auto rates = AvailableRates();
-	std::for_each(std::begin(rates), std::end(rates), std::bind(&Mp3_audio_source::AddFormat, this, std::placeholders::_1));
+	std::for_each(std::begin(rates), std::end(rates),
+	              std::bind(&Mp3_audio_source::AddFormat, this,
+	                        std::placeholders::_1));
 
 	if (mpg123_open(this->context, path.c_str()) == MPG123_ERR) {
 		throw File_error("mp3: can't open " + path + ": " +
@@ -50,9 +52,9 @@ Mp3_audio_source::~Mp3_audio_source()
 
 std::uint64_t Mp3_audio_source::Length() const
 {
-    assert(this->context != nullptr);
+	assert(this->context != nullptr);
 
-    return mpg123_length(this->context);
+	return mpg123_length(this->context);
 }
 
 /* static */ gsl::span<const long> Mp3_audio_source::AvailableRates()
@@ -135,7 +137,8 @@ Mp3_audio_source::Decode_result Mp3_audio_source::Decode()
 
 	auto buf = reinterpret_cast<unsigned char *>(&this->buffer.front());
 	size_t rbytes = 0;
-	const auto err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
+	const auto err =
+	        mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
 
 	Decode_vector decoded;
 	Decode_state decode_state = Decode_state::decoding;
@@ -182,7 +185,7 @@ Sample_format Mp3_audio_source::OutputSampleFormat() const
 	}
 }
 
-std::unique_ptr<Mp3_audio_source> Mp3_audio_source::MakeUnique(const std::string & path)
+std::unique_ptr<Mp3_audio_source> Mp3_audio_source::MakeUnique(const std::string &path)
 {
 	// This is in a separate function to let it be put into a jump table.
 	return std::make_unique<Mp3_audio_source, const std::string &>(path);

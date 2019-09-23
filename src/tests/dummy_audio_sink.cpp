@@ -8,8 +8,8 @@
  * @see tests/dummy_audio_sink.cpp
  */
 
-#include "../audio/audio_sink.h"
 #include "dummy_audio_sink.h"
+#include "../audio/audio_sink.h"
 
 void Dummy_audio_sink::Start()
 {

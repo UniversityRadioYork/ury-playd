@@ -21,7 +21,7 @@ public:
 	 * Constructs a Dummy_audio_source.
 	 * @param path The path of the file this Dummy_audio_source 'represents'.
 	 */
-	Dummy_audio_source(const std::string &path) : Audio_source(path) {};
+	Dummy_audio_source(const std::string &path) : Audio_source(path){};
 	Audio_source::Decode_result Decode() override;
 	std::uint8_t ChannelCount() const override;
 	std::uint32_t SampleRate() const override;

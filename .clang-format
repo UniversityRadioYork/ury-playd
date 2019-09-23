@@ -3,7 +3,7 @@ BasedOnStyle: Google
 
 AllowShortBlocksOnASingleLine:       false
 AllowShortFunctionsOnASingleLine:    None
-AllowShortIfStatementsOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: true
 BreakBeforeBraces:                   Linux
 Cpp11BracedListStyle:                true
 Language:                            Cpp

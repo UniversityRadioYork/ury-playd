@@ -85,7 +85,7 @@ std::uint64_t Sndfile_audio_source::Seek(std::uint64_t in_samples)
 
 std::uint64_t Sndfile_audio_source::Length() const
 {
-	return(this->info.frames);
+	return (this->info.frames);
 }
 
 Sndfile_audio_source::Decode_result Sndfile_audio_source::Decode()
@@ -126,7 +126,8 @@ Sample_format Sndfile_audio_source::OutputSampleFormat() const
 	return Sample_format::sint32;
 }
 
-std::unique_ptr<Sndfile_audio_source> Sndfile_audio_source::MakeUnique(const std::string &path)
+std::unique_ptr<Sndfile_audio_source> Sndfile_audio_source::MakeUnique(
+        const std::string &path)
 {
 	return std::make_unique<Sndfile_audio_source, const std::string &>(path);
 }

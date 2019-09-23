@@ -102,16 +102,16 @@ public:
 	 * @exception NoAudioError if the current state is NONE.
 	 * @see Seek
 	 */
-    virtual microseconds Position() const = 0;
+	virtual microseconds Position() const = 0;
 
-    /**
-     * This Audio's length.
-     *
-     * @return The length, in microseconds.
-     * @exception NoAudioError if the current state is NONE.
-     * @see Seek
-     */
-    virtual microseconds Length() const = 0;
+	/**
+	 * This Audio's length.
+	 *
+	 * @return The length, in microseconds.
+	 * @exception NoAudioError if the current state is NONE.
+	 * @see Seek
+	 */
+	virtual microseconds Length() const = 0;
 };
 
 /**
@@ -134,7 +134,7 @@ public:
 	void SetPlaying(bool playing) override;
 	void SetPosition(microseconds position) override;
 	microseconds Position() const override;
-    microseconds Length() const override;
+	microseconds Length() const override;
 	const std::string &File() const override;
 };
 
@@ -169,7 +169,7 @@ public:
 
 	void SetPosition(microseconds position) override;
 	microseconds Position() const override;
-    microseconds Length() const override;
+	microseconds Length() const override;
 
 private:
 	/// The source of audio data.

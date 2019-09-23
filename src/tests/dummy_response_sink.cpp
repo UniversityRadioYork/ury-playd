@@ -6,9 +6,9 @@
  * Implementation of Dummy_response_sink.
  */
 
+#include "dummy_response_sink.h"
 #include <ostream>
 #include <string>
-#include "dummy_response_sink.h"
 
 Dummy_response_sink::Dummy_response_sink(std::ostream &os) : os(os)
 {

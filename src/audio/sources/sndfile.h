@@ -50,7 +50,8 @@ public:
 	 *   decoder.
 	 * @returns A unique pointer to a Sndfile_audio_source.
 	 */
-	static std::unique_ptr<Sndfile_audio_source> MakeUnique(const std::string &path);
+	static std::unique_ptr<Sndfile_audio_source> MakeUnique(
+	        const std::string &path);
 
 private:
 	SF_INFO info;  ///< The libsndfile info structure.
