@@ -69,7 +69,7 @@ inline size_t Ring_buffer::WriteCapacity() const
 size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
 {
 	// This shouldn't be called with an empty (or backwards!) span.
-	const auto src_count = static_cast<size_t>(src.length());
+	const auto src_count = static_cast<size_t>(src.size());
 	Expects(0 < src_count);
 
 	/* Acquire write lock to make sure only one write can occur at a given
@@ -131,7 +131,7 @@ size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
 
 size_t Ring_buffer::Read(gsl::span<uint8_t> dest)
 {
-	const auto dest_count = static_cast<size_t>(dest.length());
+	const auto dest_count = static_cast<size_t>(dest.size());
 	Expects(0 < dest_count);
 
 	/* Acquire read lock to make sure only one read can occur at a given

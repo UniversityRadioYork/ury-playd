@@ -167,9 +167,9 @@ size_t Sdl_audio_sink::Transfer(const gsl::span<const uint8_t> src)
 	if (src.empty()) return 0;
 
 	// There should be a whole number of samples being transferred.
-	Expects(src.length() % bytes_per_sample == 0);
-	Expects(0 < src.length());
-	const auto total = static_cast<size_t>(src.length());
+	Expects(src.size() % bytes_per_sample == 0);
+	Expects(0 < src.size());
+	const auto total = static_cast<size_t>(src.size());
 
 	// Only transfer as many bytes as the ring buffer can take,
 	// truncated to the nearest sample.
@@ -189,10 +189,10 @@ size_t Sdl_audio_sink::Transfer(const gsl::span<const uint8_t> src)
 
 void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
 {
-	Expects(0 <= dest.length());
+	Expects(0 <= dest.size());
 
 	// How many bytes do we want to pull out of the ring buffer?
-	const auto req_bytes = static_cast<size_t>(dest.length());
+	const auto req_bytes = static_cast<size_t>(dest.size());
 
 	// Make sure anything not filled up with sound later is set to silence.
 	// This is slightly inefficient (two writes to sound-filled regions
