@@ -259,27 +259,23 @@ void Player::PosRaw(const std::string &tag, microseconds pos)
 
 void Player::DumpState(size_t id, const std::string &tag) const
 {
-	Response::Code code = Response::Code::eject;
+    Response::Code code = StateResponseCode();
 
-	switch (this->file->CurrentState()) {
-		case Audio::State::at_end:
-			code = Response::Code::end;
-			break;
-		case Audio::State::none:
-			code = Response::Code::eject;
-			break;
-		case Audio::State::playing:
-			code = Response::Code::play;
-			break;
-		case Audio::State::stopped:
-			code = Response::Code::stop;
-			break;
-		default:
-			// Just don't dump anything in this case.
-			return;
-	}
+    this->Respond(id, Response(tag, code));
+}
 
-	this->Respond(id, Response(tag, code));
+Response::Code Player::StateResponseCode() const {
+    switch (file->CurrentState()) {
+        case Audio::State::at_end:
+            return Response::Code::end;
+        case Audio::State::none:
+            return Response::Code::eject;
+        case Audio::State::playing:
+            return Response::Code::play;
+        case Audio::State::stopped:
+            return Response::Code::stop;
+    }
+    return Response::Code::eject;
 }
 
 void Player::Respond(int id, Response rs) const

@@ -187,6 +187,11 @@ private:
 	void DumpState(size_t id, const std::string &tag) const;
 
 	/**
+	 * @return The player's current state as a response code.
+	 */
+    Response::Code StateResponseCode() const;
+
+	/**
 	 * Outputs a response, if there is a ResponseSink attached.
 	 *
 	 * Otherwise, this method does nothing.
