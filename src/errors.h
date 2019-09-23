@@ -16,7 +16,7 @@
 /**
  * A playd exception.
  */
-class Error
+class Error : public std::exception
 {
 public:
 	/**
