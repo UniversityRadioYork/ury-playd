@@ -9,7 +9,7 @@
 
 #include "errors.h"
 
-Error::Error(const std::string &msg) : std::exception{}, message{msg}
+Error::Error(const std::string &msg) : std::runtime_error{msg}, message{msg}
 {
 }
 

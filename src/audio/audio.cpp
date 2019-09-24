@@ -24,7 +24,7 @@
 //
 
 /// The error thrown if a Null_audio is asked to do something it can't do.
-Error NotSupportedInNullAudio()
+Null_audio_error NotSupportedInNullAudio()
 {
 	return Null_audio_error{MSG_CMD_NEEDS_LOADED};
 }
