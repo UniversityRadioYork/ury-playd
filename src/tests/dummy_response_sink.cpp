@@ -7,6 +7,7 @@
  */
 
 #include "dummy_response_sink.h"
+
 #include <ostream>
 #include <string>
 

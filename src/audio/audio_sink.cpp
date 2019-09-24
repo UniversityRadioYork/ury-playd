@@ -7,17 +7,17 @@
  * @see audio/audio_sink.h
  */
 
+#include "audio_sink.h"
+
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <memory>
 #include <string>
 
-#include "SDL.h"
-
 #include "../errors.h"
 #include "../messages.h"
-#include "audio_sink.h"
+#include "SDL.h"
 #include "audio_source.h"
 #include "ringbuffer.h"
 #include "sample_format.h"

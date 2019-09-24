@@ -7,6 +7,8 @@
  * @see audio/audio.h
  */
 
+#include "audio.h"
+
 #include <cassert>
 #include <chrono>
 #include <climits>
@@ -17,7 +19,6 @@
 #include "../errors.h"
 #include "../messages.h"
 #include "../response.h"
-#include "audio.h"
 #include "audio_sink.h"
 #include "audio_source.h"
 #include "sample_format.h"

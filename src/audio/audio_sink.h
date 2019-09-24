@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "SDL.h"
-
 #include "audio_source.h"
 #include "ringbuffer.h"
 #include "sample_format.h"

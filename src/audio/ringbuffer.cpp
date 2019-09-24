@@ -6,6 +6,8 @@
  * Implementation of the Ring_buffer class.
  */
 
+#include "ringbuffer.h"
+
 #include <atomic>
 #include <cassert>
 #include <gsl/gsl>
@@ -14,7 +16,6 @@
 
 #include "../errors.h"
 #include "../messages.h"
-#include "ringbuffer.h"
 
 /* Assumptions:
 

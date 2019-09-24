@@ -8,11 +8,12 @@
  * @see tests/dummy_audio_source.cpp
  */
 
+#include "dummy_audio_source.h"
+
 #include <cstdint>
 
 #include "../audio/audio_source.h"
 #include "../audio/sample_format.h"
-#include "dummy_audio_source.h"
 
 Audio_source::Decode_result Dummy_audio_source::Decode()
 {

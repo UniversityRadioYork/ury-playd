@@ -7,6 +7,10 @@
  * @see audio/audio_source.h
  */
 
+#include "sndfile.h"
+
+#include <sndfile.h>
+
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -16,13 +20,10 @@
 #include <sstream>
 #include <string>
 
-#include <sndfile.h>
-
 #include "../../errors.h"
 #include "../../messages.h"
 #include "../audio_source.h"
 #include "../sample_format.h"
-#include "sndfile.h"
 
 Sndfile_audio_source::Sndfile_audio_source(const std::string &path)
     : Audio_source(path), file(nullptr), buffer()

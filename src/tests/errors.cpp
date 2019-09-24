@@ -3,9 +3,9 @@
  * Tests for error classes.
  */
 
-#include "catch.hpp"
-
 #include "../errors.h"
+
+#include "catch.hpp"
 
 SCENARIO("Errors contain a retrievable message", "[error]")
 {

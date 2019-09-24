@@ -7,9 +7,10 @@
  * @see audio/audio_source.h
  */
 
+#include "audio_source.h"
+
 #include <cstdint>
 
-#include "audio_source.h"
 #include "sample_format.h"
 
 Audio_source::Audio_source(const std::string &path) : path(path)

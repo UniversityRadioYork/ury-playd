@@ -6,12 +6,12 @@
  * Tests for the Ring_buffer class.
  */
 
+#include "../audio/ringbuffer.h"
+
 #include <gsl/gsl>
 
-#include "catch.hpp"
-
-#include "../audio/ringbuffer.h"
 #include "../errors.h"
+#include "catch.hpp"
 
 SCENARIO("Ring buffer cannot be read from when empty", "[ringbuffer]")
 {

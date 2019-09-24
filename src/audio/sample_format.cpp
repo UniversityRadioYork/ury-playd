@@ -7,10 +7,10 @@
  * @see audio/sample_formats.h
  */
 
+#include "sample_format.h"
+
 #include <array>
 #include <cstddef>
-
-#include "sample_format.h"
 
 const std::array<std::size_t, sample_format_count> sample_format_bps{{
         1, // PACKED_UNSIGNED_INT_8

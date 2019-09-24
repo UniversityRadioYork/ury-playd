@@ -6,11 +6,12 @@
  * Tests for the Player class.
  */
 
+#include "../player.h"
+
 #include <sstream>
 
 #include "../errors.h"
 #include "../messages.h"
-#include "../player.h"
 #include "catch.hpp"
 #include "dummy_audio_sink.h"
 #include "dummy_audio_source.h"

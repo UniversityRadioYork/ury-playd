@@ -9,11 +9,10 @@
 #include <chrono>
 #include <sstream>
 
-#include "catch.hpp"
-
 #include "../audio/audio.h"
 #include "../errors.h"
 #include "../response.h"
+#include "catch.hpp"
 #include "dummy_response_sink.h"
 
 using namespace std::chrono;

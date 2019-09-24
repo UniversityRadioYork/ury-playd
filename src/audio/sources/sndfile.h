@@ -11,11 +11,11 @@
 #define PLAYD_AUDIO_SOURCE_SNDFILE_H
 #ifdef WITH_SNDFILE
 
+#include <sndfile.h>
+
 #include <cstdint>
 #include <string>
 #include <vector>
-
-#include <sndfile.h>
 
 #include "../audio_source.h"
 #include "../sample_format.h"

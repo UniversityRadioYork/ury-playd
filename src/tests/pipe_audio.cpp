@@ -9,9 +9,8 @@
 #include <chrono>
 #include <sstream>
 
-#include "catch.hpp"
-
 #include "../audio/audio.h"
+#include "catch.hpp"
 #include "dummy_audio_sink.h"
 #include "dummy_audio_source.h"
 #include "dummy_response_sink.h"
