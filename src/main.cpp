@@ -51,7 +51,7 @@ static const std::map<std::string, Player::SourceFn> SOURCES = {
  */
 std::vector<std::string> MakeArgVector(int argc, char *argv[])
 {
-	std::vector<std::string> args;
+	std::vector<std::string> args(argc);
 	for (int i = 0; i < argc; i++) args.emplace_back(argv[i]);
 	return args;
 }
@@ -174,14 +174,14 @@ int main(int argc, char *argv[])
 	auto device_id = GetDeviceID(args);
 	if (device_id < 0) ExitWithUsage(args.at(0));
 
-	Player player(
+	Player player{
 	        device_id,
 	        &std::make_unique<Sdl_audio_sink, const Audio_source &, int>,
-	        SOURCES);
+	        SOURCES};
 
 	// Set up the IO now (to avoid a circular dependency).
 	// Make sure the player broadcasts its responses back to the IoCore.
-	Io_core io(player);
+	Io_core io{player};
 	player.SetIo(io);
 
 	// Now, actually run the IO loop.

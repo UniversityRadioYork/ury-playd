@@ -26,13 +26,13 @@
 using namespace std::chrono;
 
 Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sources)
-    : device_id(device_id),
-      sink(std::move(sink)),
-      sources(std::move(sources)),
-      file(std::make_unique<Null_audio>()),
-      dead(false),
-      io(nullptr),
-      last_pos(0)
+    : device_id{device_id},
+      sink{std::move(sink)},
+      sources{std::move(sources)},
+      file{std::make_unique<Null_audio>()},
+      dead{false},
+      io{nullptr},
+      last_pos{0}
 {
 }
 
@@ -172,9 +172,9 @@ Response Player::Pos(const std::string &tag, const std::string &pos_str)
 
 	try {
 		this->PosRaw(tag, pos);
-	} catch (Null_audio_error) {
+	} catch (Null_audio_error &) {
 		return Response::Invalid(tag, MSG_CMD_NEEDS_LOADED);
-	} catch (Seek_error) {
+	} catch (Seek_error &) {
 		// Seek failures here are a result of the decoder not liking the
 		// seek position (usually because it's outside the audio file!).
 		// Thus, unlike above, we try to recover.
@@ -282,7 +282,7 @@ Response::Code Player::StateResponseCode() const {
     return Response::Code::eject;
 }
 
-void Player::Respond(int id, Response rs) const
+void Player::Respond(int id, const Response &rs) const
 {
 	if (this->io != nullptr) this->io->Respond(id, rs);
 }

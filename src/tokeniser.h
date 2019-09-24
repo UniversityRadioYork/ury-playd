@@ -78,6 +78,12 @@ private:
 	 * @param c The character to push onto the current word.
 	 */
 	void Push(char c);
+
+    void FeedSingleQuotedChar(char c);
+
+    void FeedDoublyQuotedChar(char c);
+
+    void FeedUnquotedChar(char c);
 };
 
 #endif // PLAYD_TOKENISER_H

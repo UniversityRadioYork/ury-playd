@@ -211,7 +211,7 @@ private:
 	 *   Use 0 for broadcasts.
 	 * @param response The Response to output.
 	 */
-	void Respond(int id, Response rs) const;
+	void Respond(int id, const Response &rs) const;
 
 	/**
 	 * Sends a timestamp response.

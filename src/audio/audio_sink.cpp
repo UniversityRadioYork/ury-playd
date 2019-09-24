@@ -58,11 +58,11 @@ static void SDLCallback(void *vsink, uint8_t *data, int len)
 }
 
 Sdl_audio_sink::Sdl_audio_sink(const Audio_source &source, int device_id)
-    : bytes_per_sample(source.BytesPerSample()),
-      ring_buf((1 << ringbuf_power) * source.BytesPerSample()),
-      position_sample_count(0),
-      source_out(false),
-      state(Audio_sink::State::stopped)
+    : bytes_per_sample{source.BytesPerSample()},
+      ring_buf{(1U << ringbuf_power) * source.BytesPerSample()},
+      position_sample_count{0},
+      source_out{false},
+      state{Audio_sink::State::stopped}
 {
 	auto name = SDL_GetAudioDeviceName(device_id, 0);
 	if (name == nullptr) {
@@ -168,7 +168,7 @@ size_t Sdl_audio_sink::Transfer(const gsl::span<const uint8_t> src)
 
 	// There should be a whole number of samples being transferred.
 	Expects(src.size() % bytes_per_sample == 0);
-	Expects(0 < src.size());
+	Expects(!src.empty());
 	const auto total = static_cast<size_t>(src.size());
 
 	// Only transfer as many bytes as the ring buffer can take,

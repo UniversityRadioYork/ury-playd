@@ -13,11 +13,8 @@
 
 #include <cassert>
 #include <cstdint>
-#include <cstdlib>
 #include <iostream>
-#include <map>
 #include <memory>
-#include <sstream>
 #include <string>
 
 #include "../../errors.h"
@@ -26,7 +23,7 @@
 #include "../sample_format.h"
 
 Sndfile_audio_source::Sndfile_audio_source(const std::string &path)
-    : Audio_source(path), file(nullptr), buffer()
+    : Audio_source{path}, file{nullptr}, buffer{}
 {
 	this->info.format = 0;
 

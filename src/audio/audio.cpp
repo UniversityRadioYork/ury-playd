@@ -9,25 +9,25 @@
 
 #include "audio.h"
 
-#include <cassert>
 #include <chrono>
-#include <climits>
 #include <cstdint>
 #include <gsl/gsl>
-#include <string>
 
 #include "../errors.h"
 #include "../messages.h"
-#include "../response.h"
 #include "audio_sink.h"
 #include "audio_source.h"
 #include "sample_format.h"
 
-using namespace std::chrono;
-
 //
 // Null_audio
 //
+
+/// The error thrown if a Null_audio is asked to do something it can't do.
+Error NotSupportedInNullAudio()
+{
+	return Null_audio_error{MSG_CMD_NEEDS_LOADED};
+}
 
 Audio::State Null_audio::Update()
 {
@@ -41,27 +41,27 @@ Audio::State Null_audio::CurrentState() const
 
 void Null_audio::SetPlaying(bool)
 {
-	throw Null_audio_error(MSG_CMD_NEEDS_LOADED);
+	throw NotSupportedInNullAudio();
 }
 
-void Null_audio::SetPosition(microseconds)
+void Null_audio::SetPosition(std::chrono::microseconds)
 {
-	throw Null_audio_error(MSG_CMD_NEEDS_LOADED);
+	throw NotSupportedInNullAudio();
 }
 
-microseconds Null_audio::Position() const
+std::chrono::microseconds Null_audio::Position() const
 {
-	throw Null_audio_error(MSG_CMD_NEEDS_LOADED);
+	throw NotSupportedInNullAudio();
 }
 
-microseconds Null_audio::Length() const
+std::chrono::microseconds Null_audio::Length() const
 {
-	throw Null_audio_error(MSG_CMD_NEEDS_LOADED);
+	throw NotSupportedInNullAudio();
 }
 
 const std::string &Null_audio::File() const
 {
-	throw Null_audio_error(MSG_CMD_NEEDS_LOADED);
+	throw NotSupportedInNullAudio();
 }
 
 //
@@ -70,7 +70,7 @@ const std::string &Null_audio::File() const
 
 Basic_audio::Basic_audio(std::unique_ptr<Audio_source> src,
                          std::unique_ptr<Audio_sink> sink)
-    : src(move(src)), sink(move(sink))
+    : src{std::move(src)}, sink{std::move(sink)}
 {
 	this->ClearFrame();
 }
@@ -102,7 +102,7 @@ Audio::State Basic_audio::CurrentState() const
 	return this->sink->CurrentState();
 }
 
-microseconds Basic_audio::Position() const
+std::chrono::microseconds Basic_audio::Position() const
 {
 	Expects(this->sink != nullptr);
 	Expects(this->src != nullptr);
@@ -110,7 +110,7 @@ microseconds Basic_audio::Position() const
 	return this->src->MicrosFromSamples(this->sink->Position());
 }
 
-microseconds Basic_audio::Length() const
+std::chrono::microseconds Basic_audio::Length() const
 {
 	Expects(this->sink != nullptr);
 	Expects(this->src != nullptr);
@@ -118,7 +118,7 @@ microseconds Basic_audio::Length() const
 	return this->src->MicrosFromSamples(this->src->Length());
 }
 
-void Basic_audio::SetPosition(microseconds position)
+void Basic_audio::SetPosition(std::chrono::microseconds position)
 {
 	Expects(this->sink != nullptr);
 	Expects(this->src != nullptr);

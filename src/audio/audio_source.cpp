@@ -13,7 +13,7 @@
 
 #include "sample_format.h"
 
-Audio_source::Audio_source(const std::string &path) : path(path)
+Audio_source::Audio_source(const std::string &path) : path{path}
 {
 }
 

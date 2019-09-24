@@ -165,7 +165,7 @@ void UvShutdownCallback(uv_shutdown_t *handle, int status)
 // IoCore
 //
 
-Io_core::Io_core(Player &player) : loop(nullptr), player(player)
+Io_core::Io_core(Player &player) : loop{nullptr}, player{player}
 {
 }
 
@@ -293,7 +293,7 @@ void Io_core::Shutdown()
 	uv_close(reinterpret_cast<uv_handle_t *>(&this->server), nullptr);
 
 	// Next, ask each connection to stop.
-	for (const auto conn : this->pool) {
+	for (const auto &conn : this->pool) {
 		if (conn) conn->Shutdown();
 	}
 
@@ -488,7 +488,7 @@ void Connection::Read(ssize_t nread, const uv_buf_t *buf)
 
 	// Everything looks okay for reading.
 	auto cmds = this->tokeniser.Feed(std::string(buf->base, nread));
-	for (auto cmd : cmds) {
+	for (const auto &cmd : cmds) {
 		if (cmd.empty()) continue;
 
 		Response res = RunCommand(cmd);

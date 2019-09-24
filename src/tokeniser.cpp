@@ -8,24 +8,24 @@
  */
 
 #include <algorithm>
-#include <cassert>
 #include <locale>
+#include <gsl/gsl>
 
 #include "response.h"
 
 #include "tokeniser.h"
 
 Tokeniser::Tokeniser()
-    : escape_next(false), in_word(false), quote_type(QuoteType::NONE)
+    : escape_next{false}, in_word{false}, quote_type{QuoteType::NONE}
 {
 }
 
 std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 {
 	// The list of ready lines should be cleared by any previous Feed.
-	assert(this->ready_lines.empty());
+	Expects(this->ready_lines.empty());
 
-	for (char c : raw) {
+	for (const char c : raw) {
 		if (this->escape_next) {
 			this->Push(c);
 			continue;
@@ -33,59 +33,16 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 
 		switch (this->quote_type) {
 			case QuoteType::SINGLE:
-				if (c == '\'') {
-					this->quote_type = QuoteType::NONE;
-				} else {
-					this->Push(c);
-				}
-				break;
+                FeedSingleQuotedChar(c);
+                break;
 
 			case QuoteType::DOUBLE:
-				switch (c) {
-					case '\"':
-						this->quote_type =
-						        QuoteType::NONE;
-						break;
-
-					case '\\':
-						this->escape_next = true;
-						break;
-
-					default:
-						this->Push(c);
-						break;
-				}
-				break;
+                FeedDoublyQuotedChar(c);
+                break;
 
 			case QuoteType::NONE:
-				switch (c) {
-					case '\n':
-						this->Emit();
-						break;
-
-					case '\'':
-						this->in_word = true;
-						this->quote_type =
-						        QuoteType::SINGLE;
-						break;
-
-					case '\"':
-						this->in_word = true;
-						this->quote_type =
-						        QuoteType::DOUBLE;
-						break;
-
-					case '\\':
-						this->escape_next = true;
-						break;
-
-					default:
-						isspace(c, std::locale::classic())
-						        ? this->EndWord()
-						        : this->Push(c);
-						break;
-				}
-				break;
+                FeedUnquotedChar(c);
+                break;
 		}
 	}
 
@@ -95,14 +52,70 @@ std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
 	return lines;
 }
 
+void Tokeniser::FeedUnquotedChar(char c) {
+    switch (c) {
+        case '\n':
+            Emit();
+            break;
+
+        case '\'':
+            in_word = true;
+            quote_type =
+                    QuoteType::SINGLE;
+            break;
+
+        case '\"':
+            in_word = true;
+            quote_type =
+                    QuoteType::DOUBLE;
+            break;
+
+        case '\\':
+            escape_next = true;
+            break;
+
+        default:
+            isspace(c, std::locale::classic())
+                    ? EndWord()
+                    : Push(c);
+            break;
+    }
+}
+
+void Tokeniser::FeedDoublyQuotedChar(char c) {
+    switch (c) {
+        case '\"':
+            quote_type =
+                    QuoteType::NONE;
+            break;
+
+        case '\\':
+            escape_next = true;
+            break;
+
+        default:
+            Push(c);
+            break;
+    }
+}
+
+void Tokeniser::FeedSingleQuotedChar(char c) {
+    if (c == '\'') {
+        quote_type = QuoteType::NONE;
+    } else {
+        Push(c);
+    }
+}
+
 void Tokeniser::Push(const char c)
 {
-	assert(this->escape_next || !(this->quote_type == QuoteType::NONE &&
+	Expects(this->escape_next || !(this->quote_type == QuoteType::NONE &&
 	                              isspace(c, std::locale::classic())));
 	this->in_word = true;
 	this->current_word.push_back(c);
 	this->escape_next = false;
-	assert(!this->current_word.empty());
+
+	Ensures(!this->current_word.empty());
 }
 
 void Tokeniser::EndWord()
@@ -119,8 +132,8 @@ void Tokeniser::EndWord()
 void Tokeniser::Emit()
 {
 	// Since we assume these, we don't need to set them later.
-	assert(this->quote_type == QuoteType::NONE);
-	assert(!this->escape_next);
+	Expects(this->quote_type == QuoteType::NONE);
+	Expects(!this->escape_next);
 
 	// We might still be in a word, in which case we treat the end of a
 	// line as the end of the word too.
@@ -131,7 +144,7 @@ void Tokeniser::Emit()
 	this->words.clear();
 
 	// The state should now be clean and ready for another command.
-	assert(this->quote_type == QuoteType::NONE);
-	assert(!this->escape_next);
-	assert(this->current_word.empty());
+	Ensures(this->quote_type == QuoteType::NONE);
+	Ensures(!this->escape_next);
+	Ensures(this->current_word.empty());
 }

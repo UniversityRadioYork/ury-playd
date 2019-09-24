@@ -10,12 +10,9 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
-#include <cstdlib>
 #include <gsl/gsl>
 #include <iostream>
-#include <map>
 #include <memory>
-#include <sstream>
 #include <string>
 
 // We don't include mpg123.h directly here, because mp3.h does some polyfills
@@ -28,7 +25,7 @@
 #include "mp3.h"
 
 Mp3_audio_source::Mp3_audio_source(const std::string &path)
-    : Audio_source(path), buffer(), context(nullptr)
+    : Audio_source{path}, buffer{}, context{nullptr}
 {
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
