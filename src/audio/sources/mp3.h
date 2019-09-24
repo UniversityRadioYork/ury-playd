@@ -12,6 +12,7 @@
 #ifdef WITH_MP3
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 

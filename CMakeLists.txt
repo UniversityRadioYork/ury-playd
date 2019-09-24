@@ -92,6 +92,13 @@ target_compile_features(playd PUBLIC cxx_std_17)
 add_executable(playd_tests EXCLUDE_FROM_ALL ${SRCS} ${tests_SRCS})
 target_compile_features(playd_tests PUBLIC cxx_std_17)
 
+set_target_properties(playd playd_tests
+  PROPERTIES
+  CXX_STANDARD 17
+  CXX_STANDARD_REQUIRED ON
+  CXX_EXTENSIONS OFF
+)
+
 add_test(NAME playd_tests COMMAND playd_tests)
 
 # `make check` to both compile and run tests

@@ -48,7 +48,7 @@ const std::string &Dummy_audio_source::Path() const
 	return this->path;
 }
 
-std::uint64_t DummyAudioSource::Length() const
+std::uint64_t Dummy_audio_source::Length() const
 {
 	return 0;
 }

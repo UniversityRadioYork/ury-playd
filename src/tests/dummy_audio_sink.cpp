@@ -44,5 +44,5 @@ void Dummy_audio_sink::SourceOut()
 
 size_t Dummy_audio_sink::Transfer(const gsl::span<const uint8_t> src)
 {
-	return src.length();
+	return src.size();
 }

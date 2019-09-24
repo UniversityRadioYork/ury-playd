@@ -13,5 +13,10 @@ compiler:
   - clang
   - gcc
 
+before_script:
+  - mkdir cbuild && cd cbuild
+  - cmake ..
+
 script:
-  - mkdir cbuild && cd cbuild; cmake .. && make && make check
+  - make
+  - make check
