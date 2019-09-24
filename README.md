@@ -151,49 +151,6 @@ Building your working copy is just like on any other POSIX system. The [PKGBUILD
 
 This environment isn't currently supported, but it shouldn't be much work to make that happen.
 
-### Build without CMake
-
-#### POSIX (GNU/Linux, BSD, macOS)
-
-**Warning**: This method of building `playd` is liable to be removed in
-favour of CMake in future.
-
-`playd` comes with `config.sh`, a Bourne shell script that will generate a
-GNU-compatible Makefile that can be used both to make and install.
-
-To use the Makefile, you'll need [GNU Make] and `pkg-config` (or equivalent),
-and pkg-config packages for SDL2, libuv, and any needed decoder libraries.
-We've tested building playd on Gentoo, FreeBSD 10, and macOS, but other
-POSIX-style operating systems should work.
-
-Using the Makefile is straightforward:
-
-* Ensure you have the dependencies above;
-* Run `config.sh` (optionally, read it first to see if any variables need to be
-  overriden for your environment);
-* Optionally read the generated `Makefile`, to make sure it's ok;
-* Run `make` (or whatever GNU Make is called on your OS; in FreeBSD, for
-  example, it'd be `gmake`), and, optionally, `sudo make install`.
-  The latter will globally install playd and its man page.
-
-#### FreeBSD (10+)
-
-FreeBSD 10 and above come with `clang` 3.3 as standard, which should be able to
-compile `playd`.  `gcc` is available through the FreeBSD Ports Collection
-and package repositories.
-
-You will need `gmake`, as `Makefile` is incompatible with BSD make.  Sorry!
-
-Then, run `gmake` (__not__ `make`), and, optionally, `gmake install` to install
-`playd` (as root):
-
-    user@freebsd:~/ % gmake
-    root@freebsd:~/ # gmake install
-
-#### Windows
-
-You should use CMake.
-
 ### Ports
 
 The `ports/` directory contains files for performing fully automated
