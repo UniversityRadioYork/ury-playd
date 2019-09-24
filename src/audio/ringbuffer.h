@@ -9,6 +9,7 @@
 #ifndef PLAYD_RING_BUFFER_HPP
 #define PLAYD_RING_BUFFER_HPP
 
+#include <vector>
 #include <atomic>
 #include <mutex>
 
