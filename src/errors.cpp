@@ -9,11 +9,11 @@
 
 #include "errors.h"
 
-Error::Error(const std::string &msg) : std::runtime_error{msg}, message{msg}
+Error::Error(const std::string_view msg) : std::runtime_error{std::string {msg}}, message{msg}
 {
 }
 
-const std::string &Error::Message() const
+std::string_view Error::Message() const
 {
 	return this->message;
 }

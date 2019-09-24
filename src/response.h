@@ -23,8 +23,11 @@
 class Response
 {
 public:
-	/// The tag for unsolicited messages (not from responses).
-	static const std::string NOREQUEST;
+    /// Type for message tags.
+    using Tag = std::string_view;
+
+    /// The tag for unsolicited messages (not from responses).
+	static constexpr Tag NOREQUEST = "!";
 
 	/**
 	 * Enumeration of all possible response codes.
@@ -53,14 +56,14 @@ public:
 	 * @param tag The tag of the response.
 	 * @param code The Response::Code representing the response command.
 	 */
-	Response(const std::string &tag, Response::Code code);
+	Response(Tag tag, Response::Code code);
 
 	/**
 	 * Adds an argument to this Response.
 	 * @param arg The argument to add.  The argument must not be escaped.
 	 * @return A reference to this Response, for chaining.
 	 */
-	Response &AddArg(const std::string &arg);
+	Response &AddArg(Tag arg);
 
 	/**
 	 * Packs the Response, converting it to a BAPS3 protocol message.
@@ -74,7 +77,7 @@ public:
 	 * @param tag The tag of the original request.
 	 * @return A Response acknowledging a successful request.
 	 */
-	static Response Success(const std::string &tag);
+	static Response Success(Tag tag);
 
 	/**
 	 * Shortcut for constructing a final response to a invalid request.
@@ -82,7 +85,7 @@ public:
 	 * @param msg The failure message.
 	 * @return A Response acknowledging an invalid request.
 	 */
-	static Response Invalid(const std::string &tag, const std::string &msg);
+	static Response Invalid(Tag tag, std::string_view msg);
 
 	/**
 	 * Shortcut for constructing a final response to a failed request.
@@ -90,21 +93,15 @@ public:
 	 * @param msg The failure message.
 	 * @return A Response acknowledging a failed request.
 	 */
-	static Response Failure(const std::string &tag, const std::string &msg);
+	static Response Failure(Tag tag, std::string_view msg);
 
 private:
-	/**
-	 * A map from Response::Code codes to their string equivalents.
-	 * @see Response::Code
-	 */
-	static const std::array<std::string, CODE_COUNT> STRINGS;
-
 	/**
 	 * Escapes a single response argument.
 	 * @param arg The argument to escape.
 	 * @return The escaped argument.
 	 */
-	static std::string EscapeArg(const std::string &arg);
+	static std::string EscapeArg(std::string_view arg);
 
 	/// The current packed form of the response.
 	/// @see Pack

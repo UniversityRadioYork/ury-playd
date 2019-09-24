@@ -31,7 +31,7 @@ public:
 	 *   decoder.
 	 * @see http://www.mega-nerd.com/libsndfile/api.html#open
 	 */
-	Sndfile_audio_source(const std::string &path);
+	explicit Sndfile_audio_source(std::string_view path);
 
 	/// Destructs a Sndfile_audio_source.
 	~Sndfile_audio_source();
@@ -52,7 +52,7 @@ public:
 	 * @returns A unique pointer to a Sndfile_audio_source.
 	 */
 	static std::unique_ptr<Sndfile_audio_source> MakeUnique(
-	        const std::string &path);
+	        std::string_view path);
 
 private:
 	SF_INFO info;  ///< The libsndfile info structure.

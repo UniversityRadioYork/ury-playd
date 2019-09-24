@@ -15,28 +15,25 @@
 
 #include "response.h"
 
-/* static */ const std::string Response::NOREQUEST = "!";
-
-/* static */ const std::array<std::string, Response::CODE_COUNT> Response::STRINGS{{
-        "OHAI",  // Code::OHAI
-        "IAMA",  // Code::IAMA
-        "FLOAD", // Code::FLOAD
-        "EJECT", // Code::EJECT
-        "POS",   // Code::POS
-        "END",   // Code::END
-        "PLAY",  // Code::PLAY
-        "STOP",  // Code::STOP
-        "ACK",   // Code::ACK
-        "LEN"    // Code::LEN
+/* static */ constexpr std::array<std::string_view, Response::CODE_COUNT> CODE_STRINGS{{
+        "OHAI",  // Code::ohai
+        "IAMA",  // Code::iama
+        "FLOAD", // Code::fload
+        "EJECT", // Code::eject
+        "POS",   // Code::pos
+        "END",   // Code::end
+        "PLAY",  // Code::play
+        "STOP",  // Code::stop
+        "ACK",   // Code::ack
+        "LEN"    // Code::len
 }};
 
-Response::Response(const std::string &tag, Response::Code code)
+Response::Response(std::string_view tag, Response::Code code)
 {
-	this->string = Response::EscapeArg(tag) + " " +
-	               STRINGS[static_cast<uint8_t>(code)];
+	this->string = Response::EscapeArg(tag) + " " + std::string {CODE_STRINGS[static_cast<uint8_t>(code)]};
 }
 
-Response &Response::AddArg(const std::string &arg)
+Response &Response::AddArg(std::string_view arg)
 {
 	this->string += " " + Response::EscapeArg(arg);
 	return *this;
@@ -47,26 +44,26 @@ std::string Response::Pack() const
 	return this->string;
 }
 
-/* static */ Response Response::Success(const std::string &tag)
+/* static */ Response Response::Success(Response::Tag tag)
 {
 	return Response(tag, Response::Code::ack)
 	        .AddArg("OK")
 	        .AddArg("success");
 }
 
-/* static */ Response Response::Invalid(const std::string &tag,
-                                        const std::string &msg)
+/* static */ Response Response::Invalid(Response::Tag tag,
+                                        std::string_view msg)
 {
 	return Response(tag, Response::Code::ack).AddArg("WHAT").AddArg(msg);
 }
 
-/* static */ Response Response::Failure(const std::string &tag,
-                                        const std::string &msg)
+/* static */ Response Response::Failure(Response::Tag tag,
+                                        std::string_view msg)
 {
 	return Response(tag, Response::Code::ack).AddArg("FAIL").AddArg(msg);
 }
 
-/* static */ std::string Response::EscapeArg(const std::string &arg)
+/* static */ std::string Response::EscapeArg(std::string_view arg)
 {
 	bool escaping = false;
 	std::string escaped;

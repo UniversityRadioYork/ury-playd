@@ -37,13 +37,13 @@ Sample_format Dummy_audio_source::OutputSampleFormat() const
 	return Sample_format::sint32;
 }
 
-std::uint64_t Dummy_audio_source::Seek(std::uint64_t position)
+std::uint64_t Dummy_audio_source::Seek(std::uint64_t new_position)
 {
-	this->position = position;
+	this->position = new_position;
 	return this->position;
 }
 
-const std::string &Dummy_audio_source::Path() const
+std::string_view Dummy_audio_source::Path() const
 {
 	return this->path;
 }

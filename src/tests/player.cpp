@@ -21,15 +21,15 @@ using namespace std::string_literals;
 
 const std::map<std::string, Player::SourceFn> DUMMY_SRCS{
         {"mp3",
-         [](const std::string &path) -> std::unique_ptr<Audio_source> {
-	         return std::make_unique<Dummy_audio_source, const std::string &>(
-	                 path);
+         [](std::string_view path) -> std::unique_ptr<Audio_source> {
+	         return std::make_unique<Dummy_audio_source, std::string_view>(
+	                 std::move(path));
          }},
         {"ogg",
-         [](const std::string &) -> std::unique_ptr<Audio_source> {
+         [](std::string_view) -> std::unique_ptr<Audio_source> {
 	         throw File_error("test failure 1");
          }},
-        {"flac", [](const std::string &) -> std::unique_ptr<Audio_source> {
+        {"flac", [](std::string_view) -> std::unique_ptr<Audio_source> {
 	         throw Internal_error("test failure 2");
          }}};
 
@@ -52,7 +52,7 @@ SCENARIO("Player announces changes in state correctly", "[player]")
 				THEN("ejecting should emit nothing")
 				{
 					p.Eject("tag");
-					REQUIRE(os.str() == "");
+					REQUIRE(os.str().empty());
 				}
 
 				THEN("loading a file should emit all state")
@@ -148,7 +148,7 @@ SCENARIO("Player interacts correctly with the audio system", "[player]")
 			THEN("loading for an empty filename returns failure")
 			{
 				auto r = "tag ACK WHAT '"s +
-				         MSG_LOAD_EMPTY_PATH + "'"s;
+				         std::string{MSG_LOAD_EMPTY_PATH} + "'"s;
 				REQUIRE(p.Load("tag", "").Pack() == r);
 			}
 		}
@@ -198,7 +198,8 @@ SCENARIO("Player interacts correctly with the audio system", "[player]")
 				     "failure")
 				{
 					auto r = "tag ACK WHAT '"s +
-					         MSG_LOAD_EMPTY_PATH + "'"s;
+					         std::string{MSG_LOAD_EMPTY_PATH} +
+					         "'"s;
 					REQUIRE(p.Load("tag", "").Pack() == r);
 				}
 			}
@@ -246,7 +247,8 @@ SCENARIO("Player interacts correctly with the audio system", "[player]")
 				     "failure")
 				{
 					auto r = "tag ACK WHAT '"s +
-					         MSG_LOAD_EMPTY_PATH + "'"s;
+					         std::string{MSG_LOAD_EMPTY_PATH} +
+					         "'"s;
 					REQUIRE(p.Load("tag", "").Pack() == r);
 				}
 			}
@@ -264,8 +266,8 @@ SCENARIO("Player refuses absurd seek positions", "[seek]")
 
 		p.Load("tag", "blah.mp3");
 
-		auto response =
-		        "tag ACK WHAT '"s + MSG_SEEK_INVALID_VALUE + "'"s;
+		auto response = "tag ACK WHAT '"s +
+		                std::string{MSG_SEEK_INVALID_VALUE} + "'"s;
 
 		WHEN("the player is told to seek to a negative time")
 		{
@@ -361,8 +363,8 @@ SCENARIO("Player refuses commands when quitting", "[player]")
 
 		p.Load("tag", "blah.mp3");
 
-		auto response =
-		        "tag ACK FAIL '"s + MSG_CMD_PLAYER_CLOSING + "'"s;
+		auto response = "tag ACK FAIL '"s +
+		                std::string{MSG_CMD_PLAYER_CLOSING} + "'"s;
 
 		WHEN("the player is told to quit")
 		{

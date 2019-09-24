@@ -13,7 +13,7 @@
 
 #include "sample_format.h"
 
-Audio_source::Audio_source(const std::string &path) : path{path}
+Audio_source::Audio_source(std::string_view path) : path{path}
 {
 }
 
@@ -23,12 +23,12 @@ size_t Audio_source::BytesPerSample() const
 	return sample_format_bps[sf] * this->ChannelCount();
 }
 
-const std::string &Audio_source::Path() const
+std::string_view Audio_source::Path() const
 {
 	return this->path;
 }
 
-Samples Audio_source::SamplesFromMicros(microseconds micros) const
+Samples Audio_source::SamplesFromMicros(std::chrono::microseconds micros) const
 {
 	// The sample rate is expressed in terms of samples per second, so we
 	// need to convert the position to seconds then multiply by the rate.
@@ -36,8 +36,8 @@ Samples Audio_source::SamplesFromMicros(microseconds micros) const
 	return (micros.count() * this->SampleRate()) / 1000000;
 }
 
-microseconds Audio_source::MicrosFromSamples(Samples samples) const
+std::chrono::microseconds Audio_source::MicrosFromSamples(Samples samples) const
 {
 	// This is basically SamplesFromMicros but backwards.
-	return microseconds{(samples * 1000000) / this->SampleRate()};
+	return std::chrono::microseconds{(samples * 1000000) / this->SampleRate()};
 }

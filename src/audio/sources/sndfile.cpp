@@ -22,14 +22,14 @@
 #include "../audio_source.h"
 #include "../sample_format.h"
 
-Sndfile_audio_source::Sndfile_audio_source(const std::string &path)
+Sndfile_audio_source::Sndfile_audio_source(std::string_view path)
     : Audio_source{path}, file{nullptr}, buffer{}
 {
 	this->info.format = 0;
 
-	this->file = sf_open(path.c_str(), SFM_READ, &this->info);
+	this->file = sf_open(this->path.c_str(), SFM_READ, &this->info);
 	if (this->file == nullptr) {
-		throw File_error("sndfile: can't open " + path + ": " +
+		throw File_error("sndfile: can't open " + this->path + ": " +
 		                 sf_strerror(nullptr));
 	}
 
@@ -125,7 +125,8 @@ Sample_format Sndfile_audio_source::OutputSampleFormat() const
 }
 
 std::unique_ptr<Sndfile_audio_source> Sndfile_audio_source::MakeUnique(
-        const std::string &path)
+        std::string_view path)
 {
-	return std::make_unique<Sndfile_audio_source, const std::string &>(path);
+	return std::make_unique<Sndfile_audio_source, std::string_view>(
+	        std::move(path));
 }

@@ -24,7 +24,7 @@
 #include "../sample_format.h"
 #include "mp3.h"
 
-Mp3_audio_source::Mp3_audio_source(const std::string &path)
+Mp3_audio_source::Mp3_audio_source(std::string_view path)
     : Audio_source{path}, buffer{}, context{nullptr}
 {
 	this->context = mpg123_new(nullptr, nullptr);
@@ -35,8 +35,8 @@ Mp3_audio_source::Mp3_audio_source(const std::string &path)
 	              std::bind(&Mp3_audio_source::AddFormat, this,
 	                        std::placeholders::_1));
 
-	if (mpg123_open(this->context, path.c_str()) == MPG123_ERR) {
-		throw File_error("mp3: can't open " + path + ": " +
+	if (mpg123_open(this->context, this->path.c_str()) == MPG123_ERR) {
+		throw File_error("mp3: can't open " + this->path + ": " +
 		                 mpg123_strerror(this->context));
 	}
 }
@@ -113,13 +113,13 @@ std::uint64_t Mp3_audio_source::Seek(std::uint64_t in_samples)
 	    clen < in_samples) {
 		Debug() << "mp3: seek at" << in_samples << "past EOF at" << clen
 		        << std::endl;
-		throw Seek_error(MSG_SEEK_FAIL);
+		throw Seek_error{MSG_SEEK_FAIL};
 	}
 
 	if (mpg123_seek(this->context, in_samples, SEEK_SET) == MPG123_ERR) {
 		Debug() << "mp3: seek failed:" << mpg123_strerror(this->context)
 		        << std::endl;
-		throw Seek_error(MSG_SEEK_FAIL);
+		throw Seek_error{MSG_SEEK_FAIL};
 	}
 
 	// The actual seek position may not be the same as the requested
@@ -182,8 +182,9 @@ Sample_format Mp3_audio_source::OutputSampleFormat() const
 	}
 }
 
-std::unique_ptr<Mp3_audio_source> Mp3_audio_source::MakeUnique(const std::string &path)
+std::unique_ptr<Mp3_audio_source> Mp3_audio_source::MakeUnique(std::string_view path)
 {
 	// This is in a separate function to let it be put into a jump table.
-	return std::make_unique<Mp3_audio_source, const std::string &>(path);
+	return std::make_unique<Mp3_audio_source, std::string_view>(
+	        std::move(path));
 }

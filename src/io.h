@@ -55,12 +55,12 @@ public:
 	/**
 	 * Runs the reactor.
 	 * It will block until it terminates.
-	 * @param host The IP host to which IoCore will bind.
-	 * @param port The TCP port to which IoCore will bind.
-	 * @exception NetError Thrown if IoCore cannot bind to @a host or @a
+	 * @param host The IP host to which the IO core will bind.
+	 * @param port The TCP port to which the IO core will bind.
+	 * @exception NetError Thrown if the IO core cannot bind to @a host or @a
 	 *   port.
 	 */
-	void Run(const std::string &host, const std::string &port);
+	void Run(std::string_view host, std::string_view port);
 
 	//
 	// Connection API
@@ -124,7 +124,7 @@ private:
 	 *   listen.
 	 * @param port The TCP port on which the TCP server should listen.
 	 */
-	void InitAcceptor(const std::string &address, const std::string &port);
+	void InitAcceptor(std::string_view address, std::string_view port);
 
 	/// Sets up a periodic timer to run the playd update loop.
 	void InitUpdateTimer();

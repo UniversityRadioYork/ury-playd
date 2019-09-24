@@ -169,7 +169,7 @@ Io_core::Io_core(Player &player) : loop{nullptr}, player{player}
 {
 }
 
-void Io_core::Run(const std::string &host, const std::string &port)
+void Io_core::Run(std::string_view host, std::string_view port)
 {
 	this->loop = uv_default_loop();
 	if (this->loop == nullptr) throw Internal_error(MSG_IO_CANNOT_ALLOC);
@@ -346,7 +346,7 @@ void Io_core::InitUpdateTimer()
 	               PLAYER_UPDATE_PERIOD);
 }
 
-void Io_core::InitAcceptor(const std::string &address, const std::string &port)
+void Io_core::InitAcceptor(std::string_view address, std::string_view port)
 {
 	assert(this->loop != nullptr);
 
@@ -356,16 +356,20 @@ void Io_core::InitAcceptor(const std::string &address, const std::string &port)
 	this->server.data = static_cast<void *>(this);
 	assert(this->server.data != nullptr);
 
+	std::string address_str { address };
+    std::string port_str { port };
+
 	struct sockaddr_in bind_addr;
-	uv_ip4_addr(address.c_str(), stoi(port), &bind_addr);
+	uv_ip4_addr(address_str.c_str(), stoi(port_str), &bind_addr);
 	uv_tcp_bind(&this->server,
 	            reinterpret_cast<const sockaddr *>(&bind_addr), 0);
 
 	const auto r = uv_listen(reinterpret_cast<uv_stream_t *>(&this->server), 128,
 	                         UvListenCallback);
 	if (r) {
-		throw Net_error("Could not listen on " + address + ":" + port +
-		                " (" + std::string(uv_err_name(r)) + ")");
+	    std::ostringstream error {"Could not listen on "};
+	    error << address << ":" << port << " (" << uv_err_name(r) << ")";
+		throw Net_error(error.str());
 	}
 
 	Debug() << "Listening at" << address << "on" << port << std::endl;
@@ -375,8 +379,8 @@ void Io_core::InitSignals()
 {
 	const auto r = uv_signal_init(this->loop, &this->sigint);
 	if (r) {
-		throw Internal_error(MSG_IO_CANNOT_ALLOC + ": " +
-		                     std::string(uv_err_name(r)));
+	    auto error = std::string {MSG_IO_CANNOT_ALLOC} + ": " + uv_err_name(r);
+		throw Internal_error{error};
 	}
 
 	// We pass the player, not the IoCore.

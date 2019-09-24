@@ -21,7 +21,7 @@ public:
 	 * Constructs a Dummy_audio_source.
 	 * @param path The path of the file this Dummy_audio_source 'represents'.
 	 */
-	Dummy_audio_source(const std::string &path) : Audio_source(path){};
+	Dummy_audio_source(std::string_view path) : Audio_source(path){};
 	Audio_source::Decode_result Decode() override;
 	std::uint8_t ChannelCount() const override;
 	std::uint32_t SampleRate() const override;
@@ -29,7 +29,7 @@ public:
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	/// @return The path of the DummyAudioSource.
-	const std::string &Path() const override;
+	std::string_view Path() const override;
 
 	/// @return The length of the DummyAudioSource.
 	std::uint64_t Length() const override;

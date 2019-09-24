@@ -59,7 +59,7 @@ std::chrono::microseconds Null_audio::Length() const
 	throw NotSupportedInNullAudio();
 }
 
-const std::string &Null_audio::File() const
+std::string_view Null_audio::File() const
 {
 	throw NotSupportedInNullAudio();
 }
@@ -75,7 +75,7 @@ Basic_audio::Basic_audio(std::unique_ptr<Audio_source> src,
 	this->ClearFrame();
 }
 
-const std::string &Basic_audio::File() const
+std::string_view Basic_audio::File() const
 {
 	return this->src->Path();
 }

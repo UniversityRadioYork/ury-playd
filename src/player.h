@@ -24,8 +24,6 @@
 #include "audio/audio_source.h"
 #include "response.h"
 
-using namespace std::chrono;
-
 /**
  * A Player contains a loaded audio file and a command API for manipulating it.
  * @see Audio
@@ -34,13 +32,13 @@ using namespace std::chrono;
 class Player
 {
 public:
-	/// Type for functions that construct sinks.
+    /// Type for functions that construct sinks.
 	using SinkFn =
 	        std::function<std::unique_ptr<Audio_sink>(const Audio_source &, int)>;
 
 	/// Type for functions that construct sources.
 	using SourceFn =
-	        std::function<std::unique_ptr<Audio_source>(const std::string &)>;
+	        std::function<std::unique_ptr<Audio_source>(std::string_view)>;
 
 	/**
 	 * Constructs a Player.
@@ -85,7 +83,7 @@ public:
 	 * @see Play
 	 * @see Stop
 	 */
-	Response SetPlaying(const std::string &tag, bool playing);
+	Response SetPlaying(Response::Tag tag, bool playing);
 
 	/**
 	 * Dumps the current player state to the given ID.
@@ -96,7 +94,7 @@ public:
 	 *   For unsolicited dumps, use Response::NOREQUEST.
 	 * @return The result of dumping, which is always success.
 	 */
-	Response Dump(size_t id, const std::string &tag) const;
+	Response Dump(size_t id, Response::Tag tag) const;
 
 	/**
 	 * Ejects the current loaded song, if any.
@@ -104,7 +102,7 @@ public:
 	 *   For unsolicited ejects, use Response::NOREQUEST.
 	 * @return Whether the ejection succeeded.
 	 */
-	Response Eject(const std::string &tag);
+	Response Eject(Response::Tag tag);
 
 	/**
 	 * Ends a file, stopping and rewinding.
@@ -112,7 +110,7 @@ public:
 	 *   For unsolicited ends, use Response::NOREQUEST.
 	 * @return Whether the end succeeded.
 	 */
-	Response End(const std::string &tag);
+	Response End(Response::Tag tag);
 
 	/**
 	 * Loads a file.
@@ -121,7 +119,7 @@ public:
 	 * @param path The absolute path to a track to load.
 	 * @return Whether the load succeeded.
 	 */
-	Response Load(const std::string &tag, const std::string &path);
+	Response Load(Response::Tag tag, std::string_view path);
 
 	/**
 	 * Seeks to a given position in the current file.
@@ -130,7 +128,7 @@ public:
 	 * @param pos_str A string containing a timestamp, in microseconds
 	 * @return Whether the seek succeeded.
 	 */
-	Response Pos(const std::string &tag, const std::string &pos_str);
+	Response Pos(Response::Tag tag, std::string_view pos_str);
 
 	/**
 	 * Quits playd.
@@ -138,16 +136,16 @@ public:
 	 *   For unsolicited quits, use Response::NOREQUEST.
 	 * @return Whether the quit succeeded.
 	 */
-	Response Quit(const std::string &tag);
+	Response Quit(Response::Tag tag);
 
 private:
 	int device_id;                           ///< The sink's device ID.
 	SinkFn sink;                             ///< The sink create function.
 	std::map<std::string, SourceFn> sources; ///< The file formats map.
 	std::unique_ptr<Audio> file;             ///< The loaded audio file.
-	bool dead;               ///< Whether the Player is closing.
-	const Response_sink *io; ///< The sink for responses.
-	seconds last_pos;        ///< The last-sent position.
+	bool dead;                               ///< Whether the Player is closing.
+	const Response_sink *io;                 ///< The sink for responses.
+	std::chrono::seconds last_pos;           ///< The last-sent position.
 
 	/**
 	 * Parses pos_str as a seek timestamp.
@@ -160,7 +158,7 @@ private:
 	 * @exception Seek_error
 	 *   Raised if checks beyond those done by stoull fail.
 	 */
-	static microseconds PosParse(const std::string &pos_str);
+	static std::chrono::microseconds PosParse(std::string_view pos_str);
 
 	/**
 	 * Performs an actual seek.
@@ -172,7 +170,7 @@ private:
 	 *   Raised if the seek is out of range (usually EOF).
 	 * @see Player::Seek
 	 */
-	void PosRaw(const std::string &tag, microseconds pos);
+	void PosRaw(Response::Tag tag, std::chrono::microseconds pos);
 
 	/**
 	 * Emits a response for the current audio state to the sink.
@@ -184,7 +182,7 @@ private:
 	 *
 	 * @see DumpFileInfo
 	 */
-	void DumpState(size_t id, const std::string &tag) const;
+	void DumpState(size_t id, Response::Tag tag) const;
 
     /**
      * Emits responses for the current audio file's metrics to the sink.
@@ -196,7 +194,7 @@ private:
      *
      * @see DumpState
      */
-    void DumpFileInfo(size_t id, const std::string &tag) const;
+    void DumpFileInfo(size_t id, Response::Tag tag) const;
 
 	/**
 	 * @return The player's current state as a response code.
@@ -221,7 +219,7 @@ private:
 	 * @param tag The tag to send with the response.
 	 * @param ts The value of the response, in microseconds.
 	 */
-	void AnnounceTimestamp(Response::Code code, int id, const std::string &tag, microseconds ts) const;
+	void AnnounceTimestamp(Response::Code code, int id, Response::Tag tag, std::chrono::microseconds ts) const;
 
 	/**
 	 * Determines whether we can broadcast a POS response.
@@ -233,7 +231,7 @@ private:
 	 * @param pos The value of the POS response, in microseconds.
 	 * @return Whether it is polite to broadcast POS.
 	 */
-	bool CanBroadcastPos(microseconds pos) const;
+	bool CanBroadcastPos(std::chrono::microseconds pos) const;
 
 	/**
 	 * Broadcasts a POS response.
@@ -246,7 +244,7 @@ private:
 	 * @param pos The new position, in microseconds.
 	 * @param pos The value of the POS response, in microseconds.
 	 */
-	void BroadcastPos(const std::string &tag, microseconds pos);
+	void BroadcastPos(Response::Tag tag, std::chrono::microseconds pos);
 
 	//
 	// Audio subsystem
@@ -257,7 +255,7 @@ private:
 	 * @param path The path to a file.
 	 * @return A unique pointer to the Audio for that file.
 	 */
-	std::unique_ptr<Audio> LoadRaw(const std::string &path) const;
+	std::unique_ptr<Audio> LoadRaw(std::string_view path) const;
 
 	/**
 	 * Loads a file, creating an AudioSource.
@@ -266,7 +264,7 @@ private:
 	 *   and suitable Audio_source was found).
 	 * @see Load
 	 */
-	std::unique_ptr<Audio_source> LoadSource(const std::string &path) const;
+	std::unique_ptr<Audio_source> LoadSource(std::string_view path) const;
 };
 
 #endif // PLAYD_PLAYER_H

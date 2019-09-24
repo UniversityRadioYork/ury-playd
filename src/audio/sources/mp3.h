@@ -32,7 +32,7 @@ public:
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.
 	 */
-	Mp3_audio_source(const std::string &path);
+	explicit Mp3_audio_source(std::string_view path);
 
 	/// Destructs an Mp3AudioSource.
 	~Mp3_audio_source();
@@ -53,7 +53,7 @@ public:
 	 *   decoder.
 	 * @returns A unique pointer to a Mp3_audio_source.
 	 */
-	static std::unique_ptr<Mp3_audio_source> MakeUnique(const std::string &path);
+	static std::unique_ptr<Mp3_audio_source> MakeUnique(std::string_view path);
 
 private:
 	// This value is somewhat arbitrary, but corresponds to the minimum

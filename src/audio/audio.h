@@ -73,7 +73,7 @@ public:
 	 * @exception NoAudioError if the current state is NONE.
 	 * @see Position
 	 */
-	virtual void SetPosition(microseconds position) = 0;
+	virtual void SetPosition(std::chrono::microseconds position) = 0;
 
 	//
 	// Property access
@@ -84,7 +84,7 @@ public:
 	 * @return The filename of this current file.
 	 * @exception NoAudioError if the current state is NONE.
 	 */
-	virtual const std::string &File() const = 0;
+	virtual std::string_view File() const = 0;
 
 	/**
 	 * The state of this Audio.
@@ -102,7 +102,7 @@ public:
 	 * @exception NoAudioError if the current state is NONE.
 	 * @see Seek
 	 */
-	virtual microseconds Position() const = 0;
+	virtual std::chrono::microseconds Position() const = 0;
 
 	/**
 	 * This Audio's length.
@@ -111,7 +111,7 @@ public:
 	 * @exception NoAudioError if the current state is NONE.
 	 * @see Seek
 	 */
-	virtual microseconds Length() const = 0;
+	virtual std::chrono::microseconds Length() const = 0;
 };
 
 /**
@@ -132,10 +132,10 @@ public:
 	// The following all raise an exception:
 
 	void SetPlaying(bool playing) override;
-	void SetPosition(microseconds position) override;
-	microseconds Position() const override;
-	microseconds Length() const override;
-	const std::string &File() const override;
+	void SetPosition(std::chrono::microseconds position) override;
+	std::chrono::microseconds Position() const override;
+	std::chrono::microseconds Length() const override;
+	std::string_view File() const override;
 };
 
 /**
@@ -162,14 +162,14 @@ public:
 	            std::unique_ptr<Audio_sink> sink);
 
 	Audio::State Update() override;
-	const std::string &File() const override;
+	std::string_view File() const override;
 
 	void SetPlaying(bool playing) override;
 	Audio::State CurrentState() const override;
 
-	void SetPosition(microseconds position) override;
-	microseconds Position() const override;
-	microseconds Length() const override;
+	void SetPosition(std::chrono::microseconds position) override;
+	std::chrono::microseconds Position() const override;
+	std::chrono::microseconds Length() const override;
 
 private:
 	/// The source of audio data.

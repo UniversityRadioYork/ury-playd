@@ -23,13 +23,13 @@ public:
 	 * Constructs an Error.
 	 * @param msg The human-readable message of the error.
 	 */
-	Error(const std::string &msg);
+	Error(std::string_view msg);
 
 	/**
 	 * The human-readable message for this error.
 	 * @return A reference to the string describing this Error.
 	 */
-	const std::string &Message() const;
+	std::string_view Message() const;
 
 private:
 	std::string message; ///< The human-readable message for this Error.
@@ -49,7 +49,7 @@ public:
 	 * Constructs an ConfigError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Config_error(const std::string &msg) : Error(msg)
+	Config_error(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -64,7 +64,7 @@ public:
 	 * Constructs an InternalError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Internal_error(const std::string &msg) : Error(msg)
+	Internal_error(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -79,7 +79,7 @@ public:
 	 * Constructs a FileError.
 	 * @param msg The human-readable message of the error.
 	 */
-	File_error(const std::string &msg) : Error(msg)
+	File_error(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -94,7 +94,7 @@ public:
 	 * Constructs a SeekError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Seek_error(const std::string &msg) : Error(msg)
+	Seek_error(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -109,7 +109,7 @@ public:
 	 * Constructs a NetError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Net_error(const std::string &msg) : Error(msg)
+	Net_error(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -124,7 +124,7 @@ public:
 	 * Constructs an NoAudioError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Null_audio_error(const std::string &msg) : Error(msg)
+	Null_audio_error(const std::string_view msg) : Error(msg)
 	{
 	}
 };

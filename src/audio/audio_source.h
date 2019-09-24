@@ -18,8 +18,6 @@
 #include "../errors.h"
 #include "sample_format.h"
 
-using namespace std::chrono;
-
 /**
  * An object responsible for decoding an audio file.
  *
@@ -59,7 +57,7 @@ public:
 	 * @param path The path to the file from which this AudioSource is
 	 *   decoding.
 	 */
-	Audio_source(const std::string &path);
+	explicit Audio_source(std::string_view path);
 
 	/// Virtual, empty destructor for AudioSource.
 	virtual ~Audio_source() = default;
@@ -120,14 +118,14 @@ public:
 	 * Gets the file-path of this audio source's audio file.
 	 * @return The audio file's path.
 	 */
-	virtual const std::string &Path() const;
+	virtual std::string_view Path() const;
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
 	 * @param micros The song position, in microseconds.
 	 * @return The corresponding number of elapsed samples.
 	 */
-	virtual Samples SamplesFromMicros(microseconds micros) const;
+	virtual Samples SamplesFromMicros(std::chrono::microseconds micros) const;
 
 	virtual std::uint64_t Length() const = 0;
 
@@ -136,7 +134,7 @@ public:
 	 * @param samples The number of elapsed samples.
 	 * @return The corresponding song position, in microseconds.
 	 */
-	microseconds MicrosFromSamples(Samples samples) const;
+	std::chrono::microseconds MicrosFromSamples(Samples samples) const;
 
 protected:
 	/// The file-path of this AudioSource's audio file.

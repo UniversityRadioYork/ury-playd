@@ -23,7 +23,7 @@
 #include "player.h"
 #include "response.h"
 
-Response PlayerDead(const std::string &tag)
+Response PlayerDead(std::string_view tag)
 {
     return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
 }
@@ -43,9 +43,9 @@ Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sourc
 {
 }
 
-void Player::SetIo(const Response_sink &io)
+void Player::SetIo(const Response_sink &new_io)
 {
-	this->io = &io;
+	this->io = &new_io;
 }
 
 bool Player::Update()
@@ -69,7 +69,7 @@ bool Player::Update()
 // Commands
 //
 
-Response Player::Dump(size_t id, const std::string &tag) const
+Response Player::Dump(size_t id, Response::Tag tag) const
 {
 	if (this->dead) return PlayerDead(tag);
 
@@ -79,7 +79,7 @@ Response Player::Dump(size_t id, const std::string &tag) const
     return Response::Success(tag);
 }
 
-void Player::DumpFileInfo(size_t id, const std::string &tag) const
+void Player::DumpFileInfo(size_t id, Response::Tag tag) const
 {
     // This information won't exist if there is no file.
     if (this->file->CurrentState() == Audio::State::none) return;
@@ -94,7 +94,7 @@ void Player::DumpFileInfo(size_t id, const std::string &tag) const
     AnnounceTimestamp(Response::Code::len, id, tag, len);
 }
 
-Response Player::Eject(const std::string &tag)
+Response Player::Eject(Response::Tag tag)
 {
     if (this->dead) return PlayerDead(tag);
 
@@ -113,7 +113,7 @@ Response Player::Eject(const std::string &tag)
 	return Response::Success(tag);
 }
 
-Response Player::End(const std::string &tag)
+Response Player::End(Response::Tag tag)
 {
     if (this->dead) return PlayerDead(tag);
 
@@ -131,7 +131,7 @@ Response Player::End(const std::string &tag)
 	return Response::Success(tag);
 }
 
-Response Player::Load(const std::string &tag, const std::string &path)
+Response Player::Load(Response::Tag tag, std::string_view path)
 {
     if (this->dead) return PlayerDead(tag);
 
@@ -153,7 +153,7 @@ Response Player::Load(const std::string &tag, const std::string &path)
 	}
 
 	assert(this->file != nullptr);
-	this->last_pos = seconds{0};
+	this->last_pos = std::chrono::seconds{0};
 
 	// A load will change all of the player's state in one go,
 	// so just send a Dump() instead of writing out all of the responses
@@ -165,7 +165,7 @@ Response Player::Load(const std::string &tag, const std::string &path)
 	return Response::Success(tag);
 }
 
-Response Player::Pos(const std::string &tag, const std::string &pos_str)
+Response Player::Pos(Response::Tag tag, std::string_view pos_str)
 {
     if (this->dead) return PlayerDead(tag);
 
@@ -198,7 +198,7 @@ Response Player::Pos(const std::string &tag, const std::string &pos_str)
 	return Response::Success(tag);
 }
 
-Response Player::SetPlaying(const std::string &tag, bool playing)
+Response Player::SetPlaying(Response::Tag tag, bool playing)
 {
     if (this->dead) return PlayerDead(tag);
 
@@ -220,7 +220,7 @@ Response Player::SetPlaying(const std::string &tag, bool playing)
 	return Response::Success(tag);
 }
 
-Response Player::Quit(const std::string &tag)
+Response Player::Quit(Response::Tag tag)
 {
     if (this->dead) return PlayerDead(tag);
 
@@ -233,7 +233,7 @@ Response Player::Quit(const std::string &tag)
 // Command implementations
 //
 
-/* static */ std::chrono::microseconds Player::PosParse(const std::string &pos_str)
+/* static */ std::chrono::microseconds Player::PosParse(std::string_view pos_str)
 {
 	size_t cpos = 0;
 
@@ -247,7 +247,7 @@ Response Player::Quit(const std::string &tag)
 
 	std::uint64_t pos;
 	try {
-		pos = std::stoull(pos_str, &cpos);
+		pos = std::stoull(std::string {pos_str}, &cpos);
 	} catch (...) {
 		throw Seek_error(MSG_SEEK_INVALID_VALUE);
 	}
@@ -261,7 +261,7 @@ Response Player::Quit(const std::string &tag)
 	return std::chrono::microseconds{pos};
 }
 
-void Player::PosRaw(const std::string &tag, std::chrono::microseconds pos)
+void Player::PosRaw(Response::Tag tag, std::chrono::microseconds pos)
 {
 	Expects(this->file != nullptr);
 
@@ -269,7 +269,7 @@ void Player::PosRaw(const std::string &tag, std::chrono::microseconds pos)
 	this->BroadcastPos(tag, pos);
 }
 
-void Player::DumpState(size_t id, const std::string &tag) const
+void Player::DumpState(size_t id, Response::Tag tag) const
 {
     Response::Code code = StateResponseCode();
 
@@ -295,7 +295,7 @@ void Player::Respond(int id, const Response &rs) const
 	if (this->io != nullptr) this->io->Respond(id, rs);
 }
 
-void Player::AnnounceTimestamp(Response::Code code, int id, const std::string &tag,
+void Player::AnnounceTimestamp(Response::Code code, int id, Response::Tag tag,
 			 std::chrono::microseconds ts) const
 {
 	this->Respond(id, Response(tag, code)
@@ -307,18 +307,18 @@ bool Player::CanBroadcastPos(std::chrono::microseconds pos) const
 	// Because last_pos is counted in seconds, this condition becomes
 	// true whenever pos 'ticks over' to a different second from last_pos.
 	// The result is that we broadcast at most roughly once a second.
-	return this->last_pos < duration_cast<seconds>(pos);
+	return this->last_pos < std::chrono::duration_cast<std::chrono::seconds>(pos);
 }
 
-void Player::BroadcastPos(const std::string &tag, std::chrono::microseconds pos)
+void Player::BroadcastPos(Response::Tag tag, std::chrono::microseconds pos)
 {
 	// This ensures we don't broadcast too often:
 	// see CanBroadcastPos.
-	this->last_pos = duration_cast<seconds>(pos);
+	this->last_pos = std::chrono::duration_cast<std::chrono::seconds>(pos);
 	this->AnnounceTimestamp(Response::Code::pos, 0, tag, pos);
 }
 
-std::unique_ptr<Audio> Player::LoadRaw(const std::string &path) const
+std::unique_ptr<Audio> Player::LoadRaw(std::string_view path) const
 {
 	std::unique_ptr<Audio_source> source = this->LoadSource(path);
 	assert(source != nullptr);
@@ -327,10 +327,10 @@ std::unique_ptr<Audio> Player::LoadRaw(const std::string &path) const
 	return std::make_unique<Basic_audio>(std::move(source), std::move(sink));
 }
 
-std::unique_ptr<Audio_source> Player::LoadSource(const std::string &path) const
+std::unique_ptr<Audio_source> Player::LoadSource(std::string_view path) const
 {
 	size_t extpoint = path.find_last_of('.');
-	std::string ext = path.substr(extpoint + 1);
+	auto ext = std::string {path.substr(extpoint + 1)};
 
 	auto ibuilder = this->sources.find(ext);
 	if (ibuilder == this->sources.end()) {

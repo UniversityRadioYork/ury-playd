@@ -8,6 +8,7 @@
  */
 
 #include <algorithm>
+#include <charconv>
 #include <cstdint>
 #include <iostream>
 #include <tuple>
@@ -25,13 +26,13 @@
 #endif // WITH_SNDFILE
 
 /// The default IP hostname on which playd will bind.
-static const std::string DEFAULT_HOST = "0.0.0.0";
+constexpr std::string_view DEFAULT_HOST { "0.0.0.0" };
 
 /// The default TCP port on which playd will bind.
-static const std::string DEFAULT_PORT = "1350";
+constexpr std::string_view DEFAULT_PORT { "1350" };
 
 /// Map from file extensions to Audio_source builder functions.
-static const std::map<std::string, Player::SourceFn> SOURCES = {
+static const std::map<std::string, Player::SourceFn> SOURCES {
 #ifdef WITH_MP3
         {"mp3", Mp3_audio_source::MakeUnique},
 #endif // WITH_MP3
@@ -49,11 +50,31 @@ static const std::map<std::string, Player::SourceFn> SOURCES = {
  * @param argv Program argument vector.
  * @return The argument vector, as a C++ string vector.
  */
-std::vector<std::string> MakeArgVector(int argc, char *argv[])
+std::vector<std::string_view> MakeArgVector(int argc, char *argv[])
 {
-	std::vector<std::string> args(argc);
-	for (int i = 0; i < argc; i++) args.emplace_back(argv[i]);
+	std::vector<std::string_view> args(argc);
+	for (int i = 0; i < argc; i++) args[i] = std::string_view{argv[i]};
 	return args;
+}
+
+int GetDeviceIDFromArg(std::string_view arg)
+{
+    int id = -1;
+
+    // Parse, but only accept valid numbers (for which ec is empty)
+    auto [p, ec] = std::from_chars(arg.cbegin(), arg.cend(), id);
+    if (ec == std::errc::invalid_argument) {
+        std::cerr << "not a valid device ID: " << arg << std::endl;
+        return -1;
+    } else if (ec == std::errc::result_out_of_range) {
+        std::cerr << "device ID too large: " << arg << std::endl;
+        return -1;
+    }
+
+    // Only allow valid, outputtable devices; reject input-only devices.
+    if (!Sdl_audio_sink::IsOutputDevice(id)) return -1;
+
+    return id;
 }
 
 /**
@@ -61,31 +82,19 @@ std::vector<std::string> MakeArgVector(int argc, char *argv[])
  * @param args The program argument vector.
  * @return The device ID, -1 if invalid selection (or none).
  */
-int GetDeviceID(const std::vector<std::string> &args)
+int GetDeviceID(const std::vector<std::string_view> &args)
 {
 	// Did the user provide an ID at all?
 	if (args.size() < 2) return -1;
 
-	// Only accept valid numbers (stoi will throw for invalid ones).
-	int id;
-	try {
-		id = std::stoi(args.at(1));
-	} catch (...) {
-		// Only std::{invalid_argument,out_of_range} are thrown here.
-		return -1;
-	}
-
-	// Only allow valid, outputtable devices; reject input-only devices.
-	if (!Sdl_audio_sink::IsOutputDevice(id)) return -1;
-
-	return id;
+	return GetDeviceIDFromArg(args.at(1));
 }
 
 /**
  * Reports usage information and exits.
  * @param progname The name of the program as executed.
  */
-void ExitWithUsage(const std::string &progname)
+void ExitWithUsage(std::string_view progname)
 {
 	std::cerr << "usage: " << progname << " ID [HOST] [PORT]\n";
 	std::cerr << "where ID is one of the following numbers:\n";
@@ -109,8 +118,8 @@ void ExitWithUsage(const std::string &progname)
  * @param args The program argument vector.
  * @return A pair of strings representing the hostname and port.
  */
-std::pair<std::string, std::string> GetHostAndPort(
-        const std::vector<std::string> &args)
+std::pair<std::string_view, std::string_view> GetHostAndPort(
+        const std::vector<std::string_view> &args)
 {
 	const auto size = args.size();
 	return std::make_pair(size > 2 ? args.at(2) : DEFAULT_HOST,
@@ -123,8 +132,8 @@ std::pair<std::string, std::string> GetHostAndPort(
  * @param port The TCP port to which playd tried to bind.
  * @param msg The exception's error message.
  */
-void ExitWithNetError(const std::string &host, const std::string &port,
-                      const std::string &msg)
+void ExitWithNetError(std::string_view host, std::string_view port,
+                      std::string_view msg)
 {
 	std::cerr << "Network error: " << msg << "\n";
 	std::cerr << "Is " << host << ":" << port << " available?\n";
@@ -135,7 +144,7 @@ void ExitWithNetError(const std::string &host, const std::string &port,
  * Exits with an error message for an unhandled exception.
  * @param msg The exception's error message.
  */
-void ExitWithError(const std::string &msg)
+void ExitWithError(std::string_view msg)
 {
 	std::cerr << "Unhandled exception in main loop: " << msg << std::endl;
 	exit(EXIT_FAILURE);
