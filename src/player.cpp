@@ -23,7 +23,14 @@
 #include "player.h"
 #include "response.h"
 
-using namespace std::chrono;
+Response PlayerDead(const std::string &tag)
+{
+    return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+}
+
+//
+// Player
+//
 
 Player::Player(int device_id, SinkFn sink, std::map<std::string, SourceFn> sources)
     : device_id{device_id},
@@ -64,7 +71,7 @@ bool Player::Update()
 
 Response Player::Dump(size_t id, const std::string &tag) const
 {
-	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+	if (this->dead) return PlayerDead(tag);
 
 	this->DumpState(id, tag);
     this->DumpFileInfo(id, tag);
@@ -89,7 +96,7 @@ void Player::DumpFileInfo(size_t id, const std::string &tag) const
 
 Response Player::Eject(const std::string &tag)
 {
-	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+    if (this->dead) return PlayerDead(tag);
 
 	// Silently ignore ejects on ejected files.
 	// Concurrently speaking, this should be fine, as we are the only
@@ -108,7 +115,7 @@ Response Player::Eject(const std::string &tag)
 
 Response Player::End(const std::string &tag)
 {
-	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+    if (this->dead) return PlayerDead(tag);
 
 	// Let upstream know that the file ended by itself.
 	// This is needed for auto-advancing playlists, etc.
@@ -119,14 +126,15 @@ Response Player::End(const std::string &tag)
 	// Rewind the file back to the start.  We can't use Player::Pos() here
 	// in case End() is called from Pos(); a seek failure could start an
 	// infinite loop.
-	this->PosRaw(Response::NOREQUEST, microseconds{0});
+	this->PosRaw(Response::NOREQUEST, std::chrono::microseconds{0});
 
 	return Response::Success(tag);
 }
 
 Response Player::Load(const std::string &tag, const std::string &path)
 {
-	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+    if (this->dead) return PlayerDead(tag);
+
 	if (path.empty()) return Response::Invalid(tag, MSG_LOAD_EMPTY_PATH);
 
 	assert(this->file != nullptr);
@@ -159,9 +167,9 @@ Response Player::Load(const std::string &tag, const std::string &path)
 
 Response Player::Pos(const std::string &tag, const std::string &pos_str)
 {
-	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+    if (this->dead) return PlayerDead(tag);
 
-	microseconds pos{0};
+	std::chrono::microseconds pos{0};
 	try {
 		pos = PosParse(pos_str);
 	} catch (Seek_error &e) {
@@ -192,7 +200,7 @@ Response Player::Pos(const std::string &tag, const std::string &pos_str)
 
 Response Player::SetPlaying(const std::string &tag, bool playing)
 {
-	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+    if (this->dead) return PlayerDead(tag);
 
 	// Why is SetPlaying not split between Start() and Stop()?, I hear the
 	// best practices purists amongst you say.  Quite simply, there is a
@@ -214,7 +222,7 @@ Response Player::SetPlaying(const std::string &tag, bool playing)
 
 Response Player::Quit(const std::string &tag)
 {
-	if (this->dead) return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
+    if (this->dead) return PlayerDead(tag);
 
 	this->Eject(tag);
 	this->dead = true;
@@ -225,7 +233,7 @@ Response Player::Quit(const std::string &tag)
 // Command implementations
 //
 
-/* static */ microseconds Player::PosParse(const std::string &pos_str)
+/* static */ std::chrono::microseconds Player::PosParse(const std::string &pos_str)
 {
 	size_t cpos = 0;
 
@@ -250,10 +258,10 @@ Response Player::Quit(const std::string &tag)
 	const auto sl = pos_str.length();
 	if (cpos != sl) throw Seek_error(MSG_SEEK_INVALID_VALUE);
 
-	return microseconds{pos};
+	return std::chrono::microseconds{pos};
 }
 
-void Player::PosRaw(const std::string &tag, microseconds pos)
+void Player::PosRaw(const std::string &tag, std::chrono::microseconds pos)
 {
 	Expects(this->file != nullptr);
 
@@ -288,13 +296,13 @@ void Player::Respond(int id, const Response &rs) const
 }
 
 void Player::AnnounceTimestamp(Response::Code code, int id, const std::string &tag,
-			 microseconds ts) const
+			 std::chrono::microseconds ts) const
 {
 	this->Respond(id, Response(tag, code)
    		                  .AddArg(std::to_string(ts.count())));
 }
 
-bool Player::CanBroadcastPos(microseconds pos) const
+bool Player::CanBroadcastPos(std::chrono::microseconds pos) const
 {
 	// Because last_pos is counted in seconds, this condition becomes
 	// true whenever pos 'ticks over' to a different second from last_pos.
@@ -302,7 +310,7 @@ bool Player::CanBroadcastPos(microseconds pos) const
 	return this->last_pos < duration_cast<seconds>(pos);
 }
 
-void Player::BroadcastPos(const std::string &tag, microseconds pos)
+void Player::BroadcastPos(const std::string &tag, std::chrono::microseconds pos)
 {
 	// This ensures we don't broadcast too often:
 	// see CanBroadcastPos.
