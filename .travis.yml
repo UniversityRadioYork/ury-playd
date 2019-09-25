@@ -8,10 +8,27 @@ addons:
       - libsndfile-dev
       - libsdl2-dev
       - libuv1-dev
-      
-compiler:
-  - clang
-  - gcc
+      # The pack-in libstdc++ in Bionic doesn't support C++17, weirdly.
+      - libstdc++-8-dev
+      # These packages aren't actually needed on all builds, but it's easier to
+      # specify them up here than have to specify apt packages again and again for
+      # each matrix section that needs extra packages.
+      - gcc-8
+      - g++-8
+
+# We'd just use 'compiler' here, but we have to specify GCC8,
+# which requires some environment fun.
+matrix:
+  include:
+    # standard Bionic clang ('just works' with libstdc++-8)
+    - os: linux
+      compiler: clang
+    # gcc 8 (at time of writing, Bionic gcc won't work for weird C++17 reasons)
+    - os: linux
+      compiler: gcc
+      env:
+        - CC="gcc-8"
+        - CXX="g++-8"
 
 before_script:
   - mkdir cbuild && cd cbuild
