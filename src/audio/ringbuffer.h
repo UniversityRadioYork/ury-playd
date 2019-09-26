@@ -29,10 +29,10 @@ public:
 	 * Constructs a Ring_buffer.
 	 * @param capacity The capacity of the ring buffer, in bytes.
 	 */
-	Ring_buffer(size_t capacity);
+	explicit Ring_buffer(size_t capacity);
 
 	/// Destructs a Ring_buffer.
-	~Ring_buffer();
+	~Ring_buffer() = default;
 
 	/// Deleted copy constructor.
 	Ring_buffer(const Ring_buffer &) = delete;
@@ -65,7 +65,7 @@ public:
 	 * @return The number of bytes written.
 	 * @see WriteCapacity
 	 */
-	size_t Write(const gsl::span<const uint8_t> src);
+	size_t Write(gsl::span<const std::byte> src);
 
 	/**
 	 * Reads samples from the ring buffer into an array.
@@ -82,7 +82,7 @@ public:
 	 * @return The number of bytes read.
 	 * @see ReadCapacity
 	 */
-	size_t Read(const gsl::span<uint8_t> dest);
+	size_t Read(gsl::span<std::byte> dest);
 
 	/// Empties the ring buffer.
 	void Flush();
@@ -91,10 +91,10 @@ private:
 	/// Empties the ring buffer without acquiring locks.
 	void FlushInner();
 
-	std::vector<uint8_t> buffer; ///< The array used by the ringbuffer.
+	std::vector<std::byte> buffer; ///< The array used by the ringbuffer.
 
-	std::vector<uint8_t>::const_iterator r_it; ///< The read iterator.
-	std::vector<uint8_t>::iterator w_it;       ///< The write iterator.
+	std::vector<std::byte>::const_iterator r_it; ///< The read iterator.
+	std::vector<std::byte>::iterator w_it;       ///< The write iterator.
 
 	std::atomic<size_t> count; ///< The current read capacity.
 	// Write capacity is the total buffer capacity minus count.

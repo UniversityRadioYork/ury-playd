@@ -30,7 +30,7 @@ public:
 	std::uint64_t Position() override;
 	void SetPosition(uint64_t samples) override;
 	void SourceOut() override;
-	size_t Transfer(const gsl::span<const uint8_t> src) override;
+	size_t Transfer(gsl::span<const std::byte> src) override;
 
 	/// The current state of the DummyAudioSink.
 	Audio_sink::State state = Audio_sink::State::stopped;

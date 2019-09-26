@@ -10,12 +10,12 @@
 
 #include <atomic>
 #include <cassert>
+#include <cstddef>
 #include <gsl/gsl>
 #include <mutex>
 #include <vector>
 
 #include "../errors.h"
-#include "../messages.h"
 
 /* Assumptions:
 
@@ -32,9 +32,8 @@
                       write capacity may be lower than actual
       - always atomically read capacities */
 
-Ring_buffer::Ring_buffer(size_t capacity)
+Ring_buffer::Ring_buffer(size_t capacity) : buffer(capacity), count{0}
 {
-	this->buffer = std::vector<uint8_t>(capacity);
 	this->r_it = this->buffer.cbegin();
 	this->w_it = this->buffer.begin();
 
@@ -44,10 +43,6 @@ Ring_buffer::Ring_buffer(size_t capacity)
 
 	Ensures(ReadCapacity() == 0);
 	Ensures(WriteCapacity() == capacity);
-}
-
-Ring_buffer::~Ring_buffer()
-{
 }
 
 inline size_t Ring_buffer::ReadCapacity() const
@@ -67,7 +62,7 @@ inline size_t Ring_buffer::WriteCapacity() const
 	return this->buffer.size() - ReadCapacity();
 }
 
-size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
+size_t Ring_buffer::Write(const gsl::span<const std::byte> src)
 {
 	// This shouldn't be called with an empty (or backwards!) span.
 	const auto src_count = static_cast<size_t>(src.size());
@@ -130,7 +125,7 @@ size_t Ring_buffer::Write(const gsl::span<const uint8_t> src)
 	return write_count;
 }
 
-size_t Ring_buffer::Read(gsl::span<uint8_t> dest)
+size_t Ring_buffer::Read(gsl::span<std::byte> dest)
 {
 	const auto dest_count = static_cast<size_t>(dest.size());
 	Expects(0 < dest_count);

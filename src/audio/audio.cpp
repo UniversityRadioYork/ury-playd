@@ -135,7 +135,7 @@ void Basic_audio::SetPosition(std::chrono::microseconds position)
 void Basic_audio::ClearFrame()
 {
 	this->frame.clear();
-	this->frame_span = gsl::span<uint8_t, 0>();
+	this->frame_span = gsl::span<std::byte, 0>();
 }
 
 Audio::State Basic_audio::Update()

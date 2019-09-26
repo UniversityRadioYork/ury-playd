@@ -60,7 +60,7 @@ private:
 	// buffer size used by ffmpeg, so it's probably sensible.
 	static constexpr size_t buffer_size = 16384;
 
-	std::array<std::uint8_t, buffer_size> buffer; ///< The decoding buffer.
+	std::array<std::byte, buffer_size> buffer; ///< The decoding buffer.
 
 	/// Pointer to the mpg123 context associated with this source.
 	mpg123_handle *context;

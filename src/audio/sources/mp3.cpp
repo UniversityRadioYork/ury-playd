@@ -25,35 +25,31 @@
 #include "mp3.h"
 
 /// The set of encodings that we ask mpg123 to prepare for us.
-constexpr int mp3_requested_encodings {
-    MPG123_ENC_UNSIGNED_8 |
-    MPG123_ENC_SIGNED_8 |
-    MPG123_ENC_SIGNED_16 |
-    MPG123_ENC_SIGNED_32 |
-    MPG123_ENC_FLOAT_32
-};
+constexpr int mp3_requested_encodings{
+        MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_8 | MPG123_ENC_SIGNED_16 |
+        MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32};
 
 Sample_format SampleFormatOfMpg123(int encoding)
 {
-    // This switch should range over the encodings listed above.
-    switch (encoding) {
-        case MPG123_ENC_UNSIGNED_8:
-            return Sample_format::uint8;
-        case MPG123_ENC_SIGNED_8:
-            return Sample_format::sint8;
-        case MPG123_ENC_SIGNED_16:
-            return Sample_format::sint16;
-        case MPG123_ENC_SIGNED_32:
-            return Sample_format::sint32;
-        case MPG123_ENC_FLOAT_32:
-            return Sample_format::float32;
-        default:
-            // We shouldn't get here, if the format was set up
-            // correctly earlier.
-            throw Internal_error(
-                    "unsupported sample rate, should not "
-                    "happen");
-    }
+	// This switch should range over the encodings listed above.
+	switch (encoding) {
+		case MPG123_ENC_UNSIGNED_8:
+			return Sample_format::uint8;
+		case MPG123_ENC_SIGNED_8:
+			return Sample_format::sint8;
+		case MPG123_ENC_SIGNED_16:
+			return Sample_format::sint16;
+		case MPG123_ENC_SIGNED_32:
+			return Sample_format::sint32;
+		case MPG123_ENC_FLOAT_32:
+			return Sample_format::float32;
+		default:
+			// We shouldn't get here, if the format was set up
+			// correctly earlier.
+			throw Internal_error(
+			        "unsupported sample rate, should not "
+			        "happen");
+	}
 }
 
 Mp3_audio_source::Mp3_audio_source(std::string_view path)
@@ -101,7 +97,7 @@ void Mp3_audio_source::AddFormat(long rate)
 	// The requested encodings correspond to the sample formats available in
 	// the SampleFormat enum.
 	if (mpg123_format(this->context, rate, MPG123_STEREO | MPG123_MONO,
-                      mp3_requested_encodings) == MPG123_ERR) {
+	                  mp3_requested_encodings) == MPG123_ERR) {
 		// Ignore the error for now -- another sample rate may be
 		// available.
 		// If no sample rates work, loading a file will fail anyway.
@@ -179,7 +175,7 @@ Mp3_audio_source::Decode_result Mp3_audio_source::Decode()
 	} else {
 		// Copy only the bit of the buffer occupied by decoded data
 		auto front = this->buffer.begin();
-		decoded = Decode_vector(front, front + rbytes);
+		decoded = Decode_vector{front, front + rbytes};
 	}
 
 	return std::make_pair(decode_state, decoded);
@@ -192,7 +188,7 @@ Sample_format Mp3_audio_source::OutputSampleFormat() const
 	int encoding = 0;
 	mpg123_getformat(this->context, nullptr, nullptr, &encoding);
 
-    return SampleFormatOfMpg123(encoding);
+	return SampleFormatOfMpg123(encoding);
 }
 
 std::unique_ptr<Mp3_audio_source> Mp3_audio_source::MakeUnique(std::string_view path)

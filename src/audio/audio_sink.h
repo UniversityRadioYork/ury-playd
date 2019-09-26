@@ -97,7 +97,7 @@ public:
 	 * @param src A span representing the sample bytes to transfer.
 	 * @return The number of bytes transferred.
 	 */
-	virtual size_t Transfer(const gsl::span<const std::uint8_t> src) = 0;
+	virtual size_t Transfer(gsl::span<const std::byte> src) = 0;
 };
 
 /**
@@ -126,7 +126,7 @@ public:
 	Samples Position() override;
 	void SetPosition(Samples samples) override;
 	void SourceOut() override;
-	size_t Transfer(const gsl::span<const std::uint8_t> src) override;
+	size_t Transfer(gsl::span<const std::byte> src) override;
 
 	/**
 	 * The audio callback.
@@ -134,7 +134,7 @@ public:
 	 * playing with the callback registered to it.
 	 * @param dest The output span to which our samples should be written.
 	 */
-	void Callback(gsl::span<std::uint8_t> dest);
+	void Callback(gsl::span<std::byte> dest);
 
 	/**
 	 * Gets the number and name of each output device entry in the

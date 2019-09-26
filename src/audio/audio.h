@@ -182,7 +182,7 @@ private:
 	Audio_source::Decode_vector frame;
 
 	/// A span representing the unclaimed part of the decoded frame.
-	gsl::span<const uint8_t> frame_span;
+	gsl::span<const std::byte> frame_span;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();

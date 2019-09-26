@@ -42,7 +42,7 @@ void Dummy_audio_sink::SourceOut()
 	this->state = Audio_sink::State::at_end;
 }
 
-size_t Dummy_audio_sink::Transfer(const gsl::span<const uint8_t> src)
+size_t Dummy_audio_sink::Transfer(const gsl::span<const std::byte> src)
 {
 	return src.size();
 }

@@ -47,7 +47,7 @@ public:
 	};
 
 	/// Type of decoded sample vectors.
-	using Decode_vector = std::vector<std::uint8_t>;
+	using Decode_vector = std::vector<std::byte>;
 
 	/// Type of the result of Decode().
 	using Decode_result = std::pair<Decode_state, Decode_vector>;

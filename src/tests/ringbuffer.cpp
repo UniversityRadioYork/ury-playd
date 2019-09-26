@@ -17,33 +17,34 @@ SCENARIO("Ring buffer cannot be read from when empty", "[ringbuffer]")
 {
 	GIVEN("an empty ring buffer and properly sized buffer")
 	{
-		Ring_buffer rb(1 << 5);
-		uint8_t buf[1 << 5];
+		constexpr int cap{32};
+		Ring_buffer rb{cap};
+		std::byte buf[cap];
 
 		WHEN("a read is called for one item")
 		{
 			THEN("an InternalError is raised")
 			{
 				REQUIRE_THROWS_AS(
-				        rb.Read(gsl::span<uint8_t>(buf, 1)),
+				        rb.Read(gsl::span<std::byte>{buf, 1}),
 				        Internal_error);
 			}
 		}
-		WHEN("a read is called for 2^power items")
+		WHEN("a read is called for 'cap' items")
 		{
 			THEN("an InternalError is raised")
 			{
 				REQUIRE_THROWS_AS(
-				        rb.Read(gsl::span<uint8_t>(buf, 1 << 5)),
+				        rb.Read(gsl::span<std::byte>{buf, cap}),
 				        Internal_error);
 			}
 		}
-		WHEN("a read is called for 2^power + 1 items")
+		WHEN("a read is called for 'cap' + 1 items")
 		{
 			THEN("an InternalError is raised")
 			{
-				REQUIRE_THROWS_AS(rb.Read(gsl::span<uint8_t>(
-				                          buf, (1 << 5) + 1)),
+				REQUIRE_THROWS_AS(rb.Read(gsl::span<std::byte>{
+				                          buf, cap + 1}),
 				                  Internal_error);
 			}
 		}
@@ -52,42 +53,45 @@ SCENARIO("Ring buffer cannot be read from when empty", "[ringbuffer]")
 
 SCENARIO("Ring buffer cannot be written to when full", "[ringbuffer]")
 {
+	constexpr int cap{32};
+
 	GIVEN("a full ring buffer")
 	{
-		Ring_buffer rb(1 << 5);
-		const char *msg =
-		        "this message is 2^5 chars long!\0this bit isn't\0";
+		Ring_buffer rb{cap};
+		gsl::czstring<> msg{
+		        "this message is 2^5 chars long!\0this bit isn't\0"};
 		// TODO(MattWindsor91): this is technically not portable in the slightest.
-		const uint8_t *m8 = reinterpret_cast<const uint8_t *>(msg);
+		auto m8 = reinterpret_cast<const std::byte *>(msg);
 
-		rb.Write(gsl::span<const uint8_t>(m8, 1 << 5));
+		rb.Write(gsl::span<const std::byte>{m8, cap});
 
 		WHEN("a write is called for one item")
 		{
 			THEN("an internal error is raised")
 			{
 				REQUIRE_THROWS_AS(
-				        rb.Write(gsl::span<const uint8_t>(m8, 1)),
+				        rb.Write(gsl::span<const std::byte>(m8,
+				                                            1)),
 				        Internal_error);
 			}
 		}
-		WHEN("a write is called for 2^power items")
+		WHEN("a write is called for 'cap' items")
 		{
 			THEN("an internal error is raised")
 			{
 				REQUIRE_THROWS_AS(
-				        rb.Write(gsl::span<const uint8_t>(
-				                m8, 1 << 5)),
+				        rb.Write(gsl::span<const std::byte>{
+				                m8, cap}),
 				        Internal_error);
 			}
 		}
-		WHEN("a write is called for 2^power + 1 items")
+		WHEN("a write is called for 'cap' + 1 items")
 		{
 			THEN("an internal error is raised")
 			{
 				REQUIRE_THROWS_AS(
-				        rb.Write(gsl::span<const uint8_t>(
-				                m8, (1 << 5) + 1)),
+				        rb.Write(gsl::span<const std::byte>{
+				                m8, cap + 1}),
 				        Internal_error);
 			}
 		}
@@ -98,12 +102,13 @@ SCENARIO("Ring buffer reports capacities correctly", "[ringbuffer]")
 {
 	GIVEN("an empty ring buffer and properly sized buffer")
 	{
-		Ring_buffer rb(1 << 5);
-		uint8_t buf[1 << 5];
-		const char *msg =
-		        "this message is 2^5 chars long!\0this bit isn't\0";
+		constexpr int cap{32};
+		Ring_buffer rb{cap};
+		std::byte buf[cap];
+		gsl::czstring<> msg{
+		        "this message is 2^5 chars long!\0this bit isn't\0"};
 		// TODO(MattWindsor91): this is technically not portable in the slightest.
-		const uint8_t *m8 = reinterpret_cast<const uint8_t *>(msg);
+		auto m8 = reinterpret_cast<const std::byte *>(msg);
 
 		WHEN("nothing is written")
 		{
@@ -111,35 +116,38 @@ SCENARIO("Ring buffer reports capacities correctly", "[ringbuffer]")
 			{
 				REQUIRE(rb.ReadCapacity() == 0);
 			}
-			THEN("WriteCapacity() is 2^power")
+			THEN("WriteCapacity() is 'cap'")
 			{
-				REQUIRE(rb.WriteCapacity() == 1 << 5);
+				REQUIRE(rb.WriteCapacity() == cap);
 			}
 		}
 		WHEN("the buffer is partially written to")
 		{
-			rb.Write(gsl::span<const uint8_t>(m8, 16));
+			constexpr int amt{16};
+			static_assert(amt < cap, "should be a partial write");
+
+			rb.Write(gsl::span<const std::byte>{m8, amt});
 
 			THEN("ReadCapacity() is the amount written")
 			{
-				REQUIRE(rb.ReadCapacity() == 16);
+				REQUIRE(rb.ReadCapacity() == amt);
 			}
-			THEN("WriteCapacity() is 2^power - the amount written")
+			THEN("WriteCapacity() is 'cap' - the amount written")
 			{
-				REQUIRE(rb.WriteCapacity() == (1 << 5) - 16);
+				REQUIRE(rb.WriteCapacity() == cap - amt);
 			}
 
 			AND_WHEN("the buffer is fully read from")
 			{
-				rb.Read(gsl::span<uint8_t>(buf, 16));
+				rb.Read(gsl::span<std::byte>{buf, cap - amt});
 
 				THEN("ReadCapacity() is 0")
 				{
 					REQUIRE(rb.ReadCapacity() == 0);
 				}
-				THEN("WriteCapacity() is 2^power")
+				THEN("WriteCapacity() is 'cap'")
 				{
-					REQUIRE(rb.WriteCapacity() == 1 << 5);
+					REQUIRE(rb.WriteCapacity() == cap);
 				}
 			}
 
@@ -151,19 +159,19 @@ SCENARIO("Ring buffer reports capacities correctly", "[ringbuffer]")
 				{
 					REQUIRE(rb.ReadCapacity() == 0);
 				}
-				THEN("WriteCapacity() is 2^power")
+				THEN("WriteCapacity() is 'cap'")
 				{
-					REQUIRE(rb.WriteCapacity() == 1 << 5);
+					REQUIRE(rb.WriteCapacity() == cap);
 				}
 			}
 		}
 		WHEN("the buffer is filled")
 		{
-			rb.Write(gsl::span<const uint8_t>(m8, 1 << 5));
+			rb.Write(gsl::span<const std::byte>{m8, cap});
 
-			THEN("ReadCapacity() is 2^power")
+			THEN("ReadCapacity() is 'cap'")
 			{
-				REQUIRE(rb.ReadCapacity() == 1 << 5);
+				REQUIRE(rb.ReadCapacity() == cap);
 			}
 			THEN("WriteCapacity() is 0")
 			{
@@ -178,9 +186,9 @@ SCENARIO("Ring buffer reports capacities correctly", "[ringbuffer]")
 				{
 					REQUIRE(rb.ReadCapacity() == 0);
 				}
-				THEN("WriteCapacity() is 2^power")
+				THEN("WriteCapacity() is 'cap'")
 				{
-					REQUIRE(rb.WriteCapacity() == 1 << 5);
+					REQUIRE(rb.WriteCapacity() == cap);
 				}
 			}
 		}

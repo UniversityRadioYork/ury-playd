@@ -106,12 +106,12 @@ Sndfile_audio_source::Decode_result Sndfile_audio_source::Decode()
 	// So, we reinterpret the decoded bits as a vector of bytes, which is
 	// relatively safe--they'll be interpreted by the Audio_sink in the
 	// exact same way once we tell it how long the samples really are.
-	uint8_t *begin = reinterpret_cast<uint8_t *>(&*this->buffer.begin());
+	auto *begin = reinterpret_cast<std::byte *>(&*this->buffer.begin());
 
 	// The end is 'read' 32-bit items--read*4 bytes--after.
-	uint8_t *end = begin + (read * 4);
+	auto *end = begin + (read * 4);
 
-	return std::make_pair(Decode_state::decoding, Decode_vector(begin, end));
+	return std::make_pair(Decode_state::decoding, Decode_vector{begin, end});
 }
 
 Sample_format Sndfile_audio_source::OutputSampleFormat() const

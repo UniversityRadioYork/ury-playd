@@ -48,13 +48,14 @@ Audio_sink::State Audio_sink::CurrentState()
  * The callback used by SDL_Audio.
  * Trampolines back into vsink, which must point to an Sdl_audio_sink.
  */
-static void SDLCallback(void *vsink, uint8_t *data, int len)
+static void SDLCallback(void *vsink, unsigned char *data, int len)
 {
 	Expects(vsink != nullptr);
 	Expects(data != nullptr);
 
 	auto sink = static_cast<Sdl_audio_sink *>(vsink);
-	sink->Callback(gsl::span<uint8_t>(data, len));
+	sink->Callback(
+	        gsl::span<std::byte>(reinterpret_cast<std::byte *>(data), len));
 }
 
 Sdl_audio_sink::Sdl_audio_sink(const Audio_source &source, int device_id)
@@ -161,7 +162,7 @@ void Sdl_audio_sink::SetPosition(uint64_t samples)
 	this->ring_buf.Flush();
 }
 
-size_t Sdl_audio_sink::Transfer(const gsl::span<const uint8_t> src)
+size_t Sdl_audio_sink::Transfer(const gsl::span<const std::byte> src)
 {
 	// No point transferring 0 bytes.
 	if (src.empty()) return 0;
@@ -187,7 +188,7 @@ size_t Sdl_audio_sink::Transfer(const gsl::span<const uint8_t> src)
 	return written_count;
 }
 
-void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
+void Sdl_audio_sink::Callback(gsl::span<std::byte> dest)
 {
 	Expects(0 <= dest.size());
 
@@ -197,7 +198,7 @@ void Sdl_audio_sink::Callback(gsl::span<uint8_t> dest)
 	// Make sure anything not filled up with sound later is set to silence.
 	// This is slightly inefficient (two writes to sound-filled regions
 	// instead of one), but more elegant in failure cases.
-	std::fill(dest.begin(), dest.end(), 0);
+	std::fill(dest.begin(), dest.end(), std::byte{0});
 
 	// If we're not supposed to be playing, don't play anything.
 	if (this->state != Audio_sink::State::playing) return;
