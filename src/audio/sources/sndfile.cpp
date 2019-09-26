@@ -19,11 +19,13 @@
 
 #include "../../errors.h"
 #include "../../messages.h"
-#include "../audio_source.h"
 #include "../sample_format.h"
+#include "../source.h"
 
-Sndfile_audio_source::Sndfile_audio_source(std::string_view path)
-    : Audio_source{path}, file{nullptr}, buffer{}
+namespace playd::audio
+{
+Sndfile_source::Sndfile_source(std::string_view path)
+    : Source{path}, file{nullptr}, buffer{}
 {
 	this->info.format = 0;
 
@@ -41,18 +43,18 @@ Sndfile_audio_source::Sndfile_audio_source(std::string_view path)
 	this->buffer.insert(this->buffer.begin(), 4096 * this->info.channels, 0);
 }
 
-Sndfile_audio_source::~Sndfile_audio_source()
+Sndfile_source::~Sndfile_source()
 {
 	if (this->file != nullptr) sf_close(this->file);
 }
 
-std::uint8_t Sndfile_audio_source::ChannelCount() const
+std::uint8_t Sndfile_source::ChannelCount() const
 {
 	assert(0 < this->info.channels);
 	return static_cast<std::uint8_t>(this->info.channels);
 }
 
-std::uint32_t Sndfile_audio_source::SampleRate() const
+std::uint32_t Sndfile_source::SampleRate() const
 {
 	assert(0 < this->info.samplerate);
 	// INT32_MAX isn't a typo; if we compare against UINT32_MAX, we'll
@@ -62,7 +64,7 @@ std::uint32_t Sndfile_audio_source::SampleRate() const
 	return static_cast<std::uint32_t>(this->info.samplerate);
 }
 
-std::uint64_t Sndfile_audio_source::Seek(std::uint64_t in_samples)
+std::uint64_t Sndfile_source::Seek(std::uint64_t in_samples)
 {
 	// Have we tried to seek past the end of the file?
 	if (auto clen = static_cast<unsigned long>(this->info.frames);
@@ -81,12 +83,12 @@ std::uint64_t Sndfile_audio_source::Seek(std::uint64_t in_samples)
 	return out_samples;
 }
 
-std::uint64_t Sndfile_audio_source::Length() const
+std::uint64_t Sndfile_source::Length() const
 {
 	return (this->info.frames);
 }
 
-Sndfile_audio_source::Decode_result Sndfile_audio_source::Decode()
+Sndfile_source::Decode_result Sndfile_source::Decode()
 {
 	auto read = sf_read_int(this->file, &*this->buffer.begin(),
 	                        this->buffer.size());
@@ -104,7 +106,7 @@ Sndfile_audio_source::Decode_result Sndfile_audio_source::Decode()
 	// (from 8-bit up to 32-bit, and maybe even 32-bit float)!
 	//
 	// So, we reinterpret the decoded bits as a vector of bytes, which is
-	// relatively safe--they'll be interpreted by the Audio_sink in the
+	// relatively safe--they'll be interpreted by the Sink in the
 	// exact same way once we tell it how long the samples really are.
 	auto *begin = reinterpret_cast<std::byte *>(&*this->buffer.begin());
 
@@ -114,7 +116,7 @@ Sndfile_audio_source::Decode_result Sndfile_audio_source::Decode()
 	return std::make_pair(Decode_state::decoding, Decode_vector{begin, end});
 }
 
-Sample_format Sndfile_audio_source::OutputSampleFormat() const
+Sample_format Sndfile_source::OutputSampleFormat() const
 {
 	// Because we use int-sized reads, assume this corresponds to 32-bit
 	// signed int.
@@ -124,9 +126,9 @@ Sample_format Sndfile_audio_source::OutputSampleFormat() const
 	return Sample_format::sint32;
 }
 
-std::unique_ptr<Sndfile_audio_source> Sndfile_audio_source::MakeUnique(
-        std::string_view path)
+std::unique_ptr<Sndfile_source> Sndfile_source::MakeUnique(std::string_view path)
 {
-	return std::make_unique<Sndfile_audio_source, std::string_view>(
-	        std::move(path));
+	return std::make_unique<Sndfile_source, std::string_view>(std::move(path));
 }
+
+} // namespace playd::audio

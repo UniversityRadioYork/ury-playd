@@ -12,6 +12,8 @@
 
 #include "response.h"
 
+namespace playd {
+
 /**
  * A string tokeniser.
  *
@@ -85,5 +87,7 @@ private:
 
     void FeedUnquotedChar(char c);
 };
+
+} // namespace tokeniser
 
 #endif // PLAYD_TOKENISER_H

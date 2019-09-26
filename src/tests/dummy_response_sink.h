@@ -13,6 +13,8 @@
 
 #include "../response.h"
 
+namespace playd::tests
+{
 // A dummy class for testing the Response_sink abstract class methods.
 class Dummy_response_sink : public Response_sink
 {
@@ -30,5 +32,7 @@ private:
 	/// Reference to the output stream.
 	std::ostream &os;
 };
+
+} // namespace playd::tests
 
 #endif // PLAYD_TESTS_DUMMY_RESPONSE_SINK_H

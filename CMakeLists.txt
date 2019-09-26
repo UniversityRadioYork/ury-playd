@@ -68,8 +68,8 @@ set(SRCS ${SRCS}
   src/response.cpp
   src/tokeniser.cpp
   src/audio/audio.cpp
-  src/audio/audio_sink.cpp
-  src/audio/audio_source.cpp
+        src/audio/sink.cpp
+        src/audio/source.cpp
   src/audio/ringbuffer.cpp
   src/audio/sample_format.cpp
   )

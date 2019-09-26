@@ -15,136 +15,135 @@
 
 #include "tokeniser.h"
 
-Tokeniser::Tokeniser()
-    : escape_next{false}, in_word{false}, quote_type{QuoteType::NONE}
-{
-}
+namespace playd {
 
-std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw)
-{
-	// The list of ready lines should be cleared by any previous Feed.
-	Expects(this->ready_lines.empty());
-
-	for (const char c : raw) {
-		if (this->escape_next) {
-			this->Push(c);
-			continue;
-		}
-
-		switch (this->quote_type) {
-			case QuoteType::SINGLE:
-                FeedSingleQuotedChar(c);
-                break;
-
-			case QuoteType::DOUBLE:
-                FeedDoublyQuotedChar(c);
-                break;
-
-			case QuoteType::NONE:
-                FeedUnquotedChar(c);
-                break;
-		}
-	}
-
-	auto lines = this->ready_lines;
-	this->ready_lines.clear();
-
-	return lines;
-}
-
-void Tokeniser::FeedUnquotedChar(char c) {
-    switch (c) {
-        case '\n':
-            Emit();
-            break;
-
-        case '\'':
-            in_word = true;
-            quote_type =
-                    QuoteType::SINGLE;
-            break;
-
-        case '\"':
-            in_word = true;
-            quote_type =
-                    QuoteType::DOUBLE;
-            break;
-
-        case '\\':
-            escape_next = true;
-            break;
-
-        default:
-            isspace(c, std::locale::classic())
-                    ? EndWord()
-                    : Push(c);
-            break;
+    Tokeniser::Tokeniser()
+            : escape_next{false}, in_word{false}, quote_type{QuoteType::NONE} {
     }
-}
 
-void Tokeniser::FeedDoublyQuotedChar(char c) {
-    switch (c) {
-        case '\"':
-            quote_type =
-                    QuoteType::NONE;
-            break;
+    std::vector<std::vector<std::string>> Tokeniser::Feed(const std::string &raw) {
+        // The list of ready lines should be cleared by any previous Feed.
+        Expects(this->ready_lines.empty());
 
-        case '\\':
-            escape_next = true;
-            break;
+        for (const char c : raw) {
+            if (this->escape_next) {
+                this->Push(c);
+                continue;
+            }
 
-        default:
+            switch (this->quote_type) {
+                case QuoteType::SINGLE:
+                    FeedSingleQuotedChar(c);
+                    break;
+
+                case QuoteType::DOUBLE:
+                    FeedDoublyQuotedChar(c);
+                    break;
+
+                case QuoteType::NONE:
+                    FeedUnquotedChar(c);
+                    break;
+            }
+        }
+
+        auto lines = this->ready_lines;
+        this->ready_lines.clear();
+
+        return lines;
+    }
+
+    void Tokeniser::FeedUnquotedChar(char c) {
+        switch (c) {
+            case '\n':
+                Emit();
+                break;
+
+            case '\'':
+                in_word = true;
+                quote_type =
+                        QuoteType::SINGLE;
+                break;
+
+            case '\"':
+                in_word = true;
+                quote_type =
+                        QuoteType::DOUBLE;
+                break;
+
+            case '\\':
+                escape_next = true;
+                break;
+
+            default:
+                isspace(c, std::locale::classic())
+                ? EndWord()
+                : Push(c);
+                break;
+        }
+    }
+
+    void Tokeniser::FeedDoublyQuotedChar(char c) {
+        switch (c) {
+            case '\"':
+                quote_type =
+                        QuoteType::NONE;
+                break;
+
+            case '\\':
+                escape_next = true;
+                break;
+
+            default:
+                Push(c);
+                break;
+        }
+    }
+
+    void Tokeniser::FeedSingleQuotedChar(char c) {
+        if (c == '\'') {
+            quote_type = QuoteType::NONE;
+        } else {
             Push(c);
-            break;
+        }
     }
-}
 
-void Tokeniser::FeedSingleQuotedChar(char c) {
-    if (c == '\'') {
-        quote_type = QuoteType::NONE;
-    } else {
-        Push(c);
+    void Tokeniser::Push(const char c) {
+        Expects(this->escape_next || !(this->quote_type == QuoteType::NONE &&
+                                       isspace(c, std::locale::classic())));
+        this->in_word = true;
+        this->current_word.push_back(c);
+        this->escape_next = false;
+
+        Ensures(!this->current_word.empty());
     }
-}
 
-void Tokeniser::Push(const char c)
-{
-	Expects(this->escape_next || !(this->quote_type == QuoteType::NONE &&
-	                              isspace(c, std::locale::classic())));
-	this->in_word = true;
-	this->current_word.push_back(c);
-	this->escape_next = false;
+    void Tokeniser::EndWord() {
+        // Don't add a word unless we're in one.
+        if (!this->in_word) return;
+        this->in_word = false;
 
-	Ensures(!this->current_word.empty());
-}
+        this->words.push_back(this->current_word);
 
-void Tokeniser::EndWord()
-{
-	// Don't add a word unless we're in one.
-	if (!this->in_word) return;
-	this->in_word = false;
+        this->current_word.clear();
+    }
 
-	this->words.push_back(this->current_word);
+    void Tokeniser::Emit() {
+        // Since we assume these, we don't need to set them later.
+        Expects(this->quote_type == QuoteType::NONE);
+        Expects(!this->escape_next);
 
-	this->current_word.clear();
-}
+        // We might still be in a word, in which case we treat the end of a
+        // line as the end of the word too.
+        this->EndWord();
 
-void Tokeniser::Emit()
-{
-	// Since we assume these, we don't need to set them later.
-	Expects(this->quote_type == QuoteType::NONE);
-	Expects(!this->escape_next);
+        this->ready_lines.push_back(this->words);
 
-	// We might still be in a word, in which case we treat the end of a
-	// line as the end of the word too.
-	this->EndWord();
+        this->words.clear();
 
-	this->ready_lines.push_back(this->words);
+        // The state should now be clean and ready for another command.
+        Ensures(this->quote_type == QuoteType::NONE);
+        Ensures(!this->escape_next);
+        Ensures(this->current_word.empty());
+    }
 
-	this->words.clear();
-
-	// The state should now be clean and ready for another command.
-	Ensures(this->quote_type == QuoteType::NONE);
-	Ensures(!this->escape_next);
-	Ensures(this->current_word.empty());
-}
+} // namespace playd

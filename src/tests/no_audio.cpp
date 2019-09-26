@@ -15,93 +15,86 @@
 #include "catch.hpp"
 #include "dummy_response_sink.h"
 
-using namespace std::chrono;
-
-SCENARIO("Null_audio reports the state as none", "[no-audio]")
+namespace playd::tests
 {
-	GIVEN("A Null_audio object")
-	{
-		Null_audio n;
+SCENARIO ("Null_audio reports the state as none", "[no-audio]") {
+	GIVEN ("A Null_audio object") {
+		audio::Null_audio n;
 
-		WHEN("Update() is called")
-		{
+		WHEN ("Update() is called") {
 			auto state = n.Update();
 
-			THEN("the resulting state is NONE")
-			{
-				REQUIRE(state == Audio::State::none);
+			THEN ("the resulting state is NONE") {
+				REQUIRE(state == audio::Audio::State::none);
 			}
 		}
 	}
 }
 
-SCENARIO("Null_audio returns a state of NONE", "[no-audio]")
-{
-	GIVEN("A Null_audio object")
-	{
-		Null_audio n;
+SCENARIO ("Null_audio returns a state of NONE", "[no-audio]") {
+	GIVEN ("A Null_audio object") {
+		audio::Null_audio n;
 
-		WHEN("the Null_audio is asked for its state")
-		{
+		WHEN ("the Null_audio is asked for its state") {
 			auto state = n.CurrentState();
 
-			THEN("the state is NONE")
-			{
-				REQUIRE(state == Audio::State::none);
+			THEN ("the state is NONE") {
+				REQUIRE(state == audio::Audio::State::none);
 			}
 		}
 	}
 }
 
-SCENARIO("Null_audio throws exceptions when asked to do audio-type things",
-         "[no-audio]")
-{
-	GIVEN("A Null_audio object")
-	{
-		Null_audio n;
+SCENARIO ("Null_audio throws exceptions when asked to do audio-type things",
+          "[no-audio]") {
+	GIVEN ("A Null_audio object") {
+		audio::Null_audio n;
 
-		WHEN("SetPlaying(true) is called")
-		{
-			THEN("Null_audio_error is thrown")
-			{
+		WHEN ("SetPlaying(true) is called") {
+			THEN ("Null_audio_error is thrown") {
 				REQUIRE_THROWS_AS(n.SetPlaying(true),
 				                  Null_audio_error);
 			}
 		}
 
-		WHEN("SetPlaying(false) is called")
-		{
-			THEN("Null_audio_error is thrown")
-			{
+		WHEN ("SetPlaying(false) is called") {
+			THEN ("Null_audio_error is thrown") {
 				REQUIRE_THROWS_AS(n.SetPlaying(false),
 				                  Null_audio_error);
 			}
 		}
 
-		WHEN("SetPosition() is called")
-		{
-			THEN("Null_audio_error is thrown")
-			{
+		WHEN ("SetPosition() is called") {
+			THEN ("Null_audio_error is thrown") {
 				REQUIRE_THROWS_AS(
-				        n.SetPosition(microseconds{100}),
+				        n.SetPosition(
+				                std::chrono::microseconds{100}),
 				        Null_audio_error);
 			}
 		}
 
-		WHEN("Position() is called")
-		{
-			THEN("Null_audio_error is thrown")
-			{
-				REQUIRE_THROWS_AS(n.Position(), Null_audio_error);
+		WHEN ("Position() is called") {
+			THEN ("Null_audio_error is thrown") {
+				REQUIRE_THROWS_AS(n.
+
+				                  Position(),
+				                  Null_audio_error
+
+				);
 			}
 		}
 
-		WHEN("File() is called")
-		{
-			THEN("Null_audio_error is thrown")
-			{
-				REQUIRE_THROWS_AS(n.File(), Null_audio_error);
+		WHEN ("File() is called") {
+			THEN ("Null_audio_error is thrown") {
+				REQUIRE_THROWS_AS(n.
+
+				                  File(),
+				                  Null_audio_error
+
+				);
 			}
 		}
 	}
 }
+
+} // namespace playd::tests

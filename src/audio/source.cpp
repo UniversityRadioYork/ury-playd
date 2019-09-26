@@ -7,28 +7,30 @@
  * @see audio/audio_source.h
  */
 
-#include "audio_source.h"
+#include "source.h"
 
 #include <cstdint>
 
 #include "sample_format.h"
 
-Audio_source::Audio_source(std::string_view path) : path{path}
+namespace playd::audio
+{
+Source::Source(std::string_view path) : path{path}
 {
 }
 
-size_t Audio_source::BytesPerSample() const
+size_t Source::BytesPerSample() const
 {
 	auto sf = static_cast<uint8_t>(this->OutputSampleFormat());
 	return sample_format_bps[sf] * this->ChannelCount();
 }
 
-std::string_view Audio_source::Path() const
+std::string_view Source::Path() const
 {
 	return this->path;
 }
 
-Samples Audio_source::SamplesFromMicros(std::chrono::microseconds micros) const
+Samples Source::SamplesFromMicros(std::chrono::microseconds micros) const
 {
 	// The sample rate is expressed in terms of samples per second, so we
 	// need to convert the position to seconds then multiply by the rate.
@@ -36,8 +38,10 @@ Samples Audio_source::SamplesFromMicros(std::chrono::microseconds micros) const
 	return (micros.count() * this->SampleRate()) / 1000000;
 }
 
-std::chrono::microseconds Audio_source::MicrosFromSamples(Samples samples) const
+std::chrono::microseconds Source::MicrosFromSamples(Samples samples) const
 {
 	// This is basically SamplesFromMicros but backwards.
 	return std::chrono::microseconds{(samples * 1000000) / this->SampleRate()};
 }
+
+} // namespace playd::audio

@@ -10,15 +10,16 @@
 #include "audio.h"
 
 #include <chrono>
-#include <cstdint>
 #include <gsl/gsl>
 
 #include "../errors.h"
 #include "../messages.h"
-#include "audio_sink.h"
-#include "audio_source.h"
 #include "sample_format.h"
+#include "sink.h"
+#include "source.h"
 
+namespace playd::audio
+{
 //
 // Null_audio
 //
@@ -68,8 +69,7 @@ std::string_view Null_audio::File() const
 // Basic_audio
 //
 
-Basic_audio::Basic_audio(std::unique_ptr<Audio_source> src,
-                         std::unique_ptr<Audio_sink> sink)
+Basic_audio::Basic_audio(std::unique_ptr<Source> src, std::unique_ptr<Sink> sink)
     : src{std::move(src)}, sink{std::move(sink)}
 {
 	this->ClearFrame();
@@ -183,15 +183,17 @@ bool Basic_audio::DecodeIfFrameEmpty()
 	if (!this->FrameFinished()) return true;
 
 	Expects(this->src != nullptr);
-	Audio_source::Decode_result result = this->src->Decode();
+	auto result = this->src->Decode();
 
 	this->frame = result.second;
 	this->frame_span = this->frame;
 
-	return result.first != Audio_source::Decode_state::eof;
+	return result.first != Source::Decode_state::eof;
 }
 
 inline bool Basic_audio::FrameFinished() const
 {
 	return this->frame_span.empty();
 }
+
+} // namespace playd::audio

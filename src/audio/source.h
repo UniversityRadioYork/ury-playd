@@ -7,8 +7,8 @@
  * @see audio/audio_source.cpp
  */
 
-#ifndef PLAYD_AUDIO_SOURCE_H
-#define PLAYD_AUDIO_SOURCE_H
+#ifndef PLAYD_SOURCE_H
+#define PLAYD_SOURCE_H
 
 #include <chrono>
 #include <cstdint>
@@ -18,6 +18,8 @@
 #include "../errors.h"
 #include "sample_format.h"
 
+namespace playd::audio
+{
 /**
  * An object responsible for decoding an audio file.
  *
@@ -33,7 +35,7 @@
  *   there are exactly ChannelCount() of their samples to one of ours.
  *   We usually call this a 'mono sample'.
  */
-class Audio_source
+class Source
 {
 public:
 	/// An enumeration of possible states the decoder can be in.
@@ -57,10 +59,10 @@ public:
 	 * @param path The path to the file from which this AudioSource is
 	 *   decoding.
 	 */
-	explicit Audio_source(std::string_view path);
+	explicit Source(std::string_view path);
 
 	/// Virtual, empty destructor for AudioSource.
-	virtual ~Audio_source() = default;
+	virtual ~Source() = default;
 
 	//
 	// Methods that must be overridden
@@ -141,4 +143,6 @@ protected:
 	std::string path;
 };
 
-#endif // PLAYD_AUDIO_SOURCE_H
+} // namespace playd::audio
+
+#endif // PLAYD_SOURCE_H

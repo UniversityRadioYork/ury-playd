@@ -21,9 +21,11 @@
 #include <gsl/gsl>
 
 #include "../response.h"
-#include "audio_sink.h"
-#include "audio_source.h"
+#include "sink.h"
+#include "source.h"
 
+namespace playd::audio
+{
 /**
  * An audio item.
  *
@@ -39,7 +41,7 @@ class Audio
 {
 public:
 	/// Enumeration of possible states for Audio.
-	using State = Audio_sink::State;
+	using State = Sink::State;
 
 	/// Virtual, empty destructor for Audio.
 	virtual ~Audio() = default;
@@ -127,27 +129,32 @@ class Null_audio : public Audio
 {
 public:
 	Audio::State Update() override;
+
 	Audio::State CurrentState() const override;
 
 	// The following all raise an exception:
 
 	void SetPlaying(bool playing) override;
+
 	void SetPosition(std::chrono::microseconds position) override;
+
 	std::chrono::microseconds Position() const override;
+
 	std::chrono::microseconds Length() const override;
+
 	std::string_view File() const override;
 };
 
 /**
  * A concrete implementation of Audio as a 'pipe'.
  *
- * PipeAudio is comprised of a 'source', which decodes frames from a
+ * Basic_audio is comprised of a 'source', which decodes frames from a
  * file, and a 'sink', which plays out the decoded frames.  Updating
  * consists of shifting frames from the source to the sink.
  *
  * @see Audio
- * @see AudioSink
- * @see AudioSource
+ * @see Sink
+ * @see Source
  */
 class Basic_audio : public Audio
 {
@@ -158,28 +165,31 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	Basic_audio(std::unique_ptr<Audio_source> src,
-	            std::unique_ptr<Audio_sink> sink);
+	Basic_audio(std::unique_ptr<Source> src, std::unique_ptr<Sink> sink);
 
 	Audio::State Update() override;
+
 	std::string_view File() const override;
 
 	void SetPlaying(bool playing) override;
+
 	Audio::State CurrentState() const override;
 
 	void SetPosition(std::chrono::microseconds position) override;
+
 	std::chrono::microseconds Position() const override;
+
 	std::chrono::microseconds Length() const override;
 
 private:
 	/// The source of audio data.
-	std::unique_ptr<Audio_source> src;
+	std::unique_ptr<Source> src;
 
 	/// The sink to which audio data is sent.
-	std::unique_ptr<Audio_sink> sink;
+	std::unique_ptr<Sink> sink;
 
 	/// The current decoded frame.
-	Audio_source::Decode_vector frame;
+	Source::Decode_vector frame;
 
 	/// A span representing the unclaimed part of the decoded frame.
 	gsl::span<const std::byte> frame_span;
@@ -205,5 +215,7 @@ private:
 	/// Transfers as much of the current frame as possible to the sink.
 	void TransferFrame();
 };
+
+} // namespace playd::audio
 
 #endif // PLAYD_AUDIO_H

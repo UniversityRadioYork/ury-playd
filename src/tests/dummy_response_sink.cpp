@@ -11,6 +11,8 @@
 #include <ostream>
 #include <string>
 
+namespace playd::tests
+{
 Dummy_response_sink::Dummy_response_sink(std::ostream &os) : os(os)
 {
 }
@@ -19,3 +21,5 @@ void Dummy_response_sink::Respond(size_t, const Response &response) const
 {
 	this->os << response.Pack() << std::endl;
 }
+
+} // namespace playd::tests

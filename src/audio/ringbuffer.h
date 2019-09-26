@@ -16,6 +16,8 @@
 #undef max
 #include <gsl/gsl>
 
+namespace playd::audio
+{
 /**
  * A concurrent ring buffer.
  *
@@ -102,5 +104,7 @@ private:
 	std::mutex r_lock; ///< The read lock.
 	std::mutex w_lock; ///< The write lock.
 };
+
+} // namespace playd::audio
 
 #endif // PLAYD_RINGBUFFER_HPP

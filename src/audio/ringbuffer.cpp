@@ -17,6 +17,8 @@
 
 #include "../errors.h"
 
+namespace playd::audio
+{
 /* Assumptions:
 
    1) single producer, single consumer, enforced by locks.
@@ -191,3 +193,5 @@ inline void Ring_buffer::FlushInner()
 {
 	this->count.store(0, std::memory_order_release);
 }
+
+} // namespace playd::audio

@@ -11,6 +11,8 @@ PointerAlignment:                    Right
 Standard:                            Cpp11
 UseTab:                              ForIndentation
 
+ForEachMacros: ['SCENARIO', 'GIVEN', 'WHEN', 'THEN']
+
 AccessModifierOffset:         -8
 ColumnLimit:                  80
 SpacesBeforeTrailingComments:  1

@@ -10,19 +10,21 @@
 
 #include "dummy_audio_sink.h"
 
-#include "../audio/audio_sink.h"
+#include "../audio/sink.h"
 
+namespace playd::tests
+{
 void Dummy_audio_sink::Start()
 {
-	this->state = Audio_sink::State::playing;
+	this->state = audio::Sink::State::playing;
 }
 
 void Dummy_audio_sink::Stop()
 {
-	this->state = Audio_sink::State::stopped;
+	this->state = audio::Sink::State::stopped;
 }
 
-Audio_sink::State Dummy_audio_sink::CurrentState()
+audio::Sink::State Dummy_audio_sink::CurrentState()
 {
 	return this->state;
 }
@@ -39,10 +41,12 @@ void Dummy_audio_sink::SetPosition(uint64_t samples)
 
 void Dummy_audio_sink::SourceOut()
 {
-	this->state = Audio_sink::State::at_end;
+	this->state = audio::Sink::State::at_end;
 }
 
 size_t Dummy_audio_sink::Transfer(const gsl::span<const std::byte> src)
 {
 	return src.size();
 }
+
+} // namespace playd::tests

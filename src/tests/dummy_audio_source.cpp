@@ -12,14 +12,16 @@
 
 #include <cstdint>
 
-#include "../audio/audio_source.h"
 #include "../audio/sample_format.h"
+#include "../audio/source.h"
 
-Audio_source::Decode_result Dummy_audio_source::Decode()
+namespace playd::tests
 {
-	auto state = run_out ? Audio_source::Decode_state::eof
-	                     : Audio_source::Decode_state::decoding;
-	return std::make_pair(state, Audio_source::Decode_vector());
+audio::Source::Decode_result Dummy_audio_source::Decode()
+{
+	auto state = run_out ? audio::Source::Decode_state::eof
+	                     : audio::Source::Decode_state::decoding;
+	return std::make_pair(state, audio::Source::Decode_vector());
 }
 
 std::uint8_t Dummy_audio_source::ChannelCount() const
@@ -32,9 +34,9 @@ std::uint32_t Dummy_audio_source::SampleRate() const
 	return 44100;
 }
 
-Sample_format Dummy_audio_source::OutputSampleFormat() const
+audio::Sample_format Dummy_audio_source::OutputSampleFormat() const
 {
-	return Sample_format::sint32;
+	return audio::Sample_format::sint32;
 }
 
 std::uint64_t Dummy_audio_source::Seek(std::uint64_t new_position)
@@ -52,3 +54,4 @@ std::uint64_t Dummy_audio_source::Length() const
 {
 	return 0;
 }
+} // namespace playd::tests

@@ -12,6 +12,8 @@
 #include <array>
 #include <cstddef>
 
+namespace playd::audio
+{
 const std::array<std::size_t, sample_format_count> sample_format_bps{{
         1, // PACKED_UNSIGNED_INT_8
         1, // PACKED_SIGNED_INT_8
@@ -19,3 +21,5 @@ const std::array<std::size_t, sample_format_count> sample_format_bps{{
         4, // PACKED_SIGNED_INT_32
         4  // PACKED_FLOAT_32
 }};
+
+} // namespace playd::audio

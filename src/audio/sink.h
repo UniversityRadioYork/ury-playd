@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Declaration of the Audio_sink class.
+ * Declaration of the Sink and Sdl_sink classes.
  * @see audio/audio.cpp
  */
 
@@ -18,12 +18,14 @@
 #include <vector>
 
 #include "SDL.h"
-#include "audio_source.h"
 #include "ringbuffer.h"
 #include "sample_format.h"
+#include "source.h"
 
+namespace playd::audio
+{
 /// Abstract class for audio output sinks.
-class Audio_sink
+class Sink
 {
 public:
 	/**
@@ -38,7 +40,7 @@ public:
 	};
 
 	/// Virtual, empty destructor for Audio_sink.
-	virtual ~Audio_sink() = default;
+	virtual ~Sink() = default;
 
 	/**
 	 * Starts the audio stream.
@@ -107,7 +109,7 @@ public:
  * decoded samples from the Audio object.  While active, the Sdl_audio_sink
  * periodically transfers samples from its buffer to SDL2 in a separate thread.
  */
-class Sdl_audio_sink : public Audio_sink
+class Sdl_sink : public Sink
 {
 public:
 	/**
@@ -115,17 +117,23 @@ public:
 	 * @param source The source from which this sink will receive audio.
 	 * @param device_id The device ID to which this sink will output.
 	 */
-	Sdl_audio_sink(const Audio_source &source, int device_id);
+	Sdl_sink(const Source &source, int device_id);
 
 	/// Destructs an Sdl_audio_sink.
-	~Sdl_audio_sink() override;
+	~Sdl_sink() override;
 
 	void Start() override;
+
 	void Stop() override;
-	Audio_sink::State CurrentState() override;
+
+	Sink::State CurrentState() override;
+
 	Samples Position() override;
+
 	void SetPosition(Samples samples) override;
+
 	void SourceOut() override;
+
 	size_t Transfer(gsl::span<const std::byte> src) override;
 
 	/**
@@ -179,7 +187,9 @@ private:
 	bool source_out;
 
 	/// The decoder's current state.
-	Audio_sink::State state;
+	Sink::State state;
 };
+
+} // namespace playd::audio
 
 #endif // PLAYD_AUDIO_SINK_H
