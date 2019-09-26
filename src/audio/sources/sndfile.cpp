@@ -24,15 +24,13 @@
 
 namespace playd::audio
 {
-Sndfile_source::Sndfile_source(std::string_view path)
-    : Source{path}, file{nullptr}, buffer{}
+Sndfile_source::Sndfile_source(std::string_view path) : Source{path}, file{nullptr}, buffer{}
 {
 	this->info.format = 0;
 
 	this->file = sf_open(this->path.c_str(), SFM_READ, &this->info);
 	if (this->file == nullptr) {
-		throw File_error("sndfile: can't open " + this->path + ": " +
-		                 sf_strerror(nullptr));
+		throw File_error("sndfile: can't open " + this->path + ": " + sf_strerror(nullptr));
 	}
 
 	// Reserve enough space for a given number of frames.
@@ -67,10 +65,8 @@ std::uint32_t Sndfile_source::SampleRate() const
 std::uint64_t Sndfile_source::Seek(std::uint64_t in_samples)
 {
 	// Have we tried to seek past the end of the file?
-	if (auto clen = static_cast<unsigned long>(this->info.frames);
-	    clen < in_samples) {
-		Debug() << "sndfile: seek at" << in_samples << "past EOF at"
-		        << clen << std::endl;
+	if (auto clen = static_cast<unsigned long>(this->info.frames); clen < in_samples) {
+		Debug() << "sndfile: seek at" << in_samples << "past EOF at" << clen << std::endl;
 		throw Seek_error(MSG_SEEK_FAIL);
 	}
 
@@ -90,8 +86,7 @@ std::uint64_t Sndfile_source::Length() const
 
 Sndfile_source::Decode_result Sndfile_source::Decode()
 {
-	auto read = sf_read_int(this->file, &*this->buffer.begin(),
-	                        this->buffer.size());
+	auto read = sf_read_int(this->file, &*this->buffer.begin(), this->buffer.size());
 
 	// Have we hit the end of the file?
 	if (read == 0) {
@@ -121,8 +116,7 @@ Sample_format Sndfile_source::OutputSampleFormat() const
 	// Because we use int-sized reads, assume this corresponds to 32-bit
 	// signed int.
 	// Really, we shouldn't assume int is 32-bit!
-	static_assert(sizeof(int) == 4,
-	              "sndfile outputs int, which we need to be 4 bytes");
+	static_assert(sizeof(int) == 4, "sndfile outputs int, which we need to be 4 bytes");
 	return Sample_format::sint32;
 }
 

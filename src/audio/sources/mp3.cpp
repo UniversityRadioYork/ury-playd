@@ -27,9 +27,8 @@
 namespace playd::audio
 {
 /// The set of encodings that we ask mpg123 to prepare for us.
-constexpr int mp3_requested_encodings{
-        MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_8 | MPG123_ENC_SIGNED_16 |
-        MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32};
+constexpr int mp3_requested_encodings{MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_8 | MPG123_ENC_SIGNED_16 |
+                                      MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32};
 
 Sample_format SampleFormatOfMpg123(int encoding)
 {
@@ -54,20 +53,16 @@ Sample_format SampleFormatOfMpg123(int encoding)
 	}
 }
 
-Mp3_source::Mp3_source(std::string_view path)
-    : Source{path}, buffer{}, context{nullptr}
+Mp3_source::Mp3_source(std::string_view path) : Source{path}, buffer{}, context{nullptr}
 {
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
 
 	auto rates = AvailableRates();
-	std::for_each(
-	        std::begin(rates), std::end(rates),
-	        std::bind(&Mp3_source::AddFormat, this, std::placeholders::_1));
+	std::for_each(std::begin(rates), std::end(rates), std::bind(&Mp3_source::AddFormat, this, std::placeholders::_1));
 
 	if (mpg123_open(this->context, this->path.c_str()) == MPG123_ERR) {
-		throw File_error("mp3: can't open " + this->path + ": " +
-		                 mpg123_strerror(this->context));
+		throw File_error("mp3: can't open " + this->path + ": " + mpg123_strerror(this->context));
 	}
 }
 
@@ -98,8 +93,7 @@ void Mp3_source::AddFormat(long rate)
 
 	// The requested encodings correspond to the sample formats available in
 	// the SampleFormat enum.
-	if (mpg123_format(this->context, rate, MPG123_STEREO | MPG123_MONO,
-	                  mp3_requested_encodings) == MPG123_ERR) {
+	if (mpg123_format(this->context, rate, MPG123_STEREO | MPG123_MONO, mp3_requested_encodings) == MPG123_ERR) {
 		// Ignore the error for now -- another sample rate may be
 		// available.
 		// If no sample rates work, loading a file will fail anyway.
@@ -137,16 +131,13 @@ std::uint64_t Mp3_source::Seek(std::uint64_t in_samples)
 	assert(this->context != nullptr);
 
 	// Have we tried to seek past the end of the file?
-	if (auto clen = static_cast<unsigned long>(mpg123_length(this->context));
-	    clen < in_samples) {
-		Debug() << "mp3: seek at" << in_samples << "past EOF at" << clen
-		        << std::endl;
+	if (auto clen = static_cast<unsigned long>(mpg123_length(this->context)); clen < in_samples) {
+		Debug() << "mp3: seek at" << in_samples << "past EOF at" << clen << std::endl;
 		throw Seek_error{MSG_SEEK_FAIL};
 	}
 
 	if (mpg123_seek(this->context, in_samples, SEEK_SET) == MPG123_ERR) {
-		Debug() << "mp3: seek failed:" << mpg123_strerror(this->context)
-		        << std::endl;
+		Debug() << "mp3: seek failed:" << mpg123_strerror(this->context) << std::endl;
 		throw Seek_error{MSG_SEEK_FAIL};
 	}
 
@@ -162,8 +153,7 @@ Mp3_source::Decode_result Mp3_source::Decode()
 
 	auto buf = reinterpret_cast<unsigned char *>(&this->buffer.front());
 	size_t rbytes = 0;
-	const auto err =
-	        mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
+	const auto err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
 
 	Decode_vector decoded;
 	Decode_state decode_state = Decode_state::decoding;
@@ -171,8 +161,7 @@ Mp3_source::Decode_result Mp3_source::Decode()
 	if (err == MPG123_DONE) {
 		decode_state = Decode_state::eof;
 	} else if (err != MPG123_OK && err != MPG123_NEW_FORMAT) {
-		Debug() << "mp3: decode error:" << mpg123_strerror(this->context)
-		        << std::endl;
+		Debug() << "mp3: decode error:" << mpg123_strerror(this->context) << std::endl;
 		decode_state = Decode_state::eof;
 	} else {
 		// Copy only the bit of the buffer occupied by decoded data

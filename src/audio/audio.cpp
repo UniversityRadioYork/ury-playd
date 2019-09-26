@@ -158,8 +158,7 @@ void Basic_audio::TransferFrame()
 	Expects(this->src != nullptr);
 
 	auto written = this->sink->Transfer(this->frame_span);
-	this->frame_span =
-	        this->frame_span.last(this->frame_span.size() - written);
+	this->frame_span = this->frame_span.last(this->frame_span.size() - written);
 
 	// We empty the frame once we're done with it.  This
 	// maintains FrameFinished(), as an empty frame is a finished one.

@@ -82,8 +82,7 @@ size_t Ring_buffer::Write(const gsl::span<const std::byte> src)
 	 * the write capacity can be increased after this point by a consumer.
 	 */
 	const auto write_capacity_estimate = WriteCapacity();
-	if (write_capacity_estimate < src_count)
-		throw Internal_error("ringbuffer overflow");
+	if (write_capacity_estimate < src_count) throw Internal_error("ringbuffer overflow");
 
 	// Trim the span down to the amount we can write.
 	auto write_count = std::min(write_capacity_estimate, src_count);
@@ -99,8 +98,7 @@ size_t Ring_buffer::Write(const gsl::span<const std::byte> src)
 	// Make sure we got the iterators the right way round.
 	assert(0 <= bytes_to_end);
 
-	auto write_end_count =
-	        std::min(write_count, static_cast<size_t>(bytes_to_end));
+	auto write_end_count = std::min(write_count, static_cast<size_t>(bytes_to_end));
 
 	const auto src_end = src_to_write.first(write_end_count);
 	this->w_it = copy(src_end.cbegin(), src_end.cend(), this->w_it);
@@ -110,8 +108,7 @@ size_t Ring_buffer::Write(const gsl::span<const std::byte> src)
 	if (0 < write_start_count) {
 		Expects(this->w_it == this->buffer.end());
 		const auto src_start = src_to_write.last(write_start_count);
-		this->w_it = copy(src_start.cbegin(), src_start.cend(),
-		                  this->buffer.begin());
+		this->w_it = copy(src_start.cbegin(), src_start.cend(), this->buffer.begin());
 		Ensures(this->w_it > this->buffer.begin());
 	}
 
@@ -144,8 +141,7 @@ size_t Ring_buffer::Read(gsl::span<std::byte> dest)
 	 * the read capacity can be increased after this point by a producer.
 	 */
 	const auto read_capacity_estimate = ReadCapacity();
-	if (read_capacity_estimate < dest_count)
-		throw Internal_error("ringbuffer underflow");
+	if (read_capacity_estimate < dest_count) throw Internal_error("ringbuffer underflow");
 
 	/* See Write() for explanatory comments on what happens here:
 	 * the two functions mirror each other almost perfectly.
@@ -157,8 +153,7 @@ size_t Ring_buffer::Read(gsl::span<std::byte> dest)
 	const auto bytes_to_end = distance(this->r_it, this->buffer.cend());
 	assert(0 <= bytes_to_end);
 
-	auto read_end_count =
-	        std::min(read_count, static_cast<size_t>(bytes_to_end));
+	auto read_end_count = std::min(read_count, static_cast<size_t>(bytes_to_end));
 	auto rest = copy_n(this->r_it, read_end_count, dest_to_read.begin());
 	this->r_it += read_end_count;
 
@@ -170,8 +165,7 @@ size_t Ring_buffer::Read(gsl::span<std::byte> dest)
 		Ensures(this->r_it > this->buffer.cbegin());
 	}
 
-	if (this->count.fetch_sub(read_count, std::memory_order_acq_rel) <
-	    read_count)
+	if (this->count.fetch_sub(read_count, std::memory_order_acq_rel) < read_count)
 		throw Internal_error("capacity decreased unexpectedly");
 
 	Ensures(read_start_count + read_end_count == read_count);

@@ -199,8 +199,7 @@ SCENARIO ("Tokenisers can handle mixed-quoted strings", "[tokeniser]") {
 
 		WHEN ("the Tokeniser is fed a word with a mixture of different "
 		      "quote styles") {
-			auto lines = t.Feed(
-			        "This' is'\\ perfectly\"\\ valid \"syntax!\n");
+			auto lines = t.Feed("This' is'\\ perfectly\"\\ valid \"syntax!\n");
 
 			THEN ("one line is returned") {
 				REQUIRE(lines.
@@ -219,8 +218,7 @@ SCENARIO ("Tokenisers can handle mixed-quoted strings", "[tokeniser]") {
 			}
 
 			THEN ("the word contains the concatenation of each") {
-				REQUIRE(lines[0][0] ==
-				        "This is perfectly valid syntax!");
+				REQUIRE(lines[0][0] == "This is perfectly valid syntax!");
 			}
 		}
 	}
@@ -331,112 +329,98 @@ SCENARIO ("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 		WHEN ("the Tokeniser is fed E3") {
 			auto lines = t.Feed("''\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {""}};
+				std::vector<std::vector<std::string>> want = {{""}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed E4") {
 			auto lines = t.Feed("\"\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {""}};
+				std::vector<std::vector<std::string>> want = {{""}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed W1") {
 			auto lines = t.Feed("foo bar baz\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"foo", "bar", "baz"}};
+				std::vector<std::vector<std::string>> want = {{"foo", "bar", "baz"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed W2") {
 			auto lines = t.Feed("foo\tbar\tbaz\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"foo", "bar", "baz"}};
+				std::vector<std::vector<std::string>> want = {{"foo", "bar", "baz"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed W3") {
 			auto lines = t.Feed("foo\rbar\rbaz\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"foo", "bar", "baz"}};
+				std::vector<std::vector<std::string>> want = {{"foo", "bar", "baz"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed W4") {
 			auto lines = t.Feed("silly windows\r\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"silly", "windows"}};
+				std::vector<std::vector<std::string>> want = {{"silly", "windows"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed W5") {
 			auto lines = t.Feed("    abc def\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"abc", "def"}};
+				std::vector<std::vector<std::string>> want = {{"abc", "def"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed W6") {
 			auto lines = t.Feed("ghi jkl    \n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"ghi", "jkl"}};
+				std::vector<std::vector<std::string>> want = {{"ghi", "jkl"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed W7") {
 			auto lines = t.Feed("    mno pqr    \n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"mno", "pqr"}};
+				std::vector<std::vector<std::string>> want = {{"mno", "pqr"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed Q1") {
 			auto lines = t.Feed("abc\\\ndef\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"abc\ndef"}};
+				std::vector<std::vector<std::string>> want = {{"abc\ndef"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed Q2") {
 			auto lines = t.Feed("\"abc\ndef\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"abc\ndef"}};
+				std::vector<std::vector<std::string>> want = {{"abc\ndef"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed Q3") {
 			auto lines = t.Feed("\"abc\\\ndef\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"abc\ndef"}};
+				std::vector<std::vector<std::string>> want = {{"abc\ndef"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed Q4") {
 			auto lines = t.Feed("'abc\ndef'\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"abc\ndef"}};
+				std::vector<std::vector<std::string>> want = {{"abc\ndef"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed Q5") {
 			auto lines = t.Feed("'abc\\\ndef'\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"abc\\\ndef"}};
+				std::vector<std::vector<std::string>> want = {{"abc\\\ndef"}};
 
 				REQUIRE(lines == want);
 			}
@@ -444,8 +428,7 @@ SCENARIO ("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 		WHEN ("the Tokeniser is fed Q6") {
 			auto lines = t.Feed("Scare\\\" quotes\\\"\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"Scare\"", "quotes\""}};
+				std::vector<std::vector<std::string>> want = {{"Scare\"", "quotes\""}};
 
 				REQUIRE(lines == want);
 			}
@@ -453,17 +436,14 @@ SCENARIO ("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 		WHEN ("the Tokeniser is fed Q7") {
 			auto lines = t.Feed("I\\'m free\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"I'm", "free"}};
+				std::vector<std::vector<std::string>> want = {{"I'm", "free"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed Q8") {
-			auto lines = t.Feed(
-			        "'hello, I'\\''m an escaped single quote'\n");
+			auto lines = t.Feed("'hello, I'\\''m an escaped single quote'\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"hello, I'm an escaped single quote"}};
+				std::vector<std::vector<std::string>> want = {{"hello, I'm an escaped single quote"}};
 				REQUIRE(lines == want);
 			}
 		}
@@ -481,28 +461,24 @@ SCENARIO ("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 		WHEN ("the Tokeniser is fed M1") {
 			auto lines = t.Feed("first line\nsecond line\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"first", "line"}, {"second", "line"}};
+				std::vector<std::vector<std::string>> want = {{"first", "line"}, {"second", "line"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed U1") {
 			auto lines = t.Feed("北野 武\n");
 			THEN ("the Tokeniser returns the specified result") {
-				std::vector<std::vector<std::string>> want = {
-				        {"北野", "武"}};
+				std::vector<std::vector<std::string>> want = {{"北野", "武"}};
 				REQUIRE(lines == want);
 			}
 		}
 		WHEN ("the Tokeniser is fed X1") {
-			auto lines = t.Feed(
-			        "enqueue file \"C:\\\\Users\\\\Test\\\\Artist "
-			        "- Title.mp3\" 1\n");
+			auto lines =
+			        t.Feed("enqueue file \"C:\\\\Users\\\\Test\\\\Artist "
+			               "- Title.mp3\" 1\n");
 			THEN ("the Tokeniser returns the specified result") {
 				std::vector<std::vector<std::string>> want = {
-				        {"enqueue", "file",
-				         R"(C:\Users\Test\Artist - Title.mp3)",
-				         "1"}};
+				        {"enqueue", "file", R"(C:\Users\Test\Artist - Title.mp3)", "1"}};
 				REQUIRE(lines == want);
 			}
 		}

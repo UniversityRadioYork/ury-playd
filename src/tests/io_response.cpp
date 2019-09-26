@@ -15,8 +15,7 @@
 
 namespace playd::test
 {
-SCENARIO ("Response's convenience constructors create correct Responses",
-          "[command-result]") {
+SCENARIO ("Response's convenience constructors create correct Responses", "[command-result]") {
 	GIVEN ("A Response created via Response::Success()") {
 		Response c = Response::Success("tag");
 
@@ -51,15 +50,13 @@ SCENARIO ("Response's convenience constructors create correct Responses",
 			THEN ("the response is ACK FAIL followed by the "
 			      "failure "
 			      "message") {
-				REQUIRE(s ==
-				        "'cat people' ACK FAIL 'lp0 on fire'");
+				REQUIRE(s == "'cat people' ACK FAIL 'lp0 on fire'");
 			}
 		}
 	}
 }
 
-SCENARIO ("Responses correctly escape arguments with single quotes",
-          "[response]") {
+SCENARIO ("Responses correctly escape arguments with single quotes", "[response]") {
 	WHEN ("the Response is fed no arguments") {
 		auto r = Response("tag", Response::Code::ohai);
 
@@ -73,8 +70,7 @@ SCENARIO ("Responses correctly escape arguments with single quotes",
 	}
 
 	WHEN ("the Response is fed a single argument with no quotes") {
-		auto r =
-		        Response("tag", Response::Code::ohai).AddArg("ulyoath");
+		auto r = Response("tag", Response::Code::ohai).AddArg("ulyoath");
 
 		THEN ("the emitted response's argument is not quoted") {
 			REQUIRE(r.
@@ -86,8 +82,7 @@ SCENARIO ("Responses correctly escape arguments with single quotes",
 	}
 
 	WHEN ("the Response is fed a single argument with single quotes") {
-		auto r = Response("tag", Response::Code::ohai)
-		                 .AddArg("chattur'gha");
+		auto r = Response("tag", Response::Code::ohai).AddArg("chattur'gha");
 
 		THEN ("the emitted response's argument is single-quoted") {
 			REQUIRE(r.
@@ -99,9 +94,7 @@ SCENARIO ("Responses correctly escape arguments with single quotes",
 	}
 
 	WHEN ("the Response is fed two arguments, both with single quotes") {
-		auto r = Response("tag", Response::Code::ohai)
-		                 .AddArg("chattur'gha")
-		                 .AddArg("xel'lotath");
+		auto r = Response("tag", Response::Code::ohai).AddArg("chattur'gha").AddArg("xel'lotath");
 
 		THEN ("the emitted response's arguments are both "
 		      "single-quoted") {
@@ -109,15 +102,12 @@ SCENARIO ("Responses correctly escape arguments with single quotes",
 
 			        Pack()
 
-			        ==
-			        R"(tag OHAI 'chattur'\''gha' 'xel'\''lotath')");
+			        == R"(tag OHAI 'chattur'\''gha' 'xel'\''lotath')");
 		}
 	}
 
 	WHEN ("the Response is fed two arguments, one quoted, one unquoted") {
-		auto r = Response("tag", Response::Code::ohai)
-		                 .AddArg("chattur'gha")
-		                 .AddArg("ulyoath");
+		auto r = Response("tag", Response::Code::ohai).AddArg("chattur'gha").AddArg("ulyoath");
 
 		THEN ("the emitted response's arguments are quoted "
 		      "accordingly") {
@@ -130,8 +120,7 @@ SCENARIO ("Responses correctly escape arguments with single quotes",
 	}
 
 	WHEN ("the Response is fed a single argument with double quotes") {
-		auto r = Response("tag", Response::Code::fload)
-		                 .AddArg(R"("scare"-quotes)");
+		auto r = Response("tag", Response::Code::fload).AddArg(R"("scare"-quotes)");
 
 		THEN ("the emitted response's argument is single-quoted") {
 			REQUIRE(r.
@@ -143,8 +132,7 @@ SCENARIO ("Responses correctly escape arguments with single quotes",
 	}
 
 	WHEN ("the Response is fed a single argument with whitespace") {
-		auto r = Response("tag", Response::Code::end)
-		                 .AddArg("pargon pargon pargon");
+		auto r = Response("tag", Response::Code::end).AddArg("pargon pargon pargon");
 
 		THEN ("the emitted response's argument is single-quoted") {
 			REQUIRE(r.
@@ -157,10 +145,7 @@ SCENARIO ("Responses correctly escape arguments with single quotes",
 
 	WHEN ("the Response is fed several arguments with differing "
 	      "whitespace") {
-		auto r = Response("tag", Response::Code::end)
-		                 .AddArg("a space")
-		                 .AddArg("new\nline")
-		                 .AddArg("tab\tstop");
+		auto r = Response("tag", Response::Code::end).AddArg("a space").AddArg("new\nline").AddArg("tab\tstop");
 
 		THEN ("the emitted response's argument is single-quoted") {
 			REQUIRE(r.
@@ -181,8 +166,7 @@ SCENARIO ("Responses correctly escape arguments with single quotes",
 
 			        Pack()
 
-			        ==
-			        R"(tag FLOAD 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
+			        == R"(tag FLOAD 'C:\Users\Test\Music\Bound 4 Da Reload (Casualty).mp3')");
 		}
 	}
 }

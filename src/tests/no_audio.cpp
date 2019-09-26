@@ -45,31 +45,25 @@ SCENARIO ("Null_audio returns a state of NONE", "[no-audio]") {
 	}
 }
 
-SCENARIO ("Null_audio throws exceptions when asked to do audio-type things",
-          "[no-audio]") {
+SCENARIO ("Null_audio throws exceptions when asked to do audio-type things", "[no-audio]") {
 	GIVEN ("A Null_audio object") {
 		audio::Null_audio n;
 
 		WHEN ("SetPlaying(true) is called") {
 			THEN ("Null_audio_error is thrown") {
-				REQUIRE_THROWS_AS(n.SetPlaying(true),
-				                  Null_audio_error);
+				REQUIRE_THROWS_AS(n.SetPlaying(true), Null_audio_error);
 			}
 		}
 
 		WHEN ("SetPlaying(false) is called") {
 			THEN ("Null_audio_error is thrown") {
-				REQUIRE_THROWS_AS(n.SetPlaying(false),
-				                  Null_audio_error);
+				REQUIRE_THROWS_AS(n.SetPlaying(false), Null_audio_error);
 			}
 		}
 
 		WHEN ("SetPosition() is called") {
 			THEN ("Null_audio_error is thrown") {
-				REQUIRE_THROWS_AS(
-				        n.SetPosition(
-				                std::chrono::microseconds{100}),
-				        Null_audio_error);
+				REQUIRE_THROWS_AS(n.SetPosition(std::chrono::microseconds{100}), Null_audio_error);
 			}
 		}
 

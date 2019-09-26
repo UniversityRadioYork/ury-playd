@@ -55,8 +55,7 @@ static void SDLCallback(void *vsink, unsigned char *data, int len)
 	Expects(data != nullptr);
 
 	auto sink = static_cast<Sdl_sink *>(vsink);
-	sink->Callback(
-	        gsl::span<std::byte>(reinterpret_cast<std::byte *>(data), len));
+	sink->Callback(gsl::span<std::byte>(reinterpret_cast<std::byte *>(data), len));
 }
 
 Sdl_sink::Sdl_sink(const audio::Source &source, int device_id)
@@ -68,8 +67,7 @@ Sdl_sink::Sdl_sink(const audio::Source &source, int device_id)
 {
 	auto name = SDL_GetAudioDeviceName(device_id, 0);
 	if (name == nullptr) {
-		throw Config_error(std::string("invalid device id: ") +
-		                   std::to_string(device_id));
+		throw Config_error(std::string("invalid device id: ") + std::to_string(device_id));
 	}
 
 	SDL_AudioSpec want;
@@ -85,8 +83,7 @@ Sdl_sink::Sdl_sink(const audio::Source &source, int device_id)
 
 	this->device = SDL_OpenAudioDevice(name, 0, &want, &have, 0);
 	if (this->device == 0) {
-		throw Config_error(std::string("couldn't open device: ") +
-		                   SDL_GetError());
+		throw Config_error(std::string("couldn't open device: ") + SDL_GetError());
 	}
 }
 
@@ -102,8 +99,7 @@ Sdl_sink::~Sdl_sink()
 /* static */ void Sdl_sink::InitLibrary()
 {
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-		throw Config_error(std::string("could not initialise SDL: ") +
-		                   SDL_GetError());
+		throw Config_error(std::string("could not initialise SDL: ") + SDL_GetError());
 	}
 }
 

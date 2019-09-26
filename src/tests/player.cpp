@@ -24,22 +24,14 @@ namespace playd::tests
 const std::map<std::string, Player::SourceFn> DUMMY_SRCS{
         {"mp3",
          [](std::string_view path) -> std::unique_ptr<audio::Source> {
-	         return std::make_unique<Dummy_audio_source, std::string_view>(
-	                 std::move(path));
+	         return std::make_unique<Dummy_audio_source, std::string_view>(std::move(path));
          }},
-        {"ogg",
-         [](std::string_view) -> std::unique_ptr<audio::Source> {
-	         throw File_error("test failure 1");
-         }},
-        {"flac", [](std::string_view) -> std::unique_ptr<audio::Source> {
-	         throw Internal_error("test failure 2");
-         }}};
+        {"ogg", [](std::string_view) -> std::unique_ptr<audio::Source> { throw File_error("test failure 1"); }},
+        {"flac", [](std::string_view) -> std::unique_ptr<audio::Source> { throw Internal_error("test failure 2"); }}};
 
 SCENARIO ("Player announces changes in state correctly", "[player]") {
 	GIVEN ("a fresh Player using dummy audio sources and sinks") {
-		Player p(0,
-		         &std::make_unique<Dummy_audio_sink, const audio::Source &, int>,
-		         DUMMY_SRCS);
+		Player p(0, &std::make_unique<Dummy_audio_sink, const audio::Source &, int>, DUMMY_SRCS);
 
 		WHEN ("the player has nothing loaded") {
 			GIVEN ("a dummy response sink") {
@@ -77,9 +69,7 @@ SCENARIO ("Player announces changes in state correctly", "[player]") {
 
 SCENARIO ("Player accurately represents whether it is running", "[player]") {
 	GIVEN ("a fresh Player using dummy audio sources and sinks") {
-		Player p(0,
-		         &std::make_unique<Dummy_audio_sink, const audio::Source &, int>,
-		         DUMMY_SRCS);
+		Player p(0, &std::make_unique<Dummy_audio_sink, const audio::Source &, int>, DUMMY_SRCS);
 
 		WHEN ("the player has not been asked to quit") {
 			THEN ("Update returns true (the player is running)") {
@@ -120,9 +110,7 @@ SCENARIO ("Player accurately represents whether it is running", "[player]") {
 
 SCENARIO ("Player interacts correctly with the audio system", "[player]") {
 	GIVEN ("a fresh Player using dummy audio sources and sinks") {
-		Player p(0,
-		         &std::make_unique<Dummy_audio_sink, const audio::Source &, int>,
-		         DUMMY_SRCS);
+		Player p(0, &std::make_unique<Dummy_audio_sink, const audio::Source &, int>, DUMMY_SRCS);
 
 		WHEN ("there is no audio loaded") {
 			THEN ("playing returns failure") {
@@ -176,8 +164,7 @@ SCENARIO ("Player interacts correctly with the audio system", "[player]") {
 				              == "tag ACK OK success");
 			}
 			THEN ("loading for an empty filename returns failure") {
-				auto r = "tag ACK WHAT '"s +
-				         std::string{MSG_LOAD_EMPTY_PATH} + "'"s;
+				auto r = "tag ACK WHAT '"s + std::string{MSG_LOAD_EMPTY_PATH} + "'"s;
 				REQUIRE(p.Load("tag", "").
 
 				        Pack()
@@ -248,9 +235,7 @@ SCENARIO ("Player interacts correctly with the audio system", "[player]") {
 				}
 				THEN ("loading for an empty filename returns "
 				      "failure") {
-					auto r = "tag ACK WHAT '"s +
-					         std::string{MSG_LOAD_EMPTY_PATH} +
-					         "'"s;
+					auto r = "tag ACK WHAT '"s + std::string{MSG_LOAD_EMPTY_PATH} + "'"s;
 					REQUIRE(p.Load("tag", "").
 
 					        Pack()
@@ -323,9 +308,7 @@ SCENARIO ("Player interacts correctly with the audio system", "[player]") {
 				}
 				THEN ("loading for an empty filename returns "
 				      "failure") {
-					auto r = "tag ACK WHAT '"s +
-					         std::string{MSG_LOAD_EMPTY_PATH} +
-					         "'"s;
+					auto r = "tag ACK WHAT '"s + std::string{MSG_LOAD_EMPTY_PATH} + "'"s;
 					REQUIRE(p.Load("tag", "").
 
 					        Pack()
@@ -339,14 +322,11 @@ SCENARIO ("Player interacts correctly with the audio system", "[player]") {
 
 SCENARIO ("Player refuses absurd seek positions", "[seek]") {
 	GIVEN ("a loaded Player") {
-		Player p(0,
-		         &std::make_unique<Dummy_audio_sink, const audio::Source &, int>,
-		         DUMMY_SRCS);
+		Player p(0, &std::make_unique<Dummy_audio_sink, const audio::Source &, int>, DUMMY_SRCS);
 
 		p.Load("tag", "blah.mp3");
 
-		auto response = "tag ACK WHAT '"s +
-		                std::string{MSG_SEEK_INVALID_VALUE} + "'"s;
+		auto response = "tag ACK WHAT '"s + std::string{MSG_SEEK_INVALID_VALUE} + "'"s;
 
 		WHEN ("the player is told to seek to a negative time") {
 			auto res = p.Pos("tag", "-5");
@@ -415,9 +395,7 @@ SCENARIO ("Player refuses absurd seek positions", "[seek]") {
 
 SCENARIO ("Player handles End requests correctly", "[player]") {
 	GIVEN ("a loaded Player") {
-		Player p(0,
-		         &std::make_unique<Dummy_audio_sink, const audio::Source &, int>,
-		         DUMMY_SRCS);
+		Player p(0, &std::make_unique<Dummy_audio_sink, const audio::Source &, int>, DUMMY_SRCS);
 
 		p.Load("tag", "blah.mp3");
 
@@ -444,14 +422,11 @@ SCENARIO ("Player handles End requests correctly", "[player]") {
 
 SCENARIO ("Player refuses commands when quitting", "[player]") {
 	GIVEN ("a loaded Player") {
-		Player p(0,
-		         &std::make_unique<Dummy_audio_sink, const audio::Source &, int>,
-		         DUMMY_SRCS);
+		Player p(0, &std::make_unique<Dummy_audio_sink, const audio::Source &, int>, DUMMY_SRCS);
 
 		p.Load("tag", "blah.mp3");
 
-		auto response = "tag ACK FAIL '"s +
-		                std::string{MSG_CMD_PLAYER_CLOSING} + "'"s;
+		auto response = "tag ACK FAIL '"s + std::string{MSG_CMD_PLAYER_CLOSING} + "'"s;
 
 		WHEN ("the player is told to quit") {
 			p.Quit("t");
@@ -522,9 +497,7 @@ SCENARIO ("Player refuses commands when quitting", "[player]") {
 
 SCENARIO ("Player handles load errors properly", "[seek]") {
 	GIVEN ("a Player") {
-		Player p(0,
-		         &std::make_unique<Dummy_audio_sink, const audio::Source &, int>,
-		         DUMMY_SRCS);
+		Player p(0, &std::make_unique<Dummy_audio_sink, const audio::Source &, int>, DUMMY_SRCS);
 
 		WHEN ("no file is loaded") {
 			std::ostringstream os;
@@ -559,9 +532,7 @@ SCENARIO ("Player handles load errors properly", "[seek]") {
 			AND_WHEN("a load fails with InternalError")
 			{
 				THEN ("the error propagates outwards") {
-					REQUIRE_THROWS_AS(
-					        p.Load("tag", "blah.flac"),
-					        Internal_error);
+					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), Internal_error);
 				}
 			}
 		}
@@ -601,9 +572,7 @@ SCENARIO ("Player handles load errors properly", "[seek]") {
 			AND_WHEN("a load fails with InternalError")
 			{
 				THEN ("the error propagates outwards") {
-					REQUIRE_THROWS_AS(
-					        p.Load("tag", "blah.flac"),
-					        Internal_error);
+					REQUIRE_THROWS_AS(p.Load("tag", "blah.flac"), Internal_error);
 				}
 			}
 		}

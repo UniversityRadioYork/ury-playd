@@ -14,7 +14,7 @@ UseTab:                              ForIndentation
 ForEachMacros: ['SCENARIO', 'GIVEN', 'WHEN', 'THEN']
 
 AccessModifierOffset:         -8
-ColumnLimit:                  80
+ColumnLimit:                  120
 SpacesBeforeTrailingComments:  1
 IndentWidth:                   8
 TabWidth:                      8

@@ -23,23 +23,17 @@ SCENARIO ("Ring buffer cannot be read from when empty", "[ringbuffer]") {
 
 		WHEN ("a read is called for one item") {
 			THEN ("an InternalError is raised") {
-				REQUIRE_THROWS_AS(
-				        rb.Read(gsl::span<std::byte>{buf, 1}),
-				        Internal_error);
+				REQUIRE_THROWS_AS(rb.Read(gsl::span<std::byte>{buf, 1}), Internal_error);
 			}
 		}
 		WHEN ("a read is called for 'cap' items") {
 			THEN ("an InternalError is raised") {
-				REQUIRE_THROWS_AS(
-				        rb.Read(gsl::span<std::byte>{buf, cap}),
-				        Internal_error);
+				REQUIRE_THROWS_AS(rb.Read(gsl::span<std::byte>{buf, cap}), Internal_error);
 			}
 		}
 		WHEN ("a read is called for 'cap' + 1 items") {
 			THEN ("an InternalError is raised") {
-				REQUIRE_THROWS_AS(rb.Read(gsl::span<std::byte>{
-				                          buf, cap + 1}),
-				                  Internal_error);
+				REQUIRE_THROWS_AS(rb.Read(gsl::span<std::byte>{buf, cap + 1}), Internal_error);
 			}
 		}
 	}
@@ -50,8 +44,7 @@ SCENARIO ("Ring buffer cannot be written to when full", "[ringbuffer]") {
 
 	GIVEN ("a full ring buffer") {
 		audio::Ring_buffer rb{cap};
-		gsl::czstring<> msg{
-		        "this message is 2^5 chars long!\0this bit isn't\0"};
+		gsl::czstring<> msg{"this message is 2^5 chars long!\0this bit isn't\0"};
 		// TODO(MattWindsor91): this is technically not portable in the slightest.
 		auto m8 = reinterpret_cast<const std::byte *>(msg);
 
@@ -59,26 +52,17 @@ SCENARIO ("Ring buffer cannot be written to when full", "[ringbuffer]") {
 
 		WHEN ("a write is called for one item") {
 			THEN ("an internal error is raised") {
-				REQUIRE_THROWS_AS(
-				        rb.Write(gsl::span<const std::byte>(m8,
-				                                            1)),
-				        Internal_error);
+				REQUIRE_THROWS_AS(rb.Write(gsl::span<const std::byte>(m8, 1)), Internal_error);
 			}
 		}
 		WHEN ("a write is called for 'cap' items") {
 			THEN ("an internal error is raised") {
-				REQUIRE_THROWS_AS(
-				        rb.Write(gsl::span<const std::byte>{
-				                m8, cap}),
-				        Internal_error);
+				REQUIRE_THROWS_AS(rb.Write(gsl::span<const std::byte>{m8, cap}), Internal_error);
 			}
 		}
 		WHEN ("a write is called for 'cap' + 1 items") {
 			THEN ("an internal error is raised") {
-				REQUIRE_THROWS_AS(
-				        rb.Write(gsl::span<const std::byte>{
-				                m8, cap + 1}),
-				        Internal_error);
+				REQUIRE_THROWS_AS(rb.Write(gsl::span<const std::byte>{m8, cap + 1}), Internal_error);
 			}
 		}
 	}
@@ -89,8 +73,7 @@ SCENARIO ("Ring buffer reports capacities correctly", "[ringbuffer]") {
 		constexpr int cap{32};
 		audio::Ring_buffer rb{cap};
 		std::byte buf[cap];
-		gsl::czstring<> msg{
-		        "this message is 2^5 chars long!\0this bit isn't\0"};
+		gsl::czstring<> msg{"this message is 2^5 chars long!\0this bit isn't\0"};
 		// TODO(MattWindsor91): this is technically not portable in the slightest.
 		auto m8 = reinterpret_cast<const std::byte *>(msg);
 

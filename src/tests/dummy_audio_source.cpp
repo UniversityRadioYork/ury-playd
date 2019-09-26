@@ -19,8 +19,7 @@ namespace playd::tests
 {
 audio::Source::Decode_result Dummy_audio_source::Decode()
 {
-	auto state = run_out ? audio::Source::Decode_state::eof
-	                     : audio::Source::Decode_state::decoding;
+	auto state = run_out ? audio::Source::Decode_state::eof : audio::Source::Decode_state::decoding;
 	return std::make_pair(state, audio::Source::Decode_vector());
 }
 
