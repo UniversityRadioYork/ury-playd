@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 
 	// Set up the IO now (to avoid a circular dependency).
 	// Make sure the player broadcasts its responses back to the IoCore.
-	playd::Io_core io{player};
+	playd::io::Core io{player};
 	player.SetIo(io);
 
 	// Now, actually run the IO loop.

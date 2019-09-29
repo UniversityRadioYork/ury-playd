@@ -25,41 +25,45 @@ typedef ptrdiff_t ssize_t;
 #include "response.h"
 #include "tokeniser.h"
 
+// Forward declaration needed because of cyclic dependency between playd::io::Core and playd::Player.
 namespace playd {
-
     class Player;
+}
+
+namespace playd::io {
+
 
     class Connection;
 
-/**
- * The IO core, which services input, routes responses, and executes the
- * Player update routine periodically.
- *
- * The IO core also maintains a pool of connections which can be sent responses
- * via their IDs inside the pool.  It ensures that each connection is given an
- * ID that is unique up until the removal of said connection.
- */
-    class Io_core : public Response_sink {
+    /**
+     * The IO core, which services input, routes responses, and executes the
+     * Player update routine periodically.
+     *
+     * The IO core also maintains a pool of connections which can be sent responses
+     * via their IDs inside the pool.  It ensures that each connection is given an
+     * ID that is unique up until the removal of said connection.
+     */
+    class Core : public Response_sink {
     public:
         /**
          * Constructs an IO core.
          * @param player The player to which update requests, commands, and new
          *   connection state dump requests shall be sent.
          */
-        explicit Io_core(Player &player);
+        explicit Core(Player &player);
 
         /// Deleted copy constructor.
-        Io_core(const Io_core &) = delete;
+        Core(const Core &) = delete;
 
         /// Deleted copy-assignment.
-        Io_core &operator=(const Io_core &) = delete;
+        Core &operator=(const Core &) = delete;
 
         /**
          * Runs the reactor.
          * It will block until it terminates.
          * @param host The IP host to which the IO core will bind.
          * @param port The TCP port to which the IO core will bind.
-         * @exception NetError Thrown if the IO core cannot bind to @a host or @a
+         * @exception Net_error Thrown if the IO core cannot bind to @a host or @a
          *   port.
          */
         void Run(std::string_view host, std::string_view port);
@@ -178,13 +182,13 @@ namespace playd {
         void Unicast(size_t id, const Response &response) const;
     };
 
-/**
- * A TCP connection from a client.
- *
- * This class wraps a libuv TCP stream representing a client connection,
- * allowing it to be sent responses (directly, or via a broadcast), removed
- * from its IoCore, and queried for its name.
- */
+    /**
+     * A TCP connection from a client.
+     *
+     * This class wraps a libuv TCP stream representing a client connection,
+     * allowing it to be sent responses (directly, or via a broadcast), removed
+     * from its IoCore, and queried for its name.
+     */
     class Connection {
     public:
         /**
@@ -194,7 +198,7 @@ namespace playd {
          * @param player The player to which read commands should be sent.
          * @param id The ID of this Connection in the IoCore.
          */
-        Connection(Io_core &parent, uv_tcp_t *tcp, Player &player, size_t id);
+        Connection(Core &parent, uv_tcp_t *tcp, Player &player, size_t id);
 
         /**
          * Destructs a Connection.
@@ -245,7 +249,7 @@ namespace playd {
 
     private:
         /// The pool on which this connection is running.
-        Io_core &parent;
+        Core &parent;
 
         /// The libuv handle for the TCP connection.
         uv_tcp_t *tcp;

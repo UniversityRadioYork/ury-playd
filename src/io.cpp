@@ -37,9 +37,9 @@ typedef ptrdiff_t ssize_t;
 
 #include "io.h"
 
-namespace playd {
+namespace playd::io {
 
-    const std::uint16_t Io_core::PLAYER_UPDATE_PERIOD = 5; // ms
+    const std::uint16_t Core::PLAYER_UPDATE_PERIOD = 5; // ms
 
 //
 // libuv callbacks
@@ -47,19 +47,19 @@ namespace playd {
 // These should generally trampoline back into class methods.
 //
 
-/// The function used to allocate and initialise buffers for client reading.
+    /// The function used to allocate and initialise buffers for client reading.
     void UvAlloc(uv_handle_t *, size_t suggested_size, uv_buf_t *buf) {
         // Since we used new here, we need to use delete when we finish reading.
         *buf = uv_buf_init(new char[suggested_size](), suggested_size);
     }
 
-/// The callback fired when a client connection closes.
+    /// The callback fired when a client connection closes.
     void UvCloseCallback(uv_handle_t *handle) {
         assert(handle != nullptr);
         delete handle;
     }
 
-/// The callback fired when some bytes are read from a client connection.
+    /// The callback fired when some bytes are read from a client connection.
     void UvReadCallback(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf) {
         assert(stream != nullptr);
 
@@ -73,12 +73,12 @@ namespace playd {
         // It will be used for future reads on this client!
     }
 
-/// The callback fired when a new client connection is acquired by the listener.
+    /// The callback fired when a new client connection is acquired by the listener.
     void UvListenCallback(uv_stream_t *server, int status) {
         assert(server != nullptr);
         if (status < 0) return;
 
-        auto *io = static_cast<Io_core *>(server->data);
+        auto *io = static_cast<Core *>(server->data);
         assert(io != nullptr);
 
         io->Accept(server);
@@ -110,7 +110,7 @@ namespace playd {
     void UvUpdateTimerCallback(uv_timer_t *handle) {
         assert(handle != nullptr);
 
-        auto *io = static_cast<Io_core *>(handle->data);
+        auto *io = static_cast<Core *>(handle->data);
         assert(io != nullptr);
 
         io->UpdatePlayer();
@@ -159,10 +159,10 @@ namespace playd {
 // IoCore
 //
 
-    Io_core::Io_core(Player &player) : loop{nullptr}, player{player} {
+    Core::Core(Player &player) : loop{nullptr}, player{player} {
     }
 
-    void Io_core::Run(std::string_view host, std::string_view port) {
+    void Core::Run(std::string_view host, std::string_view port) {
         this->loop = uv_default_loop();
         if (this->loop == nullptr) throw Internal_error(MSG_IO_CANNOT_ALLOC);
 
@@ -177,7 +177,7 @@ namespace playd {
         uv_loop_close(this->loop);
     }
 
-    void Io_core::Accept(uv_stream_t *server) {
+    void Core::Accept(uv_stream_t *server) {
         assert(server != nullptr);
         assert(this->loop != nullptr);
 
@@ -211,7 +211,7 @@ namespace playd {
                       UvReadCallback);
     }
 
-    size_t Io_core::NextConnectionID() {
+    size_t Core::NextConnectionID() {
         // We'll want to try and use an existing, empty ID in the connection
         // pool.  If there aren't any (we've exceeded the maximum-so-far number
         // of simultaneous connections), we expand the pool.
@@ -230,7 +230,7 @@ namespace playd {
         return id;
     }
 
-    void Io_core::ExpandPool() {
+    void Core::ExpandPool() {
         // If we already have SIZE_MAX-1 simultaneous connections, we bail out.
         // Since this is at least 65,534, and likely to be 2^32-2 or 2^64-2,
         // this is incredibly unlikely to happen and probably means someone's
@@ -246,7 +246,7 @@ namespace playd {
         this->free_list.push_back(this->pool.size());
     }
 
-    void Io_core::Remove(size_t slot) {
+    void Core::Remove(size_t slot) {
         assert(0 < slot && slot <= this->pool.size());
 
         // Don't remove if it's already a nullptr, because we'd end up with the
@@ -259,12 +259,12 @@ namespace playd {
         assert(!this->pool.at(slot - 1));
     }
 
-    void Io_core::UpdatePlayer() {
+    void Core::UpdatePlayer() {
         const auto running = this->player.Update();
         if (!running) this->Shutdown();
     }
 
-    void Io_core::Shutdown() {
+    void Core::Shutdown() {
         Debug() << "Shutting down..." << std::endl;
 
         // If the player is ready to terminate, we need to kill the event loop
@@ -288,7 +288,7 @@ namespace playd {
         uv_close(reinterpret_cast<uv_handle_t *>(&this->sigint), nullptr);
     }
 
-    void Io_core::Respond(size_t id, const Response &response) const {
+    void Core::Respond(size_t id, const Response &response) const {
         if (this->pool.empty()) return;
 
         if (id == 0) {
@@ -298,7 +298,7 @@ namespace playd {
         }
     }
 
-    void Io_core::Broadcast(const Response &response) const {
+    void Core::Broadcast(const Response &response) const {
         Debug() << "broadcast:" << response.Pack() << std::endl;
 
         // Copy the connection by value, so that there's at least one
@@ -308,7 +308,7 @@ namespace playd {
         }
     }
 
-    void Io_core::Unicast(size_t id, const Response &response) const {
+    void Core::Unicast(size_t id, const Response &response) const {
         assert(0 < id && id <= this->pool.size());
 
         Debug() << "unicast @" << std::to_string(id) << ":" << response.Pack()
@@ -318,7 +318,7 @@ namespace playd {
         if (c) c->Respond(response);
     }
 
-    void Io_core::InitUpdateTimer() {
+    void Core::InitUpdateTimer() {
         assert(this->loop != nullptr);
 
         uv_timer_init(this->loop, &this->updater);
@@ -328,7 +328,7 @@ namespace playd {
                        PLAYER_UPDATE_PERIOD);
     }
 
-    void Io_core::InitAcceptor(std::string_view address, std::string_view port) {
+    void Core::InitAcceptor(std::string_view address, std::string_view port) {
         assert(this->loop != nullptr);
 
         if (uv_tcp_init(this->loop, &this->server)) {
@@ -356,7 +356,7 @@ namespace playd {
         Debug() << "Listening at" << address << "on" << port << std::endl;
     }
 
-    void Io_core::InitSignals() {
+    void Core::InitSignals() {
         const auto r = uv_signal_init(this->loop, &this->sigint);
         if (r) {
             auto error = std::string{MSG_IO_CANNOT_ALLOC} + ": " + uv_err_name(r);
@@ -375,7 +375,7 @@ namespace playd {
 // Connection
 //
 
-    Connection::Connection(Io_core &parent, uv_tcp_t *tcp, Player &player, size_t id)
+    Connection::Connection(Core &parent, uv_tcp_t *tcp, Player &player, size_t id)
             : parent(parent), tcp(tcp), tokeniser(), player(player), id(id) {
         Debug() << "Opening connection from" << Name() << std::endl;
     }
