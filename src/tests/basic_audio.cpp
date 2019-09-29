@@ -18,9 +18,9 @@
 namespace playd::tests
 {
 SCENARIO (
-        "Basic_audio can be constructed with a DummyAudio_sink and "
-        "DummyAudio_source",
-        "[pipe-audio]") {
+        "Basic_audio can be constructed with a Dummy_audio_sink and "
+        "Dummy_audio_source",
+        "[basic-audio]") {
 	GIVEN ("unique pointers to a sink and source") {
 		auto src = std::make_unique<Dummy_audio_source>("test");
 		auto sink = std::make_unique<Dummy_audio_sink>(*src, 0);
@@ -29,17 +29,13 @@ SCENARIO (
 			THEN ("no exceptions are thrown and queries return the "
 			      "expected initial values") {
 				audio::Basic_audio pa(std::move(src), std::move(sink));
-				REQUIRE(pa.
-
-				        Position()
-
-				        == std::chrono::microseconds{0});
+				REQUIRE(pa.Position() == std::chrono::microseconds{0});
 			}
 		}
 	}
 }
 
-SCENARIO ("Basic_audio responds to getters with valid responses", "[pipe-audio]") {
+SCENARIO ("Basic_audio responds to getters with valid responses", "[basic-audio]") {
 	GIVEN ("a valid Basic_audio and dummy components") {
 		auto src = std::make_unique<Dummy_audio_source>("test");
 		auto snk = std::make_unique<Dummy_audio_sink>(*src, 0);
@@ -108,7 +104,7 @@ SCENARIO ("Basic_audio responds to getters with valid responses", "[pipe-audio]"
 	}
 }
 
-SCENARIO ("Basic_audio propagates source emptiness correctly", "[pipe-audio]") {
+SCENARIO ("Basic_audio propagates source emptiness correctly", "[basic-audio]") {
 	GIVEN ("a valid set of dummy components") {
 		auto src = std::make_unique<Dummy_audio_source>("test");
 		auto snk = std::make_unique<Dummy_audio_sink>(*src, 0);
@@ -133,7 +129,7 @@ SCENARIO ("Basic_audio propagates source emptiness correctly", "[pipe-audio]") {
 	}
 }
 
-SCENARIO ("Basic_audio acquires state from the sink correctly", "[pipe-audio]") {
+SCENARIO ("Basic_audio acquires state from the sink correctly", "[basic-audio]") {
 	GIVEN ("a valid set of dummy components") {
 		auto src = std::make_unique<Dummy_audio_source>("test");
 		auto snk = std::make_unique<Dummy_audio_sink>(*src, 0);

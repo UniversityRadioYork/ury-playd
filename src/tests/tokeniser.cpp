@@ -20,19 +20,11 @@ SCENARIO ("Tokenisers can handle complete, unquoted commands", "[tokeniser]") {
 			auto lines = t.Feed("stop\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
 			THEN ("the word is the nullary command") {
@@ -44,19 +36,11 @@ SCENARIO ("Tokenisers can handle complete, unquoted commands", "[tokeniser]") {
 			auto lines = t.Feed("seek 10s\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains two words") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 2);
+				REQUIRE(lines[0].size() == 2);
 			}
 
 			THEN ("the first word is the command") {
@@ -74,54 +58,34 @@ SCENARIO ("Tokenisers can handle single-quoted strings", "[tokeniser]") {
 	GIVEN ("A fresh Tokeniser") {
 		Tokeniser t;
 
-		WHEN ("the Tokeniser is fed a single-quoted string with no "
-		      "special characters") {
+		WHEN ("the Tokeniser is fed a single-quoted string with no special characters") {
 			auto lines = t.Feed("'normal_string'\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains only one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
-			THEN ("the word contains the bytes enclosed in the "
-			      "single quotes") {
+			THEN ("the word contains the bytes enclosed in the single quotes") {
 				REQUIRE(lines[0][0] == "normal_string");
 			}
 		}
 
-		WHEN ("the Tokeniser is fed a single-quoted string with "
-		      "spaces") {
+		WHEN ("the Tokeniser is fed a single-quoted string with spaces") {
 			auto lines = t.Feed("'not three words'\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains only one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
-			THEN ("the word contains the bytes enclosed in the "
-			      "single quotes") {
+			THEN ("the word contains the bytes enclosed in the single quotes") {
 				REQUIRE(lines[0][0] == "not three words");
 			}
 		}
@@ -134,54 +98,34 @@ SCENARIO ("Tokenisers can handle double-quoted strings", "[tokeniser]") {
 	GIVEN ("A fresh Tokeniser") {
 		Tokeniser t;
 
-		WHEN ("the Tokeniser is fed a double-quoted string with no "
-		      "special characters") {
+		WHEN ("the Tokeniser is fed a double-quoted string with no special characters") {
 			auto lines = t.Feed("\"normal_string\"\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains only one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
-			THEN ("the word contains the bytes enclosed in the "
-			      "double quotes") {
+			THEN ("the word contains the bytes enclosed in the double quotes") {
 				REQUIRE(lines[0][0] == "normal_string");
 			}
 		}
 
-		WHEN ("the Tokeniser is fed a double-quoted string with "
-		      "spaces") {
+		WHEN ("the Tokeniser is fed a double-quoted string with spaces") {
 			auto lines = t.Feed("\"not three words\"\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains only one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
-			THEN ("the word contains the bytes enclosed in the "
-			      "double quotes") {
+			THEN ("the word contains the bytes enclosed in the double quotes") {
 				REQUIRE(lines[0][0] == "not three words");
 			}
 		}
@@ -191,30 +135,20 @@ SCENARIO ("Tokenisers can handle double-quoted strings", "[tokeniser]") {
 }
 
 SCENARIO ("Tokenisers can handle mixed-quoted strings", "[tokeniser]") {
-	// This is a slightly strange concept, but is based on what happens in
-	// POSIX shell.
+	// This is a slightly strange concept, but is based on what happens in POSIX shell.
 
 	GIVEN ("A fresh Tokeniser") {
 		Tokeniser t;
 
-		WHEN ("the Tokeniser is fed a word with a mixture of different "
-		      "quote styles") {
+		WHEN ("the Tokeniser is fed a word with a mixture of different quote styles") {
 			auto lines = t.Feed("This' is'\\ perfectly\"\\ valid \"syntax!\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains only one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
 			THEN ("the word contains the concatenation of each") {
@@ -228,24 +162,15 @@ SCENARIO ("Tokenisers can backslash-escape bytes", "[tokeniser]") {
 	GIVEN ("A fresh Tokeniser") {
 		Tokeniser t;
 
-		WHEN ("the Tokeniser is fed a backslashed space in unquoted "
-		      "mode") {
+		WHEN ("the Tokeniser is fed a backslashed space in unquoted mode") {
 			auto lines = t.Feed("backslashed\\ space\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains only one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
 			THEN ("the line contains the space, but no backslash") {
@@ -253,55 +178,34 @@ SCENARIO ("Tokenisers can backslash-escape bytes", "[tokeniser]") {
 			}
 		}
 
-		WHEN ("the Tokeniser is fed a backslashed space in "
-		      "double-quoted mode") {
+		WHEN ("the Tokeniser is fed a backslashed space in double-quoted mode") {
 			auto lines = t.Feed("\"backslashed\\ space\"\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains only one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
-			THEN ("the line contains the space, but no backslash "
-			      "or "
-			      "quotes") {
+			THEN ("the line contains the space, but no backslash or quotes") {
 				REQUIRE(lines[0][0] == "backslashed space");
 			}
 		}
 
-		WHEN ("the Tokeniser is fed a backslashed space in "
-		      "single-quoted mode") {
+		WHEN ("the Tokeniser is fed a backslashed space in single-quoted mode") {
 			auto lines = t.Feed("'backslashed\\ space'\n");
 
 			THEN ("one line is returned") {
-				REQUIRE(lines.
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines.size() == 1);
 			}
 
 			THEN ("the line contains only one word") {
-				REQUIRE(lines[0].
-
-				        size()
-
-				        == 1);
+				REQUIRE(lines[0].size() == 1);
 			}
 
-			THEN ("the line contains the space AND backslash, but "
-			      "no quotes") {
+			THEN ("the line contains the space AND backslash, but no quotes") {
 				REQUIRE(lines[0][0] == "backslashed\\ space");
 			}
 		}
@@ -448,13 +352,10 @@ SCENARIO ("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 			}
 		}
 		WHEN ("the Tokeniser is fed Q9") {
-			auto lines =
-			        t.Feed("\"hello, this is an \\\" escaped "
-			               "double quote\"\n");
+			auto lines = t.Feed("\"hello, this is an \\\" escaped double quote\"\n");
 			THEN ("the Tokeniser returns the specified result") {
 				std::vector<std::vector<std::string>> want = {
-				        {"hello, this is an \" escaped double "
-				         "quote"}};
+				        {"hello, this is an \" escaped double quote"}};
 				REQUIRE(lines == want);
 			}
 		}
@@ -473,9 +374,7 @@ SCENARIO ("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 			}
 		}
 		WHEN ("the Tokeniser is fed X1") {
-			auto lines =
-			        t.Feed("enqueue file \"C:\\\\Users\\\\Test\\\\Artist "
-			               "- Title.mp3\" 1\n");
+			auto lines = t.Feed("enqueue file \"C:\\\\Users\\\\Test\\\\Artist - Title.mp3\" 1\n");
 			THEN ("the Tokeniser returns the specified result") {
 				std::vector<std::vector<std::string>> want = {
 				        {"enqueue", "file", R"(C:\Users\Test\Artist - Title.mp3)", "1"}};

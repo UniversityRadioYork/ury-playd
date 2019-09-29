@@ -68,8 +68,8 @@ set(SRCS ${SRCS}
   src/response.cpp
   src/tokeniser.cpp
   src/audio/audio.cpp
-        src/audio/sink.cpp
-        src/audio/source.cpp
+  src/audio/sink.cpp
+  src/audio/source.cpp
   src/audio/ringbuffer.cpp
   src/audio/sample_format.cpp
   )
@@ -78,10 +78,10 @@ set(tests_SRCS ${tests_SRCS}
   src/tests/dummy_audio_source.cpp
   src/tests/dummy_response_sink.cpp
   src/tests/errors.cpp
-  src/tests/io_response.cpp
+  src/tests/response.cpp
   src/tests/main.cpp
-  src/tests/no_audio.cpp
-  src/tests/pipe_audio.cpp
+  src/tests/null_audio.cpp
+  src/tests/basic_audio.cpp
   src/tests/player.cpp
   src/tests/ringbuffer.cpp
   src/tests/tokeniser.cpp

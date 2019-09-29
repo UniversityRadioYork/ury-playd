@@ -79,18 +79,10 @@ SCENARIO ("Ring buffer reports capacities correctly", "[ringbuffer]") {
 
 		WHEN ("nothing is written") {
 			THEN ("ReadCapacity() is 0") {
-				REQUIRE(rb.
-
-				        ReadCapacity()
-
-				        == 0);
+				REQUIRE(rb.ReadCapacity() == 0);
 			}
 			THEN ("WriteCapacity() is 'cap'") {
-				REQUIRE(rb.
-
-				        WriteCapacity()
-
-				        == cap);
+				REQUIRE(rb.WriteCapacity() == cap);
 			}
 		}
 		WHEN ("the buffer is partially written to") {
@@ -100,18 +92,10 @@ SCENARIO ("Ring buffer reports capacities correctly", "[ringbuffer]") {
 			rb.Write(gsl::span<const std::byte>{m8, amt});
 
 			THEN ("ReadCapacity() is the amount written") {
-				REQUIRE(rb.
-
-				        ReadCapacity()
-
-				        == amt);
+				REQUIRE(rb.ReadCapacity() == amt);
 			}
 			THEN ("WriteCapacity() is 'cap' - the amount written") {
-				REQUIRE(rb.
-
-				        WriteCapacity()
-
-				        == cap - amt);
+				REQUIRE(rb.WriteCapacity() == cap - amt);
 			}
 
 			AND_WHEN("the buffer is fully read from")
@@ -119,40 +103,22 @@ SCENARIO ("Ring buffer reports capacities correctly", "[ringbuffer]") {
 				rb.Read(gsl::span<std::byte>{buf, cap - amt});
 
 				THEN ("ReadCapacity() is 0") {
-					REQUIRE(rb.
-
-					        ReadCapacity()
-
-					        == 0);
+					REQUIRE(rb.ReadCapacity() == 0);
 				}
 				THEN ("WriteCapacity() is 'cap'") {
-					REQUIRE(rb.
-
-					        WriteCapacity()
-
-					        == cap);
+					REQUIRE(rb.WriteCapacity() == cap);
 				}
 			}
 
 			AND_WHEN("the buffer is flushed")
 			{
-				rb.
-
-				        Flush();
+				rb.Flush();
 
 				THEN ("ReadCapacity() is 0") {
-					REQUIRE(rb.
-
-					        ReadCapacity()
-
-					        == 0);
+					REQUIRE(rb.ReadCapacity() == 0);
 				}
 				THEN ("WriteCapacity() is 'cap'") {
-					REQUIRE(rb.
-
-					        WriteCapacity()
-
-					        == cap);
+					REQUIRE(rb.WriteCapacity() == cap);
 				}
 			}
 		}
@@ -160,39 +126,21 @@ SCENARIO ("Ring buffer reports capacities correctly", "[ringbuffer]") {
 			rb.Write(gsl::span<const std::byte>{m8, cap});
 
 			THEN ("ReadCapacity() is 'cap'") {
-				REQUIRE(rb.
-
-				        ReadCapacity()
-
-				        == cap);
+				REQUIRE(rb.ReadCapacity() == cap);
 			}
 			THEN ("WriteCapacity() is 0") {
-				REQUIRE(rb.
-
-				        WriteCapacity()
-
-				        == 0);
+				REQUIRE(rb.WriteCapacity() == 0);
 			}
 
 			AND_WHEN("the buffer is flushed")
 			{
-				rb.
-
-				        Flush();
+				rb.Flush();
 
 				THEN ("ReadCapacity() is 0") {
-					REQUIRE(rb.
-
-					        ReadCapacity()
-
-					        == 0);
+					REQUIRE(rb.ReadCapacity() == 0);
 				}
 				THEN ("WriteCapacity() is 'cap'") {
-					REQUIRE(rb.
-
-					        WriteCapacity()
-
-					        == cap);
+					REQUIRE(rb.WriteCapacity() == cap);
 				}
 			}
 		}

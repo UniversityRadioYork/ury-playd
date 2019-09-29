@@ -17,7 +17,7 @@
 
 namespace playd::tests
 {
-SCENARIO ("Null_audio reports the state as none", "[no-audio]") {
+SCENARIO ("Null_audio reports the state as none", "[null-audio]") {
 	GIVEN ("A Null_audio object") {
 		audio::Null_audio n;
 
@@ -31,7 +31,7 @@ SCENARIO ("Null_audio reports the state as none", "[no-audio]") {
 	}
 }
 
-SCENARIO ("Null_audio returns a state of NONE", "[no-audio]") {
+SCENARIO ("Null_audio returns a state of NONE", "[null-audio]") {
 	GIVEN ("A Null_audio object") {
 		audio::Null_audio n;
 
@@ -45,7 +45,7 @@ SCENARIO ("Null_audio returns a state of NONE", "[no-audio]") {
 	}
 }
 
-SCENARIO ("Null_audio throws exceptions when asked to do audio-type things", "[no-audio]") {
+SCENARIO ("Null_audio throws exceptions when asked to do audio-type things", "[null-audio]") {
 	GIVEN ("A Null_audio object") {
 		audio::Null_audio n;
 
@@ -69,23 +69,13 @@ SCENARIO ("Null_audio throws exceptions when asked to do audio-type things", "[n
 
 		WHEN ("Position() is called") {
 			THEN ("Null_audio_error is thrown") {
-				REQUIRE_THROWS_AS(n.
-
-				                  Position(),
-				                  Null_audio_error
-
-				);
+				REQUIRE_THROWS_AS(n.Position(), Null_audio_error);
 			}
 		}
 
 		WHEN ("File() is called") {
 			THEN ("Null_audio_error is thrown") {
-				REQUIRE_THROWS_AS(n.
-
-				                  File(),
-				                  Null_audio_error
-
-				);
+				REQUIRE_THROWS_AS(n.File(), Null_audio_error);
 			}
 		}
 	}
