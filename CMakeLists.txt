@@ -13,7 +13,7 @@ option(WITH_SNDFILE "Enable libsndfile support" ON)
 include(version)
 
 # Add in the location of the GSL, which expects itself to be in a system include directory
-include_directories("${playd_SOURCE_DIR}/src/contrib")
+include_directories("${playd_SOURCE_DIR}/src/contrib/GSL/include")
 
 # Find mandatory libraries
 find_package(SDL2 REQUIRED)
