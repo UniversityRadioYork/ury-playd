@@ -25,7 +25,7 @@
 #include "audio/sources/sndfile.h"
 #endif // WITH_SNDFILE
 
-namespace playd {
+namespace Playd {
 
 /// The default IP hostname on which playd will bind.
     constexpr std::string_view DEFAULT_HOST{"0.0.0.0"};
@@ -36,13 +36,13 @@ namespace playd {
 /// Map from file extensions to Audio_source builder functions.
     static const std::map<std::string, Player::SourceFn> SOURCES{
 #ifdef WITH_MP3
-            {"mp3", audio::Mp3_source::MakeUnique},
+            {"mp3", Audio::MP3Source::MakeUnique},
 #endif // WITH_MP3
 
 #ifdef WITH_SNDFILE
-            {"flac", audio::Sndfile_source::MakeUnique},
-            {"ogg", audio::Sndfile_source::MakeUnique},
-            {"wav", audio::Sndfile_source::MakeUnique},
+            {"flac", Audio::SndfileSource::MakeUnique},
+            {"ogg", Audio::SndfileSource::MakeUnique},
+            {"wav", Audio::SndfileSource::MakeUnique},
 #endif // WITH_SNDFILE
     };
 
@@ -72,7 +72,7 @@ namespace playd {
         }
 
         // Only allow valid, outputtable devices; reject input-only devices.
-        if (!audio::Sdl_sink::IsOutputDevice(id)) return -1;
+        if (!Audio::SDLSink::IsOutputDevice(id)) return -1;
 
         return id;
     }
@@ -98,7 +98,7 @@ namespace playd {
         std::cerr << "where ID is one of the following numbers:\n";
 
         // Show the user the valid device IDs they can use.
-        auto device_list = audio::Sdl_sink::GetDevicesInfo();
+        auto device_list = Audio::SDLSink::GetDevicesInfo();
         for (const auto &device : device_list) {
             std::cerr << "\t" << device.first << ": " << device.second
                       << "\n";
@@ -165,8 +165,8 @@ int main(int argc, char *argv[])
 	// This call needs to happen before GetDeviceID, otherwise no device
 	// IDs will be recognised.  (This is why it's here, and not in
 	// SetupAudioSystem.)
-	playd::audio::Sdl_sink::InitLibrary();
-	atexit(playd::audio::Sdl_sink::CleanupLibrary);
+	Playd::Audio::SDLSink::InitLibrary();
+	atexit(Playd::Audio::SDLSink::CleanupLibrary);
 
 #ifdef WITH_MP3
 	// mpg123 insists on us running its init and exit functions, too.
@@ -174,29 +174,29 @@ int main(int argc, char *argv[])
 	atexit(mpg123_exit);
 #endif // WITH_MP3
 
-	auto args = playd::MakeArgVector(argc, argv);
+	auto args = Playd::MakeArgVector(argc, argv);
 
-	auto device_id = playd::GetDeviceID(args);
-	if (device_id < 0) playd::ExitWithUsage(args.at(0));
+	auto device_id = Playd::GetDeviceID(args);
+	if (device_id < 0) Playd::ExitWithUsage(args.at(0));
 
-	playd::Player player{
-	        device_id,
-	        &std::make_unique<playd::audio::Sdl_sink, const playd::audio::Source &, int>,
-	        playd::SOURCES};
+	Playd::Player player{
+            device_id,
+            &std::make_unique<Playd::Audio::SDLSink, const Playd::Audio::Source &, int>,
+            Playd::SOURCES};
 
 	// Set up the IO now (to avoid a circular dependency).
 	// Make sure the player broadcasts its responses back to the IoCore.
-	playd::io::Core io{player};
+	Playd::IO::Core io{player};
 	player.SetIo(io);
 
 	// Now, actually run the IO loop.
-	auto [host, port] = playd::GetHostAndPort(args);
+	auto [host, port] = Playd::GetHostAndPort(args);
 	try {
 		io.Run(host, port);
-	} catch (Net_error &e) {
-		playd::ExitWithNetError(host, port, e.Message());
+	} catch (NetError &e) {
+		Playd::ExitWithNetError(host, port, e.Message());
 	} catch (Error &e) {
-		playd::ExitWithError(e.Message());
+		Playd::ExitWithError(e.Message());
 	}
 
 	return EXIT_SUCCESS;

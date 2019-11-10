@@ -18,16 +18,16 @@
 #include "../errors.h"
 #include "sample_format.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /**
  * An object responsible for decoding an audio file.
  *
- * AudioSource is an abstract base class, implemented separately for each
+ * Source is an abstract base class, implemented separately for each
  * supported audio file format.
  *
- * @see Mp3_audio_source
- * @see Sndfile_audio_source
+ * @see MP3Source
+ * @see SndfileSource
  *
  * @note When we refer to 'samples' in this class, this usually refers to
  *   the smallest unit of data for *all* channels.  Some audio decoders
@@ -39,20 +39,16 @@ class Source
 {
 public:
 	/// An enumeration of possible states the decoder can be in.
-	enum class Decode_state : std::uint8_t {
-		/// The decoder is currently trying to acquire a frame.
-		need_frame,
-		/// The decoder is currently decoding a frame.
-		decoding,
-		/// The decoder has run out of things to decode.
-		eof
+	enum class DecodeState : std::uint8_t {
+		DECODING,   ///< The decoder is currently decoding a frame.
+		END_OF_FILE ///< The decoder has run out of things to decode.
 	};
 
 	/// Type of decoded sample vectors.
-	using Decode_vector = std::vector<std::byte>;
+	using DecodeVector = std::vector<std::byte>;
 
 	/// Type of the result of Decode().
-	using Decode_result = std::pair<Decode_state, Decode_vector>;
+	using DecodeResult = std::pair<DecodeState, DecodeVector>;
 
 	/**
 	 * Constructs an Audio_source.
@@ -74,7 +70,7 @@ public:
 	 *   round and the vector of bytes decoded.  The vector may be empty,
 	 *   if the decoding round did not finish off a frame.
 	 */
-	virtual Decode_result Decode() = 0;
+	virtual DecodeResult Decode() = 0;
 
 	/**
 	 * Returns the channel count.
@@ -94,7 +90,7 @@ public:
 	 * Returns the output sample format.
 	 * @return The output sample format, as a SampleFormat.
 	 */
-	virtual Sample_format OutputSampleFormat() const = 0;
+	virtual SampleFormat OutputSampleFormat() const = 0;
 
 	/**
 	 * Seeks to the given position, in samples.
@@ -143,6 +139,6 @@ protected:
 	std::string path;
 };
 
-} // namespace playd::audio
+} // namespace Playd::Audio
 
 #endif // PLAYD_SOURCE_H

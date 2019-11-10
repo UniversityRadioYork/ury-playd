@@ -17,7 +17,7 @@
 
 #include "../errors.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /* Assumptions:
 
@@ -34,7 +34,7 @@ namespace playd::audio
                       write capacity may be lower than actual
       - always atomically read capacities */
 
-Ring_buffer::Ring_buffer(size_t capacity) : buffer(capacity), count{0}
+RingBuffer::RingBuffer(size_t capacity) : buffer(capacity), count{0}
 {
 	this->r_it = this->buffer.cbegin();
 	this->w_it = this->buffer.begin();
@@ -47,7 +47,7 @@ Ring_buffer::Ring_buffer(size_t capacity) : buffer(capacity), count{0}
 	Ensures(WriteCapacity() == capacity);
 }
 
-inline size_t Ring_buffer::ReadCapacity() const
+inline size_t RingBuffer::ReadCapacity() const
 {
 	/* Acquire order here means two things:
 	 *
@@ -59,12 +59,12 @@ inline size_t Ring_buffer::ReadCapacity() const
 	return this->count.load(std::memory_order_acquire);
 }
 
-inline size_t Ring_buffer::WriteCapacity() const
+inline size_t RingBuffer::WriteCapacity() const
 {
 	return this->buffer.size() - ReadCapacity();
 }
 
-size_t Ring_buffer::Write(const gsl::span<const std::byte> src)
+size_t RingBuffer::Write(const gsl::span<const std::byte> src)
 {
 	// This shouldn't be called with an empty (or backwards!) span.
 	const auto src_count = static_cast<size_t>(src.size());
@@ -82,7 +82,7 @@ size_t Ring_buffer::Write(const gsl::span<const std::byte> src)
 	 * the write capacity can be increased after this point by a consumer.
 	 */
 	const auto write_capacity_estimate = WriteCapacity();
-	if (write_capacity_estimate < src_count) throw Internal_error("ringbuffer overflow");
+	if (write_capacity_estimate < src_count) throw InternalError("ringbuffer overflow");
 
 	// Trim the span down to the amount we can write.
 	auto write_count = std::min(write_capacity_estimate, src_count);
@@ -124,7 +124,7 @@ size_t Ring_buffer::Write(const gsl::span<const std::byte> src)
 	return write_count;
 }
 
-size_t Ring_buffer::Read(gsl::span<std::byte> dest)
+size_t RingBuffer::Read(gsl::span<std::byte> dest)
 {
 	const auto dest_count = static_cast<size_t>(dest.size());
 	Expects(0 < dest_count);
@@ -141,7 +141,7 @@ size_t Ring_buffer::Read(gsl::span<std::byte> dest)
 	 * the read capacity can be increased after this point by a producer.
 	 */
 	const auto read_capacity_estimate = ReadCapacity();
-	if (read_capacity_estimate < dest_count) throw Internal_error("ringbuffer underflow");
+	if (read_capacity_estimate < dest_count) throw InternalError("ringbuffer underflow");
 
 	/* See Write() for explanatory comments on what happens here:
 	 * the two functions mirror each other almost perfectly.
@@ -166,13 +166,13 @@ size_t Ring_buffer::Read(gsl::span<std::byte> dest)
 	}
 
 	if (this->count.fetch_sub(read_count, std::memory_order_acq_rel) < read_count)
-		throw Internal_error("capacity decreased unexpectedly");
+		throw InternalError("capacity decreased unexpectedly");
 
 	Ensures(read_start_count + read_end_count == read_count);
 	return read_count;
 }
 
-void Ring_buffer::Flush()
+void RingBuffer::Flush()
 {
 	// Make sure nothing is reading or writing.
 	std::lock_guard<std::mutex> r_guard(this->r_lock);
@@ -183,9 +183,9 @@ void Ring_buffer::Flush()
 	Ensures(this->ReadCapacity() == 0);
 }
 
-inline void Ring_buffer::FlushInner()
+inline void RingBuffer::FlushInner()
 {
 	this->count.store(0, std::memory_order_release);
 }
 
-} // namespace playd::audio
+} // namespace Playd::Audio

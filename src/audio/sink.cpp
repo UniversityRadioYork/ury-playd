@@ -22,7 +22,7 @@
 #include "sample_format.h"
 #include "source.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 //
 // Sink
@@ -30,19 +30,19 @@ namespace playd::audio
 
 Sink::State Sink::CurrentState()
 {
-	return Sink::State::none;
+	return Sink::State::NONE;
 }
 
 //
-// Sdl_sink
+// SDLSink
 //
 
-/* static */ const std::array<SDL_AudioFormat, sample_format_count> Sdl_sink::formats{{
-        AUDIO_U8,  // uint8
-        AUDIO_S8,  // sint8
-        AUDIO_S16, // sint16
-        AUDIO_S32, // sint32
-        AUDIO_F32  // float32
+/* static */ const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> SDLSink::formats{{
+        AUDIO_U8,  // UINT8
+        AUDIO_S8,  // SINT8
+        AUDIO_S16, // SINT16
+        AUDIO_S32, // SINT32
+        AUDIO_F32  // FLOAT32
 }};
 
 /**
@@ -54,20 +54,20 @@ static void SDLCallback(void *vsink, unsigned char *data, int len)
 	Expects(vsink != nullptr);
 	Expects(data != nullptr);
 
-	auto sink = static_cast<Sdl_sink *>(vsink);
+	auto sink = static_cast<SDLSink *>(vsink);
 	sink->Callback(gsl::span<std::byte>(reinterpret_cast<std::byte *>(data), len));
 }
 
-Sdl_sink::Sdl_sink(const audio::Source &source, int device_id)
+SDLSink::SDLSink(const Audio::Source &source, int device_id)
     : bytes_per_sample{source.BytesPerSample()},
-      ring_buf{(1U << ringbuf_power) * source.BytesPerSample()},
+      ring_buf{(1U << RINGBUF_POWER) * source.BytesPerSample()},
       position_sample_count{0},
       source_out{false},
-      state{Sink::State::stopped}
+      state{Sink::State::STOPPED}
 {
 	auto name = SDL_GetAudioDeviceName(device_id, 0);
 	if (name == nullptr) {
-		throw Config_error(std::string("invalid device id: ") + std::to_string(device_id));
+		throw ConfigError(std::string("invalid device id: ") + std::to_string(device_id));
 	}
 
 	SDL_AudioSpec want;
@@ -83,11 +83,11 @@ Sdl_sink::Sdl_sink(const audio::Source &source, int device_id)
 
 	this->device = SDL_OpenAudioDevice(name, 0, &want, &have, 0);
 	if (this->device == 0) {
-		throw Config_error(std::string("couldn't open device: ") + SDL_GetError());
+		throw ConfigError(std::string("couldn't open device: ") + SDL_GetError());
 	}
 }
 
-Sdl_sink::~Sdl_sink()
+SDLSink::~SDLSink()
 {
 	if (this->device == 0) return;
 
@@ -96,61 +96,61 @@ Sdl_sink::~Sdl_sink()
 	SDL_CloseAudioDevice(this->device);
 }
 
-/* static */ void Sdl_sink::InitLibrary()
+/* static */ void SDLSink::InitLibrary()
 {
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-		throw Config_error(std::string("could not initialise SDL: ") + SDL_GetError());
+		throw ConfigError(std::string("could not initialise SDL: ") + SDL_GetError());
 	}
 }
 
-/* static */ void Sdl_sink::CleanupLibrary()
+/* static */ void SDLSink::CleanupLibrary()
 {
 	SDL_Quit();
 }
 
-void Sdl_sink::Start()
+void SDLSink::Start()
 {
-	if (this->state != Sink::State::stopped) return;
+	if (this->state != Sink::State::STOPPED) return;
 
 	SDL_PauseAudioDevice(this->device, 0);
-	this->state = Sink::State::playing;
+	this->state = Sink::State::PLAYING;
 }
 
-void Sdl_sink::Stop()
+void SDLSink::Stop()
 {
-	if (this->state == Sink::State::stopped) return;
+	if (this->state == Sink::State::STOPPED) return;
 
 	SDL_PauseAudioDevice(this->device, 1);
-	this->state = Sink::State::stopped;
+	this->state = Sink::State::STOPPED;
 }
 
-Sink::State Sdl_sink::CurrentState()
+Sink::State SDLSink::CurrentState()
 {
 	return this->state;
 }
 
-void Sdl_sink::SourceOut()
+void SDLSink::SourceOut()
 {
 	// The sink should only be out if the source is.
-	Expects(this->source_out || this->state != Sink::State::at_end);
+	Expects(this->source_out || this->state != Sink::State::AT_END);
 
 	this->source_out = true;
 }
 
-uint64_t Sdl_sink::Position()
+uint64_t SDLSink::Position()
 {
 	return this->position_sample_count;
 }
 
-void Sdl_sink::SetPosition(uint64_t samples)
+void SDLSink::SetPosition(uint64_t samples)
 {
 	this->position_sample_count = samples;
 
 	// We might have been at the end of the file previously.
 	// If so, we might not be now, so clear the out flags.
 	this->source_out = false;
-	if (this->state == Sink::State::at_end) {
-		this->state = Sink::State::stopped;
+	if (this->state == Sink::State::AT_END) {
+		this->state = Sink::State::STOPPED;
 		this->Stop();
 	}
 
@@ -159,7 +159,7 @@ void Sdl_sink::SetPosition(uint64_t samples)
 	this->ring_buf.Flush();
 }
 
-size_t Sdl_sink::Transfer(const gsl::span<const std::byte> src)
+size_t SDLSink::Transfer(const gsl::span<const std::byte> src)
 {
 	// No point transferring 0 bytes.
 	if (src.empty()) return 0;
@@ -185,7 +185,7 @@ size_t Sdl_sink::Transfer(const gsl::span<const std::byte> src)
 	return written_count;
 }
 
-void Sdl_sink::Callback(gsl::span<std::byte> dest)
+void SDLSink::Callback(gsl::span<std::byte> dest)
 {
 	Expects(0 <= dest.size());
 
@@ -198,7 +198,7 @@ void Sdl_sink::Callback(gsl::span<std::byte> dest)
 	std::fill(dest.begin(), dest.end(), std::byte{0});
 
 	// If we're not supposed to be playing, don't play anything.
-	if (this->state != Sink::State::playing) return;
+	if (this->state != Sink::State::PLAYING) return;
 
 	// Let's find out how many bytes are available in total to give SDL.
 	//
@@ -215,7 +215,7 @@ void Sdl_sink::Callback(gsl::span<std::byte> dest)
 	if (avail_bytes == 0) {
 		// Is this a temporary condition, or have we genuinely played
 		// out all we can?  If the latter, we're now out too.
-		if (this->source_out) this->state = Sink::State::at_end;
+		if (this->source_out) this->state = Sink::State::AT_END;
 
 		// Don't even bother reading from the ring buffer.
 		return;
@@ -236,7 +236,7 @@ void Sdl_sink::Callback(gsl::span<std::byte> dest)
 	this->position_sample_count += read_samples;
 }
 
-/* static */ std::vector<std::pair<int, std::string>> Sdl_sink::GetDevicesInfo()
+/* static */ std::vector<std::pair<int, std::string>> SDLSink::GetDevicesInfo()
 {
 	std::vector<std::pair<int, std::string>> list;
 
@@ -250,7 +250,7 @@ void Sdl_sink::Callback(gsl::span<std::byte> dest)
 	return list;
 }
 
-/* static */ bool Sdl_sink::IsOutputDevice(int id)
+/* static */ bool SDLSink::IsOutputDevice(int id)
 {
 	const auto ids = SDL_GetNumAudioDevices(0);
 
@@ -258,4 +258,4 @@ void Sdl_sink::Callback(gsl::span<std::byte> dest)
 	return 0 <= id && id < ids;
 }
 
-} // namespace playd::audio
+} // namespace Playd::Audio

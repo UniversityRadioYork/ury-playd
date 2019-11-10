@@ -13,19 +13,19 @@
 
 #include "response.h"
 
-namespace playd {
+namespace Playd {
 
 /* static */ constexpr std::array<std::string_view, Response::CODE_COUNT> CODE_STRINGS{{
-                                                                                               "OHAI",  // Code::ohai
-                                                                                               "IAMA",  // Code::iama
-                                                                                               "FLOAD", // Code::fload
-                                                                                               "EJECT", // Code::eject
-                                                                                               "POS",   // Code::pos
-                                                                                               "END",   // Code::end
-                                                                                               "PLAY",  // Code::play
-                                                                                               "STOP",  // Code::stop
-                                                                                               "ACK",   // Code::ack
-                                                                                               "LEN"    // Code::len
+                                                                                               "OHAI",  // Code::OHAI
+                                                                                               "IAMA",  // Code::IAMA
+                                                                                               "FLOAD", // Code::FLOAD
+                                                                                               "EJECT", // Code::EJECT
+                                                                                               "POS",   // Code::POS
+                                                                                               "END",   // Code::END
+                                                                                               "PLAY",  // Code::PLAY
+                                                                                               "STOP",  // Code::STOP
+                                                                                               "ACK",   // Code::ACK
+                                                                                               "LEN"    // Code::LEN
                                                                                        }};
 
     Response::Response(std::string_view tag, Response::Code code) {
@@ -42,19 +42,19 @@ namespace playd {
     }
 
 /* static */ Response Response::Success(Response::Tag tag) {
-        return Response(tag, Response::Code::ack)
+        return Response(tag, Response::Code::ACK)
                 .AddArg("OK")
                 .AddArg("success");
     }
 
 /* static */ Response Response::Invalid(Response::Tag tag,
                                         std::string_view msg) {
-        return Response(tag, Response::Code::ack).AddArg("WHAT").AddArg(msg);
+        return Response(tag, Response::Code::ACK).AddArg("WHAT").AddArg(msg);
     }
 
 /* static */ Response Response::Failure(Response::Tag tag,
                                         std::string_view msg) {
-        return Response(tag, Response::Code::ack).AddArg("FAIL").AddArg(msg);
+        return Response(tag, Response::Code::ACK).AddArg("FAIL").AddArg(msg);
     }
 
 /* static */ std::string Response::EscapeArg(std::string_view arg) {
@@ -82,11 +82,11 @@ namespace playd {
     }
 
 //
-// Response_sink
+// ResponseSink
 //
 
-    void Response_sink::Respond(size_t, const Response &) const {
+    void ResponseSink::Respond(size_t, const Response &) const {
         // By default, do nothing.
     }
 
-} // namespace playd
+} // namespace Playd

@@ -13,17 +13,17 @@
 
 #include "../response.h"
 
-namespace playd::tests
+namespace Playd::Tests
 {
-// A dummy class for testing the Response_sink abstract class methods.
-class Dummy_response_sink : public Response_sink
+// A dummy class for testing the ResponseSink abstract class methods.
+class DummyResponseSink : public ResponseSink
 {
 public:
 	/**
 	 * Constructs a Dummy_response_sink.
 	 * @param os The ostream to which responses should be sent.
 	 */
-	Dummy_response_sink(std::ostream &os);
+	DummyResponseSink(std::ostream &os);
 
 protected:
 	virtual void Respond(size_t id, const Response &response) const override;
@@ -33,6 +33,6 @@ private:
 	std::ostream &os;
 };
 
-} // namespace playd::tests
+} // namespace Playd::Tests
 
 #endif // PLAYD_TESTS_DUMMY_RESPONSE_SINK_H

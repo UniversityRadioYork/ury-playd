@@ -11,15 +11,15 @@
 #include <ostream>
 #include <string>
 
-namespace playd::tests
+namespace Playd::Tests
 {
-Dummy_response_sink::Dummy_response_sink(std::ostream &os) : os(os)
+DummyResponseSink::DummyResponseSink(std::ostream &os) : os(os)
 {
 }
 
-void Dummy_response_sink::Respond(size_t, const Response &response) const
+void DummyResponseSink::Respond(size_t, const Response &response) const
 {
 	this->os << response.Pack() << std::endl;
 }
 
-} // namespace playd::tests
+} // namespace Playd::Tests

@@ -24,7 +24,7 @@
 #include "sink.h"
 #include "source.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /**
  * An audio item.
@@ -125,7 +125,7 @@ public:
  *
  * @see Audio
  */
-class Null_audio : public Audio
+class NullAudio : public Audio
 {
 public:
 	Audio::State Update() override;
@@ -156,7 +156,7 @@ public:
  * @see Sink
  * @see Source
  */
-class Basic_audio : public Audio
+class BasicAudio : public Audio
 {
 public:
 	/**
@@ -165,7 +165,7 @@ public:
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	Basic_audio(std::unique_ptr<Source> src, std::unique_ptr<Sink> sink);
+	BasicAudio(std::unique_ptr<Source> src, std::unique_ptr<Sink> sink);
 
 	Audio::State Update() override;
 
@@ -189,7 +189,7 @@ private:
 	std::unique_ptr<Sink> sink;
 
 	/// The current decoded frame.
-	Source::Decode_vector frame;
+	Source::DecodeVector frame;
 
 	/// A span representing the unclaimed part of the decoded frame.
 	gsl::span<const std::byte> frame_span;
@@ -216,6 +216,6 @@ private:
 	void TransferFrame();
 };
 
-} // namespace playd::audio
+} // namespace Playd::Audio
 
 #endif // PLAYD_AUDIO_H

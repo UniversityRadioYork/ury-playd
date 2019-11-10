@@ -23,10 +23,10 @@ extern "C" {
 #include "../sample_format.h"
 #include "../source.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /// Audio source for use on MP3 files.
-class Mp3_source : public Source
+class MP3Source : public Source
 {
 public:
 	/**
@@ -34,12 +34,12 @@ public:
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.
 	 */
-	explicit Mp3_source(std::string_view path);
+	explicit MP3Source(std::string_view path);
 
 	/// Destructs an Mp3AudioSource.
-	~Mp3_source();
+	~MP3Source();
 
-	Decode_result Decode() override;
+	DecodeResult Decode() override;
 
 	std::uint64_t Seek(std::uint64_t position) override;
 
@@ -50,7 +50,7 @@ public:
 
 	std::uint32_t SampleRate() const override;
 
-	Sample_format OutputSampleFormat() const override;
+	SampleFormat OutputSampleFormat() const override;
 
 	/**
 	 * Constructs an Mp3_audio_source and returns a unique pointer to it.
@@ -58,7 +58,7 @@ public:
 	 *   decoder.
 	 * @returns A unique pointer to a Mp3_audio_source.
 	 */
-	static std::unique_ptr<Mp3_source> MakeUnique(std::string_view path);
+	static std::unique_ptr<MP3Source> MakeUnique(std::string_view path);
 
 private:
 	// This value is somewhat arbitrary, but corresponds to the minimum
@@ -82,7 +82,7 @@ private:
 	void AddFormat(long rate);
 };
 
-} // namespace playd::audio
+} // namespace Playd::Audio
 
 #endif // WITH_MP3
 #endif // PLAYD_AUDIO_SOURCES_MP3_H

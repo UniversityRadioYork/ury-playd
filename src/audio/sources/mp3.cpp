@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of the Mp3_audio_source class.
+ * Implementation of the MP3Source class.
  * @see audio/sources/mp3.h
  */
 
@@ -24,62 +24,62 @@
 #include "../source.h"
 #include "mp3.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /// The set of encodings that we ask mpg123 to prepare for us.
 constexpr int mp3_requested_encodings{MPG123_ENC_UNSIGNED_8 | MPG123_ENC_SIGNED_8 | MPG123_ENC_SIGNED_16 |
                                       MPG123_ENC_SIGNED_32 | MPG123_ENC_FLOAT_32};
 
-Sample_format SampleFormatOfMpg123(int encoding)
+SampleFormat SampleFormatOfMpg123(int encoding)
 {
 	// This switch should range over the encodings listed above.
 	switch (encoding) {
 		case MPG123_ENC_UNSIGNED_8:
-			return Sample_format::uint8;
+			return SampleFormat::UINT8;
 		case MPG123_ENC_SIGNED_8:
-			return Sample_format::sint8;
+			return SampleFormat::SINT8;
 		case MPG123_ENC_SIGNED_16:
-			return Sample_format::sint16;
+			return SampleFormat::SINT16;
 		case MPG123_ENC_SIGNED_32:
-			return Sample_format::sint32;
+			return SampleFormat::SINT32;
 		case MPG123_ENC_FLOAT_32:
-			return Sample_format::float32;
+			return SampleFormat::FLOAT32;
 		default:
 			// We shouldn't get here, if the format was set up
 			// correctly earlier.
-			throw Internal_error(
+			throw InternalError(
 			        "unsupported sample rate, should not "
 			        "happen");
 	}
 }
 
-Mp3_source::Mp3_source(std::string_view path) : Source{path}, buffer{}, context{nullptr}
+MP3Source::MP3Source(std::string_view path) : Source{path}, buffer{}, context{nullptr}
 {
 	this->context = mpg123_new(nullptr, nullptr);
 	mpg123_format_none(this->context);
 
 	auto rates = AvailableRates();
-	std::for_each(std::begin(rates), std::end(rates), std::bind(&Mp3_source::AddFormat, this, std::placeholders::_1));
+	std::for_each(std::begin(rates), std::end(rates), std::bind(&MP3Source::AddFormat, this, std::placeholders::_1));
 
 	if (mpg123_open(this->context, this->path.c_str()) == MPG123_ERR) {
-		throw File_error("mp3: can't open " + this->path + ": " + mpg123_strerror(this->context));
+		throw FileError("mp3: can't open " + this->path + ": " + mpg123_strerror(this->context));
 	}
 }
 
-Mp3_source::~Mp3_source()
+MP3Source::~MP3Source()
 {
 	mpg123_delete(this->context);
 	this->context = nullptr;
 }
 
-std::uint64_t Mp3_source::Length() const
+std::uint64_t MP3Source::Length() const
 {
 	assert(this->context != nullptr);
 
 	return mpg123_length(this->context);
 }
 
-/* static */ gsl::span<const long> Mp3_source::AvailableRates()
+/* static */ gsl::span<const long> MP3Source::AvailableRates()
 {
 	const long *rawrates = nullptr;
 	size_t nrates = 0;
@@ -87,7 +87,7 @@ std::uint64_t Mp3_source::Length() const
 	return gsl::make_span(rawrates, nrates);
 }
 
-void Mp3_source::AddFormat(long rate)
+void MP3Source::AddFormat(long rate)
 {
 	Debug() << "trying to enable formats at " << rate << std::endl;
 
@@ -101,7 +101,7 @@ void Mp3_source::AddFormat(long rate)
 	};
 }
 
-std::uint8_t Mp3_source::ChannelCount() const
+std::uint8_t MP3Source::ChannelCount() const
 {
 	assert(this->context != nullptr);
 
@@ -111,7 +111,7 @@ std::uint8_t Mp3_source::ChannelCount() const
 	return static_cast<std::uint8_t>(chans);
 }
 
-std::uint32_t Mp3_source::SampleRate() const
+std::uint32_t MP3Source::SampleRate() const
 {
 	assert(this->context != nullptr);
 
@@ -126,19 +126,19 @@ std::uint32_t Mp3_source::SampleRate() const
 	return static_cast<std::uint32_t>(rate);
 }
 
-std::uint64_t Mp3_source::Seek(std::uint64_t in_samples)
+std::uint64_t MP3Source::Seek(std::uint64_t in_samples)
 {
 	assert(this->context != nullptr);
 
 	// Have we tried to seek past the end of the file?
 	if (auto clen = static_cast<unsigned long>(mpg123_length(this->context)); clen < in_samples) {
 		Debug() << "mp3: seek at" << in_samples << "past EOF at" << clen << std::endl;
-		throw Seek_error{MSG_SEEK_FAIL};
+		throw SeekError{MSG_SEEK_FAIL};
 	}
 
 	if (mpg123_seek(this->context, in_samples, SEEK_SET) == MPG123_ERR) {
 		Debug() << "mp3: seek failed:" << mpg123_strerror(this->context) << std::endl;
-		throw Seek_error{MSG_SEEK_FAIL};
+		throw SeekError{MSG_SEEK_FAIL};
 	}
 
 	// The actual seek position may not be the same as the requested
@@ -147,7 +147,7 @@ std::uint64_t Mp3_source::Seek(std::uint64_t in_samples)
 	return mpg123_tell(this->context);
 }
 
-Mp3_source::Decode_result Mp3_source::Decode()
+MP3Source::DecodeResult MP3Source::Decode()
 {
 	assert(this->context != nullptr);
 
@@ -155,24 +155,24 @@ Mp3_source::Decode_result Mp3_source::Decode()
 	size_t rbytes = 0;
 	const auto err = mpg123_read(this->context, buf, this->buffer.size(), &rbytes);
 
-	Decode_vector decoded;
-	Decode_state decode_state = Decode_state::decoding;
+	DecodeVector decoded;
+	DecodeState decode_state = DecodeState::DECODING;
 
 	if (err == MPG123_DONE) {
-		decode_state = Decode_state::eof;
+		decode_state = DecodeState::END_OF_FILE;
 	} else if (err != MPG123_OK && err != MPG123_NEW_FORMAT) {
 		Debug() << "mp3: decode error:" << mpg123_strerror(this->context) << std::endl;
-		decode_state = Decode_state::eof;
+		decode_state = DecodeState::END_OF_FILE;
 	} else {
 		// Copy only the bit of the buffer occupied by decoded data
 		auto front = this->buffer.begin();
-		decoded = Decode_vector{front, front + rbytes};
+		decoded = DecodeVector{front, front + rbytes};
 	}
 
 	return std::make_pair(decode_state, decoded);
 }
 
-Sample_format Mp3_source::OutputSampleFormat() const
+SampleFormat MP3Source::OutputSampleFormat() const
 {
 	assert(this->context != nullptr);
 
@@ -182,10 +182,10 @@ Sample_format Mp3_source::OutputSampleFormat() const
 	return SampleFormatOfMpg123(encoding);
 }
 
-std::unique_ptr<Mp3_source> Mp3_source::MakeUnique(std::string_view path)
+std::unique_ptr<MP3Source> MP3Source::MakeUnique(std::string_view path)
 {
 	// This is in a separate function to let it be put into a jump table.
-	return std::make_unique<Mp3_source, std::string_view>(std::move(path));
+	return std::make_unique<MP3Source, std::string_view>(std::move(path));
 }
 
-} // namespace playd::audio
+} // namespace Playd::Audio

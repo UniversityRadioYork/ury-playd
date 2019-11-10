@@ -13,7 +13,7 @@
 
 #include "sample_format.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 Source::Source(std::string_view path) : path{path}
 {
@@ -44,4 +44,4 @@ std::chrono::microseconds Source::MicrosFromSamples(Samples samples) const
 	return std::chrono::microseconds{(samples * 1000000) / this->SampleRate()};
 }
 
-} // namespace playd::audio
+} // namespace Playd::Audio

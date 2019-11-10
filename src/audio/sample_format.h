@@ -13,7 +13,7 @@
 #include <array>
 #include <cstdint>
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /// Type definition for samples.
 using Samples = std::uint64_t;
@@ -32,20 +32,20 @@ using Samples = std::uint64_t;
  * REMEMBER: changes here will require changes in lookup tables in both
  * sample_formats.cpp and audio_sink.cpp.
  */
-enum class Sample_format : std::uint8_t {
-	uint8,  ///< Packed 8-bit unsigned integer.
-	sint8,  ///< Packed 8-bit signed integer.
-	sint16, ///< Packed 16-bit signed integer.
-	sint32, ///< Packed 32-bit signed integer.
-	float32 ///< Packed 32-bit floating point.
+enum class SampleFormat : std::uint8_t {
+	UINT8,  ///< Packed 8-bit unsigned integer.
+	SINT8,  ///< Packed 8-bit signed integer.
+	SINT16, ///< Packed 16-bit signed integer.
+	SINT32, ///< Packed 32-bit signed integer.
+	FLOAT32 ///< Packed 32-bit floating point.
 };
 
-/// Number of sample formats available; should agree with Sample_format.
-constexpr std::size_t sample_format_count = 5;
+/// Number of sample formats available; should agree with SampleFormat.
+constexpr std::size_t SAMPLE_FORMAT_COUNT = 5;
 
 /// Map from SampleFormats to bytes-per-mono-sample.
-extern const std::array<std::size_t, sample_format_count> sample_format_bps;
+extern const std::array<std::size_t, SAMPLE_FORMAT_COUNT> sample_format_bps;
 
-} // namespace playd::audio
+} // namespace Playd::Audio
 
 #endif // PLAYD_SAMPLE_FORMATS_H

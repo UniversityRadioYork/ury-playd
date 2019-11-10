@@ -12,14 +12,14 @@
 #include <array>
 #include <cstddef>
 
-namespace playd::audio
+namespace Playd::Audio
 {
-const std::array<std::size_t, sample_format_count> sample_format_bps{{
-        1, // PACKED_UNSIGNED_INT_8
-        1, // PACKED_SIGNED_INT_8
-        2, // PACKED_SIGNED_INT_16
-        4, // PACKED_SIGNED_INT_32
-        4  // PACKED_FLOAT_32
+const std::array<std::size_t, SAMPLE_FORMAT_COUNT> sample_format_bps{{
+        1, // UINT8
+        1, // SINT8
+        2, // UINT16
+        4, // SINT32
+        4  // FLOAT32
 }};
 
-} // namespace playd::audio
+} // namespace Playd::Audio

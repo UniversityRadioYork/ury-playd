@@ -5,7 +5,7 @@
  * @file
  * Implementation of the non-virtual aspects of the IoCore class.
  *
- * The implementation of IoCore is based on [libuv][], and also makes use
+ * The implementation of Core is based on [libuv][], and also makes use
  * of various techniques mentioned in [the uvbook][].
  *
  * [libuv]: https://github.com/joyent/libuv
@@ -37,7 +37,7 @@ typedef ptrdiff_t ssize_t;
 
 #include "io.h"
 
-namespace playd::io {
+namespace Playd::IO {
 
     const std::uint16_t Core::PLAYER_UPDATE_PERIOD = 5; // ms
 
@@ -156,7 +156,7 @@ namespace playd::io {
     }
 
 //
-// IoCore
+// Core
 //
 
     Core::Core(Player &player) : loop{nullptr}, player{player} {
@@ -164,7 +164,7 @@ namespace playd::io {
 
     void Core::Run(std::string_view host, std::string_view port) {
         this->loop = uv_default_loop();
-        if (this->loop == nullptr) throw Internal_error(MSG_IO_CANNOT_ALLOC);
+        if (this->loop == nullptr) throw InternalError(MSG_IO_CANNOT_ALLOC);
 
         this->InitAcceptor(host, port);
         this->InitSignals();
@@ -197,11 +197,11 @@ namespace playd::io {
         this->pool[id - 1] = move(conn);
 
         // Begin initial responses
-        this->Respond(id, Response(Response::NOREQUEST, Response::Code::ohai)
+        this->Respond(id, Response(Response::NOREQUEST, Response::Code::OHAI)
                 .AddArg(std::to_string(id))
                 .AddArg(MSG_OHAI_BIFROST)
                 .AddArg(MSG_OHAI_PLAYD));
-        this->Respond(id, Response(Response::NOREQUEST, Response::Code::iama)
+        this->Respond(id, Response(Response::NOREQUEST, Response::Code::IAMA)
                 .AddArg("player/file"));
         this->player.Dump(id, Response::NOREQUEST);
         this->Respond(id, Response::Success(Response::NOREQUEST));
@@ -239,7 +239,7 @@ namespace playd::io {
         // Why -1?  Because slot 0 in the connection pool is reserved for
         // broadcasts.
         const auto full = this->pool.size() == (SIZE_MAX - 1);
-        if (full) throw Internal_error(MSG_TOO_MANY_CONNS);
+        if (full) throw InternalError(MSG_TOO_MANY_CONNS);
 
         this->pool.emplace_back(nullptr);
         // This isn't an off-by-one error; slots index from 1.
@@ -332,7 +332,7 @@ namespace playd::io {
         assert(this->loop != nullptr);
 
         if (uv_tcp_init(this->loop, &this->server)) {
-            throw Internal_error(MSG_IO_CANNOT_ALLOC);
+            throw InternalError(MSG_IO_CANNOT_ALLOC);
         }
         this->server.data = static_cast<void *>(this);
         assert(this->server.data != nullptr);
@@ -350,7 +350,7 @@ namespace playd::io {
         if (r) {
             std::ostringstream error{"Could not listen on "};
             error << address << ":" << port << " (" << uv_err_name(r) << ")";
-            throw Net_error(error.str());
+            throw NetError(error.str());
         }
 
         Debug() << "Listening at" << address << "on" << port << std::endl;
@@ -360,7 +360,7 @@ namespace playd::io {
         const auto r = uv_signal_init(this->loop, &this->sigint);
         if (r) {
             auto error = std::string{MSG_IO_CANNOT_ALLOC} + ": " + uv_err_name(r);
-            throw Internal_error{error};
+            throw InternalError{error};
         }
 
         // We pass the player, not the IoCore.
@@ -515,4 +515,4 @@ namespace playd::io {
         this->parent.Remove(this->id);
     }
 
-} // namespace playd
+} // namespace Playd::IO

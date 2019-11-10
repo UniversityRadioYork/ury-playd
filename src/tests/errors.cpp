@@ -7,11 +7,11 @@
 
 #include "catch.hpp"
 
-namespace playd::tests
+namespace Playd::Tests
 {
 SCENARIO ("Errors contain a retrievable message", "[error]") {
 	GIVEN ("An Error") {
-		Error e = Net_error("need an RS-232 Interface Lead");
+		Error e = NetError("need an RS-232 Interface Lead");
 
 		WHEN ("Message() is called") {
 			auto s = e.Message();
@@ -23,4 +23,4 @@ SCENARIO ("Errors contain a retrievable message", "[error]") {
 	}
 }
 
-} // namespace playd::tests
+} // namespace Playd::Tests

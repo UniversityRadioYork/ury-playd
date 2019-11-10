@@ -13,10 +13,10 @@
 #include "../audio/sink.h"
 #include "../audio/source.h"
 
-namespace playd::tests
+namespace Playd::Tests
 {
 /// Dummy audio sink, for testing audio pipelines.
-class Dummy_audio_sink : public audio::Sink
+class DummyAudioSink : public Audio::Sink
 {
 public:
 	/**
@@ -24,13 +24,13 @@ public:
 	 * @param source Ignored.
 	 * @param device_id Ignored.
 	 */
-	Dummy_audio_sink(const audio::Source &, int){};
+	DummyAudioSink(const Audio::Source &, int){};
 
 	void Start() override;
 
 	void Stop() override;
 
-	audio::Sink::State CurrentState() override;
+	Audio::Sink::State CurrentState() override;
 
 	std::uint64_t Position() override;
 
@@ -41,7 +41,7 @@ public:
 	size_t Transfer(gsl::span<const std::byte> src) override;
 
 	/// The current state of the sink.
-	audio::Sink::State state = audio::Sink::State::stopped;
+	Audio::Sink::State state = Audio::Sink::State::STOPPED;
 
 	/// The current position, in samples.
 	uint64_t position = 0;

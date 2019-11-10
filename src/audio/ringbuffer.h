@@ -16,7 +16,7 @@
 #undef max
 #include <gsl/gsl>
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /**
  * A concurrent ring buffer.
@@ -24,23 +24,23 @@ namespace playd::audio
  * This is not particularly efficient, but does the job for playd.
  * It uses two release-acquire-atomic counters to store read and write.
  */
-class Ring_buffer
+class RingBuffer
 {
 public:
 	/**
 	 * Constructs a Ring_buffer.
 	 * @param capacity The capacity of the ring buffer, in bytes.
 	 */
-	explicit Ring_buffer(size_t capacity);
+	explicit RingBuffer(size_t capacity);
 
 	/// Destructs a Ring_buffer.
-	~Ring_buffer() = default;
+	~RingBuffer() = default;
 
 	/// Deleted copy constructor.
-	Ring_buffer(const Ring_buffer &) = delete;
+	RingBuffer(const RingBuffer &) = delete;
 
 	/// Deleted copy-assignment.
-	Ring_buffer &operator=(const Ring_buffer &) = delete;
+	RingBuffer &operator=(const RingBuffer &) = delete;
 
 	/**
 	 * The current write capacity.
@@ -105,6 +105,6 @@ private:
 	std::mutex w_lock; ///< The write lock.
 };
 
-} // namespace playd::audio
+} // namespace Playd::Audio
 
 #endif // PLAYD_RINGBUFFER_HPP

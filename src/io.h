@@ -26,11 +26,11 @@ typedef ptrdiff_t ssize_t;
 #include "tokeniser.h"
 
 // Forward declaration needed because of cyclic dependency between playd::io::Core and playd::Player.
-namespace playd {
+namespace Playd {
     class Player;
 }
 
-namespace playd::io {
+namespace Playd::IO {
 
 
     class Connection;
@@ -43,7 +43,7 @@ namespace playd::io {
      * via their IDs inside the pool.  It ensures that each connection is given an
      * ID that is unique up until the removal of said connection.
      */
-    class Core : public Response_sink {
+    class Core : public ResponseSink {
     public:
         /**
          * Constructs an IO core.
@@ -271,6 +271,6 @@ namespace playd::io {
         Response RunCommand(const std::vector<std::string> &msg);
     };
 
-} // namespace playd
+} // namespace Playd::IO
 
 #endif // PLAYD_IO_CORE_H

@@ -13,25 +13,25 @@
 #include "../audio/sample_format.h"
 #include "../audio/source.h"
 
-namespace playd::tests
+namespace Playd::Tests
 {
 /// Dummy audio source, for testing audio pipelines.
-class Dummy_audio_source : public audio::Source
+class DummyAudioSource : public Audio::Source
 {
 public:
 	/**
 	 * Constructs a Dummy_audio_source.
 	 * @param path The path of the file this Dummy_audio_source 'represents'.
 	 */
-	Dummy_audio_source(std::string_view path) : audio::Source(path){};
+	DummyAudioSource(std::string_view path) : Audio::Source(path){};
 
-	audio::Source::Decode_result Decode() override;
+	Audio::Source::DecodeResult Decode() override;
 
 	std::uint8_t ChannelCount() const override;
 
 	std::uint32_t SampleRate() const override;
 
-	audio::Sample_format OutputSampleFormat() const override;
+	Audio::SampleFormat OutputSampleFormat() const override;
 
 	std::uint64_t Seek(std::uint64_t position) override;
 
@@ -48,4 +48,4 @@ public:
 	bool run_out = false;
 };
 
-} // namespace playd::tests
+} // namespace Playd::Tests

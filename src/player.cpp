@@ -23,7 +23,7 @@
 #include "player.h"
 #include "response.h"
 
-namespace playd {
+namespace Playd {
 
     Response PlayerDead(std::string_view tag) {
         return Response::Failure(tag, MSG_CMD_PLAYER_CLOSING);
@@ -37,13 +37,13 @@ namespace playd {
             : device_id{device_id},
               sink{std::move(sink)},
               sources{std::move(sources)},
-              file{std::make_unique<audio::Null_audio>()},
+              file{std::make_unique<Audio::NullAudio>()},
               dead{false},
               io{nullptr},
               last_pos{0} {
     }
 
-    void Player::SetIo(const Response_sink &new_io) {
+    void Player::SetIo(const ResponseSink &new_io) {
         this->io = &new_io;
     }
 
@@ -51,8 +51,8 @@ namespace playd {
         assert(this->file != nullptr);
         const auto as = this->file->Update();
 
-        if (as == audio::Audio::State::at_end) this->End(Response::NOREQUEST);
-        if (as == audio::Audio::State::playing) {
+        if (as == Audio::Audio::State::AT_END) this->End(Response::NOREQUEST);
+        if (as == Audio::Audio::State::PLAYING) {
             // Since the audio is currently playing, the position may have
             // advanced since last update.  So we need to update it.
             auto pos = this->file->Position();
@@ -78,16 +78,16 @@ namespace playd {
 
     void Player::DumpFileInfo(size_t id, Response::Tag tag) const {
         // This information won't exist if there is no file.
-        if (this->file->CurrentState() == audio::Audio::State::none) return;
+        if (this->file->CurrentState() == Audio::Audio::State::NONE) return;
 
         auto filename = this->file->File();
-        Respond(id, Response(tag, Response::Code::fload).AddArg(filename));
+        Respond(id, Response(tag, Response::Code::FLOAD).AddArg(filename));
 
         auto pos = this->file->Position();
-        AnnounceTimestamp(Response::Code::pos, id, tag, pos);
+        AnnounceTimestamp(Response::Code::POS, id, tag, pos);
 
         auto len = this->file->Length();
-        AnnounceTimestamp(Response::Code::len, id, tag, len);
+        AnnounceTimestamp(Response::Code::LEN, id, tag, len);
     }
 
     Response Player::Eject(Response::Tag tag) {
@@ -96,12 +96,12 @@ namespace playd {
         // Silently ignore ejects on ejected files.
         // Concurrently speaking, this should be fine, as we are the only
         // thread that can eject or un-eject files.
-        if (this->file->CurrentState() == audio::Audio::State::none) {
+        if (this->file->CurrentState() == Audio::Audio::State::NONE) {
             return Response::Success(tag);
         }
 
         assert(this->file != nullptr);
-        this->file = std::make_unique<audio::Null_audio>();
+        this->file = std::make_unique<Audio::NullAudio>();
 
         this->DumpState(0, tag);
 
@@ -113,7 +113,7 @@ namespace playd {
 
         // Let upstream know that the file ended by itself.
         // This is needed for auto-advancing playlists, etc.
-        this->Respond(0, Response(Response::NOREQUEST, Response::Code::end));
+        this->Respond(0, Response(Response::NOREQUEST, Response::Code::END));
 
         this->SetPlaying(tag, false);
 
@@ -140,7 +140,7 @@ namespace playd {
 
         try {
             this->file = this->LoadRaw(path);
-        } catch (File_error &e) {
+        } catch (FileError &e) {
             // File errors aren't fatal, so catch them here.
             return Response::Failure(tag, e.Message());
         }
@@ -164,7 +164,7 @@ namespace playd {
         std::chrono::microseconds pos{0};
         try {
             pos = PosParse(pos_str);
-        } catch (Seek_error &e) {
+        } catch (SeekError &e) {
             // Seek errors here are a result of clients sending weird times.
             // Thus, we tell them off.
             return Response::Invalid(tag, e.Message());
@@ -172,9 +172,9 @@ namespace playd {
 
         try {
             this->PosRaw(tag, pos);
-        } catch (Null_audio_error &) {
+        } catch (NullAudioError &) {
             return Response::Invalid(tag, MSG_CMD_NEEDS_LOADED);
-        } catch (Seek_error &) {
+        } catch (SeekError &) {
             // Seek failures here are a result of the decoder not liking the
             // seek position (usually because it's outside the audio file!).
             // Thus, unlike above, we try to recover.
@@ -202,7 +202,7 @@ namespace playd {
 
         try {
             this->file->SetPlaying(playing);
-        } catch (Null_audio_error &e) {
+        } catch (NullAudioError &e) {
             return Response::Invalid(tag, e.Message());
         }
 
@@ -231,21 +231,21 @@ namespace playd {
         // This means we don't need to skip whitespace first, with no loss
         // of suction: no valid position string will contain '-'.
         if (pos_str.find('-') != std::string::npos) {
-            throw Seek_error(MSG_SEEK_INVALID_VALUE);
+            throw SeekError(MSG_SEEK_INVALID_VALUE);
         }
 
         std::uint64_t pos;
         try {
             pos = std::stoull(std::string{pos_str}, &cpos);
         } catch (...) {
-            throw Seek_error(MSG_SEEK_INVALID_VALUE);
+            throw SeekError(MSG_SEEK_INVALID_VALUE);
         }
 
         // cpos will point to the first character in pos that wasn't a number.
         // We don't want any such characters here, so bail if the position isn't
         // at the end of the string.
         const auto sl = pos_str.length();
-        if (cpos != sl) throw Seek_error(MSG_SEEK_INVALID_VALUE);
+        if (cpos != sl) throw SeekError(MSG_SEEK_INVALID_VALUE);
 
         return std::chrono::microseconds{pos};
     }
@@ -265,16 +265,16 @@ namespace playd {
 
     Response::Code Player::StateResponseCode() const {
         switch (file->CurrentState()) {
-            case audio::Audio::State::at_end:
-                return Response::Code::end;
-            case audio::Audio::State::none:
-                return Response::Code::eject;
-            case audio::Audio::State::playing:
-                return Response::Code::play;
-            case audio::Audio::State::stopped:
-                return Response::Code::stop;
+            case Audio::Audio::State::AT_END:
+                return Response::Code::END;
+            case Audio::Audio::State::NONE:
+                return Response::Code::EJECT;
+            case Audio::Audio::State::PLAYING:
+                return Response::Code::PLAY;
+            case Audio::Audio::State::STOPPED:
+                return Response::Code::STOP;
         }
-        return Response::Code::eject;
+        return Response::Code::EJECT;
     }
 
     void Player::Respond(int id, const Response &rs) const {
@@ -298,27 +298,27 @@ namespace playd {
         // This ensures we don't broadcast too often:
         // see CanBroadcastPos.
         this->last_pos = std::chrono::duration_cast<std::chrono::seconds>(pos);
-        this->AnnounceTimestamp(Response::Code::pos, 0, tag, pos);
+        this->AnnounceTimestamp(Response::Code::POS, 0, tag, pos);
     }
 
-    std::unique_ptr<audio::Audio> Player::LoadRaw(std::string_view path) const {
+    std::unique_ptr<Audio::Audio> Player::LoadRaw(std::string_view path) const {
         auto source = this->LoadSource(path);
         assert(source != nullptr);
 
         auto sink = this->sink(*source, this->device_id);
-        return std::make_unique<audio::Basic_audio>(std::move(source), std::move(sink));
+        return std::make_unique<Audio::BasicAudio>(std::move(source), std::move(sink));
     }
 
-    std::unique_ptr<audio::Source> Player::LoadSource(std::string_view path) const {
+    std::unique_ptr<Audio::Source> Player::LoadSource(std::string_view path) const {
         size_t extpoint = path.find_last_of('.');
         auto ext = std::string{path.substr(extpoint + 1)};
 
         auto ibuilder = this->sources.find(ext);
         if (ibuilder == this->sources.end()) {
-            throw File_error("Unknown file format: " + ext);
+            throw FileError("Unknown file format: " + ext);
         }
 
         return (ibuilder->second)(path);
     }
 
-} // namespace playd
+} // namespace Playd

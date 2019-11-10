@@ -22,7 +22,7 @@
 #include "sample_format.h"
 #include "source.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /// Abstract class for audio output sinks.
 class Sink
@@ -33,10 +33,10 @@ public:
 	 * @see Update
 	 */
 	enum class State : uint8_t {
-		none,    ///< There is no audio.
-		stopped, ///< The audio has been stopped, or not yet played.
-		playing, ///< The audio is currently playing.
-		at_end,  ///< The audio has ended and can't play without a seek.
+		NONE,    ///< There is no audio.
+		STOPPED, ///< The audio has been stopped, or not yet played.
+		PLAYING, ///< The audio is currently playing.
+		AT_END,  ///< The audio has ended and can't play without a seek.
 	};
 
 	/// Virtual, empty destructor for Audio_sink.
@@ -109,7 +109,7 @@ public:
  * decoded samples from the Audio object.  While active, the Sdl_audio_sink
  * periodically transfers samples from its buffer to SDL2 in a separate thread.
  */
-class Sdl_sink : public Sink
+class SDLSink : public Sink
 {
 public:
 	/**
@@ -117,10 +117,10 @@ public:
 	 * @param source The source from which this sink will receive audio.
 	 * @param device_id The device ID to which this sink will output.
 	 */
-	Sdl_sink(const Source &source, int device_id);
+	SDLSink(const Source &source, int device_id);
 
 	/// Destructs an Sdl_audio_sink.
-	~Sdl_sink() override;
+	~SDLSink() override;
 
 	void Start() override;
 
@@ -169,16 +169,16 @@ private:
 	SDL_AudioDeviceID device;
 
 	/// n, where 2^n is the capacity of the Audio ring buffer.
-	static constexpr size_t ringbuf_power = 16;
+	static constexpr size_t RINGBUF_POWER = 16;
 
 	/// Mapping from SampleFormats to their equivalent SDL_AudioFormats.
-	static const std::array<SDL_AudioFormat, sample_format_count> formats;
+	static const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> formats;
 
 	/// Number of bytes in one sample.
 	size_t bytes_per_sample;
 
 	/// The ring buffer used to transfer samples to the playing callback.
-	Ring_buffer ring_buf;
+	RingBuffer ring_buf;
 
 	/// The current position, in samples.
 	Samples position_sample_count;
@@ -190,6 +190,6 @@ private:
 	Sink::State state;
 };
 
-} // namespace playd::audio
+} // namespace Playd::Audio
 
 #endif // PLAYD_AUDIO_SINK_H

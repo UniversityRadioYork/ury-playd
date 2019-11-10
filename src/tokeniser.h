@@ -12,7 +12,7 @@
 
 #include "response.h"
 
-namespace playd {
+namespace Playd {
 
 /**
  * A string tokeniser.
@@ -88,6 +88,6 @@ private:
     void FeedUnquotedChar(char c);
 };
 
-} // namespace tokeniser
+} // namespace Playd
 
 #endif // PLAYD_TOKENISER_H

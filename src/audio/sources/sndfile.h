@@ -21,10 +21,10 @@
 #include "../sample_format.h"
 #include "../source.h"
 
-namespace playd::audio
+namespace Playd::Audio
 {
 /// Audio source for use on files supported by libsndfile.
-class Sndfile_source : public Source
+class SndfileSource : public Source
 {
 public:
 	/**
@@ -33,12 +33,12 @@ public:
 	 *   decoder.
 	 * @see http://www.mega-nerd.com/libsndfile/api.html#open
 	 */
-	explicit Sndfile_source(std::string_view path);
+	explicit SndfileSource(std::string_view path);
 
 	/// Destructs a Sndfile_audio_source.
-	~Sndfile_source();
+	~SndfileSource();
 
-	Decode_result Decode() override;
+	DecodeResult Decode() override;
 
 	std::uint64_t Seek(std::uint64_t position) override;
 
@@ -48,7 +48,7 @@ public:
 
 	std::uint32_t SampleRate() const override;
 
-	Sample_format OutputSampleFormat() const override;
+	SampleFormat OutputSampleFormat() const override;
 
 	/**
 	 * Constructs an Sndfile_audio_source and returns a unique pointer to it.
@@ -56,7 +56,7 @@ public:
 	 *   decoder.
 	 * @returns A unique pointer to a Sndfile_audio_source.
 	 */
-	static std::unique_ptr<Sndfile_source> MakeUnique(std::string_view path);
+	static std::unique_ptr<SndfileSource> MakeUnique(std::string_view path);
 
 private:
 	SF_INFO info;  ///< The libsndfile info structure.
@@ -65,7 +65,7 @@ private:
 	std::vector<int32_t> buffer; ///< The decoding buffer.
 };
 
-} // namespace playd::audio
+} // namespace Playd::Audio
 
 #endif // WITH_SNDFILE
 #endif // PLAYD_AUDIO_SOURCE_SNDFILE_H

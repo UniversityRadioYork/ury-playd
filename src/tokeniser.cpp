@@ -15,7 +15,7 @@
 
 #include "tokeniser.h"
 
-namespace playd {
+namespace Playd {
 
     Tokeniser::Tokeniser()
             : escape_next{false}, in_word{false}, quote_type{QuoteType::NONE} {
@@ -146,4 +146,4 @@ namespace playd {
         Ensures(this->current_word.empty());
     }
 
-} // namespace playd
+} // namespace Playd

@@ -42,14 +42,14 @@ private:
 /**
  * An Error signifying that playd has been improperly configured.
  */
-class Config_error : public Error
+class ConfigError : public Error
 {
 public:
 	/**
 	 * Constructs an ConfigError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Config_error(const std::string_view msg) : Error(msg)
+	ConfigError(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -57,14 +57,14 @@ public:
 /**
  * An Error signifying that playd has hit an internal snag.
  */
-class Internal_error : public Error
+class InternalError : public Error
 {
 public:
 	/**
 	 * Constructs an InternalError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Internal_error(const std::string_view msg) : Error(msg)
+	InternalError(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -72,14 +72,14 @@ public:
 /**
  * An Error signifying that playd can't read a file.
  */
-class File_error : public Error
+class FileError : public Error
 {
 public:
 	/**
 	 * Constructs a FileError.
 	 * @param msg The human-readable message of the error.
 	 */
-	File_error(const std::string_view msg) : Error(msg)
+	FileError(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -87,14 +87,14 @@ public:
 /**
  * An Error signifying that playd can't seek in a file.
  */
-class Seek_error : public Error
+class SeekError : public Error
 {
 public:
 	/**
 	 * Constructs a SeekError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Seek_error(const std::string_view msg) : Error(msg)
+	SeekError(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -102,14 +102,14 @@ public:
 /**
  * A network error.
  */
-class Net_error : public Error
+class NetError : public Error
 {
 public:
 	/**
 	 * Constructs a NetError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Net_error(const std::string_view msg) : Error(msg)
+	NetError(const std::string_view msg) : Error(msg)
 	{
 	}
 };
@@ -117,14 +117,14 @@ public:
 /**
  * An Error signifying that no audio is loaded.
  */
-class Null_audio_error : public Error
+class NullAudioError : public Error
 {
 public:
 	/**
-	 * Constructs an NoAudioError.
+	 * Constructs an NullAudioError.
 	 * @param msg The human-readable message of the error.
 	 */
-	Null_audio_error(const std::string_view msg) : Error(msg)
+	NullAudioError(const std::string_view msg) : Error(msg)
 	{
 	}
 };

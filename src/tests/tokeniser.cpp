@@ -10,7 +10,7 @@
 
 #include "catch.hpp"
 
-namespace playd::tests
+namespace Playd::Tests
 {
 SCENARIO ("Tokenisers can handle complete, unquoted commands", "[tokeniser]") {
 	GIVEN ("A fresh Tokeniser") {
@@ -384,4 +384,4 @@ SCENARIO ("Tokeniser is compliant with the BAPS3 spec", "[tokeniser][spec]") {
 	}
 }
 
-} // namespace playd::tests
+} // namespace Playd::Tests

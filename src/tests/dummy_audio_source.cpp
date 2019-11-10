@@ -15,42 +15,42 @@
 #include "../audio/sample_format.h"
 #include "../audio/source.h"
 
-namespace playd::tests
+namespace Playd::Tests
 {
-audio::Source::Decode_result Dummy_audio_source::Decode()
+Audio::Source::DecodeResult DummyAudioSource::Decode()
 {
-	auto state = run_out ? audio::Source::Decode_state::eof : audio::Source::Decode_state::decoding;
-	return std::make_pair(state, audio::Source::Decode_vector());
+	auto state = run_out ? Audio::Source::DecodeState::END_OF_FILE : Audio::Source::DecodeState::DECODING;
+	return std::make_pair(state, Audio::Source::DecodeVector());
 }
 
-std::uint8_t Dummy_audio_source::ChannelCount() const
+std::uint8_t DummyAudioSource::ChannelCount() const
 {
 	return 2;
 }
 
-std::uint32_t Dummy_audio_source::SampleRate() const
+std::uint32_t DummyAudioSource::SampleRate() const
 {
 	return 44100;
 }
 
-audio::Sample_format Dummy_audio_source::OutputSampleFormat() const
+Audio::SampleFormat DummyAudioSource::OutputSampleFormat() const
 {
-	return audio::Sample_format::sint32;
+	return Audio::SampleFormat::SINT32;
 }
 
-std::uint64_t Dummy_audio_source::Seek(std::uint64_t new_position)
+std::uint64_t DummyAudioSource::Seek(std::uint64_t new_position)
 {
 	this->position = new_position;
 	return this->position;
 }
 
-std::string_view Dummy_audio_source::Path() const
+std::string_view DummyAudioSource::Path() const
 {
 	return this->path;
 }
 
-std::uint64_t Dummy_audio_source::Length() const
+std::uint64_t DummyAudioSource::Length() const
 {
 	return 0;
 }
-} // namespace playd::tests
+} // namespace Playd::Tests
