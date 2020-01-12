@@ -7,42 +7,56 @@
  * @see audio/sources/sndfile.cpp
  */
 
-#ifndef PLAYD_AUDIO_SOURCE_SNDFILE_HPP
-#define PLAYD_AUDIO_SOURCE_SNDFILE_HPP
+#ifndef PLAYD_AUDIO_SOURCES_SNDFILE_H
+#define PLAYD_AUDIO_SOURCES_SNDFILE_H
 #ifdef WITH_SNDFILE
-
-#include <cstdint>
-#include <string>
-#include <vector>
 
 #include <sndfile.h>
 
-#include "../audio_source.hpp"
-#include "../sample_formats.hpp"
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 
-/// AudioSource for use on files supported by libsndfile.
-class SndfileAudioSource : public AudioSource
+#include "../sample_format.h"
+#include "../source.h"
+
+namespace Playd::Audio
+{
+/// Audio source for use on files supported by libsndfile.
+class SndfileSource : public Source
 {
 public:
 	/**
-	 * Constructs a SndfileAudioSource.
+	 * Constructs a Sndfile_audio_source.
 	 * @param path The path to the file to load and decode using this
 	 *   decoder.
 	 * @see http://www.mega-nerd.com/libsndfile/api.html#open
 	 */
-	SndfileAudioSource(const std::string &path);
+	explicit SndfileSource(std::string_view path);
 
-	/// Destructs an Mp3AudioSource.
-	~SndfileAudioSource();
+	/// Destructs a Sndfile_audio_source.
+	~SndfileSource();
 
 	DecodeResult Decode() override;
+
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	std::uint64_t Length() const override;
 
 	std::uint8_t ChannelCount() const override;
+
 	std::uint32_t SampleRate() const override;
+
 	SampleFormat OutputSampleFormat() const override;
+
+	/**
+	 * Constructs an Sndfile_audio_source and returns a unique pointer to it.
+	 * @param path The path to the file to load and decode using this
+	 *   decoder.
+	 * @returns A unique pointer to a Sndfile_audio_source.
+	 */
+	static std::unique_ptr<SndfileSource> MakeUnique(std::string_view path);
 
 private:
 	SF_INFO info;  ///< The libsndfile info structure.
@@ -51,5 +65,7 @@ private:
 	std::vector<int32_t> buffer; ///< The decoding buffer.
 };
 
+} // namespace Playd::Audio
+
 #endif // WITH_SNDFILE
-#endif // PLAYD_AUDIO_SOURCE_SNDFILE_HPP
+#endif // PLAYD_AUDIO_SOURCE_SNDFILE_H

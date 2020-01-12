@@ -3,81 +3,189 @@
 
 /**
  * @file
- * Implementation of the RingBuffer class.
+ * Implementation of the Ring_buffer class.
  */
 
-#include <cassert>
+#include "ringbuffer.h"
 
-extern "C" {
-#include "../contrib/pa_ringbuffer/pa_ringbuffer.h"
+#include <atomic>
+#include <cassert>
+#include <cstddef>
+#include <gsl/gsl>
+#include <mutex>
+#include <vector>
+
+#include "../errors.h"
+
+namespace Playd::Audio
+{
+/* Assumptions:
+
+   1) single producer, single consumer, enforced by locks.
+      - when reading, count can only increase (read capacity can only increase)
+      - when writing, count can only decrease (write capacity can only increase)
+      - only the reader can move the read pointer, and it may do so
+   non-atomically
+      - only the writer can move the write pointer, and it may do so
+   non-atomically 2) capacities always underestimate
+      - when reading, ATOMICALLY decrease count (increase read capacity) AFTER
+   read read capacity may be lower than actual
+      - when writing, ATOMICALLY increase count (read capacity) AFTER write
+                      write capacity may be lower than actual
+      - always atomically read capacities */
+
+RingBuffer::RingBuffer(size_t capacity) : buffer(capacity), count{0}
+{
+	this->r_it = this->buffer.cbegin();
+	this->w_it = this->buffer.begin();
+
+	// Only one thread can hold this at the moment, so we're ok to
+	// do this without locks.
+	this->FlushInner();
+
+	Ensures(ReadCapacity() == 0);
+	Ensures(WriteCapacity() == capacity);
 }
 
-#include "../errors.hpp"
-#include "../messages.h"
-#include "ringbuffer.hpp"
-
-RingBuffer::RingBuffer(int power, int size)
+inline size_t RingBuffer::ReadCapacity() const
 {
-	if (power <= 0) throw InternalError("ringbuffer power must be positive");
-	if (size <= 0) throw InternalError("ringbuffer element size must be positive");
+	/* Acquire order here means two things:
+	 *
+	 * 1) no other loads in the thread checking WriteCapacity (ie the
+	 *    producer) can be ordered before it;
+	 * 2) this load sees all 'release' writes in other threads (usually
+	 *    consumers increasing the write capacity).
+	 */
+	return this->count.load(std::memory_order_acquire);
+}
 
-	this->rb = new PaUtilRingBuffer;
-	this->buffer = new char[(1 << power) * size];
+inline size_t RingBuffer::WriteCapacity() const
+{
+	return this->buffer.size() - ReadCapacity();
+}
 
-	if (PaUtil_InitializeRingBuffer(
-	            this->rb, size, static_cast<ring_buffer_size_t>(1 << power),
-	            this->buffer) != 0) {
-		throw new InternalError(MSG_OUTPUT_RINGINIT);
+size_t RingBuffer::Write(const gsl::span<const std::byte> src)
+{
+	// This shouldn't be called with an empty (or backwards!) span.
+	const auto src_count = static_cast<size_t>(src.size());
+	Expects(0 < src_count);
+
+	/* Acquire write lock to make sure only one write can occur at a given
+	 * time, and also that we can't be flushed in the middle of writing.
+	 *
+	 * This ensures that the write capacity can only go up from when we
+	 * read it here.
+	 */
+	std::lock_guard<std::mutex> w_guard(this->w_lock);
+
+	/* Remember, this is pessimistic:
+	 * the write capacity can be increased after this point by a consumer.
+	 */
+	const auto write_capacity_estimate = WriteCapacity();
+	if (write_capacity_estimate < src_count) throw InternalError("ringbuffer overflow");
+
+	// Trim the span down to the amount we can write.
+	auto write_count = std::min(write_capacity_estimate, src_count);
+	const auto src_to_write = src.first(write_count);
+
+	/* At this stage, we're the only thread that can be accessing this part
+	 * of the buffer, so we can proceed non-atomically.  The release we do
+	 * at the end makes our changes available to the consumer.
+	 */
+	// Ringbuffers loop, so how many bytes can we store until we have to
+	// loop?
+	const auto bytes_to_end = distance(this->w_it, this->buffer.end());
+	// Make sure we got the iterators the right way round.
+	assert(0 <= bytes_to_end);
+
+	auto write_end_count = std::min(write_count, static_cast<size_t>(bytes_to_end));
+
+	const auto src_end = src_to_write.first(write_end_count);
+	this->w_it = copy(src_end.cbegin(), src_end.cend(), this->w_it);
+
+	// Do we need to loop?  If so, do that.
+	auto write_start_count = write_count - write_end_count;
+	if (0 < write_start_count) {
+		Expects(this->w_it == this->buffer.end());
+		const auto src_start = src_to_write.last(write_start_count);
+		this->w_it = copy(src_start.cbegin(), src_start.cend(), this->buffer.begin());
+		Ensures(this->w_it > this->buffer.begin());
 	}
 
-	assert(this->rb != nullptr);
-	assert(this->buffer != nullptr);
+	/* Now tell the consumer it can read some more data (this HAS to be done
+	 * here, to avoid the consumer over-reading).
+	 *
+	 * Because the other thread might have moved count since we last checked
+	 * it, this needs to be acquire-release.
+	 */
+	this->count.fetch_add(write_count, std::memory_order_acq_rel);
+
+	Ensures(write_start_count + write_end_count == write_count);
+	return write_count;
 }
 
-RingBuffer::~RingBuffer()
+size_t RingBuffer::Read(gsl::span<std::byte> dest)
 {
-	assert(this->rb != nullptr);
-	delete this->rb;
+	const auto dest_count = static_cast<size_t>(dest.size());
+	Expects(0 < dest_count);
 
-	assert(this->buffer != nullptr);
-	delete[] this->buffer;
-}
+	/* Acquire read lock to make sure only one read can occur at a given
+	 * time, and also that we can't be flushed in the middle of reading.
+	 *
+	 * This ensures that the read capacity can only go up from when we
+	 * read it here.
+	 */
+	std::lock_guard<std::mutex> r_guard(this->r_lock);
 
-size_t RingBuffer::WriteCapacity() const
-{
-	return CountCast(PaUtil_GetRingBufferWriteAvailable(this->rb));
-}
+	/* Remember, this is pessimistic:
+	 * the read capacity can be increased after this point by a producer.
+	 */
+	const auto read_capacity_estimate = ReadCapacity();
+	if (read_capacity_estimate < dest_count) throw InternalError("ringbuffer underflow");
 
-size_t RingBuffer::ReadCapacity() const
-{
-	return CountCast(PaUtil_GetRingBufferReadAvailable(this->rb));
-}
+	/* See Write() for explanatory comments on what happens here:
+	 * the two functions mirror each other almost perfectly.
+	 */
 
-unsigned long RingBuffer::Write(const char *start, unsigned long count)
-{
-	if (count == 0) throw InternalError("tried to store 0 items in ringbuffer");
-	if (WriteCapacity() < count) throw InternalError("ringbuffer overflow");
+	auto read_count = std::min(read_capacity_estimate, dest_count);
+	const auto dest_to_read = dest.first(read_count);
 
-	return CountCast(PaUtil_WriteRingBuffer(
-	        this->rb, start, static_cast<ring_buffer_size_t>(count)));
-}
+	const auto bytes_to_end = distance(this->r_it, this->buffer.cend());
+	assert(0 <= bytes_to_end);
 
-unsigned long RingBuffer::Read(char *start, unsigned long count)
-{
-	if (count == 0) throw InternalError("tried to read 0 items from ringbuffer");
-	if (ReadCapacity() < count) throw InternalError("ringbuffer underflow");
+	auto read_end_count = std::min(read_count, static_cast<size_t>(bytes_to_end));
+	auto rest = copy_n(this->r_it, read_end_count, dest_to_read.begin());
+	this->r_it += read_end_count;
 
-	return CountCast(PaUtil_ReadRingBuffer(
-	        this->rb, start, static_cast<ring_buffer_size_t>(count)));
+	auto read_start_count = read_count - read_end_count;
+	if (0 < read_start_count) {
+		Expects(this->r_it == this->buffer.cend());
+		copy_n(this->buffer.cbegin(), read_start_count, rest);
+		this->r_it = this->buffer.cbegin() + read_start_count;
+		Ensures(this->r_it > this->buffer.cbegin());
+	}
+
+	if (this->count.fetch_sub(read_count, std::memory_order_acq_rel) < read_count)
+		throw InternalError("capacity decreased unexpectedly");
+
+	Ensures(read_start_count + read_end_count == read_count);
+	return read_count;
 }
 
 void RingBuffer::Flush()
 {
-	PaUtil_FlushRingBuffer(this->rb);
-	assert(this->ReadCapacity() == 0);
+	// Make sure nothing is reading or writing.
+	std::lock_guard<std::mutex> r_guard(this->r_lock);
+	std::lock_guard<std::mutex> w_guard(this->w_lock);
+
+	FlushInner();
+
+	Ensures(this->ReadCapacity() == 0);
 }
 
-/* static */ unsigned long RingBuffer::CountCast(ring_buffer_size_t count)
+inline void RingBuffer::FlushInner()
 {
-	return static_cast<unsigned long>(count);
+	this->count.store(0, std::memory_order_release);
 }
+
+} // namespace Playd::Audio

@@ -7,10 +7,12 @@
  * @see tokeniser.cpp
  */
 
-#ifndef PLAYD_TOKENISER_HPP
-#define PLAYD_TOKENISER_HPP
+#ifndef PLAYD_TOKENISER_H
+#define PLAYD_TOKENISER_H
 
-#include "response.hpp"
+#include "response.h"
+
+namespace Playd {
 
 /**
  * A string tokeniser.
@@ -78,6 +80,14 @@ private:
 	 * @param c The character to push onto the current word.
 	 */
 	void Push(char c);
+
+    void FeedSingleQuotedChar(char c);
+
+    void FeedDoublyQuotedChar(char c);
+
+    void FeedUnquotedChar(char c);
 };
 
-#endif // PLAYD_TOKENISER_HPP
+} // namespace Playd
+
+#endif // PLAYD_TOKENISER_H

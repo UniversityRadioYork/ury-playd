@@ -6,18 +6,21 @@
  * Dummy classes for response class tests.
  */
 
-#ifndef PLAYD_TESTS_IO_RESPONSE_HPP
-#define PLAYD_TESTS_IO_RESPONSE_HPP
+#ifndef PLAYD_TESTS_DUMMY_RESPONSE_SINK_H
+#define PLAYD_TESTS_DUMMY_RESPONSE_SINK_H
 
 #include <ostream>
 
-#include "../response.hpp"
+#include "../response.h"
 
+namespace Playd::Tests
+{
 // A dummy class for testing the ResponseSink abstract class methods.
-class DummyResponseSink : public ResponseSink {
+class DummyResponseSink : public ResponseSink
+{
 public:
 	/**
-	 * Constructs a DummyResponseSink.
+	 * Constructs a Dummy_response_sink.
 	 * @param os The ostream to which responses should be sent.
 	 */
 	DummyResponseSink(std::ostream &os);
@@ -30,4 +33,6 @@ private:
 	std::ostream &os;
 };
 
-#endif // PLAYD_TESTS_IO_RESPONSE_HPP
+} // namespace Playd::Tests
+
+#endif // PLAYD_TESTS_DUMMY_RESPONSE_SINK_H

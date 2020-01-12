@@ -3,12 +3,12 @@
 
 /**
  * @file
- * Declaration of the AudioSink class.
+ * Declaration of the Sink and Sdl_sink classes.
  * @see audio/audio.cpp
  */
 
-#ifndef PLAYD_AUDIO_SINK_HPP
-#define PLAYD_AUDIO_SINK_HPP
+#ifndef PLAYD_AUDIO_SINK_H
+#define PLAYD_AUDIO_SINK_H
 
 #include <array>
 #include <cstdint>
@@ -18,21 +18,29 @@
 #include <vector>
 
 #include "SDL.h"
+#include "ringbuffer.h"
+#include "sample_format.h"
+#include "source.h"
 
-#include "audio.hpp"
-#include "audio_source.hpp"
-#include "ringbuffer.hpp"
-#include "sample_formats.hpp"
-
+namespace Playd::Audio
+{
 /// Abstract class for audio output sinks.
-class AudioSink
+class Sink
 {
 public:
-	/// Type of iterators used in the Transfer() method.
-	using TransferIterator = AudioSource::DecodeVector::iterator;
+	/**
+	 * Enumeration of possible states for audio.
+	 * @see Update
+	 */
+	enum class State : uint8_t {
+		NONE,    ///< There is no audio.
+		STOPPED, ///< The audio has been stopped, or not yet played.
+		PLAYING, ///< The audio is currently playing.
+		AT_END,  ///< The audio has ended and can't play without a seek.
+	};
 
-	/// Virtual, empty destructor for AudioSink.
-	virtual ~AudioSink() = default;
+	/// Virtual, empty destructor for Audio_sink.
+	virtual ~Sink() = default;
 
 	/**
 	 * Starts the audio stream.
@@ -49,11 +57,11 @@ public:
 	virtual void Stop() = 0;
 
 	/**
-	 * Gets this AudioSink's current state (playing/stopped/at end).
-	 * @return The Audio::State representing this AudioSink's state.
-	 * @see Audio::State
+	 * Gets this sink's current state (playing/stopped/at end).
+	 * @return The Audio_sink::State representing this sink's state.
+	 * @see Audio_sink::State
 	 */
-	virtual Audio::State State();
+	virtual State CurrentState();
 
 	/**
 	 * Gets the current played position in the song, in samples.
@@ -61,16 +69,16 @@ public:
 	 * do not expect it to be highly accurate.
 	 * @return The current position, as a count of elapsed samples.
 	 */
-	virtual std::uint64_t Position() = 0;
+	virtual Samples Position() = 0;
 
 	/**
 	 * Sets the current played position, given a position in samples.
-	 * This flushes out the AudioSink ready to receive sample data from the
+	 * This flushes out the audio sink ready to receive sample data from the
 	 * new position.
 	 * @param samples The new position, as a count of elapsed samples.
 	 * @see Position
 	 */
-	virtual void SetPosition(std::uint64_t samples) = 0;
+	virtual void SetPosition(Samples samples) = 0;
 
 	/**
 	 * Tells this AudioSink that the source has run out.
@@ -81,60 +89,60 @@ public:
 	virtual void SourceOut() = 0;
 
 	/**
-	 * Transfers a range of sample bytes into the AudioSink.
-	 * The range may be empty, but must be valid.
+	 * Transfers a span of sample bytes into the audio sink.
+	 * The span may be empty, but must be valid.
 	 *
-	 * * Precondition: @a start <= @a end, @a start and @a end point to a
-	 *     valid contiguous block of sample bytes.
-	 * * Postcondition: @a start <= @a end, @a old(start) <= @a start,
-	 *     @a *start and @a end point to a valid contiguous block of sample
-	 *     bytes.
+	 * * Precondition: @a src must contain a whole number of samples.
+	 * * Postcondition: The return value is no greater than the size
+	 *     of @a src.
 	 *
-	 * @param start An iterator denoting the start of the range.  This
-	 *   iterator will be advanced by the number of bytes accepted.
-	 * @param end An iterator denoting the end of the range.
+	 * @param src A span representing the sample bytes to transfer.
+	 * @return The number of bytes transferred.
 	 */
-	virtual void Transfer(TransferIterator &start,
-	                      const TransferIterator &end) = 0;
+	virtual size_t Transfer(gsl::span<const std::byte> src) = 0;
 };
 
 /**
  * An output stream for audio, using SDL.
  *
- * An SdlAudioSink consists of an SDL output device and a buffer that stores
- * decoded samples from the Audio object.  While active, the SdlAudioSink
+ * An Sdl_audio_sink consists of an SDL output device and a buffer that stores
+ * decoded samples from the Audio object.  While active, the Sdl_audio_sink
  * periodically transfers samples from its buffer to SDL2 in a separate thread.
  */
-class SdlAudioSink : public AudioSink
+class SDLSink : public Sink
 {
 public:
 	/**
-	 * Constructs an SdlAudioSink.
+	 * Constructs an Sdl_audio_sink.
 	 * @param source The source from which this sink will receive audio.
 	 * @param device_id The device ID to which this sink will output.
 	 */
-	SdlAudioSink(const AudioSource &source, int device_id);
+	SDLSink(const Source &source, int device_id);
 
-	/// Destructs an SdlAudioSink.
-	~SdlAudioSink() override;
+	/// Destructs an Sdl_audio_sink.
+	~SDLSink() override;
 
 	void Start() override;
+
 	void Stop() override;
-	Audio::State State() override;
-	std::uint64_t Position() override;
-	void SetPosition(std::uint64_t samples) override;
+
+	Sink::State CurrentState() override;
+
+	Samples Position() override;
+
+	void SetPosition(Samples samples) override;
+
 	void SourceOut() override;
-	void Transfer(TransferIterator &start,
-	              const TransferIterator &end) override;
+
+	size_t Transfer(gsl::span<const std::byte> src) override;
 
 	/**
-	 * The callback proper.
+	 * The audio callback.
 	 * This is executed in a separate thread by SDL once a stream is
 	 * playing with the callback registered to it.
-	 * @param out The output buffer to which our samples should be written.
-	 * @param nbytes The number of bytes SDL wants to read from @a out.
+	 * @param dest The output span to which our samples should be written.
 	 */
-	void Callback(std::uint8_t *out, int nbytes);
+	void Callback(gsl::span<std::byte> dest);
 
 	/**
 	 * Gets the number and name of each output device entry in the
@@ -161,11 +169,10 @@ private:
 	SDL_AudioDeviceID device;
 
 	/// n, where 2^n is the capacity of the Audio ring buffer.
-	/// @see RINGBUF_SIZE
-	static const size_t RINGBUF_POWER;
+	static constexpr size_t RINGBUF_POWER = 16;
 
 	/// Mapping from SampleFormats to their equivalent SDL_AudioFormats.
-	static const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> FORMATS;
+	static const std::array<SDL_AudioFormat, SAMPLE_FORMAT_COUNT> formats;
 
 	/// Number of bytes in one sample.
 	size_t bytes_per_sample;
@@ -174,13 +181,15 @@ private:
 	RingBuffer ring_buf;
 
 	/// The current position, in samples.
-	std::uint64_t position_sample_count;
+	Samples position_sample_count;
 
 	/// Whether the source has run out of things to feed the sink.
 	bool source_out;
 
 	/// The decoder's current state.
-	Audio::State state;
+	Sink::State state;
 };
 
-#endif // PLAYD_AUDIO_SINK_HPP
+} // namespace Playd::Audio
+
+#endif // PLAYD_AUDIO_SINK_H

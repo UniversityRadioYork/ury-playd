@@ -3,36 +3,34 @@
 
 /**
  * @file
- * Implementation of the SndfileAudioSource class.
- * @see audio/audio_source.hpp
+ * Implementation of the SndfileAudio_source class.
+ * @see audio/audio_source.h
  */
 
-#include <cassert>
-#include <cstdint>
-#include <cstdlib>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
+#include "sndfile.h"
 
 #include <sndfile.h>
 
-#include "../../errors.hpp"
-#include "../../messages.h"
-#include "../sample_formats.hpp"
-#include "../audio_source.hpp"
-#include "sndfile.hpp"
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <memory>
+#include <string>
 
-SndfileAudioSource::SndfileAudioSource(const std::string &path)
-    : AudioSource(path), file(nullptr), buffer()
+#include "../../errors.h"
+#include "../../messages.h"
+#include "../sample_format.h"
+#include "../source.h"
+
+namespace Playd::Audio
+{
+SndfileSource::SndfileSource(std::string_view path) : Source{path}, file{nullptr}, buffer{}
 {
 	this->info.format = 0;
 
-	this->file = sf_open(path.c_str(), SFM_READ, &this->info);
+	this->file = sf_open(this->path.c_str(), SFM_READ, &this->info);
 	if (this->file == nullptr) {
-		throw FileError("sndfile: can't open " + path + ": " +
-		                sf_strerror(nullptr));
+		throw FileError("sndfile: can't open " + this->path + ": " + sf_strerror(nullptr));
 	}
 
 	// Reserve enough space for a given number of frames.
@@ -43,18 +41,18 @@ SndfileAudioSource::SndfileAudioSource(const std::string &path)
 	this->buffer.insert(this->buffer.begin(), 4096 * this->info.channels, 0);
 }
 
-SndfileAudioSource::~SndfileAudioSource()
+SndfileSource::~SndfileSource()
 {
 	if (this->file != nullptr) sf_close(this->file);
 }
 
-std::uint8_t SndfileAudioSource::ChannelCount() const
+std::uint8_t SndfileSource::ChannelCount() const
 {
 	assert(0 < this->info.channels);
 	return static_cast<std::uint8_t>(this->info.channels);
 }
 
-std::uint32_t SndfileAudioSource::SampleRate() const
+std::uint32_t SndfileSource::SampleRate() const
 {
 	assert(0 < this->info.samplerate);
 	// INT32_MAX isn't a typo; if we compare against UINT32_MAX, we'll
@@ -64,13 +62,11 @@ std::uint32_t SndfileAudioSource::SampleRate() const
 	return static_cast<std::uint32_t>(this->info.samplerate);
 }
 
-std::uint64_t SndfileAudioSource::Seek(std::uint64_t in_samples)
+std::uint64_t SndfileSource::Seek(std::uint64_t in_samples)
 {
 	// Have we tried to seek past the end of the file?
-	auto clen = static_cast<unsigned long>(this->info.frames);
-	if (clen < in_samples) {
-		Debug() << "sndfile: seek at" << in_samples << "past EOF at"
-		        << clen << std::endl;
+	if (auto clen = static_cast<unsigned long>(this->info.frames); clen < in_samples) {
+		Debug() << "sndfile: seek at" << in_samples << "past EOF at" << clen << std::endl;
 		throw SeekError(MSG_SEEK_FAIL);
 	}
 
@@ -83,15 +79,14 @@ std::uint64_t SndfileAudioSource::Seek(std::uint64_t in_samples)
 	return out_samples;
 }
 
-std::uint64_t SndfileAudioSource::Length() const
+std::uint64_t SndfileSource::Length() const
 {
-	return(this->info.frames);
+	return (this->info.frames);
 }
 
-SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()
+SndfileSource::DecodeResult SndfileSource::Decode()
 {
-	auto read = sf_read_int(this->file, &*this->buffer.begin(),
-	                        this->buffer.size());
+	auto read = sf_read_int(this->file, &*this->buffer.begin(), this->buffer.size());
 
 	// Have we hit the end of the file?
 	if (read == 0) {
@@ -106,22 +101,28 @@ SndfileAudioSource::DecodeResult SndfileAudioSource::Decode()
 	// (from 8-bit up to 32-bit, and maybe even 32-bit float)!
 	//
 	// So, we reinterpret the decoded bits as a vector of bytes, which is
-	// relatively safe--they'll be interpreted by the AudioSink in the exact
-	// same way once we tell it how long the samples really are.
-	uint8_t *begin = reinterpret_cast<uint8_t *>(&*this->buffer.begin());
+	// relatively safe--they'll be interpreted by the Sink in the
+	// exact same way once we tell it how long the samples really are.
+	auto *begin = reinterpret_cast<std::byte *>(&*this->buffer.begin());
 
 	// The end is 'read' 32-bit items--read*4 bytes--after.
-	uint8_t *end = begin + (read * 4);
+	auto *end = begin + (read * 4);
 
-	return std::make_pair(DecodeState::DECODING, DecodeVector(begin, end));
+	return std::make_pair(DecodeState::DECODING, DecodeVector{begin, end});
 }
 
-SampleFormat SndfileAudioSource::OutputSampleFormat() const
+SampleFormat SndfileSource::OutputSampleFormat() const
 {
 	// Because we use int-sized reads, assume this corresponds to 32-bit
 	// signed int.
 	// Really, we shouldn't assume int is 32-bit!
-	static_assert(sizeof(int) == 4,
-	              "sndfile outputs int, which we need to be 4 bytes");
-	return SampleFormat::PACKED_SIGNED_INT_32;
+	static_assert(sizeof(int) == 4, "sndfile outputs int, which we need to be 4 bytes");
+	return SampleFormat::SINT32;
 }
+
+std::unique_ptr<SndfileSource> SndfileSource::MakeUnique(std::string_view path)
+{
+	return std::make_unique<SndfileSource, std::string_view>(std::move(path));
+}
+
+} // namespace Playd::Audio

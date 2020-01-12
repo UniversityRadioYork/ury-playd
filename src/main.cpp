@@ -8,40 +8,43 @@
  */
 
 #include <algorithm>
+#include <charconv>
 #include <cstdint>
 #include <iostream>
 #include <tuple>
 
-#include "io.hpp"
-#include "response.hpp"
-#include "player.hpp"
+#include "io.h"
 #include "messages.h"
+#include "player.h"
+#include "response.h"
 
 #ifdef WITH_MP3
-#include "audio/sources/mp3.hpp"
+#include "audio/sources/mp3.h"
 #endif // WITH_MP3
 #ifdef WITH_SNDFILE
-#include "audio/sources/sndfile.hpp"
+#include "audio/sources/sndfile.h"
 #endif // WITH_SNDFILE
+
+namespace Playd {
 
 /// The default IP hostname on which playd will bind.
-static const std::string DEFAULT_HOST = "0.0.0.0";
+    constexpr std::string_view DEFAULT_HOST{"0.0.0.0"};
 
 /// The default TCP port on which playd will bind.
-static const std::string DEFAULT_PORT = "1350";
+    constexpr std::string_view DEFAULT_PORT{"1350"};
 
-/// Map from file extensions to AudioSource builder functions.
-static const std::map<std::string, Player::SourceFn> SOURCES = {
+/// Map from file extensions to Audio_source builder functions.
+    static const std::map<std::string, Player::SourceFn> SOURCES{
 #ifdef WITH_MP3
-        {"mp3", &std::make_unique<Mp3AudioSource, const std::string &>},
+            {"mp3", Audio::MP3Source::MakeUnique},
 #endif // WITH_MP3
 
 #ifdef WITH_SNDFILE
-        {"flac", &std::make_unique<SndfileAudioSource, const std::string &>},
-        {"ogg", &std::make_unique<SndfileAudioSource, const std::string &>},
-        {"wav", &std::make_unique<SndfileAudioSource, const std::string &>},
+            {"flac", Audio::SndfileSource::MakeUnique},
+            {"ogg", Audio::SndfileSource::MakeUnique},
+            {"wav", Audio::SndfileSource::MakeUnique},
 #endif // WITH_SNDFILE
-};
+    };
 
 /**
  * Creates a vector of strings from a C-style argument vector.
@@ -49,59 +52,63 @@ static const std::map<std::string, Player::SourceFn> SOURCES = {
  * @param argv Program argument vector.
  * @return The argument vector, as a C++ string vector.
  */
-std::vector<std::string> MakeArgVector(int argc, char *argv[])
-{
-	std::vector<std::string> args;
-	for (int i = 0; i < argc; i++) args.emplace_back(argv[i]);
-	return args;
-}
+    std::vector<std::string_view> MakeArgVector(int argc, char *argv[]) {
+        std::vector<std::string_view> args(argc);
+        for (int i = 0; i < argc; i++) args[i] = std::string_view{argv[i]};
+        return args;
+    }
+
+    int GetDeviceIDFromArg(std::string_view arg) {
+        int id = -1;
+
+        // Parse, but only accept valid numbers (for which ec is empty)
+        auto[p, ec] = std::from_chars(arg.cbegin(), arg.cend(), id);
+        if (ec == std::errc::invalid_argument) {
+            std::cerr << "not a valid device ID: " << arg << std::endl;
+            return -1;
+        } else if (ec == std::errc::result_out_of_range) {
+            std::cerr << "device ID too large: " << arg << std::endl;
+            return -1;
+        }
+
+        // Only allow valid, outputtable devices; reject input-only devices.
+        if (!Audio::SDLSink::IsOutputDevice(id)) return -1;
+
+        return id;
+    }
 
 /**
  * Tries to get the output device ID from program arguments.
  * @param args The program argument vector.
  * @return The device ID, -1 if invalid selection (or none).
  */
-int GetDeviceID(const std::vector<std::string> &args)
-{
-	// Did the user provide an ID at all?
-	if (args.size() < 2) return -1;
+    int GetDeviceID(const std::vector<std::string_view> &args) {
+        // Did the user provide an ID at all?
+        if (args.size() < 2) return -1;
 
-	// Only accept valid numbers (stoi will throw for invalid ones).
-	int id;
-	try {
-		id = std::stoi(args.at(1));
-	} catch (...) {
-		// Only std::{invalid_argument,out_of_range} are thrown here.
-		return -1;
-	}
-
-	// Only allow valid, outputtable devices; reject input-only devices.
-	if (!SdlAudioSink::IsOutputDevice(id)) return -1;
-
-	return id;
-}
+        return GetDeviceIDFromArg(args.at(1));
+    }
 
 /**
  * Reports usage information and exits.
  * @param progname The name of the program as executed.
  */
-void ExitWithUsage(const std::string &progname)
-{
-	std::cerr << "usage: " << progname << " ID [HOST] [PORT]\n";
-	std::cerr << "where ID is one of the following numbers:\n";
+    void ExitWithUsage(std::string_view progname) {
+        std::cerr << "usage: " << progname << " ID [HOST] [PORT]\n";
+        std::cerr << "where ID is one of the following numbers:\n";
 
-	// Show the user the valid device IDs they can use.
-	auto device_list = SdlAudioSink::GetDevicesInfo();
-	for (const auto &device : device_list) {
-		std::cerr << "\t" << device.first << ": " << device.second
-		          << "\n";
-	}
+        // Show the user the valid device IDs they can use.
+        auto device_list = Audio::SDLSink::GetDevicesInfo();
+        for (const auto &device : device_list) {
+            std::cerr << "\t" << device.first << ": " << device.second
+                      << "\n";
+        }
 
-	std::cerr << "default HOST: " << DEFAULT_HOST << "\n";
-	std::cerr << "default PORT: " << DEFAULT_PORT << "\n";
+        std::cerr << "default HOST: " << DEFAULT_HOST << "\n";
+        std::cerr << "default PORT: " << DEFAULT_PORT << "\n";
 
-	exit(EXIT_FAILURE);
-}
+        exit(EXIT_FAILURE);
+    }
 
 /**
  * Gets the host and port from the program arguments.
@@ -109,13 +116,12 @@ void ExitWithUsage(const std::string &progname)
  * @param args The program argument vector.
  * @return A pair of strings representing the hostname and port.
  */
-std::pair<std::string, std::string> GetHostAndPort(
-        const std::vector<std::string> &args)
-{
-	auto size = args.size();
-	return std::make_pair(size > 2 ? args.at(2) : DEFAULT_HOST,
-	                      size > 3 ? args.at(3) : DEFAULT_PORT);
-}
+    std::pair<std::string_view, std::string_view> GetHostAndPort(
+            const std::vector<std::string_view> &args) {
+        const auto size = args.size();
+        return std::make_pair(size > 2 ? args.at(2) : DEFAULT_HOST,
+                              size > 3 ? args.at(3) : DEFAULT_PORT);
+    }
 
 /**
  * Exits with an error message for a network error.
@@ -123,22 +129,21 @@ std::pair<std::string, std::string> GetHostAndPort(
  * @param port The TCP port to which playd tried to bind.
  * @param msg The exception's error message.
  */
-void ExitWithNetError(const std::string &host, const std::string &port,
-                      const std::string &msg)
-{
-	std::cerr << "Network error: " << msg << "\n";
-	std::cerr << "Is " << host << ":" << port << " available?\n";
-	exit(EXIT_FAILURE);
-}
+    void ExitWithNetError(std::string_view host, std::string_view port,
+                          std::string_view msg) {
+        std::cerr << "Network error: " << msg << "\n";
+        std::cerr << "Is " << host << ":" << port << " available?\n";
+        exit(EXIT_FAILURE);
+    }
 
 /**
  * Exits with an error message for an unhandled exception.
  * @param msg The exception's error message.
  */
-void ExitWithError(const std::string &msg)
-{
-	std::cerr << "Unhandled exception in main loop: " << msg << std::endl;
-	exit(EXIT_FAILURE);
+    void ExitWithError(std::string_view msg) {
+        std::cerr << "Unhandled exception in main loop: " << msg << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -160,8 +165,8 @@ int main(int argc, char *argv[])
 	// This call needs to happen before GetDeviceID, otherwise no device
 	// IDs will be recognised.  (This is why it's here, and not in
 	// SetupAudioSystem.)
-	SdlAudioSink::InitLibrary();
-	atexit(SdlAudioSink::CleanupLibrary);
+	Playd::Audio::SDLSink::InitLibrary();
+	atexit(Playd::Audio::SDLSink::CleanupLibrary);
 
 #ifdef WITH_MP3
 	// mpg123 insists on us running its init and exit functions, too.
@@ -169,30 +174,29 @@ int main(int argc, char *argv[])
 	atexit(mpg123_exit);
 #endif // WITH_MP3
 
-	auto args = MakeArgVector(argc, argv);
+	auto args = Playd::MakeArgVector(argc, argv);
 
-	auto device_id = GetDeviceID(args);
-	if (device_id < 0) ExitWithUsage(args.at(0));
+	auto device_id = Playd::GetDeviceID(args);
+	if (device_id < 0) Playd::ExitWithUsage(args.at(0));
 
-	Player player(device_id,
-	              &std::make_unique<SdlAudioSink, const AudioSource &, int>,
-	              SOURCES);
+	Playd::Player player{
+            device_id,
+            &std::make_unique<Playd::Audio::SDLSink, const Playd::Audio::Source &, int>,
+            Playd::SOURCES};
 
 	// Set up the IO now (to avoid a circular dependency).
 	// Make sure the player broadcasts its responses back to the IoCore.
-	IoCore io(player);
+	Playd::IO::Core io{player};
 	player.SetIo(io);
 
 	// Now, actually run the IO loop.
-	std::string host;
-	std::string port;
-	std::tie(host, port) = GetHostAndPort(args);
+	auto [host, port] = Playd::GetHostAndPort(args);
 	try {
 		io.Run(host, port);
 	} catch (NetError &e) {
-		ExitWithNetError(host, port, e.Message());
+		Playd::ExitWithNetError(host, port, e.Message());
 	} catch (Error &e) {
-		ExitWithError(e.Message());
+		Playd::ExitWithError(e.Message());
 	}
 
 	return EXIT_SUCCESS;

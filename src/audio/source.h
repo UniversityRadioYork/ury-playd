@@ -3,28 +3,31 @@
 
 /**
  * @file
- * Declaration of the AudioSource class.
+ * Declaration of the Audio_source class.
  * @see audio/audio_source.cpp
  */
 
-#ifndef PLAYD_AUDIO_SOURCE_HPP
-#define PLAYD_AUDIO_SOURCE_HPP
+#ifndef PLAYD_SOURCE_H
+#define PLAYD_SOURCE_H
 
+#include <chrono>
 #include <cstdint>
 #include <string>
 #include <vector>
 
-#include "../errors.hpp"
-#include "sample_formats.hpp"
+#include "../errors.h"
+#include "sample_format.h"
 
+namespace Playd::Audio
+{
 /**
  * An object responsible for decoding an audio file.
  *
- * AudioSource is an abstract base class, implemented separately for each
+ * Source is an abstract base class, implemented separately for each
  * supported audio file format.
  *
- * @see Mp3AudioSource
- * @see SndfileAudioSource
+ * @see MP3Source
+ * @see SndfileSource
  *
  * @note When we refer to 'samples' in this class, this usually refers to
  *   the smallest unit of data for *all* channels.  Some audio decoders
@@ -32,34 +35,30 @@
  *   there are exactly ChannelCount() of their samples to one of ours.
  *   We usually call this a 'mono sample'.
  */
-class AudioSource
+class Source
 {
 public:
 	/// An enumeration of possible states the decoder can be in.
 	enum class DecodeState : std::uint8_t {
-		/// The decoder is currently trying to acquire a frame.
-		WAITING_FOR_FRAME,
-		/// The decoder is currently decoding a frame.
-		DECODING,
-		/// The decoder has run out of things to decode.
-		END_OF_FILE
+		DECODING,   ///< The decoder is currently decoding a frame.
+		END_OF_FILE ///< The decoder has run out of things to decode.
 	};
 
 	/// Type of decoded sample vectors.
-	using DecodeVector = std::vector<std::uint8_t>;
+	using DecodeVector = std::vector<std::byte>;
 
 	/// Type of the result of Decode().
 	using DecodeResult = std::pair<DecodeState, DecodeVector>;
 
 	/**
-	 * Constructs an AudioSource.
+	 * Constructs an Audio_source.
 	 * @param path The path to the file from which this AudioSource is
 	 *   decoding.
 	 */
-	AudioSource(const std::string &path);
+	explicit Source(std::string_view path);
 
 	/// Virtual, empty destructor for AudioSource.
-	virtual ~AudioSource() = default;
+	virtual ~Source() = default;
 
 	//
 	// Methods that must be overridden
@@ -117,14 +116,14 @@ public:
 	 * Gets the file-path of this audio source's audio file.
 	 * @return The audio file's path.
 	 */
-	virtual const std::string &Path() const;
+	virtual std::string_view Path() const;
 
 	/**
 	 * Converts a position in microseconds to an elapsed sample count.
 	 * @param micros The song position, in microseconds.
 	 * @return The corresponding number of elapsed samples.
 	 */
-	virtual std::uint64_t SamplesFromMicros(std::uint64_t micros) const;
+	virtual Samples SamplesFromMicros(std::chrono::microseconds micros) const;
 
 	virtual std::uint64_t Length() const = 0;
 
@@ -133,11 +132,13 @@ public:
 	 * @param samples The number of elapsed samples.
 	 * @return The corresponding song position, in microseconds.
 	 */
-	std::uint64_t MicrosFromSamples(std::uint64_t samples) const;
+	std::chrono::microseconds MicrosFromSamples(Samples samples) const;
 
 protected:
 	/// The file-path of this AudioSource's audio file.
 	std::string path;
 };
 
-#endif // PLAYD_AUDIO_SOURCE_HPP
+} // namespace Playd::Audio
+
+#endif // PLAYD_SOURCE_H

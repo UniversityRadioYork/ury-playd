@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.11) # for workgroups
 
 project(playd)
 list(APPEND CMAKE_PREFIX_PATH "${playd_SOURCE_DIR}")
@@ -11,6 +11,9 @@ option(WITH_SNDFILE "Enable libsndfile support" ON)
 
 # Set version from git tag
 include(version)
+
+# Add in the location of the GSL, which expects itself to be in a system include directory
+include_directories("${playd_SOURCE_DIR}/src/contrib/GSL/include")
 
 # Find mandatory libraries
 find_package(SDL2 REQUIRED)
@@ -65,27 +68,37 @@ set(SRCS ${SRCS}
   src/response.cpp
   src/tokeniser.cpp
   src/audio/audio.cpp
-  src/audio/audio_sink.cpp
-  src/audio/audio_source.cpp
+  src/audio/sink.cpp
+  src/audio/source.cpp
   src/audio/ringbuffer.cpp
-  src/audio/sample_formats.cpp
-  src/contrib/pa_ringbuffer/pa_ringbuffer.c
+  src/audio/sample_format.cpp
   )
 set(tests_SRCS ${tests_SRCS}
   src/tests/dummy_audio_sink.cpp
   src/tests/dummy_audio_source.cpp
   src/tests/dummy_response_sink.cpp
   src/tests/errors.cpp
-  src/tests/io_response.cpp
+  src/tests/response.cpp
   src/tests/main.cpp
-  src/tests/no_audio.cpp
-  src/tests/pipe_audio.cpp
+  src/tests/null_audio.cpp
+  src/tests/basic_audio.cpp
   src/tests/player.cpp
   src/tests/ringbuffer.cpp
   src/tests/tokeniser.cpp
 )
 add_executable(playd ${SRCS} "src/main.cpp")
+target_compile_features(playd PUBLIC cxx_std_17)
+
 add_executable(playd_tests EXCLUDE_FROM_ALL ${SRCS} ${tests_SRCS})
+target_compile_features(playd_tests PUBLIC cxx_std_17)
+
+set_target_properties(playd playd_tests
+  PROPERTIES
+  CXX_STANDARD 17
+  CXX_STANDARD_REQUIRED ON
+  CXX_EXTENSIONS OFF
+)
+
 add_test(NAME playd_tests COMMAND playd_tests)
 
 # `make check` to both compile and run tests

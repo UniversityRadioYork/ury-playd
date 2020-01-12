@@ -3,28 +3,28 @@
 
 /**
  * @file
- * Definition of the DummyAudioSink class.
- * @see audio/audio_sink.hpp
+ * Definition of the DummyAudio_sink class.
+ * @see audio/audio_sink.h
  * @see tests/dummy_audio_sink.cpp
  */
 
-#include <cstdint>
+#include "dummy_audio_sink.h"
 
-#include "../audio/audio.hpp"
-#include "../audio/audio_sink.hpp"
-#include "dummy_audio_sink.hpp"
+#include "../audio/sink.h"
 
+namespace Playd::Tests
+{
 void DummyAudioSink::Start()
 {
-	this->state = Audio::State::PLAYING;
+	this->state = Audio::Sink::State::PLAYING;
 }
 
 void DummyAudioSink::Stop()
 {
-	this->state = Audio::State::STOPPED;
+	this->state = Audio::Sink::State::STOPPED;
 }
 
-Audio::State DummyAudioSink::State()
+Audio::Sink::State DummyAudioSink::CurrentState()
 {
 	return this->state;
 }
@@ -34,17 +34,19 @@ std::uint64_t DummyAudioSink::Position()
 	return this->position;
 }
 
-void DummyAudioSink::SetPosition(std::uint64_t samples)
+void DummyAudioSink::SetPosition(uint64_t samples)
 {
 	this->position = samples;
 }
 
 void DummyAudioSink::SourceOut()
 {
-	this->state = Audio::State::AT_END;
+	this->state = Audio::Sink::State::AT_END;
 }
 
-void DummyAudioSink::Transfer(AudioSink::TransferIterator &begin, const AudioSink::TransferIterator &end)
+size_t DummyAudioSink::Transfer(const gsl::span<const std::byte> src)
 {
-	begin = end;
+	return src.size();
 }
+
+} // namespace playd::tests

@@ -3,115 +3,125 @@
 
 /**
  * @file
- * Implementation of the PipeAudio class.
- * @see audio/pipe_audio.hpp
+ * Implementation of the NullAudio and BasicAudio classes.
+ * @see audio/audio.h
  */
 
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstdint>
-#include <string>
+#include "audio.h"
 
-#include "../errors.hpp"
+#include <chrono>
+#include <gsl/gsl>
+
+#include "../errors.h"
 #include "../messages.h"
-#include "../response.hpp"
-#include "audio.hpp"
-#include "audio_sink.hpp"
-#include "audio_source.hpp"
-#include "sample_formats.hpp"
+#include "sample_format.h"
+#include "sink.h"
+#include "source.h"
 
+namespace Playd::Audio
+{
 //
-// NoAudio
-//
-
-Audio::State NoAudio::Update()
-{
-	return Audio::State::NONE;
-}
-
-Audio::State NoAudio::CurrentState() const
-{
-	return Audio::State::NONE;
-}
-
-void NoAudio::SetPlaying(bool)
-{
-	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
-}
-
-void NoAudio::SetPosition(std::uint64_t)
-{
-	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
-}
-
-std::uint64_t NoAudio::Position() const
-{
-	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
-}
-
-std::uint64_t NoAudio::Length() const
-{
-	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
-}
-
-const std::string &NoAudio::File() const
-{
-	throw NoAudioError(MSG_CMD_NEEDS_LOADED);
-}
-
-//
-// PipeAudio
+// NullAudio
 //
 
-PipeAudio::PipeAudio(std::unique_ptr<AudioSource> src,
-                     std::unique_ptr<AudioSink> sink)
-    : src(std::move(src)), sink(std::move(sink))
+/// The error thrown if a Null_audio is asked to do something it can't do.
+NullAudioError NotSupportedInNullAudio()
+{
+	return NullAudioError{MSG_CMD_NEEDS_LOADED};
+}
+
+Audio::State NullAudio::Update()
+{
+	return State::NONE;
+}
+
+Audio::State NullAudio::CurrentState() const
+{
+	return State::NONE;
+}
+
+void NullAudio::SetPlaying(bool)
+{
+	throw NotSupportedInNullAudio();
+}
+
+void NullAudio::SetPosition(std::chrono::microseconds)
+{
+	throw NotSupportedInNullAudio();
+}
+
+std::chrono::microseconds NullAudio::Position() const
+{
+	throw NotSupportedInNullAudio();
+}
+
+std::chrono::microseconds NullAudio::Length() const
+{
+	throw NotSupportedInNullAudio();
+}
+
+std::string_view NullAudio::File() const
+{
+	throw NotSupportedInNullAudio();
+}
+
+//
+// BasicAudio
+//
+
+BasicAudio::BasicAudio(std::unique_ptr<Source> src, std::unique_ptr<Sink> sink)
+    : src{std::move(src)}, sink{std::move(sink)}
 {
 	this->ClearFrame();
 }
 
-const std::string &PipeAudio::File() const
+std::string_view BasicAudio::File() const
 {
 	return this->src->Path();
 }
 
-void PipeAudio::SetPlaying(bool playing)
+void BasicAudio::SetPlaying(bool playing)
 {
-	assert(this->sink != nullptr);
+	Expects(this->sink != nullptr);
 
 	if (playing) {
 		this->sink->Start();
+
+		// It's ok for the sink to be playing, ejected or at-end here.
+		Ensures(this->sink->CurrentState() != Audio::State::STOPPED);
 	} else {
 		this->sink->Stop();
+
+		// It's ok for the sink to be stopped, ejected or at-end here.
+		Ensures(this->sink->CurrentState() != Audio::State::PLAYING);
 	}
 }
 
-Audio::State PipeAudio::CurrentState() const
+Audio::State BasicAudio::CurrentState() const
 {
-	return this->sink->State();
+	return this->sink->CurrentState();
 }
 
-std::uint64_t PipeAudio::Position() const
+std::chrono::microseconds BasicAudio::Position() const
 {
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
 	return this->src->MicrosFromSamples(this->sink->Position());
 }
 
-std::uint64_t PipeAudio::Length() const
+std::chrono::microseconds BasicAudio::Length() const
 {
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
 	return this->src->MicrosFromSamples(this->src->Length());
 }
 
-void PipeAudio::SetPosition(std::uint64_t position)
+void BasicAudio::SetPosition(std::chrono::microseconds position)
 {
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
 	auto in_samples = this->src->SamplesFromMicros(position);
 	auto out_samples = this->src->Seek(in_samples);
@@ -122,67 +132,67 @@ void PipeAudio::SetPosition(std::uint64_t position)
 	this->ClearFrame();
 }
 
-void PipeAudio::ClearFrame()
+void BasicAudio::ClearFrame()
 {
 	this->frame.clear();
-	this->frame_iterator = this->frame.end();
+	this->frame_span = gsl::span<std::byte, 0>();
 }
 
-Audio::State PipeAudio::Update()
+Audio::State BasicAudio::Update()
 {
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
-	bool more_available = this->DecodeIfFrameEmpty();
+	const auto more_available = this->DecodeIfFrameEmpty();
 	if (!more_available) this->sink->SourceOut();
 
 	if (!this->FrameFinished()) this->TransferFrame();
 
-	return this->sink->State();
+	return this->sink->CurrentState();
 }
 
-void PipeAudio::TransferFrame()
+void BasicAudio::TransferFrame()
 {
-	assert(!this->frame.empty());
-	assert(this->sink != nullptr);
-	assert(this->src != nullptr);
+	Expects(!this->frame.empty());
+	Expects(this->sink != nullptr);
+	Expects(this->src != nullptr);
 
-	this->sink->Transfer(this->frame_iterator, this->frame.end());
+	auto written = this->sink->Transfer(this->frame_span);
+	this->frame_span = this->frame_span.last(this->frame_span.size() - written);
 
 	// We empty the frame once we're done with it.  This
 	// maintains FrameFinished(), as an empty frame is a finished one.
 	if (this->FrameFinished()) {
 		this->ClearFrame();
-		assert(this->FrameFinished());
+		Ensures(this->FrameFinished());
 	}
 
-	// The frame iterator should be somewhere between the beginning and
-	// end of the frame, unless the frame was emptied.
-	assert(this->frame.empty() ||
-	       (this->frame.begin() <= this->frame_iterator &&
-	        this->frame_iterator < this->frame.end()));
+	// The frame span should not be empty unless the frame was emptied.
+	Ensures(this->frame.empty() || !this->frame_span.empty());
 }
 
-bool PipeAudio::DecodeIfFrameEmpty()
+bool BasicAudio::DecodeIfFrameEmpty()
 {
 	// Either the current frame is in progress, or has been emptied.
 	// AdvanceFrameIterator() establishes this assertion by emptying a
 	// frame as soon as it finishes.
-	assert(this->frame.empty() || !this->FrameFinished());
+	Expects(this->frame.empty() || !this->FrameFinished());
 
 	// If we still have a frame, don't bother decoding yet.
 	if (!this->FrameFinished()) return true;
 
-	assert(this->src != nullptr);
-	AudioSource::DecodeResult result = this->src->Decode();
+	Expects(this->src != nullptr);
+	auto result = this->src->Decode();
 
 	this->frame = result.second;
-	this->frame_iterator = this->frame.begin();
+	this->frame_span = this->frame;
 
-	return result.first != AudioSource::DecodeState::END_OF_FILE;
+	return result.first != Source::DecodeState::END_OF_FILE;
 }
 
-bool PipeAudio::FrameFinished() const
+inline bool BasicAudio::FrameFinished() const
 {
-	return this->frame.end() <= this->frame_iterator;
+	return this->frame_span.empty();
 }
+
+} // namespace Playd::Audio

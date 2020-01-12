@@ -3,7 +3,7 @@ BasedOnStyle: Google
 
 AllowShortBlocksOnASingleLine:       false
 AllowShortFunctionsOnASingleLine:    None
-AllowShortIfStatementsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: Always
 BreakBeforeBraces:                   Linux
 Cpp11BracedListStyle:                true
 Language:                            Cpp
@@ -11,8 +11,10 @@ PointerAlignment:                    Right
 Standard:                            Cpp11
 UseTab:                              ForIndentation
 
+ForEachMacros: ['SCENARIO', 'GIVEN', 'WHEN', 'THEN']
+
 AccessModifierOffset:         -8
-ColumnLimit:                  80
+ColumnLimit:                  120
 SpacesBeforeTrailingComments:  1
 IndentWidth:                   8
 TabWidth:                      8

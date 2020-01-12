@@ -3,22 +3,24 @@
 
 /**
  * @file
- * Definition of the DummyAudioSource class.
- * @see audio/audio_source.hpp
+ * Definition of the DummyAudio_source class.
+ * @see audio/audio_source.h
  * @see tests/dummy_audio_source.cpp
  */
 
+#include "dummy_audio_source.h"
+
 #include <cstdint>
 
-#include "../audio/audio.hpp"
-#include "../audio/audio_source.hpp"
-#include "dummy_audio_source.hpp"
+#include "../audio/sample_format.h"
+#include "../audio/source.h"
 
-AudioSource::DecodeResult DummyAudioSource::Decode()
+namespace Playd::Tests
 {
-	auto state = run_out ? AudioSource::DecodeState::END_OF_FILE
-	                     : AudioSource::DecodeState::DECODING;
-	return std::make_pair(state, AudioSource::DecodeVector());
+Audio::Source::DecodeResult DummyAudioSource::Decode()
+{
+	auto state = run_out ? Audio::Source::DecodeState::END_OF_FILE : Audio::Source::DecodeState::DECODING;
+	return std::make_pair(state, Audio::Source::DecodeVector());
 }
 
 std::uint8_t DummyAudioSource::ChannelCount() const
@@ -31,18 +33,18 @@ std::uint32_t DummyAudioSource::SampleRate() const
 	return 44100;
 }
 
-SampleFormat DummyAudioSource::OutputSampleFormat() const
+Audio::SampleFormat DummyAudioSource::OutputSampleFormat() const
 {
-	return SampleFormat::PACKED_SIGNED_INT_32;
+	return Audio::SampleFormat::SINT32;
 }
 
-std::uint64_t DummyAudioSource::Seek(std::uint64_t position)
+std::uint64_t DummyAudioSource::Seek(std::uint64_t new_position)
 {
-	this->position = position;
+	this->position = new_position;
 	return this->position;
 }
 
-const std::string &DummyAudioSource::Path() const
+std::string_view DummyAudioSource::Path() const
 {
 	return this->path;
 }
@@ -51,3 +53,4 @@ std::uint64_t DummyAudioSource::Length() const
 {
 	return 0;
 }
+} // namespace Playd::Tests

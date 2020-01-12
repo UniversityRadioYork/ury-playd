@@ -3,24 +3,29 @@
 
 /**
  * @file
- * Declaration of the Audio class.
+ * Declaration of the Basic_audio, Null_audio and Audio classes.
  * @see audio/audio.cpp
  */
 
-#ifndef PLAYD_AUDIO_HPP
-#define PLAYD_AUDIO_HPP
+#ifndef PLAYD_AUDIO_H
+#define PLAYD_AUDIO_H
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "../response.hpp"
-#include "audio_source.hpp"
+#undef max
+#include <gsl/gsl>
 
-class AudioSink;
+#include "../response.h"
+#include "sink.h"
+#include "source.h"
 
+namespace Playd::Audio
+{
 /**
  * An audio item.
  *
@@ -35,16 +40,8 @@ class AudioSink;
 class Audio
 {
 public:
-	/**
-	 * Enumeration of possible states for this Audio.
-	 * @see Update
-	 */
-	enum class State : uint8_t {
-		NONE,    ///< There is no Audio.
-		STOPPED, ///< The Audio has been stopped, or not yet played.
-		PLAYING, ///< The Audio is currently playing.
-		AT_END,  ///< The Audio has ended and can't play without a seek.
-	};
+	/// Enumeration of possible states for Audio.
+	using State = Sink::State;
 
 	/// Virtual, empty destructor for Audio.
 	virtual ~Audio() = default;
@@ -78,7 +75,7 @@ public:
 	 * @exception NoAudioError if the current state is NONE.
 	 * @see Position
 	 */
-	virtual void SetPosition(std::uint64_t position) = 0;
+	virtual void SetPosition(std::chrono::microseconds position) = 0;
 
 	//
 	// Property access
@@ -89,13 +86,13 @@ public:
 	 * @return The filename of this current file.
 	 * @exception NoAudioError if the current state is NONE.
 	 */
-	virtual const std::string &File() const = 0;
+	virtual std::string_view File() const = 0;
 
 	/**
 	 * The state of this Audio.
 	 * @return this Audio's current state.
 	 */
-	virtual Audio::State CurrentState() const = 0;
+	virtual State CurrentState() const = 0;
 
 	/**
 	 * This Audio's current position.
@@ -107,9 +104,16 @@ public:
 	 * @exception NoAudioError if the current state is NONE.
 	 * @see Seek
 	 */
-	virtual std::uint64_t Position() const = 0;
+	virtual std::chrono::microseconds Position() const = 0;
 
-	virtual std::uint64_t Length() const = 0;
+	/**
+	 * This Audio's length.
+	 *
+	 * @return The length, in microseconds.
+	 * @exception NoAudioError if the current state is NONE.
+	 * @see Seek
+	 */
+	virtual std::chrono::microseconds Length() const = 0;
 };
 
 /**
@@ -121,67 +125,74 @@ public:
  *
  * @see Audio
  */
-class NoAudio : public Audio
+class NullAudio : public Audio
 {
 public:
 	Audio::State Update() override;
+
 	Audio::State CurrentState() const override;
 
 	// The following all raise an exception:
 
 	void SetPlaying(bool playing) override;
-	void SetPosition(std::uint64_t position) override;
-	std::uint64_t Position() const override;
-	std::uint64_t Length() const override;
-	const std::string &File() const override;
+
+	void SetPosition(std::chrono::microseconds position) override;
+
+	std::chrono::microseconds Position() const override;
+
+	std::chrono::microseconds Length() const override;
+
+	std::string_view File() const override;
 };
 
 /**
  * A concrete implementation of Audio as a 'pipe'.
  *
- * PipeAudio is comprised of a 'source', which decodes frames from a
+ * Basic_audio is comprised of a 'source', which decodes frames from a
  * file, and a 'sink', which plays out the decoded frames.  Updating
  * consists of shifting frames from the source to the sink.
  *
  * @see Audio
- * @see AudioSink
- * @see AudioSource
+ * @see Sink
+ * @see Source
  */
-class PipeAudio : public Audio
+class BasicAudio : public Audio
 {
 public:
 	/**
-	 * Constructs a PipeAudio from a source and a sink.
+	 * Constructs audio from a source and a sink.
 	 * @param src The source of decoded audio frames.
 	 * @param sink The target of decoded audio frames.
 	 * @see AudioSystem::Load
 	 */
-	PipeAudio(std::unique_ptr<AudioSource> src,
-	          std::unique_ptr<AudioSink> sink);
+	BasicAudio(std::unique_ptr<Source> src, std::unique_ptr<Sink> sink);
 
 	Audio::State Update() override;
-	const std::string &File() const override;
+
+	std::string_view File() const override;
 
 	void SetPlaying(bool playing) override;
+
 	Audio::State CurrentState() const override;
 
-	void SetPosition(std::uint64_t position) override;
-	std::uint64_t Position() const override;
+	void SetPosition(std::chrono::microseconds position) override;
 
-	std::uint64_t Length() const override;
+	std::chrono::microseconds Position() const override;
+
+	std::chrono::microseconds Length() const override;
 
 private:
 	/// The source of audio data.
-	std::unique_ptr<AudioSource> src;
+	std::unique_ptr<Source> src;
 
 	/// The sink to which audio data is sent.
-	std::unique_ptr<AudioSink> sink;
+	std::unique_ptr<Sink> sink;
 
 	/// The current decoded frame.
-	AudioSource::DecodeVector frame;
+	Source::DecodeVector frame;
 
-	/// The current position in the current decoded frame.
-	AudioSource::DecodeVector::iterator frame_iterator;
+	/// A span representing the unclaimed part of the decoded frame.
+	gsl::span<const std::byte> frame_span;
 
 	/// Clears the current frame and its iterator.
 	void ClearFrame();
@@ -205,4 +216,6 @@ private:
 	void TransferFrame();
 };
 
-#endif // PLAYD_AUDIO_HPP
+} // namespace Playd::Audio
+
+#endif // PLAYD_AUDIO_H

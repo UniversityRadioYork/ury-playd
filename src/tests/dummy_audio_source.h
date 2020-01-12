@@ -4,32 +4,39 @@
 /**
  * @file
  * Declaration of the DummyAudioSource class.
- * @see audio/audio_source.hpp
+ * @see audio/audio_source.h
  * @see tests/dummy_audio_source.cpp
  */
 
 #include <cstdint>
 
-#include "../audio/audio.hpp"
-#include "../audio/audio_source.hpp"
+#include "../audio/sample_format.h"
+#include "../audio/source.h"
 
-/// Dummy AudioSource, for testing PipeAudio.
-class DummyAudioSource : public AudioSource
+namespace Playd::Tests
+{
+/// Dummy audio source, for testing audio pipelines.
+class DummyAudioSource : public Audio::Source
 {
 public:
 	/**
-	 * Constructs a DummyAudioSource.
-	 * @param path The path of the file this DummyAudioSource 'represents'.
+	 * Constructs a Dummy_audio_source.
+	 * @param path The path of the file this Dummy_audio_source 'represents'.
 	 */
-	DummyAudioSource(const std::string &path) : AudioSource(path) {};
-	AudioSource::DecodeResult Decode() override;
+	DummyAudioSource(std::string_view path) : Audio::Source(path){};
+
+	Audio::Source::DecodeResult Decode() override;
+
 	std::uint8_t ChannelCount() const override;
+
 	std::uint32_t SampleRate() const override;
-	SampleFormat OutputSampleFormat() const override;
+
+	Audio::SampleFormat OutputSampleFormat() const override;
+
 	std::uint64_t Seek(std::uint64_t position) override;
 
 	/// @return The path of the DummyAudioSource.
-	const std::string &Path() const override;
+	std::string_view Path() const override;
 
 	/// @return The length of the DummyAudioSource.
 	std::uint64_t Length() const override;
@@ -40,3 +47,5 @@ public:
 	/// If true, the audio source will claim it has run out.
 	bool run_out = false;
 };
+
+} // namespace Playd::Tests
