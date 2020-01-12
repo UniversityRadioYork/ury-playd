@@ -239,6 +239,7 @@ SCENARIO ("Player handles End requests correctly", "[player]") {
 				REQUIRE(os.str() ==
 				        "! END\n"
 				        "! STOP\n"
+					"! POS 0\n" // auto-issued POS after STOP
 				        "! POS 0\n");
 			}
 		}
