@@ -14,7 +14,6 @@
 
 #include "../errors.h"
 #include "../messages.h"
-#include "sample_format.h"
 #include "sink.h"
 #include "source.h"
 

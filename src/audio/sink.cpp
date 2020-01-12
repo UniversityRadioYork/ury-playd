@@ -12,11 +12,9 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <memory>
 #include <string>
 
 #include "../errors.h"
-#include "../messages.h"
 #include "SDL.h"
 #include "ringbuffer.h"
 #include "sample_format.h"

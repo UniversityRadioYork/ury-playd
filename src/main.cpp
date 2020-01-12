@@ -9,9 +9,7 @@
 
 #include <algorithm>
 #include <charconv>
-#include <cstdint>
 #include <iostream>
-#include <tuple>
 
 #include "io.h"
 #include "messages.h"

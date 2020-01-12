@@ -7,7 +7,6 @@
  * @see tokeniser.h
  */
 
-#include <algorithm>
 #include <locale>
 #include <gsl/gsl>
 

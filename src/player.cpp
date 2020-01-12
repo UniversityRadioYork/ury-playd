@@ -10,10 +10,7 @@
 #include <cassert>
 #include <chrono>
 #include <cstdint>
-#include <sstream>
-#include <stdexcept>
 #include <string>
-#include <vector>
 
 #include "audio/audio.h"
 #include "audio/sink.h"
