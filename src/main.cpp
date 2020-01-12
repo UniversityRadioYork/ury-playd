@@ -58,15 +58,19 @@ namespace Playd {
         return args;
     }
 
-    int GetDeviceIDFromArg(std::string_view arg) {
-        int id = -1;
+    int GetDeviceIDFromArg(const std::string_view arg) {
+	    auto id = -1;
 
-        // Parse, but only accept valid numbers (for which ec is empty)
-        auto[p, ec] = std::from_chars(arg.cbegin(), arg.cend(), id);
+    	// MSVC doesn't support casting of string_view_iterator to const char*,
+    	// so we have to do some strange pointer fun.
+		const auto begin_ptr = &*arg.cbegin();
+		// Parse, but only accept valid numbers (for which ec is empty).
+    	auto[p, ec] = std::from_chars(begin_ptr, begin_ptr + arg.size(), id);
         if (ec == std::errc::invalid_argument) {
             std::cerr << "not a valid device ID: " << arg << std::endl;
             return -1;
-        } else if (ec == std::errc::result_out_of_range) {
+        }
+    	if (ec == std::errc::result_out_of_range) {
             std::cerr << "device ID too large: " << arg << std::endl;
             return -1;
         }
