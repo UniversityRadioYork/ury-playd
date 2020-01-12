@@ -205,6 +205,11 @@ namespace Playd {
 
         this->DumpState(0, Response::NOREQUEST);
 
+        // It can be helpful to know precisely where the player changed its
+        // playing state, and it doesn't really harm us if we're overly chatty
+        // in announcing it.
+        this->BroadcastPos(Response::NOREQUEST, this->file->Position());
+
         return Response::Success(tag);
     }
 
