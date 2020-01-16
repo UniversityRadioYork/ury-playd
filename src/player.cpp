@@ -107,7 +107,9 @@ namespace Playd {
 
     Response Player::End(Response::Tag tag) {
         if (this->dead) return PlayerDead(tag);
-
+        if (this->file->CurrentState() == Audio::Sink::State::NONE)
+            return Response::Invalid(tag, MSG_CMD_NEEDS_LOADED);
+    	
         // Let upstream know that the file ended by itself.
         // This is needed for auto-advancing playlists, etc.
         this->Respond(0, Response(Response::NOREQUEST, Response::Code::END));
@@ -117,7 +119,11 @@ namespace Playd {
         // Rewind the file back to the start.  We can't use Player::Pos() here
         // in case End() is called from Pos(); a seek failure could start an
         // infinite loop.
-        this->PosRaw(Response::NOREQUEST, std::chrono::microseconds{0});
+        try {
+            this->PosRaw(Response::NOREQUEST, std::chrono::microseconds{0});
+        } catch (NullAudioError &) {
+            return Response::Invalid(tag, MSG_CMD_NEEDS_LOADED);
+        }
 
         return Response::Success(tag);
     }
