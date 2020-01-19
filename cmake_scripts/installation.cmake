@@ -10,5 +10,4 @@ install(FILES src/playd.1       DESTINATION ${CMAKE_INSTALL_PREFIX}/${mandir})
 
 # Licenses
 install(FILES LICENSE.txt       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
-install(FILES LICENSE.portaudio DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
 install(FILES LICENSE.catch     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/licenses/ury-playd)
