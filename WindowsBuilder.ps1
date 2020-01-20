@@ -99,10 +99,6 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     Check-Python $vstring
     Write-Host " found!`n" -ForegroundColor Yellow
 
-    # These screw up libuv searching for MSVC.
-    Remove-Item Env:\VCINSTALLDIR -ErrorAction SilentlyContinue
-    Remove-Item Env:\WindowsSDKDir -ErrorAction SilentlyContinue
-
     cmake --version
 
     switch ($arch) {
@@ -137,7 +133,8 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     Write-Yellow "Creating MPG123 lib..."
     cd "$releasedir"
     mv "libmpg123-0.dll.def" "libmpg123-0.def"
-    lib /def:"libmpg123-0.def" /out:"$libdir\libmpg123-0.lib" /machine:"$arch"
+    Write-Yellow "VCINSTALLDIR: $env:VCINSTALLDIR"
+    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" lib /def:libmpg123-0.def /out:"$libdir\libmpg123-0.lib" /machine:"$arch"
     rm "libmpg123-0.def"
 
     Write-Yellow "Downloading sndfile..."
@@ -161,7 +158,16 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     git clone "$url_libuv"
     Write-Yellow "Compiling libuv..."
     cd "libuv"
-    cmd /c "vcbuild.bat" "$arch" "release" "shared"
+
+    Write-Yellow "Generating libuv VS2017 project..."
+    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "vcbuild.bat" "vs2017" "$arch" "release" "shared" "nobuild"
+    Write-Yellow "Upgrading libuv project to VS2019..."
+    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "devenv" "uv.sln" "/Upgrade"
+    Write-Yellow "Upgrading libuv tests project to VS2019..."
+    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "devenv" "test\test.sln" "/Upgrade"
+    Write-Yellow "Building libuv..."
+    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "vcbuild.bat" "vs2017" "$arch" "release" "shared" "noprojgen"
+    Write-Yellow "Copying libuv libs and headers..."
     cp "Release/*.lib" "$libdir/"
     cp "include/*" "$includedir/"
     cp "Release/*.dll" "$releasedir/"
@@ -175,9 +181,10 @@ function BuildPlayd ($arch, $archdir, $build, $tests, $check) {
     $oldpwd = $pwd
     cd "$build"
 
+    $cmake_generator = "Visual Studio 16 2019";
     switch ($arch) {
-        "x86" { $cmake_generator = "Visual Studio 14 2015"; $msbuild_platform = "Win32" }
-        "x64" { $cmake_generator = "Visual Studio 14 2015 Win64"; $msbuild_platform = "x64" }
+        "x86" { $msbuild_platform = "Win32" }
+        "x64" { $msbuild_platform = "x64" }
     }
     $targets = "playd"
     if ($tests -Or $check) {
@@ -185,9 +192,9 @@ function BuildPlayd ($arch, $archdir, $build, $tests, $check) {
     }
 
     Write-Yellow "Running cmake..."
-    cmake "$project" -G "$cmake_generator" -DCMAKE_PREFIX_PATH="$archdir"
+    cmd /c "`"$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat`" $arch & cmake `"$project`" -G `"$cmake_generator`" -A `"$msbuild_platform`" -DCMAKE_PREFIX_PATH=`"$archdir`""
     Write-Yellow "Running msbuild..."
-    msbuild playd.sln /p:Configuration="Release" /toolsversion:14.0 /p:Platform="$msbuild_platform" /p:PlatformToolset=v140 /t:"$targets" /m
+    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" $arch "&" msbuild playd.sln /p:Configuration="Release" /p:Platform="$msbuild_platform" /t:"$targets" /m
     if ($check) {
         ctest --force-new-ctest-process -C Release
     }
@@ -197,15 +204,13 @@ function BuildPlayd ($arch, $archdir, $build, $tests, $check) {
 
 function Load-MSVC-Vars {
     #Set environment variables for Visual Studio Command Prompt
-    pushd "$env:VS140COMNTOOLS"
-    cmd /c "vsvars32.bat&set" |
+    cmd /c "vswhere_usability_wrapper.cmd&set" |
     ForEach-Object {
         if ($_ -match "=") {
             $v = $_.split("="); Set-Item -Force -Path "ENV:\$($v[0])" -Value "$($v[1])"
         }
     }
-    popd
-    Write-Yellow "Visual Studio 2015 Command Prompt variables set."
+    Write-Yellow "Visual Studio 2019 Command Prompt variables set."
 }
 
 
