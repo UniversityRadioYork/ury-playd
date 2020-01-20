@@ -4,5 +4,6 @@ if(NOT CPACK_GENERATOR)
 endif()
 SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libmpg123 libsndfile libuv1 libsdl2")
 SET(CPACK_PACKAGE_NAME "ury-playd")
+SET(CPACK_PACKAGE_VENDOR "University Radio York")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "University Radio York") #required
 INCLUDE(CPack)
