@@ -169,7 +169,7 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "vcbuild.bat" "vs2017" "$arch" "release" "shared" "noprojgen"
     Write-Yellow "Copying libuv libs and headers..."
     cp "Release/*.lib" "$libdir/"
-    cp "include/*" "$includedir/"
+    cp -r "include/*" "$includedir/"
     cp "Release/*.dll" "$releasedir/"
     cp "LICENSE" "$releasedir/LICENSE.libuv"
     cd "$oldpwd"
