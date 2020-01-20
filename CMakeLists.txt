@@ -1,16 +1,20 @@
 cmake_minimum_required(VERSION 3.11) # for workgroups
 
-project(playd)
-list(APPEND CMAKE_PREFIX_PATH "${playd_SOURCE_DIR}")
-list(APPEND CMAKE_MODULE_PATH "${playd_SOURCE_DIR}/cmake_scripts")
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_scripts")
+
+# Set version from git tag
+include(version)
+
+project(playd VERSION "${PROJECTVER}")
+
+# Debian package via cpack
+include(set_cpack_flags)
 
 # Try to build with mpg123 and sndfile by default
 # Override on the CLI: `cmake -DWITH_MPG123=OFF`
 option(WITH_MPG123 "Enable MPG123 support" ON)
 option(WITH_SNDFILE "Enable libsndfile support" ON)
-
-# Set version from git tag
-include(version)
 
 # Add in the location of the GSL, which expects itself to be in a system include directory
 include_directories("${playd_SOURCE_DIR}/src/contrib/GSL/include")
