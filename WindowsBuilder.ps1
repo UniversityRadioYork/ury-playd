@@ -159,12 +159,21 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     Write-Yellow "Compiling libuv..."
     cd "libuv"
 
+    # Disable building libuv tests (can't get the VS upgrade to work headlessly)
+    (Get-Content "vcbuild.bat") | 
+    Foreach-Object {
+        if ($_ -match "msbuild test\\test.sln") 
+        {
+            #Add Lines after the selected pattern 
+            "if `"%run%`"==`"`" goto exit"
+        }
+        $_ # send the current line to output
+    } | Set-Content "vcbuild.bat"
+
     Write-Yellow "Generating libuv VS2017 project..."
     cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "vcbuild.bat" "vs2017" "$arch" "release" "shared" "nobuild"
     Write-Yellow "Upgrading libuv project to VS2019..."
     cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "devenv" "uv.sln" "/Upgrade"
-    Write-Yellow "Upgrading libuv tests project to VS2019..."
-    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "devenv" "test\test.sln" "/Upgrade"
     Write-Yellow "Building libuv..."
     cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "vcbuild.bat" "vs2017" "$arch" "release" "shared" "noprojgen"
     Write-Yellow "Copying libuv libs and headers..."
