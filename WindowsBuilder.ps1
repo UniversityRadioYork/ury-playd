@@ -133,8 +133,8 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     Write-Yellow "Creating MPG123 lib..."
     cd "$releasedir"
     mv "libmpg123-0.dll.def" "libmpg123-0.def"
-    Write-Yellow "VCINSTALLDIR: $env:VCINSTALLDIR"
-    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" lib /def:libmpg123-0.def /out:"$libdir\libmpg123-0.lib" /machine:"$arch"
+    $libout = [System.IO.Path]::Combine($libdir, "libmpg123-0.lib")
+    Run-With-VC $arch "lib /def:libmpg123-0.def /out:`"$libout`" /machine:$arch"
     rm "libmpg123-0.def"
 
     Write-Yellow "Downloading sndfile..."
@@ -171,11 +171,11 @@ function BuildDeps ($arch, $downloads, $libdir, $includedir, $build) {
     } | Set-Content "vcbuild.bat"
 
     Write-Yellow "Generating libuv VS2017 project..."
-    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "vcbuild.bat" "vs2017" "$arch" "release" "shared" "nobuild"
+    Run-With-VC $arch "vcbuild.bat vs2017 $arch release shared nobuild"
     Write-Yellow "Upgrading libuv project to VS2019..."
-    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "devenv" "uv.sln" "/Upgrade"
+    Run-With-VC $arch "devenv uv.sln /Upgrade"
     Write-Yellow "Building libuv..."
-    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" "$arch" "&" "vcbuild.bat" "vs2017" "$arch" "release" "shared" "noprojgen"
+    Run-With-VC $arch "vcbuild.bat vs2017 $arch release shared noprojgen"
     Write-Yellow "Copying libuv libs and headers..."
     cp "Release/*.lib" "$libdir/"
     cp -r "include/*" "$includedir/"
@@ -201,9 +201,9 @@ function BuildPlayd ($arch, $archdir, $build, $tests, $check) {
     }
 
     Write-Yellow "Running cmake..."
-    cmd /c "`"$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat`" $arch & cmake `"$project`" -G `"$cmake_generator`" -A `"$msbuild_platform`" -DCMAKE_PREFIX_PATH=`"$archdir`""
+    Run-With-VC $arch "cmake `"$project`" -G `"$cmake_generator`" -A $msbuild_platform -DCMAKE_PREFIX_PATH=`"$archdir`""
     Write-Yellow "Running msbuild..."
-    cmd /c "$env:VCINSTALLDIR\Auxiliary\Build\vcvarsall.bat" $arch "&" msbuild playd.sln /p:Configuration="Release" /p:Platform="$msbuild_platform" /t:"$targets" /m
+    Run-With-VC $arch "msbuild playd.sln /p:Configuration=Release /p:Platform=$msbuild_platform /t:$targets /m"
     if ($check) {
         ctest --force-new-ctest-process -C Release
     }
@@ -212,16 +212,37 @@ function BuildPlayd ($arch, $archdir, $build, $tests, $check) {
 
 
 function Load-MSVC-Vars {
-    #Set environment variables for Visual Studio Command Prompt
+    # Grab %VCINSTALLDIR%
     cmd /c "vswhere_usability_wrapper.cmd&set" |
     ForEach-Object {
-        if ($_ -match "=") {
-            $v = $_.split("="); Set-Item -Force -Path "ENV:\$($v[0])" -Value "$($v[1])"
+        if ($_ -match "VCINSTALLDIR=") {
+            $vcinstalldir = $_.split("=")[1];
         }
     }
-    Write-Yellow "Visual Studio 2019 Command Prompt variables set."
+
+    if ($vcinstalldir) {
+        Write-Yellow "Visual Studio 2019 found at '$vcinstalldir'"
+    } else {
+        Throw "Could not find Visual Studio 2019."
+    }
+
+    $batpath = "Auxiliary\Build\vcvarsall.bat"
+    $global:vcvarsall = "$([System.IO.Path]::Combine($vcinstalldir, $batpath))"
+    if ( -not (Test-Path $vcvarsall) ) {
+        Throw "Could not find '$vcvarsall'"
+    }
 }
 
+# Run a command in a vcvars environment.
+# Use literal quotes to surround paths with spaces.
+function Run-With-VC {
+    Param
+    (
+        [Parameter(Mandatory=$True)][string]$arch,
+        [Parameter(Mandatory=$True)][string]$cmd
+    )
+    cmd /s /c "`"$vcvarsall`" $arch & $cmd"
+}
 
 # Check if an exe is Python 2.7.
 function Check-Python-Version ($pypath, $vstring) {
