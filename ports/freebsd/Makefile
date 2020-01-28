@@ -39,11 +39,6 @@ SNDFILE_CMAKE_BOOL=	WITH_SNDFILE
 
 OPTIONS_DEFAULT?=	MPG123 SNDFILE
 
-# Add PortAudio license to the playd license file, because they're
-# both MIT.
-pre-install:
-	${CAT} "${WRKSRC}/LICENSE.portaudio" >> "${WRKSRC}/LICENSE.txt"
-
 .include <bsd.port.options.mk>
 
 .include <bsd.port.mk>

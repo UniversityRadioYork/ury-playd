@@ -210,9 +210,8 @@ philosophy.
 ## Legal
 
 All original code is licenced under the [MIT licence] (see LICENSE.txt).
-Some code is taken from the [PortAudio] project (see LICENSE.portaudio),
-as well as [CATCH] (see LICENSE.catch).  The various CMake scripts come
-with their licence information attached.
+Some code is taken from the [CATCH] project (see LICENSE.catch).
+The various CMake scripts come with their licence information attached.
 
 
 [Arch Linux]:             https://www.archlinux.org/
