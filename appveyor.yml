@@ -4,13 +4,8 @@
 #
 #-----------------------------------------------------------------------------
 
-# Disable builds until this script is fixed
-branches:
-  only:
-    - fix-appveyor
-
 # Operating system (build VM template)
-os: Visual Studio 2015
+os: Visual Studio 2019
 
 matrix:
   # Abort all the builds as soon as one fails.
