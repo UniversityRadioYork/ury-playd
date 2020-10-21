@@ -100,7 +100,7 @@ Additional dependencies for building without CMake:
 
 All dependencies are available in [homebrew].
 
-	URYs-Mac:ury-playd ury$ homebrew install cmake mpg123 libsndfile libuv sdl2
+	URYs-Mac:ury-playd ury$ brew install cmake mpg123 libsndfile libuv sdl2 cpp-gsl
 
 _Note: URY does not actually have a Mac._
 
